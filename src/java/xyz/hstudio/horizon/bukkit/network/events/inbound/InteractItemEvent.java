@@ -4,18 +4,15 @@ import org.bukkit.inventory.ItemStack;
 import xyz.hstudio.horizon.bukkit.data.HoriPlayer;
 import xyz.hstudio.horizon.bukkit.network.events.Event;
 import xyz.hstudio.horizon.bukkit.network.events.WrappedPacket;
-import xyz.hstudio.horizon.bukkit.util.Hand;
 
 public class InteractItemEvent extends Event {
 
     public final ItemStack itemStack;
-    public final Hand hand;
     public final InteractType interactType;
 
-    public InteractItemEvent(final HoriPlayer player, final ItemStack itemStack, final Hand hand, final InteractType interactType, final WrappedPacket packet) {
+    public InteractItemEvent(final HoriPlayer player, final ItemStack itemStack, final InteractType interactType, final WrappedPacket packet) {
         super(player, packet);
         this.itemStack = itemStack;
-        this.hand = hand;
         this.interactType = interactType;
     }
 

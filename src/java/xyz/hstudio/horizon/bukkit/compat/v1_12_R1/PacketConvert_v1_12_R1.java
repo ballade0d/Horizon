@@ -1,10 +1,11 @@
-package xyz.hstudio.horizon.bukkit.compat.v1_8_R3;
+package xyz.hstudio.horizon.bukkit.compat.v1_12_R1;
 
-import net.minecraft.server.v1_8_R3.*;
+import net.minecraft.server.v1_12_R1.*;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
-import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
-import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
 import org.bukkit.util.Vector;
 import xyz.hstudio.horizon.bukkit.compat.PacketConvert;
 import xyz.hstudio.horizon.bukkit.data.HoriPlayer;
@@ -14,7 +15,7 @@ import xyz.hstudio.horizon.bukkit.network.events.inbound.*;
 import xyz.hstudio.horizon.bukkit.util.BlockUtils;
 import xyz.hstudio.horizon.bukkit.util.Hand;
 
-public class PacketConvert_v1_8_R3 extends PacketConvert {
+public class PacketConvert_v1_12_R1 extends PacketConvert {
 
     @Override
     public Event convertIn(final HoriPlayer player, final Object packet) {
@@ -24,8 +25,8 @@ public class PacketConvert_v1_8_R3 extends PacketConvert {
             return convertMoveEvent(player, (PacketPlayInFlying) packet);
         } else if (packet instanceof PacketPlayInBlockDig) {
             return convertBlockBreakEvent(player, (PacketPlayInBlockDig) packet);
-        } else if (packet instanceof PacketPlayInBlockPlace) {
-            return convertBlockPlaceEvent(player, (PacketPlayInBlockPlace) packet);
+        } else if (packet instanceof PacketPlayInUseItem) {
+            return convertBlockPlaceEvent(player, (PacketPlayInUseItem) packet);
         } else if (packet instanceof PacketPlayInUseEntity) {
             return convertInteractEntityEvent(player, (PacketPlayInUseEntity) packet);
         } else if (packet instanceof PacketPlayInHeldItemSlot) {
@@ -70,14 +71,12 @@ public class PacketConvert_v1_8_R3 extends PacketConvert {
             updateRot = true;
             moveType = MoveEvent.MoveType.POSITION_LOOK;
         }
-        boolean hasPos = packet.g();
-        boolean hasLook = packet.h();
-        double x = hasPos ? packet.a() : player.position.getX();
-        double y = hasPos ? packet.b() : player.position.getY();
-        double z = hasPos ? packet.c() : player.position.getZ();
-        float yaw = hasLook ? packet.d() : player.position.getYaw();
-        float pitch = hasLook ? packet.e() : player.position.getPitch();
-        boolean onGround = packet.f();
+        double x = packet.a(player.position.getX());
+        double y = packet.b(player.position.getY());
+        double z = packet.c(player.position.getZ());
+        float yaw = packet.a(player.position.getYaw());
+        float pitch = packet.b(player.position.getPitch());
+        boolean onGround = packet.a();
         Location to = new Location(player.world, x, y, z, yaw, pitch);
         if (Math.abs(to.getX()) >= Integer.MAX_VALUE || Math.abs(to.getY()) >= Integer.MAX_VALUE || Math.abs(to.getZ()) >= Integer.MAX_VALUE ||
                 Double.isNaN(to.getX()) || Double.isNaN(to.getY()) || Double.isNaN(to.getZ())) {
@@ -127,39 +126,38 @@ public class PacketConvert_v1_8_R3 extends PacketConvert {
         return new InteractItemEvent(player, item, interactType, new WrappedPacket(packet));
     }
 
-    private Event convertBlockPlaceEvent(final HoriPlayer player, final PacketPlayInBlockPlace packet) {
-        org.bukkit.inventory.ItemStack bukkitItemStack = player.getHeldItem();
-        ItemStack itemStack = bukkitItemStack == null ? null : CraftItemStack.asNMSCopy(bukkitItemStack);
+    private Event convertBlockPlaceEvent(final HoriPlayer player, final PacketPlayInUseItem packet) {
+        ItemStack itemStack = ((CraftPlayer) player.player).getHandle().b(packet.c());
         BlockPosition bPos = packet.a();
         int x = bPos.getX();
         int y = bPos.getY();
         int z = bPos.getZ();
         Vector targetedPosition = new Vector(x, y, z);
         BlockPlaceEvent.BlockFace face;
-        switch (packet.getFace()) {
-            case 0:
-                face = BlockPlaceEvent.BlockFace.BOTTOM;
+        switch (packet.b()) {
+            case DOWN:
                 y -= 1;
+                face = BlockPlaceEvent.BlockFace.BOTTOM;
                 break;
-            case 1:
-                face = BlockPlaceEvent.BlockFace.TOP;
+            case UP:
                 y += 1;
+                face = BlockPlaceEvent.BlockFace.TOP;
                 break;
-            case 2:
-                face = BlockPlaceEvent.BlockFace.NORTH;
+            case NORTH:
                 z -= 1;
+                face = BlockPlaceEvent.BlockFace.NORTH;
                 break;
-            case 3:
-                face = BlockPlaceEvent.BlockFace.SOUTH;
+            case SOUTH:
                 z += 1;
+                face = BlockPlaceEvent.BlockFace.SOUTH;
                 break;
-            case 4:
-                face = BlockPlaceEvent.BlockFace.WEST;
+            case WEST:
                 x -= 1;
+                face = BlockPlaceEvent.BlockFace.WEST;
                 break;
-            case 5:
-                face = BlockPlaceEvent.BlockFace.EAST;
+            case EAST:
                 x += 1;
+                face = BlockPlaceEvent.BlockFace.EAST;
                 break;
             default:
                 face = BlockPlaceEvent.BlockFace.INVALID;
@@ -169,13 +167,10 @@ public class PacketConvert_v1_8_R3 extends PacketConvert {
         Location placed = new Location(player.world, x, y, z);
         if (!targetedPosition.equals(new Vector(-1, -1, -1))) {
             BlockPlaceEvent.PlaceType placeType = itemStack != null && itemStack.getItem() instanceof ItemBlock ? BlockPlaceEvent.PlaceType.PLACE_BLOCK : BlockPlaceEvent.PlaceType.INTERACT_BLOCK;
-            return new BlockPlaceEvent(player, placed, face, CraftItemStack.asBukkitCopy(itemStack).getType(), interaction, placeType, new WrappedPacket(packet));
-        } else {
-            if (bukkitItemStack == null) {
-                return null;
-            }
-            return new InteractItemEvent(player, bukkitItemStack, InteractItemEvent.InteractType.START_USE_ITEM, new WrappedPacket(packet));
+            // Does CraftItemStack#asBukkitCopy perform well?
+            return new BlockPlaceEvent(player, placed, face, itemStack == null ? org.bukkit.Material.AIR : CraftItemStack.asBukkitCopy(itemStack).getType(), interaction, placeType, new WrappedPacket(packet));
         }
+        return null;
     }
 
     private Event convertInteractEntityEvent(final HoriPlayer player, final PacketPlayInUseEntity packet) {

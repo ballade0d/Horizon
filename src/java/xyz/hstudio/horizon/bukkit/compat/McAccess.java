@@ -3,7 +3,12 @@ package xyz.hstudio.horizon.bukkit.compat;
 import io.netty.channel.ChannelPipeline;
 import lombok.Getter;
 import org.bukkit.entity.Player;
+import xyz.hstudio.horizon.bukkit.compat.v1_12_R1.McAccess_v1_12_R1;
+import xyz.hstudio.horizon.bukkit.compat.v1_13_R2.McAccess_v1_13_R2;
+import xyz.hstudio.horizon.bukkit.compat.v1_14_R1.McAccess_v1_14_R1;
+import xyz.hstudio.horizon.bukkit.compat.v1_15_R1.McAccess_v1_15_R1;
 import xyz.hstudio.horizon.bukkit.compat.v1_8_R3.McAccess_v1_8_R3;
+import xyz.hstudio.horizon.bukkit.util.Version;
 
 public abstract class McAccess {
 
@@ -11,14 +16,39 @@ public abstract class McAccess {
     private static McAccess inst;
 
     public static void init() {
-        inst = new McAccess_v1_8_R3();
+        switch (Version.VERSION) {
+            case v1_8:
+                inst = new McAccess_v1_8_R3();
+                break;
+            case v1_12:
+                inst = new McAccess_v1_12_R1();
+                break;
+            case v1_13:
+                inst = new McAccess_v1_13_R2();
+                break;
+            case v1_14:
+                inst = new McAccess_v1_14_R1();
+                break;
+            case v1_15:
+                inst = new McAccess_v1_15_R1();
+                break;
+        }
     }
 
     public abstract ChannelPipeline getPipeline(final Player player);
 
+    /**
+     * Fast sin method by using nms's ones
+     */
     public abstract float sin(final float v);
 
+    /**
+     * Fast cos method by using nms's ones
+     */
     public abstract float cos(final float v);
 
+    /**
+     * Check if a player has no hit cooldown
+     */
     public abstract boolean isAccumulated(final Player player);
 }

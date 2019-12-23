@@ -14,8 +14,7 @@ public enum Version {
     v1_15(573),
     UNKNOWN(0);
 
-    @Getter
-    private static final Version VERSION;
+    public static final Version VERSION;
 
     static {
         String rawVersion = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];

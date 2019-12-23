@@ -30,8 +30,8 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
 
     /**
      * An easy packet order check.
-     * This will detect post killaura
-     * Including LB's ones. Yes, it's like 10 lines.
+     * This will detect post killaura,
+     * including LB's ones. Yes, it's like 10 lines.
      *
      * @author MrCraftGoo
      */
