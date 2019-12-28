@@ -7,11 +7,11 @@ import java.util.Arrays;
 
 public enum Version {
 
-    v1_8(47),
-    v1_12(335),
-    v1_13(393),
-    v1_14(477),
-    v1_15(573),
+    v1_8_R3(47),
+    v1_12_R1(335),
+    v1_13_R2(393),
+    v1_14_R1(477),
+    v1_15_R1(573),
     UNKNOWN(0);
 
     public static final Version VERSION;
@@ -30,16 +30,16 @@ public enum Version {
     }
 
     public static Version getNearest(final int protocol) {
-        if (protocol >= v1_15.protocol) {
-            return v1_15;
-        } else if (protocol >= v1_14.protocol) {
-            return v1_14;
-        } else if (protocol >= v1_13.protocol) {
-            return v1_13;
-        } else if (protocol >= v1_12.protocol) {
-            return v1_12;
-        } else if (protocol >= v1_8.protocol) {
-            return v1_8;
+        if (protocol >= v1_15_R1.protocol) {
+            return v1_15_R1;
+        } else if (protocol >= v1_14_R1.protocol) {
+            return v1_14_R1;
+        } else if (protocol >= v1_13_R2.protocol) {
+            return v1_13_R2;
+        } else if (protocol >= v1_12_R1.protocol) {
+            return v1_12_R1;
+        } else if (protocol >= v1_8_R3.protocol) {
+            return v1_8_R3;
         }
         return UNKNOWN;
     }

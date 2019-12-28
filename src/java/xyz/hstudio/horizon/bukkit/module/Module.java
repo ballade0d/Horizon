@@ -1,5 +1,6 @@
 package xyz.hstudio.horizon.bukkit.module;
 
+import xyz.hstudio.horizon.bukkit.Logger;
 import xyz.hstudio.horizon.bukkit.api.ModuleType;
 import xyz.hstudio.horizon.bukkit.config.Config;
 import xyz.hstudio.horizon.bukkit.data.Data;
@@ -12,10 +13,13 @@ import java.util.concurrent.ConcurrentHashMap;
 public abstract class Module<K extends Data, V extends Config> {
 
     private static final Map<ModuleType, Module> moduleMap = new ConcurrentHashMap<>();
+
+    private final ModuleType moduleType;
     private final V config;
 
     public Module(final ModuleType moduleType, final V config) {
         // This throws a warn in IDE, tell me any suggestion if you have.
+        this.moduleType = moduleType;
         this.config = (V) config.load();
         Module.moduleMap.put(moduleType, this);
     }
@@ -46,10 +50,22 @@ public abstract class Module<K extends Data, V extends Config> {
      * @param runnable The tasks will be executed.
      * @author MrCraftGoo
      */
-    protected void punish(final HoriPlayer player, final K data, final String type, final double weight, final Runnable runnable) {
+    protected void punish(final HoriPlayer player, final K data, final String type, final double weight, final Runnable... runnable) {
         int lastVL = data.lastVL = (int) data.vL;
         double vL = data.vL += weight;
+
+        data.lastFailTick = player.currentTick;
         // TODO: Punish
+    }
+
+    /**
+     * Send a debug message to the console
+     */
+    protected void debug(final Object object) {
+        if (!this.config.debug) {
+            return;
+        }
+        Logger.info("DEBUG|" + this.moduleType.name(), object);
     }
 
     public abstract K getData(final HoriPlayer player);

@@ -9,6 +9,9 @@ import java.lang.reflect.Field;
 
 public abstract class Config {
 
+    // Will be loaded from config
+    public boolean debug = true;
+
     /**
      * A nice and easy way to load values from configuration
      *

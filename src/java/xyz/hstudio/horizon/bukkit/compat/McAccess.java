@@ -17,19 +17,19 @@ public abstract class McAccess {
 
     public static void init() {
         switch (Version.VERSION) {
-            case v1_8:
+            case v1_8_R3:
                 inst = new McAccess_v1_8_R3();
                 break;
-            case v1_12:
+            case v1_12_R1:
                 inst = new McAccess_v1_12_R1();
                 break;
-            case v1_13:
+            case v1_13_R2:
                 inst = new McAccess_v1_13_R2();
                 break;
-            case v1_14:
+            case v1_14_R1:
                 inst = new McAccess_v1_14_R1();
                 break;
-            case v1_15:
+            case v1_15_R1:
                 inst = new McAccess_v1_15_R1();
                 break;
         }

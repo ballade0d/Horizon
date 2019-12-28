@@ -5,10 +5,16 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import xyz.hstudio.horizon.bukkit.Horizon;
 import xyz.hstudio.horizon.bukkit.compat.McAccess;
+import xyz.hstudio.horizon.bukkit.data.checks.KillAuraData;
+import xyz.hstudio.horizon.bukkit.data.checks.ScaffoldData;
+import xyz.hstudio.horizon.bukkit.network.ChannelHandler;
 
 public class HoriPlayer {
 
+    public final KillAuraData killAuraData = new KillAuraData();
+    public final ScaffoldData scaffoldData = new ScaffoldData();
     public Player player;
     public long currentTick;
     public World world;
@@ -26,6 +32,10 @@ public class HoriPlayer {
         this.world = player.getWorld();
         this.position = player.getLocation();
         this.heldSlot = player.getInventory().getHeldItemSlot();
+
+        ChannelHandler.register(this, this.pipeline);
+
+        Horizon.PLAYERS.put(player.getUniqueId(), this);
     }
 
     /**

@@ -4,4 +4,6 @@ public abstract class Data {
 
     public double vL = 0;
     public int lastVL = 0;
+
+    public long lastFailTick = 0;
 }
