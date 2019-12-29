@@ -82,18 +82,16 @@ public class Location {
         return Math.sqrt(this.lengthSquared());
     }
 
-    // Math.pow(x, 2) is faster than x*x ?
     public double lengthSquared() {
-        return Math.pow(this.x, 2) + Math.pow(this.y, 2) + Math.pow(this.z, 2);
+        return NumberConversions.square(this.x) + NumberConversions.square(this.y) + NumberConversions.square(this.z);
     }
 
     public double distance(final Location loc) {
         return Math.sqrt(this.distanceSquared(loc));
     }
 
-    // Math.pow(x, 2) is faster than x*x ?
     public double distanceSquared(final Location loc) {
-        return Math.pow(this.x - loc.x, 2) + Math.pow(this.y - loc.y, 2) + Math.pow(this.z - loc.z, 2);
+        return NumberConversions.square(this.x - loc.x) + NumberConversions.square(this.y - loc.y) + NumberConversions.square(this.z - loc.z);
     }
 
     public Vector toVector() {

@@ -34,9 +34,11 @@ public class Horizon extends JavaPlugin {
     public void onEnable() {
         if (Version.VERSION == Version.UNKNOWN) {
             // Unknown version
+            Logger.info("INFO", "Your server version is not supported!");
             Bukkit.getPluginManager().disablePlugin(this);
             return;
         }
+
         McAccess.init();
         PacketConvert.init();
         new Listeners();

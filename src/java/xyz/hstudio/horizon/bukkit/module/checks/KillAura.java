@@ -3,6 +3,7 @@ package xyz.hstudio.horizon.bukkit.module.checks;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.NumberConversions;
 import org.bukkit.util.Vector;
 import xyz.hstudio.horizon.bukkit.api.ModuleType;
 import xyz.hstudio.horizon.bukkit.config.checks.KillAuraConfig;
@@ -204,7 +205,7 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
                         .orElse(0.0);
                 double stdDeviation = 0.0;
                 for (Integer i : data.moveInterval) {
-                    stdDeviation += Math.pow(i.doubleValue() - average, 2.0);
+                    stdDeviation += NumberConversions.square(i.doubleValue() - average);
                 }
 
                 // Customizable?
@@ -276,11 +277,12 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
             }
 
             boolean vectorDir = accelDir.clone().crossProduct(yaw).dot(new Vector(0, 1, 0)) >= 0;
-            double rawAngle = MathUtils.angle(accelDir, yaw);
-            double angle = (vectorDir ? 1 : -1) * rawAngle;
-            double multiple = angle / (Math.PI / 4);
+            double angle = (vectorDir ? 1 : -1) * MathUtils.angle(accelDir, yaw);
 
-            if (Math.abs(multiple - Math.floor(multiple)) > config.threshold && Math.abs(multiple - Math.ceil(multiple)) > config.threshold) {
+            double multiple = angle / (Math.PI / 4);
+            double threshold = config.max_angle * Math.PI / 180;
+
+            if (Math.abs(multiple - Math.floor(multiple)) > threshold && Math.abs(multiple - Math.ceil(multiple)) > threshold) {
                 this.debug("Failed: TypeF, a:" + angle);
 
                 // Punish

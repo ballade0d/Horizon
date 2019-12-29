@@ -40,17 +40,17 @@ public abstract class McAccess {
     public abstract ChannelPipeline getPipeline(final Player player);
 
     /**
-     * Fast sin method by using nms's ones
+     * Fast sin method by using nms's ones.
      */
     public abstract float sin(final float v);
 
     /**
-     * Fast cos method by using nms's ones
+     * Fast cos method by using nms's ones.
      */
     public abstract float cos(final float v);
 
     /**
-     * Check if a player has no hit cooldown
+     * Check if a player has no hit cooldown.
      */
     public abstract boolean isAccumulated(final Player player);
 
@@ -60,7 +60,7 @@ public abstract class McAccess {
     public abstract float getFriction(final Block block);
 
     /**
-     * Get the bounding box of a player
+     * Get the bounding box of a player.
      */
     public abstract AxisAlignedBB getCube(final Player player);
 }

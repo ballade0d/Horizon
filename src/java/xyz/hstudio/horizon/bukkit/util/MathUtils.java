@@ -11,6 +11,8 @@ public class MathUtils {
         return number / Math.pow(10, decimals);
     }
 
+    // Skidded from Bukkit lol.
+    // But I switched Math.sin and Math.cos to NMS's for better performance.
     public static Vector getDirection(final float yaw, final float pitch) {
         Vector vector = new Vector();
         float rotX = (float) Math.toRadians(yaw);

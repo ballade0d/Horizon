@@ -4,6 +4,7 @@ import org.bukkit.Effect;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.util.NumberConversions;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
@@ -133,7 +134,7 @@ public class AxisAlignedBB {
         double distX = Math.max(this.minX - vector.getX(), Math.max(0, vector.getX() - this.maxX));
         double distY = Math.max(this.minY - vector.getY(), Math.max(0, vector.getY() - this.maxY));
         double distZ = Math.max(this.minZ - vector.getZ(), Math.max(0, vector.getZ() - this.maxZ));
-        return Math.sqrt(Math.pow(distX, 2) + Math.pow(distY, 2) + Math.pow(distZ, 2));
+        return Math.sqrt(NumberConversions.square(distX) + NumberConversions.square(distY) + NumberConversions.square(distZ));
     }
 
     @Override
