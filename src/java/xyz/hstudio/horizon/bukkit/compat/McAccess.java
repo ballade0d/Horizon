@@ -2,12 +2,14 @@ package xyz.hstudio.horizon.bukkit.compat;
 
 import io.netty.channel.ChannelPipeline;
 import lombok.Getter;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import xyz.hstudio.horizon.bukkit.compat.v1_12_R1.McAccess_v1_12_R1;
 import xyz.hstudio.horizon.bukkit.compat.v1_13_R2.McAccess_v1_13_R2;
 import xyz.hstudio.horizon.bukkit.compat.v1_14_R1.McAccess_v1_14_R1;
 import xyz.hstudio.horizon.bukkit.compat.v1_15_R1.McAccess_v1_15_R1;
 import xyz.hstudio.horizon.bukkit.compat.v1_8_R3.McAccess_v1_8_R3;
+import xyz.hstudio.horizon.bukkit.util.AxisAlignedBB;
 import xyz.hstudio.horizon.bukkit.util.Version;
 
 public abstract class McAccess {
@@ -51,4 +53,14 @@ public abstract class McAccess {
      * Check if a player has no hit cooldown
      */
     public abstract boolean isAccumulated(final Player player);
+
+    /**
+     * Get the friction of a block.
+     */
+    public abstract float getFriction(final Block block);
+
+    /**
+     * Get the bounding box of a player
+     */
+    public abstract AxisAlignedBB getCube(final Player player);
 }

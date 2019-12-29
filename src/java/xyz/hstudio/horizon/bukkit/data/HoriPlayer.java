@@ -1,15 +1,16 @@
 package xyz.hstudio.horizon.bukkit.data;
 
 import io.netty.channel.ChannelPipeline;
-import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.Vector;
 import xyz.hstudio.horizon.bukkit.Horizon;
 import xyz.hstudio.horizon.bukkit.compat.McAccess;
 import xyz.hstudio.horizon.bukkit.data.checks.KillAuraData;
 import xyz.hstudio.horizon.bukkit.data.checks.ScaffoldData;
 import xyz.hstudio.horizon.bukkit.network.ChannelHandler;
+import xyz.hstudio.horizon.bukkit.util.Location;
 
 public class HoriPlayer {
 
@@ -20,8 +21,11 @@ public class HoriPlayer {
     public World world;
     public Location position;
     public int heldSlot;
+    public float friction;
+    public Vector velocity = new Vector(0, 0, 0);
     public boolean isSneaking;
     public boolean isSprinting;
+    public boolean isOnGround;
     public long hitSlowdownTick = -1;
     private ChannelPipeline pipeline;
 
@@ -30,7 +34,7 @@ public class HoriPlayer {
         this.pipeline = McAccess.getInst().getPipeline(player);
 
         this.world = player.getWorld();
-        this.position = player.getLocation();
+        this.position = new Location(player.getLocation());
         this.heldSlot = player.getInventory().getHeldItemSlot();
 
         ChannelHandler.register(this, this.pipeline);

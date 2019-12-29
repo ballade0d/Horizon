@@ -1,5 +1,6 @@
 package xyz.hstudio.horizon.bukkit.module.checks;
 
+import org.bukkit.block.Block;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
@@ -9,16 +10,11 @@ import xyz.hstudio.horizon.bukkit.data.HoriPlayer;
 import xyz.hstudio.horizon.bukkit.data.checks.KillAuraData;
 import xyz.hstudio.horizon.bukkit.module.Module;
 import xyz.hstudio.horizon.bukkit.network.events.Event;
-import xyz.hstudio.horizon.bukkit.network.events.inbound.ActionEvent;
-import xyz.hstudio.horizon.bukkit.network.events.inbound.InteractEntityEvent;
-import xyz.hstudio.horizon.bukkit.network.events.inbound.InteractItemEvent;
-import xyz.hstudio.horizon.bukkit.network.events.inbound.MoveEvent;
+import xyz.hstudio.horizon.bukkit.network.events.inbound.*;
 import xyz.hstudio.horizon.bukkit.util.MathUtils;
 import xyz.hstudio.horizon.bukkit.util.TimeUtils;
 
 public class KillAura extends Module<KillAuraData, KillAuraConfig> {
-
-    private final double EXPANDER = Math.pow(2, 24);
 
     public KillAura() {
         super(ModuleType.KillAura, new KillAuraConfig());
@@ -36,6 +32,7 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
         typeC(event, player, data, config);
         typeD(event, player, data, config);
         typeE(event, player, data, config);
+        typeF(event, player, data, config);
     }
 
     /**
@@ -144,85 +141,15 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
     }
 
     /**
-     * A Rotation check.
-     * It detects some aimbot and killaura.
-     * From Islandscout, I'll credit him.
-     * <p>
-     * Accuracy: 9/10 - Haven't found any false positives
-     * Efficiency: 3/10 - Very slow
-     *
-     * @author Islandscout
-     */
-    private void typeD(final Event event, final HoriPlayer player, final KillAuraData data, final KillAuraConfig config) {
-        if (event instanceof MoveEvent) {
-            MoveEvent e = (MoveEvent) event;
-            Vector mouseMove = new Vector(e.to.getYaw() - e.from.getYaw(), e.to.getPitch() - e.from.getPitch(), 0);
-            data.mouseMoves.add(mouseMove);
-            if (data.mouseMoves.size() > 5) {
-                data.mouseMoves.remove(0);
-            }
-
-            if (!clickedBefore(player, data)) {
-                return;
-            }
-
-            double minSpeed = Double.MAX_VALUE;
-            double maxSpeed = 0D;
-            double maxAngle = 0D;
-            for (int i = 1; i < data.mouseMoves.size(); i++) {
-                Vector lastMouseMove = data.mouseMoves.get(i - 1);
-                Vector currMouseMove = data.mouseMoves.get(i);
-                double speed = currMouseMove.length();
-                double lastSpeed = lastMouseMove.length();
-                double angle = (lastSpeed != 0 && lastSpeed != 0) ? MathUtils.angle(lastMouseMove, currMouseMove) : 0D;
-                if (Double.isNaN(angle)) {
-                    angle = 0D;
-                }
-                maxSpeed = Math.max(speed, maxSpeed);
-                minSpeed = Math.min(speed, minSpeed);
-                maxAngle = Math.max(angle, maxAngle);
-
-                if (maxSpeed - minSpeed > 4 && minSpeed < 0.01 && maxAngle < 0.1 && lastSpeed > 1) {
-                    this.debug("Failed: TypeD, ms:" + maxSpeed + ", ms:" + minSpeed + ", ma:" + maxAngle + ", ls:" + lastSpeed);
-
-                    // Punish
-                    this.punish(player, data, "TypeD", 0);
-                }
-            }
-        } else if (event instanceof InteractEntityEvent) {
-            long currTick = player.currentTick;
-            if (!data.clickTicks.contains(currTick)) {
-                data.clickTicks.add(currTick);
-            }
-            for (int i = data.clickTicks.size() - 1; i >= 0; i--) {
-                if (currTick - data.clickTicks.get(i) > 5) {
-                    data.clickTicks.remove(i);
-                }
-            }
-        }
-    }
-
-    private boolean clickedBefore(final HoriPlayer player, final KillAuraData data) {
-        long time = player.currentTick - 2;
-        for (int i = 0; i < data.clickTicks.size(); i++) {
-            if (time == data.clickTicks.get(i)) {
-                data.clickTicks.remove(i);
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
      * A GCD check.
      * It detects a large amount of killaura.
      * <p>
-     * Accuracy: 7/10 - It may have false positives, though it only works when player fails other killaura check.
+     * Accuracy: 7/10 - It may have false positives, though it only works when player fails other killaura check
      * Efficiency: 9/10 - Almost instantly
      *
      * @author MrCraftGoo
      */
-    private void typeE(final Event event, final HoriPlayer player, final KillAuraData data, final KillAuraConfig config) {
+    private void typeD(final Event event, final HoriPlayer player, final KillAuraData data, final KillAuraConfig config) {
         if (event instanceof MoveEvent) {
             MoveEvent e = (MoveEvent) event;
             if (!e.updateRot) {
@@ -232,24 +159,135 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
             if (player.currentTick - data.lastFailTick > 5) {
                 return;
             }
-            float pitchChange = Math.abs(e.to.getPitch() - e.from.getPitch());
+            float pitchChange = Math.abs(e.to.pitch - e.from.pitch);
             if (pitchChange == 0) {
                 return;
             }
-            int pitch = (int) (pitchChange * EXPANDER);
-            int lastPitch = (int) (data.lastPitchChange * EXPANDER);
+            // Convert it to int so I can get gcd.
+            int pitch = (int) (pitchChange * config.expander);
+            int lastPitch = (int) (data.lastPitchChange * config.expander);
             long gcd = this.greatestCommonDivisor(pitch, lastPitch);
-            if (gcd <= 0b100000000000000000) {
-                this.debug("Failed: TypeE, g:" + gcd);
+
+            if (gcd <= 131072) {
+                this.debug("Failed: TypeD, g:" + gcd);
 
                 // Punish
-                this.punish(player, data, "TypeE", 0);
+                this.punish(player, data, "TypeD", 0);
             }
+
             data.lastPitchChange = pitchChange;
         }
     }
 
     private long greatestCommonDivisor(final int current, final int previous) {
         return previous <= 16384 ? current : this.greatestCommonDivisor(previous, current % previous);
+    }
+
+    /**
+     * An AutoClicker check based on client tick.
+     * <p>
+     * Accuracy: 9/10 - Haven't found any false positives
+     * Efficiency: 6/10 - A bit slow
+     *
+     * @author MrCraftGoo
+     */
+    private void typeE(final Event event, final HoriPlayer player, final KillAuraData data, final KillAuraConfig config) {
+        if (event instanceof MoveEvent) {
+            if (!data.swung) {
+                data.moves++;
+                return;
+            }
+            if (data.moves < 8 && data.moveInterval.add(data.moves) && data.moveInterval.size() == 40) {
+                double average = data.moveInterval.stream()
+                        .mapToDouble(d -> d)
+                        .average()
+                        .orElse(0.0);
+                double stdDeviation = 0.0;
+                for (Integer i : data.moveInterval) {
+                    stdDeviation += Math.pow(i.doubleValue() - average, 2.0);
+                }
+
+                // Customizable?
+                if (stdDeviation < 0.3) {
+                    this.debug("Failed: TypeE, s:" + stdDeviation);
+
+                    // Punish
+                    this.punish(player, data, "TypeE", 0);
+                }
+                data.moveInterval.clear();
+            }
+            data.swung = false;
+            data.moves = 1;
+        } else if (event instanceof SwingEvent) {
+            data.swung = true;
+        }
+    }
+
+    /**
+     * A direction check. It can detect a large amount of killaura.
+     * Still need improvements.
+     * I learnt this from Islandscout, but much lighter than his.
+     * <p>
+     * TODO: Ignore when colliding entities
+     * TODO: Ignore the first tick player jump (Unimportant)
+     * TODO: Ignore when getting knock back
+     * TODO: Ignore when riding vehicle
+     * <p>
+     * Accuracy: 7/10 - It may have some false positives
+     * Efficiency: 10/10 - Super fast
+     *
+     * @author Islandscout, MrCraftGoo
+     */
+    private void typeF(final Event event, final HoriPlayer player, final KillAuraData data, final KillAuraConfig config) {
+        if (event instanceof MoveEvent) {
+            MoveEvent e = (MoveEvent) event;
+            if (!e.updateRot || player.currentTick - data.lastHitTick > 6 || e.isUnderBlock || !e.collidingBlocks.isEmpty()) {
+                return;
+            }
+
+            Block footBlock = player.position.add(0, -1, 0).getBlock();
+            if (footBlock == null) {
+                return;
+            }
+            Vector velocity = e.velocity.clone().setY(0);
+            double friction = e.oldFriction;
+            Vector prevVelocity = player.velocity.clone();
+            if (e.hitSlowdown) {
+                prevVelocity.multiply(0.6);
+            }
+            if (Math.abs(prevVelocity.getX() * friction) < 0.005) {
+                prevVelocity.setX(0);
+            }
+            if (Math.abs(prevVelocity.getZ() * friction) < 0.005) {
+                prevVelocity.setZ(0);
+            }
+            double dX = velocity.getX();
+            double dZ = velocity.getZ();
+            dX /= friction;
+            dZ /= friction;
+            dX -= prevVelocity.getX();
+            dZ -= prevVelocity.getZ();
+
+            Vector accelDir = new Vector(dX, 0, dZ);
+            Vector yaw = MathUtils.getDirection(e.to.yaw, 0);
+
+            if (velocity.length() < 0.15 || accelDir.lengthSquared() < 0.000001) {
+                return;
+            }
+
+            boolean vectorDir = accelDir.clone().crossProduct(yaw).dot(new Vector(0, 1, 0)) >= 0;
+            double rawAngle = MathUtils.angle(accelDir, yaw);
+            double angle = (vectorDir ? 1 : -1) * rawAngle;
+            double multiple = angle / (Math.PI / 4);
+
+            if (Math.abs(multiple - Math.floor(multiple)) > config.threshold && Math.abs(multiple - Math.ceil(multiple)) > config.threshold) {
+                this.debug("Failed: TypeF, a:" + angle);
+
+                // Punish
+                this.punish(player, data, "TypeF", 0);
+            }
+        } else if (event instanceof InteractEntityEvent) {
+            data.lastHitTick = player.currentTick;
+        }
     }
 }

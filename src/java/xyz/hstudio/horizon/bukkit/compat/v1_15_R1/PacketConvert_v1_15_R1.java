@@ -1,7 +1,6 @@
 package xyz.hstudio.horizon.bukkit.compat.v1_15_R1;
 
 import net.minecraft.server.v1_15_R1.*;
-import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 import org.bukkit.craftbukkit.v1_15_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_15_R1.entity.CraftPlayer;
@@ -12,8 +11,8 @@ import xyz.hstudio.horizon.bukkit.data.HoriPlayer;
 import xyz.hstudio.horizon.bukkit.network.events.Event;
 import xyz.hstudio.horizon.bukkit.network.events.WrappedPacket;
 import xyz.hstudio.horizon.bukkit.network.events.inbound.*;
-import xyz.hstudio.horizon.bukkit.util.BlockUtils;
 import xyz.hstudio.horizon.bukkit.util.Hand;
+import xyz.hstudio.horizon.bukkit.util.Location;
 
 public class PacketConvert_v1_15_R1 extends PacketConvert {
 
@@ -31,6 +30,8 @@ public class PacketConvert_v1_15_R1 extends PacketConvert {
             return convertInteractEntityEvent(player, (PacketPlayInUseEntity) packet);
         } else if (packet instanceof PacketPlayInHeldItemSlot) {
             return convertHeldItemEvent(player, (PacketPlayInHeldItemSlot) packet);
+        } else if (packet instanceof PacketPlayInArmAnimation) {
+            return convertSwingEvent(player, (PacketPlayInArmAnimation) packet);
         }
         return null;
     }
@@ -71,15 +72,15 @@ public class PacketConvert_v1_15_R1 extends PacketConvert {
             updateRot = true;
             moveType = MoveEvent.MoveType.POSITION_LOOK;
         }
-        double x = packet.a(player.position.getX());
-        double y = packet.b(player.position.getY());
-        double z = packet.c(player.position.getZ());
-        float yaw = packet.a(player.position.getYaw());
-        float pitch = packet.b(player.position.getPitch());
+        double x = packet.a(player.position.x);
+        double y = packet.b(player.position.y);
+        double z = packet.c(player.position.z);
+        float yaw = packet.a(player.position.yaw);
+        float pitch = packet.b(player.position.pitch);
         boolean onGround = packet.a();
         Location to = new Location(player.world, x, y, z, yaw, pitch);
-        if (Math.abs(to.getX()) >= Integer.MAX_VALUE || Math.abs(to.getY()) >= Integer.MAX_VALUE || Math.abs(to.getZ()) >= Integer.MAX_VALUE ||
-                Double.isNaN(to.getX()) || Double.isNaN(to.getY()) || Double.isNaN(to.getZ())) {
+        if (Math.abs(to.x) >= Integer.MAX_VALUE || Math.abs(to.y) >= Integer.MAX_VALUE || Math.abs(to.z) >= Integer.MAX_VALUE ||
+                Double.isNaN(to.x) || Double.isNaN(to.y) || Double.isNaN(to.z)) {
             return new BadMoveEvent(player, new WrappedPacket(packet));
         }
         return new MoveEvent(player, to, onGround, updatePos, updateRot, moveType, new WrappedPacket(packet));
@@ -113,7 +114,7 @@ public class PacketConvert_v1_15_R1 extends PacketConvert {
         if (interactType == null) {
             BlockPosition pos = packet.b();
             Location loc = new Location(player.world, pos.getX(), pos.getY(), pos.getZ());
-            org.bukkit.block.Block b = BlockUtils.getBlock(loc);
+            org.bukkit.block.Block b = loc.getBlock();
             if (b == null) {
                 return null;
             }
@@ -189,6 +190,10 @@ public class PacketConvert_v1_15_R1 extends PacketConvert {
 
     private Event convertHeldItemEvent(final HoriPlayer player, final PacketPlayInHeldItemSlot packet) {
         return new HeldItemEvent(player, packet.b(), new WrappedPacket(packet));
+    }
+
+    private Event convertSwingEvent(final HoriPlayer player, final PacketPlayInArmAnimation packet) {
+        return new SwingEvent(player, Hand.valueOf(packet.b().name()), new WrappedPacket(packet));
     }
 
     @Override

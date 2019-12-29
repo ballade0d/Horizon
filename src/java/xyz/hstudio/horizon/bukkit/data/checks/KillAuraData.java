@@ -1,6 +1,5 @@
 package xyz.hstudio.horizon.bukkit.data.checks;
 
-import org.bukkit.util.Vector;
 import xyz.hstudio.horizon.bukkit.data.Data;
 
 import java.util.ArrayList;
@@ -22,9 +21,13 @@ public class KillAuraData extends Data {
     public long failTypeCTick;
 
     // TypeD
-    public List<Vector> mouseMoves = new ArrayList<>();
-    public List<Long> clickTicks = new ArrayList<>();
+    public float lastPitchChange;
 
     // TypeE
-    public float lastPitchChange;
+    public List<Integer> moveInterval = new ArrayList<>();
+    public int moves;
+    public boolean swung;
+
+    // TypeF
+    public long lastHitTick = Long.MIN_VALUE;
 }

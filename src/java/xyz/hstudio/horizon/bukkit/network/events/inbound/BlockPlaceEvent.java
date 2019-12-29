@@ -1,12 +1,12 @@
 package xyz.hstudio.horizon.bukkit.network.events.inbound;
 
 import lombok.Getter;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.util.Vector;
 import xyz.hstudio.horizon.bukkit.data.HoriPlayer;
 import xyz.hstudio.horizon.bukkit.network.events.Event;
 import xyz.hstudio.horizon.bukkit.network.events.WrappedPacket;
+import xyz.hstudio.horizon.bukkit.util.Location;
 
 public class BlockPlaceEvent extends Event {
 
@@ -33,17 +33,17 @@ public class BlockPlaceEvent extends Event {
     public Location getTargetLocation() {
         switch (face) {
             case TOP:
-                return new Location(placed.getWorld(), placed.getX(), placed.getY() - 1, placed.getZ());
+                return new Location(placed.world, placed.x, placed.y - 1, placed.z);
             case EAST:
-                return new Location(placed.getWorld(), placed.getX() - 1, placed.getY(), placed.getZ());
+                return new Location(placed.world, placed.x - 1, placed.y, placed.z);
             case WEST:
-                return new Location(placed.getWorld(), placed.getX() + 1, placed.getY(), placed.getZ());
+                return new Location(placed.world, placed.x + 1, placed.y, placed.z);
             case NORTH:
-                return new Location(placed.getWorld(), placed.getX(), placed.getY(), placed.getZ() + 1);
+                return new Location(placed.world, placed.x, placed.y, placed.z + 1);
             case SOUTH:
-                return new Location(placed.getWorld(), placed.getX(), placed.getY(), placed.getZ() - 1);
+                return new Location(placed.world, placed.x, placed.y, placed.z - 1);
             case BOTTOM:
-                return new Location(placed.getWorld(), placed.getX(), placed.getY() + 1, placed.getZ());
+                return new Location(placed.world, placed.x, placed.y + 1, placed.z);
             case INVALID:
                 return placed;
         }
