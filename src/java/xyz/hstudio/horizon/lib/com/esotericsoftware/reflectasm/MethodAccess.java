@@ -1,6 +1,6 @@
 package xyz.hstudio.horizon.lib.com.esotericsoftware.reflectasm;
 
-import org.objectweb.asm.*;
+import xyz.hstudio.horizon.lib.org.objectweb.asm.*;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;

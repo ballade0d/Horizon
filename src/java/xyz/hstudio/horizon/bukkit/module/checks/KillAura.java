@@ -17,6 +17,8 @@ import xyz.hstudio.horizon.bukkit.util.TimeUtils;
 
 public class KillAura extends Module<KillAuraData, KillAuraConfig> {
 
+    private static final double EXPANDER = Math.pow(2, 24);
+
     public KillAura() {
         super(ModuleType.KillAura, new KillAuraConfig());
     }
@@ -165,8 +167,8 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
                 return;
             }
             // Convert it to int so I can get gcd.
-            int pitch = (int) (pitchChange * config.expander);
-            int lastPitch = (int) (data.lastPitchChange * config.expander);
+            int pitch = (int) (pitchChange * EXPANDER);
+            int lastPitch = (int) (data.lastPitchChange * EXPANDER);
             long gcd = this.greatestCommonDivisor(pitch, lastPitch);
 
             if (gcd <= 131072) {
@@ -232,7 +234,6 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
      * TODO: Ignore when colliding entities
      * TODO: Ignore the first tick player jump (Unimportant)
      * TODO: Ignore when getting knock back
-     * TODO: Ignore when riding vehicle
      * <p>
      * Accuracy: 7/10 - It may have some false positives
      * Efficiency: 10/10 - Super fast
@@ -242,7 +243,7 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
     private void typeF(final Event event, final HoriPlayer player, final KillAuraData data, final KillAuraConfig config) {
         if (event instanceof MoveEvent) {
             MoveEvent e = (MoveEvent) event;
-            if (!e.updateRot || player.currentTick - data.lastHitTick > 6 || e.isUnderBlock || !e.collidingBlocks.isEmpty()) {
+            if (!e.updateRot || player.currentTick - data.lastHitTick > 6 || player.vehicle != -1 || e.isUnderBlock || !e.collidingBlocks.isEmpty()) {
                 return;
             }
 
@@ -280,9 +281,10 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
             double angle = (vectorDir ? 1 : -1) * MathUtils.angle(accelDir, yaw);
 
             double multiple = angle / (Math.PI / 4);
-            double threshold = config.max_angle * Math.PI / 180;
+            double threshold = Math.toRadians(config.max_angle);
 
-            if (Math.abs(multiple - Math.floor(multiple)) > threshold && Math.abs(multiple - Math.ceil(multiple)) > threshold) {
+            // Probably add a threshold?
+            if (Math.abs(multiple - NumberConversions.floor(multiple)) > threshold && Math.abs(multiple - NumberConversions.ceil(multiple)) > threshold) {
                 this.debug("Failed: TypeF, a:" + angle);
 
                 // Punish

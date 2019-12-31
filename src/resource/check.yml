@@ -1,0 +1,4 @@
+killaura:
+  enabled: true
+  debug: true
+  max_angle: 0.6

@@ -12,11 +12,11 @@ import xyz.hstudio.horizon.bukkit.util.Hand;
 
 public class InteractEntityEvent extends Event {
 
-    public final InteractAction action;
+    public final InteractType action;
     public final Entity entity;
     public final Hand hand;
 
-    public InteractEntityEvent(final HoriPlayer player, final InteractAction action, final Entity entity, final Hand hand, final WrappedPacket packet) {
+    public InteractEntityEvent(final HoriPlayer player, final InteractType action, final Entity entity, final Hand hand, final WrappedPacket packet) {
         super(player, packet);
         this.action = action;
         this.entity = entity;
@@ -25,7 +25,7 @@ public class InteractEntityEvent extends Event {
 
     @Override
     public boolean pre() {
-        if (action != InteractAction.ATTACK || !(entity instanceof Player)) {
+        if (action != InteractType.ATTACK || !(entity instanceof Player)) {
             return true;
         }
         if (McAccess.getInst().isAccumulated(player.player)) {
@@ -41,7 +41,7 @@ public class InteractEntityEvent extends Event {
     public void post() {
     }
 
-    public enum InteractAction {
+    public enum InteractType {
         ATTACK, INTERACT
     }
 }

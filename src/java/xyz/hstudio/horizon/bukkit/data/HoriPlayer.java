@@ -27,6 +27,7 @@ public class HoriPlayer {
     public boolean isSprinting;
     public boolean isOnGround;
     public long hitSlowdownTick = -1;
+    public int vehicle = -1;
     private ChannelPipeline pipeline;
 
     public HoriPlayer(final Player player) {

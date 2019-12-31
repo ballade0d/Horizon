@@ -1,5 +1,6 @@
 package xyz.hstudio.horizon.bukkit.compat.v1_13_R2;
 
+import io.netty.buffer.Unpooled;
 import net.minecraft.server.v1_13_R2.*;
 import org.bukkit.block.BlockFace;
 import org.bukkit.craftbukkit.v1_13_R2.CraftWorld;
@@ -11,8 +12,11 @@ import xyz.hstudio.horizon.bukkit.data.HoriPlayer;
 import xyz.hstudio.horizon.bukkit.network.events.Event;
 import xyz.hstudio.horizon.bukkit.network.events.WrappedPacket;
 import xyz.hstudio.horizon.bukkit.network.events.inbound.*;
+import xyz.hstudio.horizon.bukkit.network.events.outbound.VehicleEvent;
 import xyz.hstudio.horizon.bukkit.util.Hand;
 import xyz.hstudio.horizon.bukkit.util.Location;
+
+import java.util.stream.IntStream;
 
 public class PacketConvert_v1_13_R2 extends PacketConvert {
 
@@ -77,7 +81,7 @@ public class PacketConvert_v1_13_R2 extends PacketConvert {
         double z = packet.c(player.position.z);
         float yaw = packet.a(player.position.yaw);
         float pitch = packet.b(player.position.pitch);
-        boolean onGround = packet.a();
+        boolean onGround = packet.b();
         Location to = new Location(player.world, x, y, z, yaw, pitch);
         if (Math.abs(to.x) >= Integer.MAX_VALUE || Math.abs(to.y) >= Integer.MAX_VALUE || Math.abs(to.z) >= Integer.MAX_VALUE ||
                 Double.isNaN(to.x) || Double.isNaN(to.y) || Double.isNaN(to.z)) {
@@ -179,10 +183,10 @@ public class PacketConvert_v1_13_R2 extends PacketConvert {
         if (entity == null) {
             return null;
         }
-        InteractEntityEvent.InteractAction action =
+        InteractEntityEvent.InteractType action =
                 packet.b() == PacketPlayInUseEntity.EnumEntityUseAction.ATTACK ?
-                        InteractEntityEvent.InteractAction.ATTACK :
-                        InteractEntityEvent.InteractAction.INTERACT;
+                        InteractEntityEvent.InteractType.ATTACK :
+                        InteractEntityEvent.InteractType.INTERACT;
         return new InteractEntityEvent(player, action, entity.getBukkitEntity(), Hand.MAIN_HAND, new WrappedPacket(packet));
     }
 
@@ -196,6 +200,28 @@ public class PacketConvert_v1_13_R2 extends PacketConvert {
 
     @Override
     public Event convertOut(final HoriPlayer player, final Object packet) {
+        if (packet instanceof PacketPlayOutMount) {
+            return convertAttachEvent(player, (PacketPlayOutMount) packet);
+        }
+        return null;
+    }
+
+    private Event convertAttachEvent(final HoriPlayer player, final PacketPlayOutMount packet) {
+        // Faster than reflection?
+        PacketDataSerializer serializer = new PacketDataSerializer(Unpooled.buffer(16));
+        try {
+            packet.b(serializer);
+        } catch (Exception e) {
+            return null;
+        }
+        int vehicle = serializer.g();
+        int[] passengers = serializer.b();
+        // Is it efficient?
+        if (IntStream.of(passengers).anyMatch(i -> i == player.player.getEntityId())) {
+            return new VehicleEvent(player, vehicle, new WrappedPacket(packet));
+        } else if (player.vehicle == vehicle) {
+            return new VehicleEvent(player, -1, new WrappedPacket(packet));
+        }
         return null;
     }
 }

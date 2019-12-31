@@ -1,7 +1,7 @@
 package xyz.hstudio.horizon.lib.com.esotericsoftware.reflectasm;
 
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.MethodVisitor;
+import xyz.hstudio.horizon.lib.org.objectweb.asm.ClassWriter;
+import xyz.hstudio.horizon.lib.org.objectweb.asm.MethodVisitor;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;

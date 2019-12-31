@@ -1,6 +1,8 @@
 package xyz.hstudio.horizon.bukkit.config;
 
+import com.google.common.primitives.Primitives;
 import xyz.hstudio.horizon.bukkit.Horizon;
+import xyz.hstudio.horizon.bukkit.api.ModuleType;
 import xyz.hstudio.horizon.bukkit.config.annotation.Load;
 import xyz.hstudio.horizon.bukkit.util.YamlLoader;
 import xyz.hstudio.horizon.lib.com.esotericsoftware.reflectasm.FieldAccess;
@@ -9,7 +11,9 @@ import java.lang.reflect.Field;
 
 public abstract class Config {
 
-    // Will be loaded from config
+    @Load(file = "check.yml", path = "enabled")
+    public boolean enabled = true;
+    @Load(file = "check.yml", path = "debug")
     public boolean debug = true;
 
     /**
@@ -19,7 +23,7 @@ public abstract class Config {
      * @throws IllegalStateException When config is miss
      * @author MrCraftGoo
      */
-    public Config load() throws IllegalStateException {
+    public Config load(final ModuleType type) throws IllegalStateException {
         FieldAccess access = FieldAccess.get(this.getClass());
         Field[] fields = access.getFields();
         for (int i = 0; i < fields.length; i++) {
@@ -30,7 +34,7 @@ public abstract class Config {
             }
 
             String file = annotation.file();
-            String path = annotation.path();
+            String path = type.name().toLowerCase() + "." + annotation.path();
 
             YamlLoader config = Horizon.getInst().configMap.get(file);
             if (config == null) {
@@ -39,12 +43,12 @@ public abstract class Config {
 
             Object value = config.get(path);
             if (value == null) {
-                config.set(path, access.get(this, i));
-                continue;
+                config.set(path, value = access.get(this, i));
             }
 
-            if (!value.getClass().isAssignableFrom(access.getFieldTypes()[i])) {
-                throw new IllegalStateException("Failed to load value: " + path + " [3]");
+            // Double.class.isAssignableFrom(double.class) is false :/
+            if (!Primitives.unwrap(value.getClass()).isAssignableFrom(access.getFieldTypes()[i])) {
+                throw new IllegalStateException("Failed to load value: " + path + " [2]");
             }
 
             access.set(this, i, value);

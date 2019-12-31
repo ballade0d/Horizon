@@ -44,6 +44,7 @@ public class ChannelHandler extends ChannelDuplexHandler {
     }
 
     public void write(final ChannelHandlerContext ctx, Object packet, final ChannelPromise promise) throws Exception {
+        PacketConvert.getInst().convertOut(player, packet);
         super.write(ctx, packet, promise);
     }
 }

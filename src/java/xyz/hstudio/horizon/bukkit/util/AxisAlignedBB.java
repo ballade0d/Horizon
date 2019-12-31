@@ -83,9 +83,9 @@ public class AxisAlignedBB {
     // TODO: Any ways to optimize it?
     public List<Block> getBlocks(final World world) {
         List<Block> blocks = new ArrayList<>();
-        for (int x = (int) Math.floor(this.minX); x < (int) Math.ceil(this.maxX); x++) {
-            for (int y = (int) Math.floor(this.minY); y < (int) Math.ceil(this.maxY); y++) {
-                for (int z = (int) Math.floor(this.minZ); z < (int) Math.ceil(this.maxZ); z++) {
+        for (int x = NumberConversions.floor(this.minX); x < NumberConversions.ceil(this.maxX); x++) {
+            for (int y = NumberConversions.floor(this.minY); y < NumberConversions.ceil(this.maxY); y++) {
+                for (int z = NumberConversions.floor(this.minZ); z < NumberConversions.ceil(this.maxZ); z++) {
                     Block block = new Location(world, x, y, z).getBlock();
                     if (block == null || block.isEmpty()) {
                         continue;
@@ -100,9 +100,9 @@ public class AxisAlignedBB {
     // TODO: Any ways to optimize it?
     public Set<Material> getMaterials(final World world) {
         Set<Material> blocks = new HashSet<>();
-        for (int x = (int) Math.floor(this.minX); x < (int) Math.ceil(this.maxX); x++) {
-            for (int y = (int) Math.floor(this.minY); y < (int) Math.ceil(this.maxY); y++) {
-                for (int z = (int) Math.floor(this.minZ); z < (int) Math.ceil(this.maxZ); z++) {
+        for (int x = NumberConversions.floor(this.minX); x < NumberConversions.ceil(this.maxX); x++) {
+            for (int y = NumberConversions.floor(this.minY); y < NumberConversions.ceil(this.maxY); y++) {
+                for (int z = NumberConversions.floor(this.minZ); z < NumberConversions.ceil(this.maxZ); z++) {
                     Block block = new Location(world, x, y, z).getBlock();
                     if (block == null || block.isEmpty()) {
                         continue;
@@ -116,9 +116,9 @@ public class AxisAlignedBB {
 
     // TODO: Any ways to optimize it?
     public boolean isEmpty(final World world) {
-        for (int x = (int) Math.floor(this.minX); x < (int) Math.ceil(this.maxX); x++) {
-            for (int y = (int) Math.floor(this.minY); y < (int) Math.ceil(this.maxY); y++) {
-                for (int z = (int) Math.floor(this.minZ); z < (int) Math.ceil(this.maxZ); z++) {
+        for (int x = NumberConversions.floor(this.minX); x < NumberConversions.ceil(this.maxX); x++) {
+            for (int y = NumberConversions.floor(this.minY); y < NumberConversions.ceil(this.maxY); y++) {
+                for (int z = NumberConversions.floor(this.minZ); z < NumberConversions.ceil(this.maxZ); z++) {
                     Block block = new Location(world, x, y, z).getBlock();
                     if (block == null || block.isEmpty() || !block.getType().isSolid()) {
                         continue;

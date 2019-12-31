@@ -11,6 +11,8 @@ import xyz.hstudio.horizon.bukkit.module.checks.KillAura;
 import xyz.hstudio.horizon.bukkit.util.Version;
 import xyz.hstudio.horizon.bukkit.util.YamlLoader;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -39,11 +41,34 @@ public class Horizon extends JavaPlugin {
             return;
         }
 
+        File folder = this.getDataFolder();
+        if (!folder.exists()) {
+            folder.mkdirs();
+        }
+
+        File checkFile = new File(folder, "check.yml");
+        if (!checkFile.exists()) {
+            saveResource("check.yml", true);
+        }
+        YamlLoader yaml = YamlLoader.loadConfiguration(checkFile);
+        this.configMap.put("check.yml", yaml);
+
         McAccess.init();
         PacketConvert.init();
         new Listeners();
 
         // Enable checks
         new KillAura();
+    }
+
+    @Override
+    public void onDisable() {
+        for (Map.Entry<String, YamlLoader> entry : this.configMap.entrySet()) {
+            try {
+                entry.getValue().save(new File(this.getDataFolder(), entry.getKey()));
+            } catch (IOException e) {
+                Logger.info("ERROR", "Failed to save the file " + entry.getKey() + "!");
+            }
+        }
     }
 }

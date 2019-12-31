@@ -1,5 +1,6 @@
 package xyz.hstudio.horizon.bukkit.compat.v1_12_R1;
 
+import io.netty.buffer.Unpooled;
 import net.minecraft.server.v1_12_R1.*;
 import org.bukkit.block.BlockFace;
 import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
@@ -11,8 +12,11 @@ import xyz.hstudio.horizon.bukkit.data.HoriPlayer;
 import xyz.hstudio.horizon.bukkit.network.events.Event;
 import xyz.hstudio.horizon.bukkit.network.events.WrappedPacket;
 import xyz.hstudio.horizon.bukkit.network.events.inbound.*;
+import xyz.hstudio.horizon.bukkit.network.events.outbound.VehicleEvent;
 import xyz.hstudio.horizon.bukkit.util.Hand;
 import xyz.hstudio.horizon.bukkit.util.Location;
+
+import java.util.stream.IntStream;
 
 public class PacketConvert_v1_12_R1 extends PacketConvert {
 
@@ -179,10 +183,10 @@ public class PacketConvert_v1_12_R1 extends PacketConvert {
         if (entity == null) {
             return null;
         }
-        InteractEntityEvent.InteractAction action =
+        InteractEntityEvent.InteractType action =
                 packet.a() == PacketPlayInUseEntity.EnumEntityUseAction.ATTACK ?
-                        InteractEntityEvent.InteractAction.ATTACK :
-                        InteractEntityEvent.InteractAction.INTERACT;
+                        InteractEntityEvent.InteractType.ATTACK :
+                        InteractEntityEvent.InteractType.INTERACT;
         return new InteractEntityEvent(player, action, entity.getBukkitEntity(), Hand.MAIN_HAND, new WrappedPacket(packet));
     }
 
@@ -196,6 +200,28 @@ public class PacketConvert_v1_12_R1 extends PacketConvert {
 
     @Override
     public Event convertOut(final HoriPlayer player, final Object packet) {
+        if (packet instanceof PacketPlayOutMount) {
+            return convertAttachEvent(player, (PacketPlayOutMount) packet);
+        }
+        return null;
+    }
+
+    private Event convertAttachEvent(final HoriPlayer player, final PacketPlayOutMount packet) {
+        // Faster than reflection?
+        PacketDataSerializer serializer = new PacketDataSerializer(Unpooled.buffer(16));
+        try {
+            packet.b(serializer);
+        } catch (Exception e) {
+            return null;
+        }
+        int vehicle = serializer.g();
+        int[] passengers = serializer.b();
+        // Is it efficient?
+        if (IntStream.of(passengers).anyMatch(i -> i == player.player.getEntityId())) {
+            return new VehicleEvent(player, vehicle, new WrappedPacket(packet));
+        } else if (player.vehicle == vehicle) {
+            return new VehicleEvent(player, -1, new WrappedPacket(packet));
+        }
         return null;
     }
 }

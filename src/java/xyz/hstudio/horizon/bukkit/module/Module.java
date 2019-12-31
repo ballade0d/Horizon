@@ -1,5 +1,6 @@
 package xyz.hstudio.horizon.bukkit.module;
 
+import lombok.Getter;
 import xyz.hstudio.horizon.bukkit.Logger;
 import xyz.hstudio.horizon.bukkit.api.ModuleType;
 import xyz.hstudio.horizon.bukkit.config.Config;
@@ -15,12 +16,13 @@ public abstract class Module<K extends Data, V extends Config> {
     private static final Map<ModuleType, Module> moduleMap = new ConcurrentHashMap<>();
 
     private final ModuleType moduleType;
+    @Getter
     private final V config;
 
     public Module(final ModuleType moduleType, final V config) {
         // This throws a warn in IDE, tell me any suggestion if you have.
         this.moduleType = moduleType;
-        this.config = (V) config.load();
+        this.config = (V) config.load(moduleType);
         Module.moduleMap.put(moduleType, this);
     }
 
@@ -35,6 +37,9 @@ public abstract class Module<K extends Data, V extends Config> {
      */
     public static boolean doCheck(final Event event, final HoriPlayer player) {
         for (Module module : Module.moduleMap.values()) {
+            if (!module.config.enabled) {
+                continue;
+            }
             module.doCheck(event, player, module.getData(player), module.config);
         }
         return true;
