@@ -70,7 +70,7 @@ public abstract class Module<K extends Data, V extends Config> {
         if (!this.config.debug) {
             return;
         }
-        Logger.info("DEBUG|" + this.moduleType.name(), object);
+        Logger.info("Debug|" + this.moduleType.name(), object);
     }
 
     public abstract K getData(final HoriPlayer player);

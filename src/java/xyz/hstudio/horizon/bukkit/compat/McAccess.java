@@ -63,4 +63,9 @@ public abstract class McAccess {
      * Get the bounding box of a player.
      */
     public abstract AxisAlignedBB getCube(final Player player);
+
+    /**
+     * Run a task in the main thread.
+     */
+    public abstract void ensureMainThread(final Runnable task);
 }

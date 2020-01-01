@@ -52,4 +52,19 @@ public class HoriPlayer {
     public ItemStack getHeldItem() {
         return this.player.getInventory().getItem(this.heldSlot);
     }
+
+    /**
+     * Get player's head position accurately.
+     *
+     * @return Player's head position.
+     */
+    public Vector getHeadPosition() {
+        Vector add = new Vector(0, 0, 0);
+        add.setY(this.isSneaking ? 1.54 : 1.62);
+        return position.toVector().clone().add(add);
+    }
+
+    public void sendMessage(final String msg) {
+        McAccess.getInst().ensureMainThread(() -> this.player.sendMessage(msg));
+    }
 }

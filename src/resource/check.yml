@@ -2,3 +2,7 @@ killaura:
   enabled: true
   debug: true
   max_angle: 0.6
+scaffold:
+  enabled: true
+  debug: true
+  max_angle: 90

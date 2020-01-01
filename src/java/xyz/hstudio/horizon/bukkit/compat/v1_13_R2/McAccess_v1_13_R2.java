@@ -4,6 +4,8 @@ import io.netty.channel.ChannelPipeline;
 import net.minecraft.server.v1_13_R2.AxisAlignedBB;
 import net.minecraft.server.v1_13_R2.Chunk;
 import net.minecraft.server.v1_13_R2.MathHelper;
+import org.bukkit.Bukkit;
+import org.bukkit.craftbukkit.v1_13_R2.CraftServer;
 import org.bukkit.craftbukkit.v1_13_R2.CraftWorld;
 import org.bukkit.craftbukkit.v1_13_R2.entity.CraftPlayer;
 import org.bukkit.entity.Player;
@@ -54,5 +56,17 @@ public class McAccess_v1_13_R2 extends McAccess {
         double maxY = AABB.getDouble(cube, 4);
         double maxZ = AABB.getDouble(cube, 5);
         return new xyz.hstudio.horizon.bukkit.util.AxisAlignedBB(minX, minY, minZ, maxX, maxY, maxZ);
+    }
+
+    @Override
+    public void ensureMainThread(final Runnable task) {
+        ((CraftServer) Bukkit.getServer()).getServer().processQueue.add(() -> {
+            try {
+                task.run();
+            } catch (Throwable throwable) {
+                // Have to cache any throwable or the server will crash if an error occurs.
+                throwable.printStackTrace();
+            }
+        });
     }
 }

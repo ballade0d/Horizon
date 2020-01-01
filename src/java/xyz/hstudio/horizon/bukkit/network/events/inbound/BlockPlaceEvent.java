@@ -10,16 +10,11 @@ import xyz.hstudio.horizon.bukkit.util.Location;
 
 public class BlockPlaceEvent extends Event {
 
-    @Getter
-    private final Location placed;
-    @Getter
-    private final BlockFace face;
-    @Getter
-    private final Material material;
-    @Getter
-    private final Vector interaction;
-    @Getter
-    private final PlaceType placeType;
+    public final Location placed;
+    public final BlockFace face;
+    public final Material material;
+    public final Vector interaction;
+    public final PlaceType placeType;
 
     public BlockPlaceEvent(final HoriPlayer player, final Location placed, final BlockFace face, final Material material, final Vector interaction, final PlaceType placeType, final WrappedPacket packet) {
         super(player, packet);
@@ -28,6 +23,48 @@ public class BlockPlaceEvent extends Event {
         this.material = material;
         this.interaction = interaction;
         this.placeType = placeType;
+    }
+
+    // placed.getFace(against)
+    public Vector getPlaceBlockFace() {
+        switch (face) {
+            case TOP:
+                return new Vector(0, -1, 0);
+            case BOTTOM:
+                return new Vector(0, 1, 0);
+            case SOUTH:
+                return new Vector(0, 0, -1);
+            case NORTH:
+                return new Vector(0, 0, 1);
+            case WEST:
+                return new Vector(1, 0, 0);
+            case EAST:
+                return new Vector(-1, 0, 0);
+            case INVALID:
+                return new Vector(0, 0, 0);
+        }
+        return null;
+    }
+
+    // against.getFace(placed)
+    public Vector getTargetBlockFace() {
+        switch (face) {
+            case TOP:
+                return new Vector(0, 1, 0);
+            case BOTTOM:
+                return new Vector(0, -1, 0);
+            case SOUTH:
+                return new Vector(0, 0, 1);
+            case NORTH:
+                return new Vector(0, 0, -1);
+            case WEST:
+                return new Vector(-1, 0, 0);
+            case EAST:
+                return new Vector(1, 0, 0);
+            case INVALID:
+                return new Vector(0, 0, 0);
+        }
+        return null;
     }
 
     public Location getTargetLocation() {

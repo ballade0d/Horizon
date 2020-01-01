@@ -1,9 +1,8 @@
 package horizon;
 
-import java.text.DecimalFormat;
-
 public class Test {
 
-    public static void main(String[] args){
+    public static void main(String[] args) {
+        System.out.println(Math.toRadians(0.6));
     }
 }

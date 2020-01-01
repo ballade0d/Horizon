@@ -54,6 +54,10 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
             data.lagging = now - data.lastMove < 5;
             data.lastMove = now;
         } else if (event instanceof InteractEntityEvent) {
+            InteractEntityEvent e = (InteractEntityEvent) event;
+            if (e.action != InteractEntityEvent.InteractType.ATTACK) {
+                return;
+            }
             // Ignoring laggy players so this check won't false af like matrix while lagging
             // Inspired by funkemonkey
             long deltaT = TimeUtils.now() - data.lastMove;
@@ -99,6 +103,10 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
                 }
             }
         } else if (event instanceof InteractEntityEvent) {
+            InteractEntityEvent e = (InteractEntityEvent) event;
+            if (e.action != InteractEntityEvent.InteractType.ATTACK) {
+                return;
+            }
             long deltaT = player.currentTick - data.failTypeBTick;
             // Detect both pre AutoBlock and post AutoBlock.
             if (deltaT <= 1) {
@@ -133,6 +141,10 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
                 }
             }
         } else if (event instanceof InteractEntityEvent) {
+            InteractEntityEvent e = (InteractEntityEvent) event;
+            if (e.action != InteractEntityEvent.InteractType.ATTACK) {
+                return;
+            }
             long deltaT = player.currentTick - data.failTypeCTick;
             if (deltaT == 0) {
                 this.debug("Failed: TypeC, d:" + deltaT);
@@ -291,6 +303,10 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
                 this.punish(player, data, "TypeF", 0);
             }
         } else if (event instanceof InteractEntityEvent) {
+            InteractEntityEvent e = (InteractEntityEvent) event;
+            if (e.action != InteractEntityEvent.InteractType.ATTACK) {
+                return;
+            }
             data.lastHitTick = player.currentTick;
         }
     }
