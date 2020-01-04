@@ -29,5 +29,5 @@ public class KillAuraData extends Data {
     public boolean swung;
 
     // TypeF
-    public long lastHitTick = Long.MIN_VALUE;
+    public long lastHitTick = -10000;
 }

@@ -7,6 +7,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 import xyz.hstudio.horizon.bukkit.Horizon;
 import xyz.hstudio.horizon.bukkit.compat.McAccess;
+import xyz.hstudio.horizon.bukkit.data.checks.AutoSwitchData;
 import xyz.hstudio.horizon.bukkit.data.checks.KillAuraData;
 import xyz.hstudio.horizon.bukkit.data.checks.ScaffoldData;
 import xyz.hstudio.horizon.bukkit.network.ChannelHandler;
@@ -14,6 +15,7 @@ import xyz.hstudio.horizon.bukkit.util.Location;
 
 public class HoriPlayer {
 
+    public final AutoSwitchData autoSwitchData = new AutoSwitchData();
     public final KillAuraData killAuraData = new KillAuraData();
     public final ScaffoldData scaffoldData = new ScaffoldData();
     public Player player;
@@ -28,6 +30,7 @@ public class HoriPlayer {
     public boolean isOnGround;
     public long hitSlowdownTick = -1;
     public int vehicle = -1;
+    public long ping;
     private ChannelPipeline pipeline;
 
     public HoriPlayer(final Player player) {

@@ -7,8 +7,11 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import xyz.hstudio.horizon.bukkit.compat.McAccess;
 import xyz.hstudio.horizon.bukkit.compat.PacketConvert;
+import xyz.hstudio.horizon.bukkit.config.ConfigFile;
 import xyz.hstudio.horizon.bukkit.data.HoriPlayer;
+import xyz.hstudio.horizon.bukkit.kirin.Kirin;
 import xyz.hstudio.horizon.bukkit.listener.Listeners;
+import xyz.hstudio.horizon.bukkit.module.checks.AutoSwitch;
 import xyz.hstudio.horizon.bukkit.module.checks.KillAura;
 import xyz.hstudio.horizon.bukkit.module.checks.Scaffold;
 import xyz.hstudio.horizon.bukkit.thread.Async;
@@ -37,6 +40,7 @@ public class Horizon extends JavaPlugin {
     public final Map<String, YamlLoader> configMap = new ConcurrentHashMap<>();
     public List<String> announcements = new ArrayList<>();
     public Set<String> aliases = new HashSet<>();
+    public ConfigFile config;
 
     public Horizon() {
         Horizon.inst = this;
@@ -60,14 +64,32 @@ public class Horizon extends JavaPlugin {
         if (!checkFile.exists()) {
             saveResource("check.yml", true);
         }
-        YamlLoader yaml = YamlLoader.loadConfiguration(checkFile);
-        this.configMap.put("check.yml", yaml);
+        YamlLoader checkYaml = YamlLoader.loadConfiguration(checkFile);
+        this.configMap.put("check.yml", checkYaml);
+
+        File configFile = new File(folder, "config.yml");
+        if (!checkFile.exists()) {
+            saveResource("config.yml", true);
+        }
+        YamlLoader configYaml = YamlLoader.loadConfiguration(configFile);
+        this.configMap.put("config.yml", configYaml);
+        this.config = new ConfigFile().load();
+
+        if (this.config.kirin_enabled) {
+            try {
+                new Kirin(this.config);
+            } catch (Exception e) {
+                Logger.info("Kirin", "Failed to init Kirin! Please contact the author for help.");
+                e.printStackTrace();
+            }
+        }
 
         McAccess.init();
         PacketConvert.init();
         new Listeners();
 
         // Enable checks
+        new AutoSwitch();
         new KillAura();
         new Scaffold();
 

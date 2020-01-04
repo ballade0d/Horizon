@@ -15,6 +15,7 @@ import xyz.hstudio.horizon.bukkit.network.events.inbound.*;
 import xyz.hstudio.horizon.bukkit.network.events.outbound.VehicleEvent;
 import xyz.hstudio.horizon.bukkit.util.Hand;
 import xyz.hstudio.horizon.bukkit.util.Location;
+import xyz.hstudio.horizon.bukkit.util.MathUtils;
 
 import java.util.stream.IntStream;
 
@@ -83,7 +84,7 @@ public class PacketConvert_v1_14_R1 extends PacketConvert {
         float pitch = packet.b(player.position.pitch);
         boolean onGround = packet.b();
         Location to = new Location(player.world, x, y, z, yaw, pitch);
-        if (Math.abs(to.x) >= Integer.MAX_VALUE || Math.abs(to.y) >= Integer.MAX_VALUE || Math.abs(to.z) >= Integer.MAX_VALUE ||
+        if (MathUtils.abs(to.x) >= Integer.MAX_VALUE || MathUtils.abs(to.y) >= Integer.MAX_VALUE || MathUtils.abs(to.z) >= Integer.MAX_VALUE ||
                 Double.isNaN(to.x) || Double.isNaN(to.y) || Double.isNaN(to.z)) {
             return new BadMoveEvent(player, new WrappedPacket(packet));
         }

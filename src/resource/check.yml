@@ -1,3 +1,6 @@
+autoswitch:
+  enabled: true
+  debug: true
 killaura:
   enabled: true
   debug: true
@@ -5,4 +8,4 @@ killaura:
 scaffold:
   enabled: true
   debug: true
-  max_angle: 90
+  max_angle: 90.0

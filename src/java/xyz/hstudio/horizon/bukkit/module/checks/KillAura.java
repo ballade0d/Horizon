@@ -174,8 +174,10 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
             if (player.currentTick - data.lastFailTick > 5) {
                 return;
             }
-            float pitchChange = Math.abs(e.to.pitch - e.from.pitch);
-            if (pitchChange == 0) {
+            float pitchChange = this.getDistance(e.from.pitch, e.to.pitch);
+            float yawChange = this.getDistance(e.from.yaw, e.to.yaw);
+            if (pitchChange == 0 || yawChange == 0) {
+                data.lastPitchChange = pitchChange;
                 return;
             }
             // Convert it to int so I can get gcd.
@@ -196,6 +198,11 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
 
     private long greatestCommonDivisor(final int current, final int previous) {
         return previous <= 16384 ? current : this.greatestCommonDivisor(previous, current % previous);
+    }
+
+    private float getDistance(final float from, final float to) {
+        float distance = MathUtils.abs(to - from) % 360.0f;
+        return distance > 180 ? 360 - distance : distance;
     }
 
     /**
@@ -240,7 +247,6 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
 
     /**
      * A direction check. It can detect a large amount of killaura.
-     * Still need improvements.
      * I learnt this from Islandscout, but much lighter than his.
      * <p>
      * TODO: Ignore when colliding entities
@@ -269,10 +275,10 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
             if (e.hitSlowdown) {
                 prevVelocity.multiply(0.6);
             }
-            if (Math.abs(prevVelocity.getX() * friction) < 0.005) {
+            if (MathUtils.abs(prevVelocity.getX() * friction) < 0.005) {
                 prevVelocity.setX(0);
             }
-            if (Math.abs(prevVelocity.getZ() * friction) < 0.005) {
+            if (MathUtils.abs(prevVelocity.getZ() * friction) < 0.005) {
                 prevVelocity.setZ(0);
             }
             double dX = velocity.getX();
@@ -296,7 +302,7 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
             double threshold = Math.toRadians(config.max_angle);
 
             // Probably add a threshold?
-            if (Math.abs(multiple - NumberConversions.floor(multiple)) > threshold && Math.abs(multiple - NumberConversions.ceil(multiple)) > threshold) {
+            if (MathUtils.abs(multiple - NumberConversions.floor(multiple)) > threshold && MathUtils.abs(multiple - NumberConversions.ceil(multiple)) > threshold) {
                 this.debug("Failed: TypeF, a:" + angle);
 
                 // Punish

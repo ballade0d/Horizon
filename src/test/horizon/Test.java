@@ -1,8 +1,9 @@
 package horizon;
 
+import xyz.hstudio.horizon.bukkit.kirin.Kirin;
+
 public class Test {
 
-    public static void main(String[] args) {
-        System.out.println(Math.toRadians(0.6));
+    public static void main(String[] args) throws Exception {
     }
 }
