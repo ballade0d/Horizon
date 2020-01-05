@@ -49,7 +49,6 @@ public class MoveEvent extends Event {
         this.oldFriction = player.friction;
         this.newFriction = this.computeFriction();
 
-        // TODO: Probably optimize it? It takes 0.02ms to run.
         // This will only get the blocks that are colliding horizontally.
         this.collidingBlocks = this.cube.add(-0.0001, 0.0001, -0.0001, 0.0001, 0, 0.0001).getMaterials(to.world);
     }
@@ -68,6 +67,8 @@ public class MoveEvent extends Event {
     @Override
     public boolean pre() {
         this.player.currentTick++;
+
+        this.player.world = this.to.world;
         return true;
     }
 

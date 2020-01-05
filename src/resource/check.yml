@@ -1,6 +1,9 @@
 autoswitch:
   enabled: true
   debug: true
+invalidmotion:
+  enabled: true
+  debug: true
 killaura:
   enabled: true
   debug: true

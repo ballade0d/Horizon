@@ -12,6 +12,7 @@ import xyz.hstudio.horizon.bukkit.data.HoriPlayer;
 import xyz.hstudio.horizon.bukkit.kirin.Kirin;
 import xyz.hstudio.horizon.bukkit.listener.Listeners;
 import xyz.hstudio.horizon.bukkit.module.checks.AutoSwitch;
+import xyz.hstudio.horizon.bukkit.module.checks.InvalidMotion;
 import xyz.hstudio.horizon.bukkit.module.checks.KillAura;
 import xyz.hstudio.horizon.bukkit.module.checks.Scaffold;
 import xyz.hstudio.horizon.bukkit.thread.Async;
@@ -90,6 +91,7 @@ public class Horizon extends JavaPlugin {
 
         // Enable checks
         new AutoSwitch();
+        new InvalidMotion();
         new KillAura();
         new Scaffold();
 

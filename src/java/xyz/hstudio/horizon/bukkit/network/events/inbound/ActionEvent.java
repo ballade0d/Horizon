@@ -33,10 +33,13 @@ public class ActionEvent extends Event {
             case STOP_SPRINTING:
                 this.player.isSprinting = false;
                 break;
+            case START_GLIDING:
+                this.player.isGliding = true;
+                break;
         }
     }
 
     public enum Action {
-        START_SNEAKING, STOP_SNEAKING, START_SPRINTING, STOP_SPRINTING
+        START_SNEAKING, STOP_SNEAKING, START_SPRINTING, STOP_SPRINTING, START_GLIDING
     }
 }

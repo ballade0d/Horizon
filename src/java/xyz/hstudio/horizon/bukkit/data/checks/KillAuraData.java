@@ -28,6 +28,6 @@ public class KillAuraData extends Data {
     public int moves;
     public boolean swung;
 
-    // TypeF
+    // TypeF, TypeG
     public long lastHitTick = -10000;
 }

@@ -2,7 +2,9 @@ package xyz.hstudio.horizon.bukkit.compat;
 
 import io.netty.channel.ChannelPipeline;
 import lombok.Getter;
+import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import xyz.hstudio.horizon.bukkit.compat.v1_12_R1.McAccess_v1_12_R1;
 import xyz.hstudio.horizon.bukkit.compat.v1_13_R2.McAccess_v1_13_R2;
@@ -68,4 +70,9 @@ public abstract class McAccess {
      * Run a task in the main thread.
      */
     public abstract void ensureMainThread(final Runnable task);
+
+    /**
+     * Get an entity in a specified world by id
+     */
+    public abstract Entity getEntity(final World world, final int id);
 }

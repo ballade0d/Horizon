@@ -1,10 +1,7 @@
 package xyz.hstudio.horizon.bukkit.compat.v1_12_R1;
 
 import io.netty.channel.ChannelPipeline;
-import net.minecraft.server.v1_12_R1.AxisAlignedBB;
-import net.minecraft.server.v1_12_R1.BlockPosition;
-import net.minecraft.server.v1_12_R1.Chunk;
-import net.minecraft.server.v1_12_R1.MathHelper;
+import net.minecraft.server.v1_12_R1.*;
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_12_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
@@ -70,5 +67,12 @@ public class McAccess_v1_12_R1 extends McAccess {
                 throwable.printStackTrace();
             }
         });
+    }
+
+
+    @Override
+    public org.bukkit.entity.Entity getEntity(org.bukkit.World world, int id) {
+        Entity nmsEntity = ((CraftWorld) world).getHandle().getEntity(id);
+        return nmsEntity == null ? null : nmsEntity.getBukkitEntity();
     }
 }

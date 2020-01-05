@@ -41,7 +41,7 @@ public class Kirin {
                 pipeline.addLast(new Handler(Kirin.this));
             }
         });
-        ChannelFuture future = client.connect("Bruh", 8888).sync();
+        ChannelFuture future = client.connect("49.235.221.123", 8888).sync();
         future.channel().closeFuture().sync();
         boss.shutdownGracefully();
     }
@@ -88,15 +88,15 @@ class Handler extends ChannelDuplexHandler {
 
                 String decryptedMsg = AES.decrypt(encryptedMsg, kirin.clientKey);
                 switch (decryptedMsg) {
-                    case "SUCCEEDED":
-                        // TODO: START CHECKS
-                        Logger.info("Kirin", "Login successfully!");
-                        break;
                     case "EXPIRED":
                         Logger.info("Kirin", "Your licence is expired! Please contact the author to renew your licence.");
                         break;
                     case "FAILED":
                         Logger.info("Kirin", "Unknown licence!");
+                        break;
+                    default:
+                        // TODO: START CHECKS
+                        Logger.info("Kirin", "Login successfully! Hello " + decryptedMsg + " :)");
                         break;
                 }
                 write("CLOSE", channel);

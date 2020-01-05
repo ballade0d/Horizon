@@ -82,7 +82,7 @@ public class PacketConvert_v1_8_R3 extends PacketConvert {
         float yaw = hasLook ? packet.d() : player.position.yaw;
         float pitch = hasLook ? packet.e() : player.position.pitch;
         boolean onGround = packet.f();
-        Location to = new Location(player.world, x, y, z, yaw, pitch);
+        Location to = new Location(player.player.getWorld(), x, y, z, yaw, pitch);
         if (MathUtils.abs(to.x) >= Integer.MAX_VALUE || MathUtils.abs(to.y) >= Integer.MAX_VALUE || MathUtils.abs(to.z) >= Integer.MAX_VALUE ||
                 Double.isNaN(to.x) || Double.isNaN(to.y) || Double.isNaN(to.z)) {
             return new BadMoveEvent(player, new WrappedPacket(packet));

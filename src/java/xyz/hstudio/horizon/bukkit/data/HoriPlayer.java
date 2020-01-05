@@ -2,12 +2,15 @@ package xyz.hstudio.horizon.bukkit.data;
 
 import io.netty.channel.ChannelPipeline;
 import org.bukkit.World;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
 import org.bukkit.util.Vector;
 import xyz.hstudio.horizon.bukkit.Horizon;
 import xyz.hstudio.horizon.bukkit.compat.McAccess;
 import xyz.hstudio.horizon.bukkit.data.checks.AutoSwitchData;
+import xyz.hstudio.horizon.bukkit.data.checks.InvalidMotionData;
 import xyz.hstudio.horizon.bukkit.data.checks.KillAuraData;
 import xyz.hstudio.horizon.bukkit.data.checks.ScaffoldData;
 import xyz.hstudio.horizon.bukkit.network.ChannelHandler;
@@ -16,6 +19,7 @@ import xyz.hstudio.horizon.bukkit.util.Location;
 public class HoriPlayer {
 
     public final AutoSwitchData autoSwitchData = new AutoSwitchData();
+    public final InvalidMotionData invalidMotionData = new InvalidMotionData();
     public final KillAuraData killAuraData = new KillAuraData();
     public final ScaffoldData scaffoldData = new ScaffoldData();
     public Player player;
@@ -28,6 +32,7 @@ public class HoriPlayer {
     public boolean isSneaking;
     public boolean isSprinting;
     public boolean isOnGround;
+    public boolean isGliding;
     public long hitSlowdownTick = -1;
     public int vehicle = -1;
     public long ping;
@@ -69,5 +74,30 @@ public class HoriPlayer {
 
     public void sendMessage(final String msg) {
         McAccess.getInst().ensureMainThread(() -> this.player.sendMessage(msg));
+    }
+
+    /**
+     * Get player's current vehicle.
+     */
+    public Entity getVehicle() {
+        if (this.vehicle == -1) {
+            return null;
+        }
+        return McAccess.getInst().getEntity(this.world, this.vehicle);
+    }
+
+    /**
+     * Get the level of a potion
+     *
+     * @param name
+     * @return
+     */
+    public int getPotionEffectAmplifier(final String name) {
+        for (PotionEffect e : this.player.getActivePotionEffects()) {
+            if (e.getType().getName().equals(name)) {
+                return e.getAmplifier() + 1;
+            }
+        }
+        return 0;
     }
 }

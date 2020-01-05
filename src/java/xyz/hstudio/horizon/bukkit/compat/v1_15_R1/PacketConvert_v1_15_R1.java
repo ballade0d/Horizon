@@ -56,6 +56,9 @@ public class PacketConvert_v1_15_R1 extends PacketConvert {
             case STOP_SPRINTING:
                 action = ActionEvent.Action.STOP_SPRINTING;
                 break;
+            case START_FALL_FLYING:
+                action = ActionEvent.Action.START_GLIDING;
+                break;
             default:
                 return null;
         }
@@ -83,7 +86,7 @@ public class PacketConvert_v1_15_R1 extends PacketConvert {
         float yaw = packet.a(player.position.yaw);
         float pitch = packet.b(player.position.pitch);
         boolean onGround = packet.b();
-        Location to = new Location(player.world, x, y, z, yaw, pitch);
+        Location to = new Location(player.player.getWorld(), x, y, z, yaw, pitch);
         if (MathUtils.abs(to.x) >= Integer.MAX_VALUE || MathUtils.abs(to.y) >= Integer.MAX_VALUE || MathUtils.abs(to.z) >= Integer.MAX_VALUE ||
                 Double.isNaN(to.x) || Double.isNaN(to.y) || Double.isNaN(to.z)) {
             return new BadMoveEvent(player, new WrappedPacket(packet));
