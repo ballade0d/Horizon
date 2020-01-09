@@ -9,16 +9,14 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.util.Vector;
 import xyz.hstudio.horizon.bukkit.Horizon;
 import xyz.hstudio.horizon.bukkit.compat.McAccess;
-import xyz.hstudio.horizon.bukkit.data.checks.AutoSwitchData;
-import xyz.hstudio.horizon.bukkit.data.checks.InvalidMotionData;
-import xyz.hstudio.horizon.bukkit.data.checks.KillAuraData;
-import xyz.hstudio.horizon.bukkit.data.checks.ScaffoldData;
+import xyz.hstudio.horizon.bukkit.data.checks.*;
 import xyz.hstudio.horizon.bukkit.network.ChannelHandler;
 import xyz.hstudio.horizon.bukkit.util.Location;
 
 public class HoriPlayer {
 
     public final AutoSwitchData autoSwitchData = new AutoSwitchData();
+    public final BadPacketData badPacketData = new BadPacketData();
     public final InvalidMotionData invalidMotionData = new InvalidMotionData();
     public final KillAuraData killAuraData = new KillAuraData();
     public final ScaffoldData scaffoldData = new ScaffoldData();
@@ -28,6 +26,8 @@ public class HoriPlayer {
     public Location position;
     public int heldSlot;
     public float friction;
+    public double prevDeltaY;
+    public double prevPrevDeltaY;
     public Vector velocity = new Vector(0, 0, 0);
     public boolean isSneaking;
     public boolean isSprinting;
@@ -36,7 +36,7 @@ public class HoriPlayer {
     public long hitSlowdownTick = -1;
     public int vehicle = -1;
     public long ping;
-    private ChannelPipeline pipeline;
+    public ChannelPipeline pipeline;
 
     public HoriPlayer(final Player player) {
         this.player = player;
@@ -87,10 +87,7 @@ public class HoriPlayer {
     }
 
     /**
-     * Get the level of a potion
-     *
-     * @param name
-     * @return
+     * Get the level of an active potion.
      */
     public int getPotionEffectAmplifier(final String name) {
         for (PotionEffect e : this.player.getActivePotionEffects()) {
@@ -99,5 +96,12 @@ public class HoriPlayer {
             }
         }
         return 0;
+    }
+
+    /**
+     * Send a packet to the player
+     */
+    public void sendPacket(final Object packet){
+        this.pipeline.writeAndFlush(packet);
     }
 }

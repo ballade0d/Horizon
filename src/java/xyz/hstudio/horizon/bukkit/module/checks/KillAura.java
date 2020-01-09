@@ -219,14 +219,14 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
                 data.moves++;
                 return;
             }
-            if (data.moves < 8 && data.moveInterval.add(data.moves) && data.moveInterval.size() == 40) {
+            if (data.moves < 8 && data.moveInterval.add(data.moves) && data.moveInterval.size() == 25) {
                 double average = data.moveInterval.stream()
                         .mapToDouble(d -> d)
                         .average()
                         .orElse(0.0);
                 double stdDeviation = 0.0;
-                for (Integer i : data.moveInterval) {
-                    stdDeviation += NumberConversions.square(i.doubleValue() - average);
+                for (int i : data.moveInterval) {
+                    stdDeviation += NumberConversions.square(i - average);
                 }
 
                 // Customizable?
@@ -301,7 +301,7 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
             double multiple = angle / (Math.PI / 4);
             double threshold = Math.toRadians(config.max_angle);
 
-            // Probably add a threshold?
+            // TODO: Add a threshold
             if (MathUtils.abs(multiple - NumberConversions.floor(multiple)) > threshold && MathUtils.abs(multiple - NumberConversions.ceil(multiple)) > threshold) {
                 this.debug("Failed: TypeF, a:" + angle);
 

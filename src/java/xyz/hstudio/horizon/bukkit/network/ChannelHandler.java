@@ -34,6 +34,13 @@ public class ChannelHandler extends ChannelDuplexHandler {
         pipeline.addBefore("packet_handler", HANDLER_NAME, handler);
     }
 
+    public static void unregister(final HoriPlayer player){
+        ChannelPipeline pipeline = player.pipeline;
+        if (pipeline.get(HANDLER_NAME) != null) {
+            pipeline.remove(HANDLER_NAME);
+        }
+    }
+
     public void channelRead(final ChannelHandlerContext ctx, Object packet) throws Exception {
         try {
             ChannelHandler.run(player, packet);

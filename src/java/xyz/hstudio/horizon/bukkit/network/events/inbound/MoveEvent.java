@@ -9,6 +9,7 @@ import xyz.hstudio.horizon.bukkit.network.events.Event;
 import xyz.hstudio.horizon.bukkit.network.events.WrappedPacket;
 import xyz.hstudio.horizon.bukkit.util.AxisAlignedBB;
 import xyz.hstudio.horizon.bukkit.util.Location;
+import xyz.hstudio.horizon.bukkit.util.MaterialUtils;
 
 import java.util.Set;
 
@@ -25,6 +26,8 @@ public class MoveEvent extends Event {
     public final boolean hitSlowdown;
     public final boolean onGroundReally;
     public final boolean isUnderBlock;
+    public final boolean isOnSlime;
+    public final boolean isOnBed;
     public final float oldFriction;
     public final float newFriction;
     public Set<Material> collidingBlocks;
@@ -42,15 +45,48 @@ public class MoveEvent extends Event {
         this.moveType = moveType;
 
         this.hitSlowdown = player.currentTick == player.hitSlowdownTick;
-        // TODO: A real on ground check.
+        // TODO: A REAL on ground check.
         this.onGroundReally = onGround;
         this.isUnderBlock = !this.cube.add(0, 1.5, 0, 0, 0.5, 0).isEmpty(to.world);
+
+        this.isOnSlime = this.checkSlime();
+        this.isOnBed = this.checkBed();
 
         this.oldFriction = player.friction;
         this.newFriction = this.computeFriction();
 
         // This will only get the blocks that are colliding horizontally.
         this.collidingBlocks = this.cube.add(-0.0001, 0.0001, -0.0001, 0.0001, 0, 0.0001).getMaterials(to.world);
+    }
+
+    /**
+     * Check if player is bouncing on slime
+     *
+     * @author Islandscout
+     */
+    private boolean checkSlime() {
+        Block standing = this.from.add(0, -0.01, 0).getBlock();
+        if (standing == null) {
+            return false;
+        }
+        double slimeExpect = -0.96 * this.player.prevPrevDeltaY;
+        return standing.getType() == MaterialUtils.SLIME_BLOCK.parse() && !player.isSneaking &&
+                player.prevDeltaY < 0 && this.velocity.getY() > 0 && this.velocity.getY() > (player.prevPrevDeltaY < -0.1F ? slimeExpect - 0.003 : 0) && this.velocity.getY() <= slimeExpect;
+    }
+
+    /**
+     * Check if player is bouncing on bed
+     *
+     * @author MrCraftGoo
+     */
+    private boolean checkBed() {
+        Block standing = this.from.add(0, -0.01, 0).getBlock();
+        if (standing == null) {
+            return false;
+        }
+        double bedExpect = -0.62F * player.prevPrevDeltaY;
+        return standing.getType().name().contains("BED") && !player.isSneaking &&
+                player.prevDeltaY < 0 && this.velocity.getY() > 0 && this.velocity.getY() > (player.prevPrevDeltaY < -0.1F ? bedExpect - 0.003 : 0) && this.velocity.getY() <= bedExpect;
     }
 
     private float computeFriction() {
@@ -69,6 +105,10 @@ public class MoveEvent extends Event {
         this.player.currentTick++;
 
         this.player.world = this.to.world;
+
+        if (this.player.isGliding && this.onGround) {
+            this.player.isGliding = false;
+        }
         return true;
     }
 
@@ -77,6 +117,8 @@ public class MoveEvent extends Event {
         this.player.position = this.to;
         this.player.isOnGround = this.onGround;
         this.player.friction = this.newFriction;
+        this.player.prevPrevDeltaY = this.player.prevDeltaY;
+        this.player.prevDeltaY = this.velocity.getY();
         this.player.velocity = this.velocity;
     }
 

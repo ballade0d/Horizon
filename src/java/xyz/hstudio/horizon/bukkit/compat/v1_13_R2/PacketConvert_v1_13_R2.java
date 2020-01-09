@@ -13,6 +13,7 @@ import xyz.hstudio.horizon.bukkit.network.events.Event;
 import xyz.hstudio.horizon.bukkit.network.events.WrappedPacket;
 import xyz.hstudio.horizon.bukkit.network.events.inbound.*;
 import xyz.hstudio.horizon.bukkit.network.events.outbound.VehicleEvent;
+import xyz.hstudio.horizon.bukkit.network.events.outbound.VelocityEvent;
 import xyz.hstudio.horizon.bukkit.util.Hand;
 import xyz.hstudio.horizon.bukkit.util.Location;
 import xyz.hstudio.horizon.bukkit.util.MathUtils;
@@ -37,6 +38,8 @@ public class PacketConvert_v1_13_R2 extends PacketConvert {
             return convertHeldItemEvent(player, (PacketPlayInHeldItemSlot) packet);
         } else if (packet instanceof PacketPlayInArmAnimation) {
             return convertSwingEvent(player, (PacketPlayInArmAnimation) packet);
+        } else if (packet instanceof PacketPlayInKeepAlive) {
+            return convertKeepAliveRespondEvent(player, (PacketPlayInKeepAlive) packet);
         }
         return null;
     }
@@ -202,10 +205,16 @@ public class PacketConvert_v1_13_R2 extends PacketConvert {
         return new SwingEvent(player, Hand.valueOf(packet.b().name()), new WrappedPacket(packet));
     }
 
+    private Event convertKeepAliveRespondEvent(final HoriPlayer player, final PacketPlayInKeepAlive packet) {
+        return new KeepAliveRespondEvent(player, packet.b(), new WrappedPacket(packet));
+    }
+
     @Override
     public Event convertOut(final HoriPlayer player, final Object packet) {
         if (packet instanceof PacketPlayOutMount) {
             return convertAttachEvent(player, (PacketPlayOutMount) packet);
+        } else if (packet instanceof PacketPlayOutEntityVelocity) {
+            return convertVelocityEvent(player, (PacketPlayOutEntityVelocity) packet);
         }
         return null;
     }
@@ -227,5 +236,22 @@ public class PacketConvert_v1_13_R2 extends PacketConvert {
             return new VehicleEvent(player, -1, new WrappedPacket(packet));
         }
         return null;
+    }
+
+    private Event convertVelocityEvent(final HoriPlayer player, final PacketPlayOutEntityVelocity packet) {
+        PacketDataSerializer serializer = new PacketDataSerializer(Unpooled.buffer(8));
+        try {
+            packet.b(serializer);
+        } catch (Exception e) {
+            return null;
+        }
+        int id = serializer.g();
+        if (id != player.player.getEntityId()) {
+            return null;
+        }
+        double x = serializer.readShort() / 8000D;
+        double y = serializer.readShort() / 8000D;
+        double z = serializer.readShort() / 8000D;
+        return new VelocityEvent(player, x, y, z, new WrappedPacket(packet));
     }
 }

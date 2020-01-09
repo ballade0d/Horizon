@@ -1,6 +1,5 @@
 package xyz.hstudio.horizon.bukkit.module.checks;
 
-import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 import xyz.hstudio.horizon.bukkit.api.ModuleType;
 import xyz.hstudio.horizon.bukkit.compat.McAccess;
@@ -31,61 +30,41 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionConfig
     /**
      * Basic y-axis motion check. Based on Minecraft moving mechanism.
      *
-     * @author MrCraftGoo, Islandscout
+     * @author MrCraftGoo
      */
     private void typeA(final Event event, final HoriPlayer player, final InvalidMotionData data, final InvalidMotionConfig config) {
         if (event instanceof MoveEvent) {
             MoveEvent e = (MoveEvent) event;
-            if (!e.updatePos) {
-                return;
-            }
-            Block standing = e.from.add(0, -0.01, 0).getBlock();
-            if (standing == null) {
+            if (!e.updatePos || e.player.player.isFlying()) {
                 return;
             }
 
-            double deltaY = e.to.y - e.from.y;
+            double deltaY = e.velocity.getY();
 
-            double prevDeltaY = data.prevDeltaY;
+            double prevDeltaY = player.prevDeltaY;
             double expected;
 
             // Trust client onGround?
-            // TODO: Handle Honey, Water, FakeGround, Knockback, Step
+            // TODO: Handle Honey Block, Water, Fake Ground, Velocity, Step, Ladder, Tower
 
             if (player.isGliding) {
-                if (e.onGround) {
-                    player.isGliding = false;
-                    // Experiment value
-                    expected = deltaY;
-                } else {
-                    double motionY = prevDeltaY;
-                    Vector direction = e.from.getDirection();
-                    float rotPitch = (float) Math.toRadians(e.to.pitch - e.from.pitch);
-                    // Magic numbers from MCP
-                    // Wtf is this??
-                    float magic = McAccess.getInst().cos(rotPitch);
-                    magic = (float) (magic * magic * Math.min(1.0D, direction.length() / 0.4D));
-                    if (prevDeltaY < 0.0) {
-                        motionY += prevDeltaY * -0.1 * (double) magic;
-                    }
-                    if (rotPitch < 0.0) {
-                        motionY += e.velocity.length() * (-McAccess.getInst().sin(rotPitch)) * 0.04 * 3.2D;
-                    }
-                    motionY *= 0.9900000095367432D;
-                    expected = motionY;
+                double motionY = prevDeltaY;
+                Vector direction = e.from.getDirection();
+                float rotPitch = (float) Math.toRadians(e.to.pitch - e.from.pitch);
+                // Magic numbers from MCP
+                // Wtf is this??
+                float magic = McAccess.getInst().cos(rotPitch);
+                magic = (float) (magic * magic * Math.min(1, direction.length() / 0.4));
+                if (prevDeltaY < 0.0) {
+                    motionY += prevDeltaY * -0.1 * (double) magic;
                 }
+                if (rotPitch < 0.0) {
+                    motionY += e.velocity.length() * (-McAccess.getInst().sin(rotPitch)) * 0.04 * 3.2;
+                }
+                motionY *= 0.9900000095367432;
+                expected = motionY;
             } else {
-                // This magic value is something like elasticity.
-                // Put these judgments in MoveEvent?
-                double slimeExpect = -0.96 * data.prevPrevDeltaY;
-                double bedExpect = -0.62F * data.prevPrevDeltaY;
-                if (standing.getType() == MaterialUtils.SLIME_BLOCK.parse() && !player.isSneaking &&
-                        data.prevDeltaY < 0 && deltaY > 0 && deltaY > (data.prevPrevDeltaY < -0.1F ? slimeExpect - 0.003 : 0) && deltaY <= slimeExpect) {
-                    // Player is bouncing on slime
-                    expected = deltaY;
-                } else if (standing.getType().name().contains("BED") && !player.isSneaking &&
-                        data.prevDeltaY < 0 && deltaY > 0 && deltaY > (data.prevPrevDeltaY < -0.1F ? bedExpect - 0.003 : 0) && deltaY <= bedExpect) {
-                    // Player is bouncing on bed
+                if (e.isOnSlime || e.isOnBed) {
                     expected = deltaY;
                 } else if (e.collidingBlocks.contains(MaterialUtils.COBWEB.parse())) {
                     // Y speed in web. Anything shouldn't affect it so it's a value.
@@ -95,12 +74,17 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionConfig
                     expected = deltaY;
                     data.inAir = false;
                 } else {
-                    if (!data.inAir) {
+                    // This is updated after move, so in the tick player get/lose the potion this falses.
+                    // TODO: Implement a system to track player's available potion effects? (Maybe hard)
+                    int levitation = player.getPotionEffectAmplifier("LEVITATION");
+                    if (levitation > 0) {
+                        expected = prevDeltaY + (0.05 * (levitation + 1) - prevDeltaY) * 0.2;
+                    } else if (!data.inAir) {
                         // Jump init height.
                         expected = 0.42 + player.getPotionEffectAmplifier("JUMP") * 0.1;
                     } else {
-                        // Magic number from MCP
-                        // Basically it's something like gravitational acceleration
+                        // Magic number from MCP.
+                        // Basically it's something like gravitational acceleration.
                         expected = (prevDeltaY - 0.08) * 0.9800000190734863;
                     }
                     data.inAir = true;
@@ -114,9 +98,15 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionConfig
                 // Punish
                 this.punish(player, data, "TypeA", 0);
             }
+        }
+    }
 
-            data.prevPrevDeltaY = data.prevDeltaY;
-            data.prevDeltaY = deltaY;
+    /**
+     * Vehicle motion check.
+     */
+    private void typeB(final Event event, final HoriPlayer player, final InvalidMotionData data, final InvalidMotionConfig config) {
+        if (event instanceof MoveEvent) {
+
         }
     }
 }

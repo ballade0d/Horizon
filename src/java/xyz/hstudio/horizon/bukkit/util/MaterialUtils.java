@@ -6,6 +6,8 @@ public enum MaterialUtils {
 
     SLIME_BLOCK(),
     HONEY_BLOCK(),
+    LADDER(),
+    VINE(),
     COBWEB("WEB");
 
     private final String[] legacy;

@@ -11,10 +11,8 @@ import xyz.hstudio.horizon.bukkit.config.ConfigFile;
 import xyz.hstudio.horizon.bukkit.data.HoriPlayer;
 import xyz.hstudio.horizon.bukkit.kirin.Kirin;
 import xyz.hstudio.horizon.bukkit.listener.Listeners;
-import xyz.hstudio.horizon.bukkit.module.checks.AutoSwitch;
-import xyz.hstudio.horizon.bukkit.module.checks.InvalidMotion;
-import xyz.hstudio.horizon.bukkit.module.checks.KillAura;
-import xyz.hstudio.horizon.bukkit.module.checks.Scaffold;
+import xyz.hstudio.horizon.bukkit.module.checks.*;
+import xyz.hstudio.horizon.bukkit.network.ChannelHandler;
 import xyz.hstudio.horizon.bukkit.thread.Async;
 import xyz.hstudio.horizon.bukkit.util.Version;
 import xyz.hstudio.horizon.bukkit.util.YamlLoader;
@@ -91,6 +89,7 @@ public class Horizon extends JavaPlugin {
 
         // Enable checks
         new AutoSwitch();
+        new BadPacket();
         new InvalidMotion();
         new KillAura();
         new Scaffold();
@@ -121,12 +120,13 @@ public class Horizon extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        for (Map.Entry<String, YamlLoader> entry : this.configMap.entrySet()) {
+        Horizon.PLAYERS.values().forEach(ChannelHandler::unregister);
+        this.configMap.forEach((string, yaml) -> {
             try {
-                entry.getValue().save(new File(this.getDataFolder(), entry.getKey()));
+                yaml.save(new File(this.getDataFolder(), string));
             } catch (IOException e) {
-                Logger.info("Error", "Failed to save the file " + entry.getKey() + "!");
+                Logger.info("Error", "Failed to save the file " + string + "!");
             }
-        }
+        });
     }
 }
