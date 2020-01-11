@@ -7,9 +7,9 @@ import xyz.hstudio.horizon.bukkit.compat.McAccess;
 import xyz.hstudio.horizon.bukkit.data.HoriPlayer;
 import xyz.hstudio.horizon.bukkit.network.events.Event;
 import xyz.hstudio.horizon.bukkit.network.events.WrappedPacket;
-import xyz.hstudio.horizon.bukkit.util.AxisAlignedBB;
+import xyz.hstudio.horizon.bukkit.util.AABB;
 import xyz.hstudio.horizon.bukkit.util.Location;
-import xyz.hstudio.horizon.bukkit.util.MaterialUtils;
+import xyz.hstudio.horizon.bukkit.util.MatUtils;
 
 import java.util.Set;
 
@@ -18,7 +18,7 @@ public class MoveEvent extends Event {
     public final Location from;
     public final Location to;
     public final Vector velocity;
-    public final AxisAlignedBB cube;
+    public final AABB cube;
     public final boolean onGround;
     public final boolean updatePos;
     public final boolean updateRot;
@@ -46,7 +46,7 @@ public class MoveEvent extends Event {
 
         this.hitSlowdown = player.currentTick == player.hitSlowdownTick;
         // TODO: A REAL on ground check.
-        this.onGroundReally = onGround;
+        this.onGroundReally = this.to.isOnGround(this.cube);
         this.isUnderBlock = !this.cube.add(0, 1.5, 0, 0, 0.5, 0).isEmpty(to.world);
 
         this.isOnSlime = this.checkSlime();
@@ -60,17 +60,17 @@ public class MoveEvent extends Event {
     }
 
     /**
-     * Check if player is bouncing on slime
+     * Check if player is bouncing on slime block
      *
      * @author Islandscout
      */
     private boolean checkSlime() {
-        Block standing = this.from.add(0, -0.01, 0).getBlock();
+        Block standing = this.from.add(0, -0.001, 0).getBlock();
         if (standing == null) {
             return false;
         }
-        double slimeExpect = -0.96 * this.player.prevPrevDeltaY;
-        return standing.getType() == MaterialUtils.SLIME_BLOCK.parse() && !player.isSneaking &&
+        double slimeExpect = -0.96 * player.prevPrevDeltaY;
+        return standing.getType() == MatUtils.SLIME_BLOCK.parse() && !player.isSneaking &&
                 player.prevDeltaY < 0 && this.velocity.getY() > 0 && this.velocity.getY() > (player.prevPrevDeltaY < -0.1F ? slimeExpect - 0.003 : 0) && this.velocity.getY() <= slimeExpect;
     }
 
@@ -80,7 +80,7 @@ public class MoveEvent extends Event {
      * @author MrCraftGoo
      */
     private boolean checkBed() {
-        Block standing = this.from.add(0, -0.01, 0).getBlock();
+        Block standing = this.from.add(0, -0.001, 0).getBlock();
         if (standing == null) {
             return false;
         }
@@ -91,8 +91,8 @@ public class MoveEvent extends Event {
 
     private float computeFriction() {
         float friction = 0.91F;
-        if (this.player.isOnGround) {
-            Block b = this.player.position.add(0, -1, 0).getBlock();
+        if (player.isOnGround) {
+            Block b = player.position.add(0, -1, 0).getBlock();
             if (b != null) {
                 friction *= McAccess.getInst().getFriction(b);
             }
@@ -102,24 +102,24 @@ public class MoveEvent extends Event {
 
     @Override
     public boolean pre() {
-        this.player.currentTick++;
+        player.currentTick++;
 
-        this.player.world = this.to.world;
+        player.world = this.to.world;
 
-        if (this.player.isGliding && this.onGround) {
-            this.player.isGliding = false;
+        if (player.isGliding && this.onGround) {
+            player.isGliding = false;
         }
         return true;
     }
 
     @Override
     public void post() {
-        this.player.position = this.to;
-        this.player.isOnGround = this.onGround;
-        this.player.friction = this.newFriction;
-        this.player.prevPrevDeltaY = this.player.prevDeltaY;
-        this.player.prevDeltaY = this.velocity.getY();
-        this.player.velocity = this.velocity;
+        player.position = this.to;
+        player.isOnGround = this.onGround;
+        player.friction = this.newFriction;
+        player.prevPrevDeltaY = player.prevDeltaY;
+        player.prevDeltaY = this.velocity.getY();
+        player.velocity = this.velocity;
     }
 
     public enum MoveType {

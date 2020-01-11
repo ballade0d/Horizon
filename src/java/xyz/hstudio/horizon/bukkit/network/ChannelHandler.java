@@ -16,8 +16,18 @@ public class ChannelHandler extends ChannelDuplexHandler {
     private static final String HANDLER_NAME = "horizon_packet_handler";
     private final HoriPlayer player;
 
-    private static void run(final HoriPlayer player, final Object packet) {
+    private static void runInbound(final HoriPlayer player, final Object packet) {
         Event event = PacketConvert.getInst().convertIn(player, packet);
+        if (event == null) {
+            return;
+        }
+        event.pre();
+        Module.doCheck(event, player);
+        event.post();
+    }
+
+    private static void runOutbound(final HoriPlayer player, final Object packet) {
+        Event event = PacketConvert.getInst().convertOut(player, packet);
         if (event == null) {
             return;
         }
@@ -34,7 +44,7 @@ public class ChannelHandler extends ChannelDuplexHandler {
         pipeline.addBefore("packet_handler", HANDLER_NAME, handler);
     }
 
-    public static void unregister(final HoriPlayer player){
+    public static void unregister(final HoriPlayer player) {
         ChannelPipeline pipeline = player.pipeline;
         if (pipeline.get(HANDLER_NAME) != null) {
             pipeline.remove(HANDLER_NAME);
@@ -43,7 +53,7 @@ public class ChannelHandler extends ChannelDuplexHandler {
 
     public void channelRead(final ChannelHandlerContext ctx, Object packet) throws Exception {
         try {
-            ChannelHandler.run(player, packet);
+            ChannelHandler.runInbound(player, packet);
         } catch (Throwable throwable) {
             throwable.printStackTrace();
         }
@@ -51,7 +61,11 @@ public class ChannelHandler extends ChannelDuplexHandler {
     }
 
     public void write(final ChannelHandlerContext ctx, Object packet, final ChannelPromise promise) throws Exception {
-        PacketConvert.getInst().convertOut(player, packet);
+        try {
+            ChannelHandler.runOutbound(player, packet);
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+        }
         super.write(ctx, packet, promise);
     }
 }

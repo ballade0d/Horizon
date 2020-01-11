@@ -8,11 +8,12 @@ import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import xyz.hstudio.horizon.bukkit.compat.McAccess;
-import xyz.hstudio.horizon.lib.com.esotericsoftware.reflectasm.FieldAccess;
+import xyz.hstudio.horizon.bukkit.util.AABB;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class McAccess_v1_8_R3 extends McAccess {
-
-    private final FieldAccess AABB = FieldAccess.get(AxisAlignedBB.class);
 
     @Override
     public ChannelPipeline getPipeline(final Player player) {
@@ -45,16 +46,9 @@ public class McAccess_v1_8_R3 extends McAccess {
     }
 
     @Override
-    public xyz.hstudio.horizon.bukkit.util.AxisAlignedBB getCube(final Player player) {
+    public AABB getCube(final Player player) {
         AxisAlignedBB cube = ((CraftPlayer) player).getHandle().getBoundingBox();
-        // It has different field name between Spigot/Paper. I have to use reflection.
-        double minX = AABB.getDouble(cube, 0);
-        double minY = AABB.getDouble(cube, 1);
-        double minZ = AABB.getDouble(cube, 2);
-        double maxX = AABB.getDouble(cube, 3);
-        double maxY = AABB.getDouble(cube, 4);
-        double maxZ = AABB.getDouble(cube, 5);
-        return new xyz.hstudio.horizon.bukkit.util.AxisAlignedBB(minX, minY, minZ, maxX, maxY, maxZ);
+        return new AABB(cube.a, cube.b, cube.c, cube.d, cube.e, cube.f);
     }
 
     @Override
@@ -73,5 +67,37 @@ public class McAccess_v1_8_R3 extends McAccess {
     public org.bukkit.entity.Entity getEntity(org.bukkit.World world, int id) {
         Entity nmsEntity = ((CraftWorld) world).getHandle().a(id);
         return nmsEntity == null ? null : nmsEntity.getBukkitEntity();
+    }
+
+    @Override
+    public AABB[] getBoxes(final org.bukkit.block.Block block) {
+        WorldServer world = ((CraftWorld) block.getWorld()).getHandle();
+        Chunk chunk = world.getChunkIfLoaded(block.getX() >> 4, block.getZ() >> 4);
+        if (chunk == null) {
+            return new AABB[0];
+        }
+        BlockPosition bPos = new BlockPosition(block.getX(), block.getY(), block.getZ());
+        IBlockData data = chunk.getBlockData(bPos);
+        Block b = data.getBlock();
+
+        // Have to update shape
+        b.updateShape(world, bPos);
+        List<AxisAlignedBB> bbs = new ArrayList<>();
+        AxisAlignedBB cube = new AxisAlignedBB(block.getX(), block.getY(), block.getZ(), block.getX() + 1, block.getY() + 1, block.getZ() + 1);
+        b.a(world, bPos, data, cube, bbs, null);
+
+        AxisAlignedBB[] raw = bbs.toArray(new AxisAlignedBB[0]);
+        AABB[] boxes = new AABB[bbs.size()];
+
+        for (int i = 0; i < bbs.size(); i++) {
+            boxes[i] = new AABB(raw[i].a, raw[i].b, raw[i].c, raw[i].d, raw[i].e, raw[i].f);
+        }
+
+        return boxes;
+    }
+
+    @Override
+    public double getMoveFactor(final Player player) {
+        return ((CraftPlayer) player).getHandle().getAttributeInstance(GenericAttributes.MOVEMENT_SPEED).getValue();
     }
 }

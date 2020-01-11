@@ -2,17 +2,17 @@ package xyz.hstudio.horizon.bukkit.util;
 
 import org.bukkit.Material;
 
-public enum MaterialUtils {
+public enum MatUtils {
 
-    SLIME_BLOCK(),
+    SLIME_BLOCK("SLIME_BLOCK"),
     HONEY_BLOCK(),
-    LADDER(),
-    VINE(),
+    LADDER("LADDER"),
+    VINE("VINE"),
     COBWEB("WEB");
 
     private final String[] legacy;
 
-    MaterialUtils(final String... legacy) {
+    MatUtils(final String... legacy) {
         this.legacy = legacy;
     }
 

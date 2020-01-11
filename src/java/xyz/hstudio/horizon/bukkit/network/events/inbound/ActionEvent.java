@@ -22,19 +22,19 @@ public class ActionEvent extends Event {
     public void post() {
         switch (this.action) {
             case START_SNEAKING:
-                this.player.isSneaking = true;
+                player.isSneaking = true;
                 break;
             case STOP_SNEAKING:
-                this.player.isSneaking = false;
+                player.isSneaking = false;
                 break;
             case START_SPRINTING:
-                this.player.isSprinting = true;
+                player.isSprinting = true;
                 break;
             case STOP_SPRINTING:
-                this.player.isSprinting = false;
+                player.isSprinting = false;
                 break;
             case START_GLIDING:
-                this.player.isGliding = true;
+                player.isGliding = true;
                 break;
         }
     }

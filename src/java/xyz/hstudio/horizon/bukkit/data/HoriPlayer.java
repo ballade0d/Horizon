@@ -31,6 +31,8 @@ public class HoriPlayer {
     public Vector velocity = new Vector(0, 0, 0);
     public boolean isSneaking;
     public boolean isSprinting;
+    public boolean isEating;
+    public boolean isPullingBow;
     public boolean isOnGround;
     public boolean isGliding;
     public long hitSlowdownTick = -1;
@@ -101,7 +103,7 @@ public class HoriPlayer {
     /**
      * Send a packet to the player
      */
-    public void sendPacket(final Object packet){
+    public void sendPacket(final Object packet) {
         this.pipeline.writeAndFlush(packet);
     }
 }

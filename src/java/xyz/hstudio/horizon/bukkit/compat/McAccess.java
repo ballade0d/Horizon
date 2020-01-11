@@ -11,7 +11,7 @@ import xyz.hstudio.horizon.bukkit.compat.v1_13_R2.McAccess_v1_13_R2;
 import xyz.hstudio.horizon.bukkit.compat.v1_14_R1.McAccess_v1_14_R1;
 import xyz.hstudio.horizon.bukkit.compat.v1_15_R1.McAccess_v1_15_R1;
 import xyz.hstudio.horizon.bukkit.compat.v1_8_R3.McAccess_v1_8_R3;
-import xyz.hstudio.horizon.bukkit.util.AxisAlignedBB;
+import xyz.hstudio.horizon.bukkit.util.AABB;
 import xyz.hstudio.horizon.bukkit.util.Version;
 
 public abstract class McAccess {
@@ -64,7 +64,7 @@ public abstract class McAccess {
     /**
      * Get the bounding box of a player.
      */
-    public abstract AxisAlignedBB getCube(final Player player);
+    public abstract AABB getCube(final Player player);
 
     /**
      * Run a task in the main thread.
@@ -72,7 +72,17 @@ public abstract class McAccess {
     public abstract void ensureMainThread(final Runnable task);
 
     /**
-     * Get an entity in a specified world by id
+     * Get the entity in a specified world by id
      */
     public abstract Entity getEntity(final World world, final int id);
+
+    /**
+     * Get the voxel shapes of a block.
+     */
+    public abstract AABB[] getBoxes(final Block block);
+
+    /**
+     * Get the value of movement speed attribute.
+     */
+    public abstract double getMoveFactor(final Player player);
 }

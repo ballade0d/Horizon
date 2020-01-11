@@ -11,11 +11,15 @@ import xyz.hstudio.horizon.bukkit.data.HoriPlayer;
 import xyz.hstudio.horizon.bukkit.network.events.Event;
 import xyz.hstudio.horizon.bukkit.network.events.WrappedPacket;
 import xyz.hstudio.horizon.bukkit.network.events.inbound.*;
+import xyz.hstudio.horizon.bukkit.network.events.outbound.MetaEvent;
 import xyz.hstudio.horizon.bukkit.network.events.outbound.VehicleEvent;
 import xyz.hstudio.horizon.bukkit.network.events.outbound.VelocityEvent;
 import xyz.hstudio.horizon.bukkit.util.Hand;
 import xyz.hstudio.horizon.bukkit.util.Location;
 import xyz.hstudio.horizon.bukkit.util.MathUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class PacketConvert_v1_8_R3 extends PacketConvert {
 
@@ -215,6 +219,8 @@ public class PacketConvert_v1_8_R3 extends PacketConvert {
             return convertAttachEvent(player, (PacketPlayOutAttachEntity) packet);
         } else if (packet instanceof PacketPlayOutEntityVelocity) {
             return convertVelocityEvent(player, (PacketPlayOutEntityVelocity) packet);
+        } else if (packet instanceof PacketPlayOutEntityMetadata) {
+            return convertMetaEvent(player, (PacketPlayOutEntityMetadata) packet);
         }
         return null;
     }
@@ -253,5 +259,29 @@ public class PacketConvert_v1_8_R3 extends PacketConvert {
         double y = serializer.readShort() / 8000D;
         double z = serializer.readShort() / 8000D;
         return new VelocityEvent(player, x, y, z, new WrappedPacket(packet));
+    }
+
+    private Event convertMetaEvent(final HoriPlayer player, final PacketPlayOutEntityMetadata packet) {
+        PacketDataSerializer serializer = new PacketDataSerializer(Unpooled.buffer(0));
+        try {
+            packet.b(serializer);
+            int id = serializer.e();
+            if (id != player.player.getEntityId()) {
+                return null;
+            }
+            List<DataWatcher.WatchableObject> metaData = DataWatcher.b(serializer);
+            if (metaData == null) {
+                return null;
+            }
+            List<MetaEvent.WatchableObject> objects = new ArrayList<>();
+            for (DataWatcher.WatchableObject watchableObject : metaData) {
+                int index = watchableObject.a();
+                Object object = watchableObject.b();
+                objects.add(new MetaEvent.WatchableObject(index, object));
+            }
+            return new MetaEvent(player, objects, new WrappedPacket(packet));
+        } catch (Exception e) {
+            return null;
+        }
     }
 }

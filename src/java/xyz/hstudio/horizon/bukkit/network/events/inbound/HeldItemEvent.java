@@ -15,7 +15,7 @@ public class HeldItemEvent extends Event {
 
     @Override
     public boolean pre() {
-        this.player.heldSlot = this.slot;
+        player.heldSlot = this.slot;
         return true;
     }
 

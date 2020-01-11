@@ -20,6 +20,6 @@ public class VehicleEvent extends Event {
 
     @Override
     public void post() {
-        this.player.vehicle = vehicle;
+        player.vehicle = vehicle;
     }
 }

@@ -43,7 +43,7 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
      * This will detect all post killaura,
      * Yes, it's like 10 lines.
      * <p>
-     * Accuracy: 7/10 - Should not have much false positives
+     * Accuracy: 8/10 - Should not have much false positives
      * Efficiency: 9/10 - Detects post killaura almost instantly
      *
      * @author MrCraftGoo
@@ -201,7 +201,7 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
     }
 
     private float getDistance(final float from, final float to) {
-        float distance = MathUtils.abs(to - from) % 360.0f;
+        float distance = MathUtils.abs(to - from) % 360F;
         return distance > 180 ? 360 - distance : distance;
     }
 
@@ -223,8 +223,8 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
                 double average = data.moveInterval.stream()
                         .mapToDouble(d -> d)
                         .average()
-                        .orElse(0.0);
-                double stdDeviation = 0.0;
+                        .orElse(0);
+                double stdDeviation = 0;
                 for (int i : data.moveInterval) {
                     stdDeviation += NumberConversions.square(i - average);
                 }
@@ -315,5 +315,12 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
             }
             data.lastHitTick = player.currentTick;
         }
+    }
+
+    /**
+     * A HitBox check.
+     */
+    private void typeG(final Event event, final HoriPlayer player, final KillAuraData data, final KillAuraConfig config) {
+
     }
 }

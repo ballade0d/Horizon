@@ -29,9 +29,9 @@ public class InteractEntityEvent extends Event {
             return true;
         }
         if (McAccess.getInst().isAccumulated(player.player)) {
-            ItemStack itemStack = this.player.getHeldItem();
-            if (this.player.isSprinting || (itemStack != null && itemStack.containsEnchantment(Enchantment.KNOCKBACK))) {
-                this.player.hitSlowdownTick = this.player.currentTick;
+            ItemStack itemStack = player.getHeldItem();
+            if (player.isSprinting || (itemStack != null && itemStack.containsEnchantment(Enchantment.KNOCKBACK))) {
+                player.hitSlowdownTick = player.currentTick;
             }
         }
         return true;

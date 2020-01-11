@@ -12,12 +12,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class AxisAlignedBB {
+public class AABB {
 
     public final double minX, minY, minZ;
     public final double maxX, maxY, maxZ;
 
-    public AxisAlignedBB(final double minX, final double minY, final double minZ, final double maxX, final double maxY, final double maxZ) {
+    public AABB(final double minX, final double minY, final double minZ, final double maxX, final double maxY, final double maxZ) {
         this.minX = minX;
         this.minY = minY;
         this.minZ = minZ;
@@ -26,7 +26,7 @@ public class AxisAlignedBB {
         this.maxZ = maxZ;
     }
 
-    public AxisAlignedBB(final Vector min, final Vector max) {
+    public AABB(final Vector min, final Vector max) {
         this.minX = min.getX();
         this.minY = min.getY();
         this.minZ = min.getZ();
@@ -35,39 +35,49 @@ public class AxisAlignedBB {
         this.maxZ = max.getZ();
     }
 
-    public AxisAlignedBB expand(final double x, final double y, final double z) {
+    public AABB expand(final double x, final double y, final double z) {
         double minX = this.minX - x;
         double minY = this.minY - y;
         double minZ = this.minZ - z;
         double maxX = this.maxX + x;
         double maxY = this.maxY + y;
         double maxZ = this.maxZ + z;
-        return new AxisAlignedBB(minX, minY, minZ, maxX, maxY, maxZ);
+        return new AABB(minX, minY, minZ, maxX, maxY, maxZ);
     }
 
-    public AxisAlignedBB shrink(final double x, final double y, final double z) {
+    public AABB shrink(final double x, final double y, final double z) {
         double minX = this.minX + x;
         double minY = this.minY + y;
         double minZ = this.minZ + z;
         double maxX = this.maxX - x;
         double maxY = this.maxY - y;
         double maxZ = this.maxZ - z;
-        return new AxisAlignedBB(minX, minY, minZ, maxX, maxY, maxZ);
+        return new AABB(minX, minY, minZ, maxX, maxY, maxZ);
     }
 
-    public AxisAlignedBB add(final double x, final double y, final double z) {
-        return new AxisAlignedBB(this.minX + x, this.minY + y, this.minZ + z, this.maxX + x, this.maxY + y, this.maxZ + z);
+    public AABB add(final double x, final double y, final double z) {
+        return new AABB(this.minX + x, this.minY + y, this.minZ + z, this.maxX + x, this.maxY + y, this.maxZ + z);
     }
 
-    public AxisAlignedBB add(final double minX, final double minY, final double minZ, final double maxX, final double maxY, final double maxZ) {
-        return new AxisAlignedBB(this.minX + minX, this.minY + minY, this.minZ + minZ, this.maxX + maxX, this.maxY + maxY, this.maxZ + maxZ);
+    public AABB add(final double minX, final double minY, final double minZ, final double maxX, final double maxY, final double maxZ) {
+        return new AABB(this.minX + minX, this.minY + minY, this.minZ + minZ, this.maxX + maxX, this.maxY + maxY, this.maxZ + maxZ);
     }
 
-    public AxisAlignedBB add(final Vector vec) {
-        return new AxisAlignedBB(this.minX + vec.getX(), this.minY + vec.getY(), this.minZ + vec.getZ(), this.maxX + vec.getX(), this.maxY + vec.getY(), this.maxZ + vec.getZ());
+    public AABB add(final Vector vec) {
+        return new AABB(this.minX + vec.getX(), this.minY + vec.getY(), this.minZ + vec.getZ(), this.maxX + vec.getX(), this.maxY + vec.getY(), this.maxZ + vec.getZ());
     }
 
-    public AxisAlignedBB highlight(final World world, final double accuracy) {
+    public boolean isColliding(final AABB other) {
+        if (this.maxX < other.minX || minX > other.maxX) {
+            return false;
+        }
+        if (maxY < other.minY || minY > other.maxY) {
+            return false;
+        }
+        return !(maxZ < other.minZ) && !(minZ > other.maxZ);
+    }
+
+    public AABB highlight(final World world, final double accuracy) {
         for (double x = this.minX; x <= this.maxX; x += accuracy) {
             for (double y = this.minY; y <= this.maxY; y += accuracy) {
                 for (double z = this.minZ; z <= this.maxZ; z += accuracy) {

@@ -31,11 +31,11 @@ public class BadPacket extends Module<BadPacketData, BadPacketConfig> {
      *
      * @author MrCraftGoo
      */
-    private void typeA(final Event event, final HoriPlayer player, final BadPacketData data, final BadPacketConfig config){
-        if(event instanceof KeepAliveRespondEvent){
+    private void typeA(final Event event, final HoriPlayer player, final BadPacketData data, final BadPacketConfig config) {
+        if (event instanceof KeepAliveRespondEvent) {
             // A player should send 20 move packets(1.8.8 or lower)
             // or 1 move packet (1.9 or higher) at least in one second.
-            if(player.currentTick == data.lastTick){
+            if (player.currentTick == data.lastTick) {
                 this.debug("Failed: TypeA");
 
                 // Punish
@@ -50,15 +50,15 @@ public class BadPacket extends Module<BadPacketData, BadPacketConfig> {
      *
      * @author MrCraftGoo
      */
-    private void typeB(final Event event, final HoriPlayer player, final BadPacketData data, final BadPacketConfig config){
-        if(event instanceof MoveEvent){
+    private void typeB(final Event event, final HoriPlayer player, final BadPacketData data, final BadPacketConfig config) {
+        if (event instanceof MoveEvent) {
             MoveEvent e = (MoveEvent) event;
-            if(e.moveType != MoveEvent.MoveType.FLYING){
+            if (e.moveType != MoveEvent.MoveType.FLYING) {
                 data.flyingCount = 0;
                 return;
             }
             // A player can send only 19 flying packets in a row.
-            if(++data.flyingCount > 20){
+            if (++data.flyingCount > 20) {
                 this.debug("Failed: TypeB");
 
                 // Punish

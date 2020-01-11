@@ -4,6 +4,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.util.NumberConversions;
 import org.bukkit.util.Vector;
+import xyz.hstudio.horizon.bukkit.compat.McAccess;
 
 /**
  * A wrapped Location class. Remember to use this instead of using bukkit's.
@@ -51,6 +52,22 @@ public class Location {
 
     public Block getBlockUnsafe() {
         return this.world.getBlockAt(this.getBlockX(), this.getBlockY(), this.getBlockZ());
+    }
+
+    public boolean isOnGround(final AABB cube) {
+        AABB surrounding = new AABB(cube.minX, cube.minY - 1, cube.minZ, cube.maxX, cube.minY, cube.maxZ);
+        AABB underFeet = new AABB(cube.minX, cube.minY - 0.001, cube.minZ, cube.maxX, cube.minY, cube.maxZ);
+        for (Block block : surrounding.getBlocks(this.world)) {
+            if (block.isLiquid() || !block.getType().isSolid()) {
+                continue;
+            }
+            for (AABB bBox : McAccess.getInst().getBoxes(block)) {
+                if (bBox.isColliding(underFeet)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     public Location add(final double x, final double y, final double z) {
