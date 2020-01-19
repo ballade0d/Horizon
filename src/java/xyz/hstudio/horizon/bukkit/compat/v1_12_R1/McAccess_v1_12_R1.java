@@ -9,6 +9,7 @@ import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import xyz.hstudio.horizon.bukkit.compat.McAccess;
 import xyz.hstudio.horizon.bukkit.util.AABB;
+import xyz.hstudio.horizon.bukkit.util.RandomUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -100,5 +101,10 @@ public class McAccess_v1_12_R1 extends McAccess {
     @Override
     public double getMoveFactor(final Player player) {
         return ((CraftPlayer) player).getHandle().getAttributeInstance(GenericAttributes.MOVEMENT_SPEED).getValue();
+    }
+
+    @Override
+    public Object newTransactionPacket() {
+        return new PacketPlayOutTransaction(0, RandomUtils.nextShort(), false);
     }
 }

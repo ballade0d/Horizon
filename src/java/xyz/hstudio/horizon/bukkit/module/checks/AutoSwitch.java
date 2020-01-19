@@ -48,7 +48,9 @@ public class AutoSwitch extends Module<AutoSwitchData, AutoSwitchConfig> {
                 this.debug("Failed: TypeA");
 
                 // Punish
-                this.punish(player, data, "TypeA", 0);
+                this.punish(player, data, "TypeA", 5);
+            } else {
+                reward("TypeA", data, 0.999);
             }
         }
     }
@@ -71,7 +73,9 @@ public class AutoSwitch extends Module<AutoSwitchData, AutoSwitchConfig> {
                 this.debug("Failed: TypeB, t:" + deltaT);
 
                 // Punish
-                this.punish(player, data, "TypeB", 0);
+                this.punish(player, data, "TypeB", 5);
+            } else {
+                reward("TypeB", data, 0.999);
             }
             data.usingItem = false;
             data.lastSwitchTick = player.currentTick;

@@ -1,6 +1,5 @@
 package xyz.hstudio.horizon.bukkit.module.checks;
 
-import org.bukkit.util.Vector;
 import xyz.hstudio.horizon.bukkit.api.ModuleType;
 import xyz.hstudio.horizon.bukkit.compat.McAccess;
 import xyz.hstudio.horizon.bukkit.config.checks.InvalidMotionConfig;
@@ -26,11 +25,13 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionConfig
     @Override
     public void doCheck(final Event event, final HoriPlayer player, final InvalidMotionData data, final InvalidMotionConfig config) {
         typeA(event, player, data, config);
-        typeB(event, player, data, config);
     }
 
     /**
      * Basic y-axis motion check. Based on Minecraft moving mechanism.
+     * <p>
+     * Accuracy: 8/10 - It may have some false positives.
+     * Efficiency: 10/10 - Detects a lot of move related hacks instantly
      *
      * @author MrCraftGoo
      */
@@ -54,10 +55,9 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionConfig
             // TODO: Fix the false positives when toggling fly.
 
             if (player.isGliding) {
+                // Gliding function, from MCP
                 expected = prevDeltaY;
                 float pitchRot = (float) Math.toRadians(e.to.pitch - e.from.pitch);
-                // Magic numbers from MCP
-                // Wtf is this??
                 double magic = McAccess.getInst().cos(pitchRot);
                 magic = magic * magic * Math.min(1, e.from.getDirection().length() / 0.4);
                 if (prevDeltaY < 0) {
@@ -69,12 +69,13 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionConfig
                 expected *= 0.99;
             } else {
                 if (e.isOnSlime || e.isOnBed) {
-                    // Ignore because isOnSlime and isOnBed is already predicated in MoveEvent
+                    // Ignore because it is already predicated in MoveEvent
                     expected = deltaY;
                 } else if (e.collidingBlocks.contains(MatUtils.COBWEB.parse())) {
                     // Y speed in web. Anything shouldn't affect it so it's a value.
                     expected = -0.007;
                 } else if (e.onGround) {
+                    // Have to be 0 because of some client bugs.
                     expected = 0;
                     data.inAir = false;
                 } else {
@@ -83,10 +84,12 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionConfig
                     boolean onLadder = e.collidingBlocks.contains(MatUtils.LADDER.parse()) ||
                             e.collidingBlocks.contains(MatUtils.VINE.parse());
                     if (levitation > 0) {
+                        // Levitation function
                         expected = prevDeltaY + (0.05 * levitation - prevDeltaY) * 0.2;
                     } else if (!data.inAir && deltaY > 0) {
                         // Jump init height.
                         expected = 0.42 + player.getPotionEffectAmplifier("JUMP") * 0.1;
+                        // The first tick climbing ladder
                         if (onLadder && MathUtils.abs(deltaY - 0.1176) < 0.001) {
                             expected = 0.1176;
                         }
@@ -96,6 +99,8 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionConfig
                             // Players can jump even if they're colliding with ladder on ground,
                             // so I added this judgement.
                         } else if (MathUtils.abs(expected - deltaY) > 0.001) {
+                            // -0.15 = max climbing down speed
+                            // 0.1176 = max climbing up speed (0.1176 = (0.2 - 0.08) * 0.98)
                             expected = deltaY < 0 ? -0.15 : 0.1176;
                         }
                     }
@@ -106,45 +111,23 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionConfig
             if (MathUtils.abs(expected) < 0.005) {
                 expected = deltaY;
             }
+            if (e.isTeleport) {
+                expected = 0;
+            }
 
             // Check for absolute value so that FastFall/Hop hacks will also be detected.
             double discrepancy = MathUtils.abs(deltaY - expected);
             // Don't check if onGroundReally is true to avoid false positives when joining.
-            if (!e.onGround && !e.onGroundReally && discrepancy > config.tolerance) {
+            if (!e.isTeleport && !e.onGroundReally && discrepancy > config.typeA_tolerance) {
                 this.debug("Failed: TypeA, d:" + deltaY + ", e:" + expected);
 
                 // Punish
-                this.punish(player, data, "TypeA", 0);
+                this.punish(player, data, "TypeA", discrepancy * 5);
+            } else {
+                reward("TypeA", data, 0.98);
             }
 
             data.lastExpect = expected;
-        }
-    }
-
-    /**
-     * An easy Strafe/Speed/InvalidMotion check.
-     *
-     * @author MrCraftGoo
-     */
-    private void typeB(final Event event, final HoriPlayer player, final InvalidMotionData data, final InvalidMotionConfig config) {
-        if (event instanceof MoveEvent) {
-            MoveEvent e = (MoveEvent) event;
-            if (!e.updatePos || e.player.player.isFlying()) {
-                return;
-            }
-            if (!e.collidingBlocks.isEmpty() || e.onGround || player.isOnGround) {
-                return;
-            }
-            Vector velocity = e.velocity.clone().setY(0);
-            Vector prevVelocity = player.velocity.clone().setY(0);
-            double speed = velocity.lengthSquared();
-            double angle = MathUtils.angle(velocity, prevVelocity);
-            if (speed > 0.015 && angle > 0.2) {
-                this.debug("Failed: TypeB, s:" + speed + ", a:" + angle);
-
-                // Punish
-                this.punish(player, data, "TypeB", 0);
-            }
         }
     }
 }

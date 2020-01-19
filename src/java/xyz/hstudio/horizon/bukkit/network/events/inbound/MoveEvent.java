@@ -31,6 +31,7 @@ public class MoveEvent extends Event {
     public final float oldFriction;
     public final float newFriction;
     public Set<Material> collidingBlocks;
+    public boolean isTeleport;
 
     public MoveEvent(final HoriPlayer player, final Location to, final boolean onGround, final boolean updatePos, final boolean updateRot, final MoveType moveType, final WrappedPacket packet) {
         super(player, packet);
@@ -46,7 +47,7 @@ public class MoveEvent extends Event {
 
         this.hitSlowdown = player.currentTick == player.hitSlowdownTick;
         // TODO: A REAL on ground check.
-        this.onGroundReally = this.to.isOnGround(this.cube);
+        this.onGroundReally = this.to.isOnGround(this.cube, false);
         this.isUnderBlock = !this.cube.add(0, 1.5, 0, 0, 0.5, 0).isEmpty(to.world);
 
         this.isOnSlime = this.checkSlime();
@@ -104,7 +105,12 @@ public class MoveEvent extends Event {
     public boolean pre() {
         player.currentTick++;
 
-        player.world = this.to.world;
+        Location tpLoc = player.teleportPos;
+        if (player.isTeleporting && tpLoc.world.equals(this.to.world) && to.distanceSquared(tpLoc) < 0.001) {
+            player.isTeleporting = false;
+            player.position = tpLoc;
+            this.isTeleport = true;
+        }
 
         if (player.isGliding && this.onGround) {
             player.isGliding = false;

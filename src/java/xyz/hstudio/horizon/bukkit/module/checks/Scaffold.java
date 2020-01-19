@@ -29,13 +29,14 @@ public class Scaffold extends Module<ScaffoldData, ScaffoldConfig> {
     public void doCheck(final Event event, final HoriPlayer player, final ScaffoldData data, final ScaffoldConfig config) {
         typeA(event, player, data, config);
         typeB(event, player, data, config);
+        // TODO: SafeWalk check
     }
 
     /**
      * An easy packet check. This will detect some poorly made Scaffold/Tower.
      * <p>
      * Accuracy: 10/10 - It shouldn't have any false positive.
-     * Efficiency: 7/10 - Detects some Block hacks instantly.
+     * Efficiency: 8/10 - Detects some Block hacks instantly.
      *
      * @author MrCraftGoo
      */
@@ -49,7 +50,8 @@ public class Scaffold extends Module<ScaffoldData, ScaffoldConfig> {
                 this.debug("Failed: TypeA");
 
                 // Punish
-                this.punish(player, data, "TypeA", 0);
+                this.punish(player, data, "TypeA", 5);
+                return;
             }
             Vector interaction = e.interaction;
             // Performance?
@@ -58,7 +60,8 @@ public class Scaffold extends Module<ScaffoldData, ScaffoldConfig> {
                 this.debug("Failed: TypeA, i:" + interaction.toString());
 
                 // Punish
-                this.punish(player, data, "TypeA", 0);
+                this.punish(player, data, "TypeA", 5);
+                return;
             }
 
             Block b = e.getTargetLocation().getBlock();
@@ -67,7 +70,8 @@ public class Scaffold extends Module<ScaffoldData, ScaffoldConfig> {
                 this.debug("Failed: TypeA, t:" + type);
 
                 // Punish
-                this.punish(player, data, "TypeA", 0);
+                this.punish(player, data, "TypeA", 5);
+                return;
             }
 
             long deltaT = TimeUtils.now() - data.lastMove;
@@ -76,11 +80,13 @@ public class Scaffold extends Module<ScaffoldData, ScaffoldConfig> {
                     this.debug("Failed: TypeA");
 
                     // Punish
-                    this.punish(player, data, "TypeA", 0);
+                    this.punish(player, data, "TypeA", 3);
+                    return;
                 }
             } else if (data.typeDFails > 0) {
                 data.typeDFails--;
             }
+            reward("TypeA", data, 0.999);
         } else if (event instanceof MoveEvent) {
             long now = TimeUtils.now();
             data.lagging = now - data.lastMove < 5;
@@ -101,11 +107,13 @@ public class Scaffold extends Module<ScaffoldData, ScaffoldConfig> {
                 return;
             }
             float angle = player.position.getDirection().angle(e.getPlaceBlockFace());
-            if (angle > Math.toRadians(config.max_angle)) {
+            if (angle > Math.toRadians(config.typeB_max_angle)) {
                 this.debug("Failed: TypeB, a:" + angle);
 
                 // Punish
-                this.punish(player, data, "TypeB", 0);
+                this.punish(player, data, "TypeB", 4);
+            } else {
+                reward("TypeB", data, 0.999);
             }
         }
     }

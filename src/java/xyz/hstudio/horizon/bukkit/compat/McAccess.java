@@ -85,4 +85,9 @@ public abstract class McAccess {
      * Get the value of movement speed attribute.
      */
     public abstract double getMoveFactor(final Player player);
+
+    /**
+     * Create a new transaction packet.
+     */
+    public abstract Object newTransactionPacket();
 }

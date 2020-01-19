@@ -36,6 +36,7 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
         typeD(event, player, data, config);
         typeE(event, player, data, config);
         typeF(event, player, data, config);
+        // TODO: Aim checks.
     }
 
     /**
@@ -65,13 +66,14 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
                 if (data.typeAFails > 0) {
                     data.typeAFails--;
                 }
+                reward("TypeA", data, 0.999);
                 return;
             }
             if (++data.typeAFails > 5) {
                 this.debug("Failed: TypeA, d:" + deltaT);
 
                 // Punish
-                this.punish(player, data, "TypeA", 0);
+                this.punish(player, data, "TypeA", 4);
             }
         }
     }
@@ -108,12 +110,14 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
                 return;
             }
             long deltaT = player.currentTick - data.failTypeBTick;
-            // Detect both pre AutoBlock and post AutoBlock.
+            // Detect both pre and post AutoBlock.
             if (deltaT <= 1) {
                 this.debug("Failed: TypeB, t:" + deltaT);
 
                 // Punish
-                this.punish(player, data, "TypeB", 0);
+                this.punish(player, data, "TypeB", 3);
+            } else {
+                reward("TypeB", data, 0.999);
             }
         }
     }
@@ -150,7 +154,9 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
                 this.debug("Failed: TypeC, d:" + deltaT);
 
                 // Punish
-                this.punish(player, data, "TypeC", 0);
+                this.punish(player, data, "TypeC", 5);
+            } else {
+                reward("TypeC", data, 0.999);
             }
         }
     }
@@ -189,7 +195,9 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
                 this.debug("Failed: TypeD, g:" + gcd);
 
                 // Punish
-                this.punish(player, data, "TypeD", 0);
+                this.punish(player, data, "TypeD", 3);
+            } else {
+                reward("TypeD", data, 0.999);
             }
 
             data.lastPitchChange = pitchChange;
@@ -229,12 +237,14 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
                     stdDeviation += NumberConversions.square(i - average);
                 }
 
-                // Customizable?
+                // TODO: Customizable?
                 if (stdDeviation < 0.3) {
                     this.debug("Failed: TypeE, s:" + stdDeviation);
 
                     // Punish
-                    this.punish(player, data, "TypeE", 0);
+                    this.punish(player, data, "TypeE", 5);
+                } else {
+                    reward("TypeE", data, 0.999);
                 }
                 data.moveInterval.clear();
             }
@@ -261,7 +271,7 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
     private void typeF(final Event event, final HoriPlayer player, final KillAuraData data, final KillAuraConfig config) {
         if (event instanceof MoveEvent) {
             MoveEvent e = (MoveEvent) event;
-            if (!e.updateRot || player.currentTick - data.lastHitTick > 6 || player.vehicle != -1 || e.isUnderBlock || !e.collidingBlocks.isEmpty()) {
+            if (!e.updateRot || player.currentTick - data.lastHitTick > 6 || player.getVehicle() != null || e.isUnderBlock || e.isTeleport || !e.collidingBlocks.isEmpty()) {
                 return;
             }
 
@@ -299,14 +309,16 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
             double angle = (vectorDir ? 1 : -1) * MathUtils.angle(accelDir, yaw);
 
             double multiple = angle / (Math.PI / 4);
-            double threshold = Math.toRadians(config.max_angle);
+            double threshold = Math.toRadians(config.typeF_max_angle);
 
             // TODO: Add a threshold
-            if (MathUtils.abs(multiple - NumberConversions.floor(multiple)) > threshold && MathUtils.abs(multiple - NumberConversions.ceil(multiple)) > threshold) {
+            if (Math.abs(multiple - Math.round(multiple)) > threshold) {
                 this.debug("Failed: TypeF, a:" + angle);
 
                 // Punish
-                this.punish(player, data, "TypeF", 0);
+                this.punish(player, data, "TypeF", 3);
+            } else {
+                reward("TypeF", data, 0.995);
             }
         } else if (event instanceof InteractEntityEvent) {
             InteractEntityEvent e = (InteractEntityEvent) event;
@@ -315,12 +327,5 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
             }
             data.lastHitTick = player.currentTick;
         }
-    }
-
-    /**
-     * A HitBox check.
-     */
-    private void typeG(final Event event, final HoriPlayer player, final KillAuraData data, final KillAuraConfig config) {
-
     }
 }

@@ -41,6 +41,8 @@ public class PacketConvert_v1_8_R3 extends PacketConvert {
             return convertSwingEvent(player, (PacketPlayInArmAnimation) packet);
         } else if (packet instanceof PacketPlayInKeepAlive) {
             return convertKeepAliveRespondEvent(player, (PacketPlayInKeepAlive) packet);
+        } else if (packet instanceof PacketPlayInTransaction) {
+            return convertTransaction(player, (PacketPlayInTransaction) packet);
         }
         return null;
     }
@@ -211,6 +213,14 @@ public class PacketConvert_v1_8_R3 extends PacketConvert {
 
     private Event convertKeepAliveRespondEvent(final HoriPlayer player, final PacketPlayInKeepAlive packet) {
         return new KeepAliveRespondEvent(player, packet.a(), new WrappedPacket(packet));
+    }
+
+    private Event convertTransaction(final HoriPlayer player, final PacketPlayInTransaction packet) {
+        if (packet.a() != 0) {
+            return null;
+        }
+        player.ping = System.currentTimeMillis() - player.lastRequestSent;
+        return null;
     }
 
     @Override

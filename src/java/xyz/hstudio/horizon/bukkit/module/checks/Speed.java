@@ -20,7 +20,7 @@ public class Speed {
         if (usingItem) {
             initForce *= 0.2;
         }
-        boolean sprinting = player.isSprinting && !player.isSneaking;
+        boolean sprinting = player.isSprinting && !player.isSneaking && player.getPotionEffectAmplifier("BLINDNESS") <= 0;
         // TODO: Fix this
         boolean flying = player.player.isFlying();
 

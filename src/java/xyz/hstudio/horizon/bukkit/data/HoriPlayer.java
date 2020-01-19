@@ -13,10 +13,14 @@ import xyz.hstudio.horizon.bukkit.data.checks.*;
 import xyz.hstudio.horizon.bukkit.network.ChannelHandler;
 import xyz.hstudio.horizon.bukkit.util.Location;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class HoriPlayer {
 
     public final AutoSwitchData autoSwitchData = new AutoSwitchData();
     public final BadPacketData badPacketData = new BadPacketData();
+    public final HitBoxData hitBoxData = new HitBoxData();
     public final InvalidMotionData invalidMotionData = new InvalidMotionData();
     public final KillAuraData killAuraData = new KillAuraData();
     public final ScaffoldData scaffoldData = new ScaffoldData();
@@ -29,6 +33,7 @@ public class HoriPlayer {
     public double prevDeltaY;
     public double prevPrevDeltaY;
     public Vector velocity = new Vector(0, 0, 0);
+    public List<Vector> velocities = new ArrayList<>();
     public boolean isSneaking;
     public boolean isSprinting;
     public boolean isEating;
@@ -36,8 +41,12 @@ public class HoriPlayer {
     public boolean isOnGround;
     public boolean isGliding;
     public long hitSlowdownTick = -1;
+    public long teleportTime = -1;
+    public boolean isTeleporting;
+    public Location teleportPos;
     public int vehicle = -1;
     public long ping;
+    public long lastRequestSent;
     public ChannelPipeline pipeline;
 
     public HoriPlayer(final Player player) {
@@ -69,9 +78,11 @@ public class HoriPlayer {
      * @return Player's head position.
      */
     public Vector getHeadPosition() {
-        Vector add = new Vector(0, 0, 0);
-        add.setY(this.isSneaking ? 1.54 : 1.62);
-        return position.toVector().clone().add(add);
+        if (this.getVehicle() != null) {
+            return position.toVector().setY(position.y + player.getEyeHeight());
+        }
+        Vector add = new Vector(0, this.isSneaking ? 1.54 : 1.62, 0);
+        return this.position.toVector().add(add);
     }
 
     public void sendMessage(final String msg) {

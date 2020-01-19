@@ -6,6 +6,8 @@ import org.bukkit.util.NumberConversions;
 import org.bukkit.util.Vector;
 import xyz.hstudio.horizon.bukkit.compat.McAccess;
 
+import java.util.List;
+
 /**
  * A wrapped Location class. Remember to use this instead of using bukkit's.
  * This includes optimized math utils and async block-getter method.
@@ -54,17 +56,33 @@ public class Location {
         return this.world.getBlockAt(this.getBlockX(), this.getBlockY(), this.getBlockZ());
     }
 
-    public boolean isOnGround(final AABB cube) {
+    public boolean isOnGround(final AABB cube, final boolean ignoreOnGround) {
         AABB surrounding = new AABB(cube.minX, cube.minY - 1, cube.minZ, cube.maxX, cube.minY, cube.maxZ);
         AABB underFeet = new AABB(cube.minX, cube.minY - 0.001, cube.minZ, cube.maxX, cube.minY, cube.maxZ);
+        AABB topFeet = cube.add(0, 0.001, 0, 0, 0, 0);
+        List<Block> above = !ignoreOnGround ? null : topFeet.getBlocks(this.world);
         for (Block block : surrounding.getBlocks(this.world)) {
             if (block.isLiquid() || !block.getType().isSolid()) {
                 continue;
             }
+            // Ignore if player is in ground
             for (AABB bBox : McAccess.getInst().getBoxes(block)) {
-                if (bBox.isColliding(underFeet)) {
-                    return true;
+                if (!bBox.isColliding(underFeet)) {
+                    continue;
                 }
+                if (ignoreOnGround) {
+                    for (Block aboveBlock : above) {
+                        if (aboveBlock.isLiquid() || !aboveBlock.getType().isSolid()) {
+                            continue;
+                        }
+                        for (AABB aboveBox : McAccess.getInst().getBoxes(aboveBlock)) {
+                            if (aboveBox.isColliding(topFeet)) {
+                                return false;
+                            }
+                        }
+                    }
+                }
+                return true;
             }
         }
         return false;

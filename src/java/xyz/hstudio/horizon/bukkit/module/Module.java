@@ -7,6 +7,7 @@ import xyz.hstudio.horizon.bukkit.config.Config;
 import xyz.hstudio.horizon.bukkit.data.Data;
 import xyz.hstudio.horizon.bukkit.data.HoriPlayer;
 import xyz.hstudio.horizon.bukkit.network.events.Event;
+import xyz.hstudio.horizon.bukkit.util.Pair;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -56,8 +57,11 @@ public abstract class Module<K extends Data, V extends Config> {
      * @author MrCraftGoo
      */
     protected void punish(final HoriPlayer player, final K data, final String type, final double weight, final Runnable... runnable) {
-        int lastVL = data.lastVL = (int) data.vL;
-        double vL = data.vL += weight;
+        Pair<Double, Double> pair = data.violationLevels.getOrDefault(type, new Pair<>(0D, 0D));
+        data.violationLevels.put(type, pair.setValue(pair.getKey()).setKey(pair.getKey() + weight));
+
+        int prevVL = (int) data.violationLevels.values().stream().mapToDouble(Pair::getValue).sum();
+        int vL = (int) data.violationLevels.values().stream().mapToDouble(Pair::getKey).sum();
 
         data.lastFailTick = player.currentTick;
         // TODO: Punish
@@ -71,6 +75,14 @@ public abstract class Module<K extends Data, V extends Config> {
             return;
         }
         Logger.info("Debug|" + this.moduleType.name(), object);
+    }
+
+    protected void reward(final String type, final K data, final double multiplier) {
+        Pair<Double, Double> pair = data.violationLevels.get(type);
+        if (pair == null) {
+            return;
+        }
+        data.violationLevels.put(type, pair.setValue(pair.getKey()).setKey(pair.getKey() * multiplier));
     }
 
     public abstract K getData(final HoriPlayer player);

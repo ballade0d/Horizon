@@ -35,11 +35,14 @@ public class BadPacket extends Module<BadPacketData, BadPacketConfig> {
         if (event instanceof KeepAliveRespondEvent) {
             // A player should send 20 move packets(1.8.8 or lower)
             // or 1 move packet (1.9 or higher) at least in one second.
+            // If player didn't send move packets in 2 sec but send KeepAlive packets, flag him.
             if (player.currentTick == data.lastTick) {
                 this.debug("Failed: TypeA");
 
                 // Punish
-                this.punish(player, data, "TypeA", 0);
+                this.punish(player, data, "TypeA", 5);
+            } else {
+                reward("TypeA", data, 0.99);
             }
             data.lastTick = player.currentTick;
         }
@@ -62,7 +65,9 @@ public class BadPacket extends Module<BadPacketData, BadPacketConfig> {
                 this.debug("Failed: TypeB");
 
                 // Punish
-                this.punish(player, data, "TypeB", 0);
+                this.punish(player, data, "TypeB", 5);
+            } else {
+                reward("TypeB", data, 0.99);
             }
         }
     }
