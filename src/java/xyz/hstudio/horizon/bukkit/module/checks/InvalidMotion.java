@@ -115,16 +115,17 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionConfig
                 expected = 0;
             }
 
-            // Check for absolute value so that FastFall/Hop hacks will also be detected.
+            // Check for absolute value so that FastFall and LowHop will also be detected.
             double discrepancy = MathUtils.abs(deltaY - expected);
-            // Don't check if onGroundReally is true to avoid false positives when joining.
-            if (!e.isTeleport && !e.onGroundReally && discrepancy > config.typeA_tolerance) {
+            // Don't check if onGroundReally is true to avoid false positives when chunks aren't sent to the player.
+            // Don't check if onGround is true to avoid some false positives. GroundSpoof check will fix the bypass.
+            if (!e.isTeleport && !e.onGround && !e.onGroundReally && discrepancy > config.typeA_tolerance) {
                 this.debug("Failed: TypeA, d:" + deltaY + ", e:" + expected);
 
                 // Punish
                 this.punish(player, data, "TypeA", discrepancy * 5);
             } else {
-                reward("TypeA", data, 0.98);
+                reward("TypeA", data, 0.99);
             }
 
             data.lastExpect = expected;

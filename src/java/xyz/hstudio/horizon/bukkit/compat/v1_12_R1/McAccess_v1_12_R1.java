@@ -86,7 +86,7 @@ public class McAccess_v1_12_R1 extends McAccess {
         b.updateState(data, world, bPos);
         List<AxisAlignedBB> bbs = new ArrayList<>();
         AxisAlignedBB cube = new AxisAlignedBB(block.getX(), block.getY(), block.getZ(), block.getX() + 1, block.getY() + 1, block.getZ() + 1);
-        b.a(data, world, bPos, cube, bbs, null, false);
+        b.a(data, world, bPos, cube, bbs, null, true);
 
         AxisAlignedBB[] raw = bbs.toArray(new AxisAlignedBB[0]);
         AABB[] boxes = new AABB[bbs.size()];

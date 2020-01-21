@@ -14,6 +14,13 @@ invalidmotion:
   debug: true
   typeA:
     tolerance: 0.001
+inventory:
+  enabled: true
+  debug: true
+  typeA:
+    checkRotation: true
+    checkAction: true
+    checkHit: true
 killaura:
   enabled: true
   debug: true

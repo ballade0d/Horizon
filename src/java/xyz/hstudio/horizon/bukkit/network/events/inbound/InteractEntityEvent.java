@@ -37,10 +37,6 @@ public class InteractEntityEvent extends Event {
         return true;
     }
 
-    @Override
-    public void post() {
-    }
-
     public enum InteractType {
         ATTACK, INTERACT
     }

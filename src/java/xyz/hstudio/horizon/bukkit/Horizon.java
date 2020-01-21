@@ -94,6 +94,7 @@ public class Horizon extends JavaPlugin {
         new BadPacket();
         new HitBox();
         new InvalidMotion();
+        new Inventory();
         new KillAura();
         new Scaffold();
 

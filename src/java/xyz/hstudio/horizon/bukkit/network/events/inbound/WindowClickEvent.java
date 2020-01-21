@@ -4,18 +4,16 @@ import xyz.hstudio.horizon.bukkit.data.HoriPlayer;
 import xyz.hstudio.horizon.bukkit.network.events.Event;
 import xyz.hstudio.horizon.bukkit.network.events.WrappedPacket;
 
-public class HeldItemEvent extends Event {
+public class WindowClickEvent extends Event {
 
+    public final int windowID;
     public final int slot;
+    public final int button;
 
-    public HeldItemEvent(final HoriPlayer player, final int slot, final WrappedPacket packet) {
+    public WindowClickEvent(final HoriPlayer player, final int windowID, final int slot, final int button, final WrappedPacket packet) {
         super(player, packet);
+        this.windowID = windowID;
         this.slot = slot;
-    }
-
-    @Override
-    public boolean pre() {
-        player.heldSlot = this.slot;
-        return true;
+        this.button = button;
     }
 }

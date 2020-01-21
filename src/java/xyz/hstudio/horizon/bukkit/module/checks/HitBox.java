@@ -41,7 +41,7 @@ public class HitBox extends Module<HitBoxData, HitBoxConfig> {
     /**
      * A simple Reach check.
      * <p>
-     * Accuracy: 8/10 - It may have some falses.
+     * Accuracy: 8/10 - It may have some rare falses.
      * Efficiency: 10/10 - Detects reach instantly.
      *
      * @author MrCraftGoo, Islandscout
@@ -72,13 +72,16 @@ public class HitBox extends Module<HitBoxData, HitBoxConfig> {
 
             Location targetPos = new Location(targetPlayer.getLocation());
             if (target != null && this.getData(target).history.size() != 0) {
+                // Get the history position to avoid false positives.
                 targetPos = this.getHistoryLocation(player.ping, this.getData(target).history);
             }
             Vector move = targetPos.toVector().subtract(targetPlayer.getLocation().toVector());
             AABB targetCube = McAccess.getInst().getCube(targetPlayer).add(move);
 
+            // Get player's eye position instead of feet position.
             Vector playerPos = player.getHeadPosition();
 
+            // Use Euclidean Distance
             double reach = targetCube.distance(playerPos);
 
             if (reach > config.typeA_max_reach) {

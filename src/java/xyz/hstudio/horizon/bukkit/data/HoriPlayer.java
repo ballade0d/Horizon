@@ -22,6 +22,7 @@ public class HoriPlayer {
     public final BadPacketData badPacketData = new BadPacketData();
     public final HitBoxData hitBoxData = new HitBoxData();
     public final InvalidMotionData invalidMotionData = new InvalidMotionData();
+    public final InventoryData inventoryData = new InventoryData();
     public final KillAuraData killAuraData = new KillAuraData();
     public final ScaffoldData scaffoldData = new ScaffoldData();
     public Player player;

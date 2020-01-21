@@ -18,11 +18,6 @@ public class MetaEvent extends Event {
     }
 
     @Override
-    public boolean pre() {
-        return true;
-    }
-
-    @Override
     public void post() {
         if (Version.VERSION == Version.v1_8_R3) {
             for (WatchableObject object : this.objects) {

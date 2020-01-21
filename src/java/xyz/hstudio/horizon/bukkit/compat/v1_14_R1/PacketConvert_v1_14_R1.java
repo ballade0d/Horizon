@@ -12,9 +12,7 @@ import xyz.hstudio.horizon.bukkit.data.HoriPlayer;
 import xyz.hstudio.horizon.bukkit.network.events.Event;
 import xyz.hstudio.horizon.bukkit.network.events.WrappedPacket;
 import xyz.hstudio.horizon.bukkit.network.events.inbound.*;
-import xyz.hstudio.horizon.bukkit.network.events.outbound.MetaEvent;
-import xyz.hstudio.horizon.bukkit.network.events.outbound.VehicleEvent;
-import xyz.hstudio.horizon.bukkit.network.events.outbound.VelocityEvent;
+import xyz.hstudio.horizon.bukkit.network.events.outbound.*;
 import xyz.hstudio.horizon.bukkit.util.Hand;
 import xyz.hstudio.horizon.bukkit.util.Location;
 import xyz.hstudio.horizon.bukkit.util.MathUtils;
@@ -45,6 +43,12 @@ public class PacketConvert_v1_14_R1 extends PacketConvert {
             return convertKeepAliveRespondEvent(player, (PacketPlayInKeepAlive) packet);
         } else if (packet instanceof PacketPlayInTransaction) {
             return convertTransaction(player, (PacketPlayInTransaction) packet);
+        } else if (packet instanceof PacketPlayInWindowClick) {
+            return convertWindowClickEvent(player, (PacketPlayInWindowClick) packet);
+        } else if (packet instanceof PacketPlayInCloseWindow) {
+            return convertWindowCloseEvent(player, (PacketPlayInCloseWindow) packet);
+        } else if (packet instanceof PacketPlayInClientCommand) {
+            return convertClientCommandEvent(player, (PacketPlayInClientCommand) packet);
         }
         return null;
     }
@@ -223,6 +227,18 @@ public class PacketConvert_v1_14_R1 extends PacketConvert {
         return null;
     }
 
+    private Event convertWindowClickEvent(final HoriPlayer player, final PacketPlayInWindowClick packet) {
+        return new WindowClickEvent(player, packet.b(), packet.c(), packet.d(), new WrappedPacket(packet));
+    }
+
+    private Event convertWindowCloseEvent(final HoriPlayer player, final PacketPlayInCloseWindow packet) {
+        return new WindowCloseEvent(player, new WrappedPacket(packet));
+    }
+
+    private Event convertClientCommandEvent(final HoriPlayer player, final PacketPlayInClientCommand packet) {
+        return new ClientCommandEvent(player, ClientCommandEvent.ClientCommand.valueOf(packet.b().name()), new WrappedPacket(packet));
+    }
+
     @Override
     public Event convertOut(final HoriPlayer player, final Object packet) {
         if (packet instanceof PacketPlayOutMount) {
@@ -231,6 +247,10 @@ public class PacketConvert_v1_14_R1 extends PacketConvert {
             return convertVelocityEvent(player, (PacketPlayOutEntityVelocity) packet);
         } else if (packet instanceof PacketPlayOutEntityMetadata) {
             return convertMetaEvent(player, (PacketPlayOutEntityMetadata) packet);
+        } else if (packet instanceof PacketPlayOutOpenWindow) {
+            return convertOpenWindowEvent(player, (PacketPlayOutOpenWindow) packet);
+        } else if (packet instanceof PacketPlayOutCloseWindow) {
+            return convertCloseWindowEvent(player, (PacketPlayOutCloseWindow) packet);
         }
         return null;
     }
@@ -293,5 +313,13 @@ public class PacketConvert_v1_14_R1 extends PacketConvert {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    private Event convertOpenWindowEvent(final HoriPlayer player, final PacketPlayOutOpenWindow packet) {
+        return new OpenWindowEvent(player, new WrappedPacket(packet));
+    }
+
+    private Event convertCloseWindowEvent(final HoriPlayer player, final PacketPlayOutCloseWindow packet) {
+        return new CloseWindowEvent(player, new WrappedPacket(packet));
     }
 }

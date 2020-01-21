@@ -87,15 +87,6 @@ public class BlockPlaceEvent extends Event {
         return null;
     }
 
-    @Override
-    public boolean pre() {
-        return true;
-    }
-
-    @Override
-    public void post() {
-    }
-
     public enum PlaceType {
         PLACE_BLOCK, INTERACT_BLOCK
     }

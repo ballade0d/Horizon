@@ -36,6 +36,7 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
         typeD(event, player, data, config);
         typeE(event, player, data, config);
         typeF(event, player, data, config);
+        typeG(event, player, data, config);
         // TODO: Aim checks.
     }
 
@@ -312,13 +313,13 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
             double threshold = Math.toRadians(config.typeF_max_angle);
 
             // TODO: Add a threshold
-            if (Math.abs(multiple - Math.round(multiple)) > threshold) {
+            if (MathUtils.abs(multiple - Math.round(multiple)) > threshold) {
                 this.debug("Failed: TypeF, a:" + angle);
 
                 // Punish
                 this.punish(player, data, "TypeF", 3);
             } else {
-                reward("TypeF", data, 0.995);
+                reward("TypeF", data, 0.999);
             }
         } else if (event instanceof InteractEntityEvent) {
             InteractEntityEvent e = (InteractEntityEvent) event;
@@ -326,6 +327,25 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
                 return;
             }
             data.lastHitTick = player.currentTick;
+        }
+    }
+
+    /**
+     * An AimBot/Rotation check.
+     *
+     * @author MrCraftGoo
+     */
+    private void typeG(final Event event, final HoriPlayer player, final KillAuraData data, final KillAuraConfig config) {
+        if (event instanceof MoveEvent) {
+            MoveEvent e = (MoveEvent) event;
+            if (!e.updateRot) {
+                return;
+            }
+            float diffYaw = MathUtils.abs(e.to.yaw - e.from.yaw);
+            float diffPitch = MathUtils.abs(e.to.pitch - e.from.pitch);
+            if (diffYaw >= 3.0 && diffPitch > 0.001 && diffPitch < 0.0995) {
+                this.debug("A");
+            }
         }
     }
 }

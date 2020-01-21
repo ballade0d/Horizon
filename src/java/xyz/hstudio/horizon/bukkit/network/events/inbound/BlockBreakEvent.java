@@ -22,15 +22,6 @@ public class BlockBreakEvent extends Event {
         this.digType = digType;
     }
 
-    @Override
-    public boolean pre() {
-        return true;
-    }
-
-    @Override
-    public void post() {
-    }
-
     public enum DigType {
         START, CANCEL, COMPLETE
     }

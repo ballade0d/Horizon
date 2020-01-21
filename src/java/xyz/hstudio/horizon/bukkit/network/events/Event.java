@@ -14,7 +14,12 @@ public abstract class Event {
         this.cancelled = false;
     }
 
-    public abstract boolean pre();
+    // This is the default pre method to reduce jar size.
+    public boolean pre() {
+        return true;
+    }
 
-    public abstract void post();
+    // This is the default post method to reduce jar size.
+    public void post() {
+    }
 }

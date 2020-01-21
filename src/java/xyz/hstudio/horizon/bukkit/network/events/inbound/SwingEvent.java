@@ -13,13 +13,4 @@ public class SwingEvent extends Event {
         super(player, packet);
         this.hand = hand;
     }
-
-    @Override
-    public boolean pre() {
-        return true;
-    }
-
-    @Override
-    public void post() {
-    }
 }

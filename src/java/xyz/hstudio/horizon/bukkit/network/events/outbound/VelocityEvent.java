@@ -16,14 +16,4 @@ public class VelocityEvent extends Event {
         this.y = y;
         this.z = z;
     }
-
-    @Override
-    public boolean pre() {
-        return true;
-    }
-
-    @Override
-    public void post() {
-
-    }
 }

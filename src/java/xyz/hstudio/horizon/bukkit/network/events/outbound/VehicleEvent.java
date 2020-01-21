@@ -14,11 +14,6 @@ public class VehicleEvent extends Event {
     }
 
     @Override
-    public boolean pre() {
-        return true;
-    }
-
-    @Override
     public void post() {
         player.vehicle = vehicle;
     }

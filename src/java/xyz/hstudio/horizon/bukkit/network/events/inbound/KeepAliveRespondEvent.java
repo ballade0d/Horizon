@@ -12,13 +12,4 @@ public class KeepAliveRespondEvent extends Event {
         super(player, packet);
         this.id = id;
     }
-
-    @Override
-    public boolean pre() {
-        return true;
-    }
-
-    @Override
-    public void post() {
-    }
 }
