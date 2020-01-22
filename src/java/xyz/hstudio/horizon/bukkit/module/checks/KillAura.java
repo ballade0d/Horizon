@@ -331,7 +331,7 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
     }
 
     /**
-     * An AimBot/Rotation check.
+     * An AimBot/Rotation Pattern check.
      *
      * @author MrCraftGoo
      */
@@ -344,7 +344,10 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
             float diffYaw = MathUtils.abs(e.to.yaw - e.from.yaw);
             float diffPitch = MathUtils.abs(e.to.pitch - e.from.pitch);
             if (diffYaw >= 3.0 && diffPitch > 0.001 && diffPitch < 0.0995) {
-                this.debug("A");
+                this.debug("Failed: TypeG, p:1");
+
+                // Punish
+                this.punish(player, data, "TypeG", 5);
             }
         }
     }

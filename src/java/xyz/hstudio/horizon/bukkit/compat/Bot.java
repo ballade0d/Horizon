@@ -14,7 +14,13 @@ public interface Bot {
 
     void updatePing(final int ping);
 
+    void updateHealth(final float health);
+
     void swing();
+
+    void setSneak(final boolean sneak);
+
+    void setSprint(final boolean sprint);
 
     void move(final Location to, final boolean onGround);
 }

@@ -28,9 +28,6 @@ public class ActionEvent extends Event {
             case STOP_SPRINTING:
                 player.isSprinting = false;
                 break;
-            case START_GLIDING:
-                player.isGliding = true;
-                break;
         }
     }
 

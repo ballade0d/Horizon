@@ -49,6 +49,8 @@ public class PacketConvert_v1_14_R1 extends PacketConvert {
             return convertWindowCloseEvent(player, (PacketPlayInCloseWindow) packet);
         } else if (packet instanceof PacketPlayInClientCommand) {
             return convertClientCommandEvent(player, (PacketPlayInClientCommand) packet);
+        } else if (packet instanceof PacketPlayInAbilities) {
+            return convertAbilitiesEvent(player, (PacketPlayInAbilities) packet);
         }
         return null;
     }
@@ -237,6 +239,10 @@ public class PacketConvert_v1_14_R1 extends PacketConvert {
 
     private Event convertClientCommandEvent(final HoriPlayer player, final PacketPlayInClientCommand packet) {
         return new ClientCommandEvent(player, ClientCommandEvent.ClientCommand.valueOf(packet.b().name()), new WrappedPacket(packet));
+    }
+
+    private Event convertAbilitiesEvent(final HoriPlayer player, final PacketPlayInAbilities packet) {
+        return new AbilitiesEvent(player, packet.isFlying(), new WrappedPacket(packet));
     }
 
     @Override

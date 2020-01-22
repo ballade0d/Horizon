@@ -11,6 +11,7 @@ import xyz.hstudio.horizon.bukkit.config.ConfigFile;
 import xyz.hstudio.horizon.bukkit.data.HoriPlayer;
 import xyz.hstudio.horizon.bukkit.kirin.Kirin;
 import xyz.hstudio.horizon.bukkit.listener.Listeners;
+import xyz.hstudio.horizon.bukkit.module.checks.Timer;
 import xyz.hstudio.horizon.bukkit.module.checks.*;
 import xyz.hstudio.horizon.bukkit.network.ChannelHandler;
 import xyz.hstudio.horizon.bukkit.thread.Async;
@@ -86,7 +87,7 @@ public class Horizon extends JavaPlugin {
         McAccess.init();
         PacketConvert.init();
         // Run every 50ms (1 tick)
-        new Timer("Horizon Processing Thread", true).schedule(new Async(), 50L, 50L);
+        new java.util.Timer("Horizon Processing Thread", true).schedule(new Async(), 50L, 50L);
         new Listeners();
 
         // Enable checks
@@ -97,6 +98,7 @@ public class Horizon extends JavaPlugin {
         new Inventory();
         new KillAura();
         new Scaffold();
+        new Timer();
 
         // Enable commands
         // Do not need to cache exceptions.

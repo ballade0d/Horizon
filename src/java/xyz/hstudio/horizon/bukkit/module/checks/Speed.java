@@ -21,8 +21,7 @@ public class Speed {
             initForce *= 0.2;
         }
         boolean sprinting = player.isSprinting && !player.isSneaking && player.getPotionEffectAmplifier("BLINDNESS") <= 0;
-        // TODO: Fix this
-        boolean flying = player.player.isFlying();
+        boolean flying = player.isFlying();
 
         float multiplier;
         if (player.isOnGround) {

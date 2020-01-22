@@ -31,3 +31,6 @@ scaffold:
   debug: true
   typeB:
     max_angle: 90.0
+timer:
+  enabled: true
+  debug: true

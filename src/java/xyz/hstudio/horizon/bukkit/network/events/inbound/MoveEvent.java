@@ -66,13 +66,13 @@ public class MoveEvent extends Event {
      * @author Islandscout
      */
     private boolean checkSlime() {
-        Block standing = this.from.add(0, -0.001, 0).getBlock();
+        Block standing = this.from.add(0, -0.01, 0).getBlock();
         if (standing == null) {
             return false;
         }
         double slimeExpect = -0.96 * player.prevPrevDeltaY;
         return standing.getType() == MatUtils.SLIME_BLOCK.parse() && !player.isSneaking &&
-                player.prevDeltaY < 0 && this.velocity.getY() > 0 && this.velocity.getY() > (player.prevPrevDeltaY < -0.1F ? slimeExpect - 0.003 : 0) && this.velocity.getY() <= slimeExpect;
+                player.prevDeltaY < 0 && this.velocity.getY() > 0 && this.velocity.getY() <= slimeExpect;
     }
 
     /**
@@ -81,13 +81,13 @@ public class MoveEvent extends Event {
      * @author MrCraftGoo
      */
     private boolean checkBed() {
-        Block standing = this.from.add(0, -0.001, 0).getBlock();
+        Block standing = this.from.add(0, -0.01, 0).getBlock();
         if (standing == null) {
             return false;
         }
         double bedExpect = -0.62F * player.prevPrevDeltaY;
         return standing.getType().name().contains("BED") && !player.isSneaking &&
-                player.prevDeltaY < 0 && this.velocity.getY() > 0 && this.velocity.getY() > (player.prevPrevDeltaY < -0.1F ? bedExpect - 0.003 : 0) && this.velocity.getY() <= bedExpect;
+                player.prevDeltaY < 0 && this.velocity.getY() > 0 && this.velocity.getY() <= bedExpect;
     }
 
     private float computeFriction() {
@@ -110,10 +110,6 @@ public class MoveEvent extends Event {
             player.isTeleporting = false;
             player.position = tpLoc;
             this.isTeleport = true;
-        }
-
-        if (player.isGliding && this.onGround) {
-            player.isGliding = false;
         }
         return true;
     }

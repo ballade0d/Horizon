@@ -40,10 +40,12 @@ public class Inventory extends Module<InventoryData, InventoryConfig> {
             // However, this won't work in 1.9+.
             if (e.command == ClientCommandEvent.ClientCommand.OPEN_INVENTORY_ACHIEVEMENT) {
                 data.inventoryOpened = true;
+                data.inventoryOpenTick = player.currentTick;
             }
         } else if (event instanceof WindowClickEvent) {
             // Client clicked window, so there should be a window opened.
             data.inventoryOpened = true;
+            data.inventoryOpenTick = player.currentTick;
         } else if (event instanceof WindowCloseEvent) {
             // Client closed window
             data.inventoryOpened = false;
@@ -56,6 +58,11 @@ public class Inventory extends Module<InventoryData, InventoryConfig> {
                 return;
             }
 
+            // Move packet can be sent if player open inventory while moving/rotating
+            if (player.currentTick - data.inventoryOpenTick < 2) {
+                return;
+            }
+
             // It's impossible to rotate if inventory is opened.
             if (config.typeA_checkRotation && e.updateRot) {
                 // Block Inventory Rotation
@@ -64,6 +71,7 @@ public class Inventory extends Module<InventoryData, InventoryConfig> {
                 // Punish
                 this.punish(player, data, "TypeA", 5);
             }
+
             if (e.updatePos) {
                 // TODO: Inventory Position check
                 // Inventory Position check is harder to make

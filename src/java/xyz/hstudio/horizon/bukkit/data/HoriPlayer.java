@@ -25,6 +25,7 @@ public class HoriPlayer {
     public final InventoryData inventoryData = new InventoryData();
     public final KillAuraData killAuraData = new KillAuraData();
     public final ScaffoldData scaffoldData = new ScaffoldData();
+    public final TimerData timerData = new TimerData();
     public Player player;
     public long currentTick;
     public World world;
@@ -41,6 +42,7 @@ public class HoriPlayer {
     public boolean isPullingBow;
     public boolean isOnGround;
     public boolean isGliding;
+    public long toggleFlyTime;
     public long hitSlowdownTick = -1;
     public long teleportTime = -1;
     public boolean isTeleporting;
@@ -71,6 +73,13 @@ public class HoriPlayer {
      */
     public ItemStack getHeldItem() {
         return this.player.getInventory().getItem(this.heldSlot);
+    }
+
+    /**
+     * Check if player is flying
+     */
+    public boolean isFlying() {
+        return System.currentTimeMillis() - this.toggleFlyTime <= 100L || this.player.isFlying();
     }
 
     /**

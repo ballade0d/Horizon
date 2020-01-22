@@ -38,43 +38,45 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionConfig
     private void typeA(final Event event, final HoriPlayer player, final InvalidMotionData data, final InvalidMotionConfig config) {
         if (event instanceof MoveEvent) {
             MoveEvent e = (MoveEvent) event;
-            if (!e.updatePos || e.player.player.isFlying()) {
+            if (!e.updatePos || player.isFlying()) {
                 return;
             }
 
             double deltaY = e.velocity.getY();
 
-            // Changed prevDeltaY to lastExpect to avoid some weird bugs.
+            // Use lastExpect to avoid some weird bugs.
             double prevDeltaY = data.lastExpect;
             // Magic number from MCP.
             // Basically it's something like gravitational acceleration.
             double expected = (prevDeltaY - 0.08) * 0.98;
 
-            // Trust client onGround?
             // TODO: Handle Water, Fake Ground, Velocity, Step, Tower, Vehicle
-            // TODO: Fix the false positives when toggling fly.
 
             if (player.isGliding) {
                 // Gliding function, from MCP
-                expected = prevDeltaY;
-                float pitchRot = (float) Math.toRadians(e.to.pitch - e.from.pitch);
+                double motionY = player.prevDeltaY;
+                float pitchRot = (float) Math.toRadians(e.to.pitch);
                 double magic = McAccess.getInst().cos(pitchRot);
-                magic = magic * magic * Math.min(1, e.from.getDirection().length() / 0.4);
-                if (prevDeltaY < 0) {
-                    expected += prevDeltaY * -0.1 * magic;
+                magic = magic * magic * Math.min(1.0D, e.to.getDirection().length() / 0.4D);
+                motionY += -0.08 + magic * 0.06;
+                if (motionY < 0) {
+                    motionY += motionY * -0.1 * magic;
                 }
                 if (pitchRot < 0) {
-                    expected += e.velocity.length() * -McAccess.getInst().sin(pitchRot) * 0.04 * 3.2;
+                    motionY += player.velocity.clone().setY(0).length() * (-McAccess.getInst().sin(pitchRot)) * 0.04 * 3.2;
                 }
-                expected *= 0.99;
+                motionY *= 0.98;
+                expected = motionY;
             } else {
                 if (e.isOnSlime || e.isOnBed) {
                     // Ignore because it is already predicated in MoveEvent
                     expected = deltaY;
+                    data.inAir = true;
                 } else if (e.collidingBlocks.contains(MatUtils.COBWEB.parse())) {
                     // Y speed in web. Anything shouldn't affect it so it's a value.
-                    expected = -0.007;
-                } else if (e.onGround) {
+                    // TODO: Fix the false positives when moving out from cobweb.
+                    expected = -0.00196;
+                } else if (e.onGround || e.onGroundReally) {
                     // Have to be 0 because of some client bugs.
                     expected = 0;
                     data.inAir = false;
@@ -107,8 +109,8 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionConfig
                     data.inAir = true;
                 }
             }
-            // Fix a weird stuff that in 1.8 small movements are approximated to 0.
-            if (MathUtils.abs(expected) < 0.005) {
+            // In 1.8.8 or lower, small movements are approximated to 0.
+            if (MathUtils.abs(expected) < 0.005 && expected != 0) {
                 expected = deltaY;
             }
             if (e.isTeleport) {
@@ -116,11 +118,12 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionConfig
             }
 
             // Check for absolute value so that FastFall and LowHop will also be detected.
-            double discrepancy = MathUtils.abs(deltaY - expected);
+            // But 1.9+ is weird and some functions are not very accurate so absolute value can't be used.
+            double discrepancy = deltaY - expected;
             // Don't check if onGroundReally is true to avoid false positives when chunks aren't sent to the player.
             // Don't check if onGround is true to avoid some false positives. GroundSpoof check will fix the bypass.
             if (!e.isTeleport && !e.onGround && !e.onGroundReally && discrepancy > config.typeA_tolerance) {
-                this.debug("Failed: TypeA, d:" + deltaY + ", e:" + expected);
+                this.debug("Failed: TypeA, d:" + deltaY + ", e:" + expected + ", p:" + prevDeltaY);
 
                 // Punish
                 this.punish(player, data, "TypeA", discrepancy * 5);

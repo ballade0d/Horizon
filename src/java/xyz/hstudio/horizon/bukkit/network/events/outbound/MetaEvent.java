@@ -25,22 +25,28 @@ public class MetaEvent extends Event {
                     continue;
                 }
                 byte statue = (byte) object.object;
-                if ((statue & 16) != 16) {
+                if ((statue & 16) == 16) {
+                    player.isEating = true;
+                    player.isPullingBow = true;
+                } else {
                     player.isEating = false;
                     player.isPullingBow = false;
-                    break;
                 }
             }
         } else {
             for (WatchableObject object : this.objects) {
-                if (object.index != 6) {
-                    continue;
-                }
-                byte statue = (byte) object.object;
-                if ((statue & 1) != 1) {
-                    player.isEating = false;
-                    player.isPullingBow = false;
-                    break;
+                if (object.index == 6) {
+                    byte statue = (byte) object.object;
+                    if ((statue & 1) == 1) {
+                        player.isEating = true;
+                        player.isPullingBow = true;
+                    } else {
+                        player.isEating = false;
+                        player.isPullingBow = false;
+                    }
+                } else if (object.index == 0) {
+                    byte statue = (byte) object.object;
+                    player.isGliding = (statue & 128) == 128;
                 }
             }
         }
