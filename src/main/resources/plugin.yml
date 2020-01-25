@@ -1,0 +1,6 @@
+name: Horizon
+main: xyz.hstudio.horizon.bukkit.Horizon
+version: 'BETA'
+commands:
+  horizon:
+    aliases: [hori, hz]
