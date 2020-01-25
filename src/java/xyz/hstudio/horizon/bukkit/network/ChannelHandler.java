@@ -51,6 +51,7 @@ public class ChannelHandler extends ChannelDuplexHandler {
         }
     }
 
+    @Override
     public void channelRead(final ChannelHandlerContext ctx, Object packet) throws Exception {
         try {
             ChannelHandler.runInbound(player, packet);
@@ -60,6 +61,7 @@ public class ChannelHandler extends ChannelDuplexHandler {
         super.channelRead(ctx, packet);
     }
 
+    @Override
     public void write(final ChannelHandlerContext ctx, Object packet, final ChannelPromise promise) throws Exception {
         try {
             ChannelHandler.runOutbound(player, packet);

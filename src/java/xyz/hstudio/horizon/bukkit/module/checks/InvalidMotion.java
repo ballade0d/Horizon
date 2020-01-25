@@ -57,7 +57,7 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionConfig
                 double motionY = player.prevDeltaY;
                 float pitchRot = (float) Math.toRadians(e.to.pitch);
                 double magic = McAccess.getInst().cos(pitchRot);
-                magic = magic * magic * Math.min(1.0D, e.to.getDirection().length() / 0.4D);
+                magic = magic * magic * Math.min(1.0, e.to.getDirection().length() / 0.4);
                 motionY += -0.08 + magic * 0.06;
                 if (motionY < 0) {
                     motionY += motionY * -0.1 * magic;

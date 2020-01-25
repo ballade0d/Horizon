@@ -20,6 +20,7 @@ public class HoriPlayer {
 
     public final AutoSwitchData autoSwitchData = new AutoSwitchData();
     public final BadPacketData badPacketData = new BadPacketData();
+    public final GroundSpoofData groundSpoofData = new GroundSpoofData();
     public final HitBoxData hitBoxData = new HitBoxData();
     public final InvalidMotionData invalidMotionData = new InvalidMotionData();
     public final InventoryData inventoryData = new InventoryData();
@@ -119,6 +120,14 @@ public class HoriPlayer {
             }
         }
         return 0;
+    }
+
+    /**
+     * Send transaction request to the client.
+     */
+    public void sendRequest() {
+        this.lastRequestSent = System.currentTimeMillis();
+        this.sendPacket(McAccess.getInst().newTransactionPacket());
     }
 
     /**

@@ -87,12 +87,15 @@ public class Horizon extends JavaPlugin {
         McAccess.init();
         PacketConvert.init();
         // Run every 50ms (1 tick)
-        new java.util.Timer("Horizon Processing Thread", true).schedule(new Async(), 50L, 50L);
+        Thread thread = new Thread(new Async(), "Horizon Processing Thread");
+        thread.setDaemon(true);
+        thread.start();
         new Listeners();
 
         // Enable checks
         new AutoSwitch();
         new BadPacket();
+        new GroundSpoof();
         new HitBox();
         new InvalidMotion();
         new Inventory();

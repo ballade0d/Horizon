@@ -25,22 +25,17 @@ public class MetaEvent extends Event {
                     continue;
                 }
                 byte statue = (byte) object.object;
-                if ((statue & 16) == 16) {
-                    player.isEating = true;
-                    player.isPullingBow = true;
-                } else {
+                if ((statue & 16) != 16) {
                     player.isEating = false;
                     player.isPullingBow = false;
+                    break;
                 }
             }
         } else {
             for (WatchableObject object : this.objects) {
                 if (object.index == 6) {
                     byte statue = (byte) object.object;
-                    if ((statue & 1) == 1) {
-                        player.isEating = true;
-                        player.isPullingBow = true;
-                    } else {
+                    if ((statue & 1) != 1) {
                         player.isEating = false;
                         player.isPullingBow = false;
                     }

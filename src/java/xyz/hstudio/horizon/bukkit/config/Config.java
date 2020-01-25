@@ -23,8 +23,8 @@ public abstract class Config {
      * @throws IllegalStateException When config is miss
      * @author MrCraftGoo
      */
-    public Config load(final ModuleType type) throws IllegalStateException {
-        FieldAccess access = FieldAccess.get(this.getClass());
+    public static <T extends Config> T load(final ModuleType type, final T conf) throws IllegalStateException {
+        FieldAccess access = FieldAccess.get(conf.getClass());
         Field[] fields = access.getFields();
         for (int i = 0; i < fields.length; i++) {
             Field field = fields[i];
@@ -43,7 +43,7 @@ public abstract class Config {
 
             Object value = config.get(path);
             if (value == null) {
-                config.set(path, value = access.get(this, i));
+                config.set(path, value = access.get(conf, i));
             }
 
             // Double.class.isAssignableFrom(double.class) is false :/
@@ -51,9 +51,9 @@ public abstract class Config {
                 throw new IllegalStateException("Failed to load value: " + path + " [2]");
             }
 
-            access.set(this, i, value);
+            access.set(conf, i, value);
         }
 
-        return this;
+        return conf;
     }
 }

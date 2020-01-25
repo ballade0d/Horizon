@@ -14,7 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class Module<K extends Data, V extends Config> {
 
-    private static final Map<ModuleType, Module> moduleMap = new ConcurrentHashMap<>();
+    private static final Map<ModuleType, Module<? extends Data, ? extends Config>> moduleMap = new ConcurrentHashMap<>();
 
     private final ModuleType moduleType;
     @Getter
@@ -23,7 +23,7 @@ public abstract class Module<K extends Data, V extends Config> {
     public Module(final ModuleType moduleType, final V config) {
         // This throws a warn in IDE, tell me any suggestion if you have.
         this.moduleType = moduleType;
-        this.config = (V) config.load(moduleType);
+        this.config = Config.load(moduleType, config);
         Module.moduleMap.put(moduleType, this);
     }
 
@@ -37,11 +37,11 @@ public abstract class Module<K extends Data, V extends Config> {
      * @author MrCraftGoo
      */
     public static boolean doCheck(final Event event, final HoriPlayer player) {
-        for (Module module : Module.moduleMap.values()) {
-            if (!module.config.enabled) {
+        for (Module modules : Module.moduleMap.values()) {
+            if (!modules.config.enabled) {
                 continue;
             }
-            module.doCheck(event, player, module.getData(player), module.config);
+            modules.doCheck(event, player, modules.getData(player), modules.config);
         }
         return true;
     }

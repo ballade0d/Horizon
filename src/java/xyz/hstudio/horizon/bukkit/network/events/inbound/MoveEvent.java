@@ -3,6 +3,7 @@ package xyz.hstudio.horizon.bukkit.network.events.inbound;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
+import xyz.hstudio.horizon.bukkit.Logger;
 import xyz.hstudio.horizon.bukkit.compat.McAccess;
 import xyz.hstudio.horizon.bukkit.data.HoriPlayer;
 import xyz.hstudio.horizon.bukkit.network.events.Event;
@@ -19,7 +20,6 @@ public class MoveEvent extends Event {
     public final Location to;
     public final Vector velocity;
     public final AABB cube;
-    public final boolean onGround;
     public final boolean updatePos;
     public final boolean updateRot;
     public final MoveType moveType;
@@ -30,6 +30,7 @@ public class MoveEvent extends Event {
     public final boolean isOnBed;
     public final float oldFriction;
     public final float newFriction;
+    public boolean onGround;
     public Set<Material> collidingBlocks;
     public boolean isTeleport;
 
@@ -47,7 +48,7 @@ public class MoveEvent extends Event {
 
         this.hitSlowdown = player.currentTick == player.hitSlowdownTick;
         // TODO: A REAL on ground check.
-        this.onGroundReally = this.to.isOnGround(this.cube, false);
+        this.onGroundReally = this.to.isOnGround(false, 0.001);
         this.isUnderBlock = !this.cube.add(0, 1.5, 0, 0, 0.5, 0).isEmpty(to.world);
 
         this.isOnSlime = this.checkSlime();
@@ -72,7 +73,7 @@ public class MoveEvent extends Event {
         }
         double slimeExpect = -0.96 * player.prevPrevDeltaY;
         return standing.getType() == MatUtils.SLIME_BLOCK.parse() && !player.isSneaking &&
-                player.prevDeltaY < 0 && this.velocity.getY() > 0 && this.velocity.getY() <= slimeExpect;
+                player.prevDeltaY <= 0 && this.velocity.getY() > 0 && this.velocity.getY() <= slimeExpect;
     }
 
     /**
@@ -86,8 +87,11 @@ public class MoveEvent extends Event {
             return false;
         }
         double bedExpect = -0.62F * player.prevPrevDeltaY;
+        if (standing.getType().name().contains("BED")) {
+            Logger.info("", "e:" + bedExpect + ", d:" + this.velocity.getY() + ", p:" + player.prevDeltaY);
+        }
         return standing.getType().name().contains("BED") && !player.isSneaking &&
-                player.prevDeltaY < 0 && this.velocity.getY() > 0 && this.velocity.getY() <= bedExpect;
+                player.prevDeltaY <= 0 && this.velocity.getY() > 0 && this.velocity.getY() <= bedExpect;
     }
 
     private float computeFriction() {

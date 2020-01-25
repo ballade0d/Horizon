@@ -1,6 +1,7 @@
 package xyz.hstudio.horizon.bukkit.util;
 
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.configuration.file.YamlConstructor;
@@ -15,7 +16,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.logging.Level;
 
-@SuppressWarnings("all")
 public class YamlLoader extends YamlConfiguration {
 
     public int commentNum = 0;
@@ -30,7 +30,7 @@ public class YamlLoader extends YamlConfiguration {
     public static YamlLoader loadConfiguration(final File file) {
         YamlLoader config = new YamlLoader();
         try {
-            config.load(file);
+            config.load(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8));
         } catch (FileNotFoundException ignored) {
         } catch (IOException | InvalidConfigurationException var4) {
             Bukkit.getLogger().log(Level.SEVERE, "Cannot load " + file, var4);
@@ -38,21 +38,14 @@ public class YamlLoader extends YamlConfiguration {
         return config;
     }
 
-    public static YamlConfiguration loadConfiguration(InputStream stream) {
+    public static YamlConfiguration loadConfiguration(final InputStream stream) {
         YamlLoader config = new YamlLoader();
         try {
-            config.load(stream);
-        } catch (IOException var3) {
+            config.load(new InputStreamReader(stream));
+        } catch (IOException | InvalidConfigurationException var3) {
             Bukkit.getLogger().log(Level.SEVERE, "Cannot load configuration from stream", var3);
-        } catch (InvalidConfigurationException var4) {
-            Bukkit.getLogger().log(Level.SEVERE, "Cannot load configuration from stream", var4);
         }
         return config;
-    }
-
-    public void load(final File file) throws IOException, InvalidConfigurationException {
-        FileInputStream stream = new FileInputStream(file);
-        load((new InputStreamReader(stream, StandardCharsets.UTF_8)));
     }
 
     public void load(final Reader reader) throws IOException, InvalidConfigurationException {
@@ -66,12 +59,8 @@ public class YamlLoader extends YamlConfiguration {
         loadFromString(this.getConfigContent(builder.toString()));
     }
 
-    public void load(InputStream inputStream) throws IOException, InvalidConfigurationException {
-        this.load(new InputStreamReader(inputStream));
-    }
-
     @SuppressWarnings("rawtypes")
-    public void loadFromString(String contents) throws InvalidConfigurationException {
+    public void loadFromString(final String contents) throws InvalidConfigurationException {
         Map input;
         try {
             input = (Map) yaml.load(contents);
@@ -86,6 +75,29 @@ public class YamlLoader extends YamlConfiguration {
         }
         if (input != null) {
             convertMapsToSections(input, this);
+        }
+    }
+
+    private String getConfigContent(final String string) {
+        try {
+            String addLine;
+            String currentLine;
+            StringBuilder whole = new StringBuilder();
+            BufferedReader reader = new BufferedReader(new StringReader(string));
+            while ((currentLine = reader.readLine()) != null) {
+                if (currentLine.trim().startsWith("#")) {
+                    addLine = currentLine.replaceFirst("#", "COMMENT_" + commentNum + ": \"");
+                    whole.append(addLine).append("\"").append("\n");
+                    commentNum++;
+                } else {
+                    whole.append(currentLine).append("\n");
+                }
+            }
+            reader.close();
+            return whole.toString();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
         }
     }
 
@@ -107,29 +119,6 @@ public class YamlLoader extends YamlConfiguration {
             dump = "";
         }
         return header + dump;
-    }
-
-    private String getConfigContent(final String string) {
-        try {
-            String addLine;
-            String currentLine;
-            StringBuilder whole = new StringBuilder("");
-            BufferedReader reader = new BufferedReader(new StringReader(string));
-            while ((currentLine = reader.readLine()) != null) {
-                if (currentLine.trim().startsWith("#")) {
-                    addLine = currentLine.replaceFirst("#", "COMMENT_" + commentNum + ": \"");
-                    whole.append(addLine + "\"").append("\n");
-                    commentNum++;
-                } else {
-                    whole.append(currentLine).append("\n");
-                }
-            }
-            reader.close();
-            return whole.toString();
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
     }
 
     private String prepareConfigString(final String configString) {
@@ -176,5 +165,15 @@ public class YamlLoader extends YamlConfiguration {
             }
         }
         return config.toString();
+    }
+
+    public ConfigurationSection getSection(final String path) {
+        Object val = this.get(path, null);
+        if (val != null) {
+            return val instanceof ConfigurationSection ? (ConfigurationSection) val : null;
+        } else {
+            val = this.get(path, this.getDefault(path));
+            return val instanceof ConfigurationSection ? this.createSection(path) : null;
+        }
     }
 }

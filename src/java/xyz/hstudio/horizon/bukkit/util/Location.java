@@ -56,10 +56,10 @@ public class Location {
         return this.world.getBlockAt(this.getBlockX(), this.getBlockY(), this.getBlockZ());
     }
 
-    public boolean isOnGround(final AABB cube, final boolean ignoreOnGround) {
-        AABB surrounding = new AABB(cube.minX, cube.minY - 1, cube.minZ, cube.maxX, cube.minY, cube.maxZ);
-        AABB underFeet = new AABB(cube.minX, cube.minY - 0.001, cube.minZ, cube.maxX, cube.minY, cube.maxZ);
-        AABB topFeet = cube.add(0, 0.001, 0, 0, 0, 0);
+    public boolean isOnGround(final boolean ignoreOnGround, final double feetDepth) {
+        AABB surrounding = new AABB(this.x - 0.3, this.y - 1, this.z - 0.3, this.x + 0.3, this.y, this.z + 0.3);
+        AABB underFeet = new AABB(this.x - 0.3, this.y - feetDepth, this.z - 0.3, this.x + 0.3, this.y, this.z + 0.3);
+        AABB topFeet = underFeet.add(0, feetDepth + 0.00001, 0, 0, 0, 0);
         List<Block> above = !ignoreOnGround ? null : topFeet.getBlocks(this.world);
         for (Block block : surrounding.getBlocks(this.world)) {
             if (block.isLiquid() || !block.getType().isSolid()) {

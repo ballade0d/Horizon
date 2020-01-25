@@ -2,14 +2,13 @@ package xyz.hstudio.horizon.bukkit.thread;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import xyz.hstudio.horizon.bukkit.Horizon;
-import xyz.hstudio.horizon.bukkit.compat.McAccess;
+import xyz.hstudio.horizon.bukkit.data.HoriPlayer;
 
-import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-public class Async extends TimerTask {
+public class Async implements Runnable {
 
     private static final ExecutorService threadPool = Executors.newSingleThreadExecutor(
             new ThreadFactoryBuilder()
@@ -28,15 +27,25 @@ public class Async extends TimerTask {
 
     @Override
     public void run() {
-        // Run every 60 tick
-        if (currentTick % 60 == 0) {
-            long time = System.currentTimeMillis();
-            Object packet = McAccess.getInst().newTransactionPacket();
-            Horizon.PLAYERS.values().forEach(p -> {
-                p.lastRequestSent = time;
-                p.sendPacket(packet);
-            });
+        try {
+            long current = System.nanoTime();
+            while (true) {
+
+                // Run every 80 tick
+                if (currentTick % 80 == 0) {
+                    Horizon.PLAYERS.values().forEach(HoriPlayer::sendRequest);
+                }
+                currentTick++;
+
+                current = (current + 50000000L - System.nanoTime()) / 1000000L;
+                // Wait for 1 tick
+                if (current > 0) {
+                    Thread.sleep(current);
+                }
+                current = System.nanoTime();
+            }
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
         }
-        currentTick++;
     }
 }

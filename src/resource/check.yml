@@ -4,6 +4,9 @@ autoswitch:
 badpacket:
   enabled: true
   debug: true
+groundspoof:
+  enabled: true
+  debug: true
 hitbox:
   enabled: true
   debug: true

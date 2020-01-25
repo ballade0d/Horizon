@@ -58,8 +58,9 @@ public class Inventory extends Module<InventoryData, InventoryConfig> {
                 return;
             }
 
-            // Move packet can be sent if player open inventory while moving/rotating
-            if (player.currentTick - data.inventoryOpenTick < 2) {
+            // Client still sends rotation/position packet after 1~3 tick player open inventory
+            // if player open inventory while moving/rotating
+            if (player.currentTick - data.inventoryOpenTick < 3) {
                 return;
             }
 
