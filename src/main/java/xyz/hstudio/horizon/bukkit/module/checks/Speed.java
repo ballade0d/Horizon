@@ -1,6 +1,7 @@
 package xyz.hstudio.horizon.bukkit.module.checks;
 
-import xyz.hstudio.horizon.bukkit.compat.McAccess;
+import xyz.hstudio.horizon.bukkit.compat.IMcAccessor;
+import xyz.hstudio.horizon.bukkit.compat.McAccessor;
 import xyz.hstudio.horizon.bukkit.data.HoriPlayer;
 
 public class Speed {
@@ -25,7 +26,7 @@ public class Speed {
 
         float multiplier;
         if (player.isOnGround) {
-            float movementFactor = (float) McAccess.getInst().getMoveFactor(player.player);
+            float movementFactor = (float) McAccessor.INSTANCE.getMoveFactor(player.player);
             multiplier = movementFactor * 0.16277136F / (newFriction * newFriction * newFriction);
             float groundMultiplier = (5 * (player.player.getWalkSpeed()));
             multiplier *= groundMultiplier;

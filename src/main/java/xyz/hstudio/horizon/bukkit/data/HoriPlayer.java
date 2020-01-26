@@ -8,7 +8,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.util.Vector;
 import xyz.hstudio.horizon.bukkit.Horizon;
-import xyz.hstudio.horizon.bukkit.compat.McAccess;
+import xyz.hstudio.horizon.bukkit.compat.IMcAccessor;
+import xyz.hstudio.horizon.bukkit.compat.McAccessor;
 import xyz.hstudio.horizon.bukkit.data.checks.*;
 import xyz.hstudio.horizon.bukkit.network.ChannelHandler;
 import xyz.hstudio.horizon.bukkit.util.Location;
@@ -18,7 +19,6 @@ import java.util.List;
 
 public class HoriPlayer {
 
-    public final AutoSwitchData autoSwitchData = new AutoSwitchData();
     public final BadPacketData badPacketData = new BadPacketData();
     public final GroundSpoofData groundSpoofData = new GroundSpoofData();
     public final HitBoxData hitBoxData = new HitBoxData();
@@ -55,7 +55,7 @@ public class HoriPlayer {
 
     public HoriPlayer(final Player player) {
         this.player = player;
-        this.pipeline = McAccess.getInst().getPipeline(player);
+        this.pipeline = McAccessor.INSTANCE.getPipeline(player);
 
         this.world = player.getWorld();
         this.position = new Location(player.getLocation());
@@ -97,7 +97,7 @@ public class HoriPlayer {
     }
 
     public void sendMessage(final String msg) {
-        McAccess.getInst().ensureMainThread(() -> this.player.sendMessage(msg));
+        McAccessor.INSTANCE.ensureMainThread(() -> this.player.sendMessage(msg));
     }
 
     /**
@@ -107,7 +107,7 @@ public class HoriPlayer {
         if (this.vehicle == -1) {
             return null;
         }
-        return McAccess.getInst().getEntity(this.world, this.vehicle);
+        return McAccessor.INSTANCE.getEntity(this.world, this.vehicle);
     }
 
     /**
@@ -127,7 +127,7 @@ public class HoriPlayer {
      */
     public void sendRequest() {
         this.lastRequestSent = System.currentTimeMillis();
-        this.sendPacket(McAccess.getInst().newTransactionPacket());
+        this.sendPacket(McAccessor.INSTANCE.newTransactionPacket());
     }
 
     /**

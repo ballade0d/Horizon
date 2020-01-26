@@ -10,6 +10,8 @@ import xyz.hstudio.horizon.bukkit.network.events.inbound.MoveEvent;
 
 public class Timer extends Module<TimerData, TimerConfig> {
 
+    private static final long MULTIPLIER = 1000000L;
+
     public Timer() {
         super(ModuleType.Timer, new TimerConfig());
     }
@@ -42,16 +44,16 @@ public class Timer extends Module<TimerData, TimerConfig> {
 
             // Skip if player is teleporting.
             if (e.isTeleport || System.currentTimeMillis() - player.teleportTime < 2000L) {
-                data.drift = 50000000L;
+                data.drift = 50 * MULTIPLIER;
                 return;
             }
 
             long drift = data.drift;
-            long delta = timeElapsed - 50000000L;
+            long delta = timeElapsed - 50 * MULTIPLIER;
             drift += delta;
 
-            if (drift > 1000000 * 1000) {
-                drift = 1000000 * 1000;
+            if (drift > 1000 * MULTIPLIER) {
+                drift = 1000 * MULTIPLIER;
             }
 
             double diff = drift * 1E-6;
@@ -64,16 +66,16 @@ public class Timer extends Module<TimerData, TimerConfig> {
                 this.punish(player, data, "TypeA", -diff / 50 * 3);
 
                 // Reset drift to -45 to stop spam-flagging.
-                drift = -45 * 1000000;
+                drift = -45 * MULTIPLIER;
             } else {
                 reward("TypeA", data, 0.995);
             }
             // Reduce drift
             // Inspired by Islandscout, I'll credit him.
             if (drift < 0) {
-                drift = (long) Math.min(0, drift + (50 - (50 / 1.005)) / 1E-6);
+                drift = (long) Math.min(0, drift + (50 - (50 / 1.005)) * MULTIPLIER);
             } else {
-                drift = (long) Math.max(0, drift + (50 - (50 / 0.995)) / 1E-6);
+                drift = (long) Math.max(0, drift + (50 - (50 / 0.995)) * MULTIPLIER);
             }
 
             data.drift = drift;

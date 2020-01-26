@@ -20,7 +20,8 @@ public class Listeners implements Listener {
 
     @EventHandler
     public void onPlayerJoin(final PlayerJoinEvent event) {
-        new HoriPlayer(event.getPlayer());
+        // Use callSyncMethod to fix an error if late-bind is enabled.
+        Bukkit.getScheduler().callSyncMethod(Horizon.getInst(), () -> new HoriPlayer(event.getPlayer()));
     }
 
     @EventHandler

@@ -10,7 +10,6 @@ import xyz.hstudio.horizon.bukkit.module.Module;
 import xyz.hstudio.horizon.bukkit.network.events.Event;
 import xyz.hstudio.horizon.bukkit.network.events.inbound.BlockPlaceEvent;
 import xyz.hstudio.horizon.bukkit.network.events.inbound.MoveEvent;
-import xyz.hstudio.horizon.bukkit.util.TimeUtils;
 
 import java.util.stream.DoubleStream;
 
@@ -29,6 +28,8 @@ public class Scaffold extends Module<ScaffoldData, ScaffoldConfig> {
     public void doCheck(final Event event, final HoriPlayer player, final ScaffoldData data, final ScaffoldConfig config) {
         typeA(event, player, data, config);
         typeB(event, player, data, config);
+        typeC(event, player, data, config);
+        typeD(event, player, data, config);
         // TODO: SafeWalk check
     }
 
@@ -46,51 +47,29 @@ public class Scaffold extends Module<ScaffoldData, ScaffoldConfig> {
             if (e.placeType != BlockPlaceEvent.PlaceType.PLACE_BLOCK) {
                 return;
             }
+
+            Vector interaction = e.interaction;
+            Block b = e.getTargetLocation().getBlock();
             if (e.face == BlockPlaceEvent.BlockFace.INVALID) {
                 this.debug("Failed: TypeA");
 
                 // Punish
                 this.punish(player, data, "TypeA", 5);
-                return;
-            }
-            Vector interaction = e.interaction;
-            // Performance?
-            if (DoubleStream.of(interaction.getX(), interaction.getY(), interaction.getZ())
+            } else if (DoubleStream.of(interaction.getX(), interaction.getY(), interaction.getZ())
                     .anyMatch(d -> d > 1 || d < 0)) {
+                // Stream Performance?
                 this.debug("Failed: TypeA, i:" + interaction.toString());
 
                 // Punish
                 this.punish(player, data, "TypeA", 5);
-                return;
-            }
-
-            Block b = e.getTargetLocation().getBlock();
-            String type = b == null ? null : b.getType().name();
-            if (b != null && type.contains("AIR")) {
-                this.debug("Failed: TypeA, t:" + type);
+            } else if (b != null && b.getType().name().contains("AIR")) {
+                this.debug("Failed: TypeA");
 
                 // Punish
                 this.punish(player, data, "TypeA", 5);
-                return;
+            } else {
+                reward("TypeA", data, 0.999);
             }
-
-            long deltaT = TimeUtils.now() - data.lastMove;
-            if (!data.lagging && deltaT < 20) {
-                if (++data.typeDFails > 4) {
-                    this.debug("Failed: TypeA");
-
-                    // Punish
-                    this.punish(player, data, "TypeA", 3);
-                    return;
-                }
-            } else if (data.typeDFails > 0) {
-                data.typeDFails--;
-            }
-            reward("TypeA", data, 0.999);
-        } else if (event instanceof MoveEvent) {
-            long now = TimeUtils.now();
-            data.lagging = now - data.lastMove < 5;
-            data.lastMove = now;
         }
     }
 
@@ -99,6 +78,8 @@ public class Scaffold extends Module<ScaffoldData, ScaffoldConfig> {
      * <p>
      * Accuracy: 9/10 - It may have a bit false positives.
      * Efficiency: 6/10 - Detects some poorly made Scaffold/Tower.
+     *
+     * @author MrCraftGoo
      */
     private void typeB(final Event event, final HoriPlayer player, final ScaffoldData data, final ScaffoldConfig config) {
         if (event instanceof BlockPlaceEvent) {
@@ -115,6 +96,75 @@ public class Scaffold extends Module<ScaffoldData, ScaffoldConfig> {
             } else {
                 reward("TypeB", data, 0.999);
             }
+        }
+    }
+
+    /**
+     * A place packet order check.
+     * <p>
+     * Accuracy: 8/10 - Should not have much false positives
+     * Efficiency: 9/10 - Detects post scaffold almost instantly
+     *
+     * @author MrCraftGoo
+     */
+    private void typeC(final Event event, final HoriPlayer player, final ScaffoldData data, final ScaffoldConfig config) {
+        if (event instanceof BlockPlaceEvent) {
+            BlockPlaceEvent e = (BlockPlaceEvent) event;
+            if (e.placeType != BlockPlaceEvent.PlaceType.PLACE_BLOCK) {
+                return;
+            }
+
+            long deltaT = System.currentTimeMillis() - data.lastMove;
+            if (data.lagging || deltaT >= 20) {
+                if (data.typeCFails > 0) {
+                    data.typeCFails--;
+                } else {
+                    reward("TypeC", data, 0.999);
+                }
+                return;
+            }
+            if (++data.typeCFails > 4) {
+                this.debug("Failed: TypeC, d:" + deltaT);
+
+                // Punish
+                this.punish(player, data, "TypeC", 4);
+            }
+        } else if (event instanceof MoveEvent) {
+            long now = System.currentTimeMillis();
+            data.lagging = now - data.lastMove < 5;
+            data.lastMove = now;
+        }
+    }
+
+    /**
+     * A direction check. It can detect a large amount of scaffold.
+     * <p>
+     * Accuracy: 7/10 - It may have some false positives
+     * Efficiency: 10/10 - Super fast
+     *
+     * @author MrCraftGoo
+     */
+    private void typeD(final Event event, final HoriPlayer player, final ScaffoldData data, final ScaffoldConfig config) {
+        if (event instanceof MoveEvent) {
+            MoveEvent e = (MoveEvent) event;
+            if (player.currentTick - data.lastPlaceTick > 6 || e.isTeleport) {
+                return;
+            }
+            // TODO: Add a threshold
+            if (!e.strafeNormally) {
+                this.debug("Failed: TypeD");
+
+                // Punish
+                this.punish(player, data, "TypeD", 4);
+            } else {
+                reward("TypeD", data, 0.999);
+            }
+        } else if (event instanceof BlockPlaceEvent) {
+            BlockPlaceEvent e = (BlockPlaceEvent) event;
+            if (e.placeType != BlockPlaceEvent.PlaceType.PLACE_BLOCK) {
+                return;
+            }
+            data.lastPlaceTick = player.currentTick;
         }
     }
 }

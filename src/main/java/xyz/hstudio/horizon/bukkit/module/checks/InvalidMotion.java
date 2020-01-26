@@ -1,7 +1,8 @@
 package xyz.hstudio.horizon.bukkit.module.checks;
 
 import xyz.hstudio.horizon.bukkit.api.ModuleType;
-import xyz.hstudio.horizon.bukkit.compat.McAccess;
+import xyz.hstudio.horizon.bukkit.compat.IMcAccessor;
+import xyz.hstudio.horizon.bukkit.compat.McAccessor;
 import xyz.hstudio.horizon.bukkit.config.checks.InvalidMotionConfig;
 import xyz.hstudio.horizon.bukkit.data.HoriPlayer;
 import xyz.hstudio.horizon.bukkit.data.checks.InvalidMotionData;
@@ -56,14 +57,14 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionConfig
                 // Gliding function, from MCP
                 double motionY = player.prevDeltaY;
                 float pitchRot = (float) Math.toRadians(e.to.pitch);
-                double magic = McAccess.getInst().cos(pitchRot);
+                double magic = McAccessor.INSTANCE.cos(pitchRot);
                 magic = magic * magic * Math.min(1.0, e.to.getDirection().length() / 0.4);
                 motionY += -0.08 + magic * 0.06;
                 if (motionY < 0) {
                     motionY += motionY * -0.1 * magic;
                 }
                 if (pitchRot < 0) {
-                    motionY += player.velocity.clone().setY(0).length() * (-McAccess.getInst().sin(pitchRot)) * 0.04 * 3.2;
+                    motionY += player.velocity.clone().setY(0).length() * (-McAccessor.INSTANCE.sin(pitchRot)) * 0.04 * 3.2;
                 }
                 motionY *= 0.98;
                 expected = motionY;

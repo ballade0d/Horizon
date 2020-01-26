@@ -4,7 +4,8 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.util.NumberConversions;
 import org.bukkit.util.Vector;
-import xyz.hstudio.horizon.bukkit.compat.McAccess;
+import xyz.hstudio.horizon.bukkit.compat.IMcAccessor;
+import xyz.hstudio.horizon.bukkit.compat.McAccessor;
 
 import java.util.List;
 
@@ -66,7 +67,7 @@ public class Location {
                 continue;
             }
             // Ignore if player is in ground
-            for (AABB bBox : McAccess.getInst().getBoxes(block)) {
+            for (AABB bBox : McAccessor.INSTANCE.getBoxes(block)) {
                 if (!bBox.isColliding(underFeet)) {
                     continue;
                 }
@@ -75,7 +76,7 @@ public class Location {
                         if (aboveBlock.isLiquid() || !aboveBlock.getType().isSolid()) {
                             continue;
                         }
-                        for (AABB aboveBox : McAccess.getInst().getBoxes(aboveBlock)) {
+                        for (AABB aboveBox : McAccessor.INSTANCE.getBoxes(aboveBlock)) {
                             if (aboveBox.isColliding(topFeet)) {
                                 return false;
                             }

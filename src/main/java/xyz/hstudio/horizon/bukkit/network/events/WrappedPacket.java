@@ -1,9 +1,9 @@
 package xyz.hstudio.horizon.bukkit.network.events;
 
+import com.esotericsoftware.reflectasm.FieldAccess;
+import com.esotericsoftware.reflectasm.MethodAccess;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import xyz.hstudio.horizon.lib.com.esotericsoftware.reflectasm.FieldAccess;
-import xyz.hstudio.horizon.lib.com.esotericsoftware.reflectasm.MethodAccess;
 
 @RequiredArgsConstructor
 public class WrappedPacket {

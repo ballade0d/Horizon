@@ -7,14 +7,14 @@ import org.bukkit.craftbukkit.v1_8_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
 import org.bukkit.util.NumberConversions;
 import org.bukkit.util.Vector;
-import xyz.hstudio.horizon.bukkit.compat.Bot;
+import xyz.hstudio.horizon.bukkit.compat.IBot;
 import xyz.hstudio.horizon.bukkit.data.HoriPlayer;
 import xyz.hstudio.horizon.bukkit.util.Location;
 
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
-public class Bot_v1_8_R3 extends EntityPlayer implements Bot {
+public class Bot_v1_8_R3 extends EntityPlayer implements IBot {
 
     private final HoriPlayer receiver;
     // Cache the object to reduce the usage of ram.

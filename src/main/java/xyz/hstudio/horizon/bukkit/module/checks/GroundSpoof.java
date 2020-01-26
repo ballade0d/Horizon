@@ -31,7 +31,6 @@ public class GroundSpoof extends Module<GroundSpoofData, GroundSpoofConfig> {
             if (e.onGroundReally) {
                 return;
             }
-            // TODO: Make it run before other movement checks.
             if (e.onGround) {
                 Location checkLoc = new Location(e.to.world, e.from.x, e.to.y, e.from.z);
                 if (checkLoc.isOnGround(false, 0.02)) {

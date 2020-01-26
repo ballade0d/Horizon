@@ -5,7 +5,8 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.ChannelPromise;
 import lombok.RequiredArgsConstructor;
-import xyz.hstudio.horizon.bukkit.compat.PacketConvert;
+import xyz.hstudio.horizon.bukkit.compat.IPacketConverter;
+import xyz.hstudio.horizon.bukkit.compat.PacketConverter;
 import xyz.hstudio.horizon.bukkit.data.HoriPlayer;
 import xyz.hstudio.horizon.bukkit.module.Module;
 import xyz.hstudio.horizon.bukkit.network.events.Event;
@@ -17,7 +18,7 @@ public class ChannelHandler extends ChannelDuplexHandler {
     private final HoriPlayer player;
 
     private static void runInbound(final HoriPlayer player, final Object packet) {
-        Event event = PacketConvert.getInst().convertIn(player, packet);
+        Event event = PacketConverter.INSTANCE.convertIn(player, packet);
         if (event == null) {
             return;
         }
@@ -27,7 +28,7 @@ public class ChannelHandler extends ChannelDuplexHandler {
     }
 
     private static void runOutbound(final HoriPlayer player, final Object packet) {
-        Event event = PacketConvert.getInst().convertOut(player, packet);
+        Event event = PacketConverter.INSTANCE.convertOut(player, packet);
         if (event == null) {
             return;
         }

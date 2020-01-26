@@ -1,7 +1,8 @@
 package xyz.hstudio.horizon.bukkit.util;
 
 import org.bukkit.util.Vector;
-import xyz.hstudio.horizon.bukkit.compat.McAccess;
+import xyz.hstudio.horizon.bukkit.compat.IMcAccessor;
+import xyz.hstudio.horizon.bukkit.compat.McAccessor;
 
 public class MathUtils {
 
@@ -14,10 +15,10 @@ public class MathUtils {
         Vector vector = new Vector();
         float rotX = (float) Math.toRadians(yaw);
         float rotY = (float) Math.toRadians(pitch);
-        vector.setY(-McAccess.getInst().sin(rotY));
-        double xz = McAccess.getInst().cos(rotY);
-        vector.setX(-xz * McAccess.getInst().sin(rotX));
-        vector.setZ(xz * McAccess.getInst().cos(rotX));
+        vector.setY(-McAccessor.INSTANCE.sin(rotY));
+        double xz = McAccessor.INSTANCE.cos(rotY);
+        vector.setX(-xz * McAccessor.INSTANCE.sin(rotX));
+        vector.setZ(xz * McAccessor.INSTANCE.cos(rotX));
         return vector;
     }
 

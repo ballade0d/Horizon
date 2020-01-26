@@ -4,7 +4,8 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import xyz.hstudio.horizon.bukkit.compat.McAccess;
+import xyz.hstudio.horizon.bukkit.compat.IMcAccessor;
+import xyz.hstudio.horizon.bukkit.compat.McAccessor;
 import xyz.hstudio.horizon.bukkit.data.HoriPlayer;
 import xyz.hstudio.horizon.bukkit.network.events.Event;
 import xyz.hstudio.horizon.bukkit.network.events.WrappedPacket;
@@ -28,7 +29,7 @@ public class InteractEntityEvent extends Event {
         if (action != InteractType.ATTACK || !(entity instanceof Player)) {
             return true;
         }
-        if (McAccess.getInst().isAccumulated(player.player)) {
+        if (McAccessor.INSTANCE.isAccumulated(player.player)) {
             ItemStack itemStack = player.getHeldItem();
             if (player.isSprinting || (itemStack != null && itemStack.containsEnchantment(Enchantment.KNOCKBACK))) {
                 player.hitSlowdownTick = player.currentTick;

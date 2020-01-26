@@ -4,8 +4,11 @@ import xyz.hstudio.horizon.bukkit.data.Data;
 
 public class ScaffoldData extends Data {
 
-    //TypeA
+    // TypeC
     public boolean lagging;
     public long lastMove;
-    public int typeDFails;
+    public int typeCFails;
+
+    // TypeD
+    public long lastPlaceTick = -10000;
 }

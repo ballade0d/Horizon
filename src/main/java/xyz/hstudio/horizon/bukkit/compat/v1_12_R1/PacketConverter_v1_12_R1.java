@@ -1,12 +1,13 @@
-package xyz.hstudio.horizon.bukkit.compat.v1_8_R3;
+package xyz.hstudio.horizon.bukkit.compat.v1_12_R1;
 
 import io.netty.buffer.Unpooled;
-import net.minecraft.server.v1_8_R3.*;
+import net.minecraft.server.v1_12_R1.*;
 import org.bukkit.block.BlockFace;
-import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
-import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
 import org.bukkit.util.Vector;
-import xyz.hstudio.horizon.bukkit.compat.PacketConvert;
+import xyz.hstudio.horizon.bukkit.compat.IPacketConverter;
 import xyz.hstudio.horizon.bukkit.data.HoriPlayer;
 import xyz.hstudio.horizon.bukkit.network.events.Event;
 import xyz.hstudio.horizon.bukkit.network.events.WrappedPacket;
@@ -18,8 +19,9 @@ import xyz.hstudio.horizon.bukkit.util.MathUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.IntStream;
 
-public class PacketConvert_v1_8_R3 extends PacketConvert {
+public class PacketConverter_v1_12_R1 implements IPacketConverter {
 
     @Override
     public Event convertIn(final HoriPlayer player, final Object packet) {
@@ -29,8 +31,8 @@ public class PacketConvert_v1_8_R3 extends PacketConvert {
             return convertMoveEvent(player, (PacketPlayInFlying) packet);
         } else if (packet instanceof PacketPlayInBlockDig) {
             return convertBlockBreakEvent(player, (PacketPlayInBlockDig) packet);
-        } else if (packet instanceof PacketPlayInBlockPlace) {
-            return convertBlockPlaceEvent(player, (PacketPlayInBlockPlace) packet);
+        } else if (packet instanceof PacketPlayInUseItem) {
+            return convertBlockPlaceEvent(player, (PacketPlayInUseItem) packet);
         } else if (packet instanceof PacketPlayInUseEntity) {
             return convertInteractEntityEvent(player, (PacketPlayInUseEntity) packet);
         } else if (packet instanceof PacketPlayInHeldItemSlot) {
@@ -68,6 +70,9 @@ public class PacketConvert_v1_8_R3 extends PacketConvert {
             case STOP_SPRINTING:
                 action = ActionEvent.Action.STOP_SPRINTING;
                 break;
+            case START_FALL_FLYING:
+                action = ActionEvent.Action.START_GLIDING;
+                break;
             default:
                 return null;
         }
@@ -89,14 +94,12 @@ public class PacketConvert_v1_8_R3 extends PacketConvert {
             updateRot = true;
             moveType = MoveEvent.MoveType.POSITION_LOOK;
         }
-        boolean hasPos = packet.g();
-        boolean hasLook = packet.h();
-        double x = hasPos ? packet.a() : player.position.x;
-        double y = hasPos ? packet.b() : player.position.y;
-        double z = hasPos ? packet.c() : player.position.z;
-        float yaw = hasLook ? packet.d() : player.position.yaw;
-        float pitch = hasLook ? packet.e() : player.position.pitch;
-        boolean onGround = packet.f();
+        double x = packet.a(player.position.x);
+        double y = packet.b(player.position.y);
+        double z = packet.c(player.position.z);
+        float yaw = packet.a(player.position.yaw);
+        float pitch = packet.b(player.position.pitch);
+        boolean onGround = packet.a();
         Location to = new Location(player.player.getWorld(), x, y, z, yaw, pitch);
         if (MathUtils.abs(to.x) >= Integer.MAX_VALUE || MathUtils.abs(to.y) >= Integer.MAX_VALUE || MathUtils.abs(to.z) >= Integer.MAX_VALUE ||
                 Double.isNaN(to.x) || Double.isNaN(to.y) || Double.isNaN(to.z)) {
@@ -146,39 +149,38 @@ public class PacketConvert_v1_8_R3 extends PacketConvert {
         return new InteractItemEvent(player, item, interactType, new WrappedPacket(packet));
     }
 
-    private Event convertBlockPlaceEvent(final HoriPlayer player, final PacketPlayInBlockPlace packet) {
-        org.bukkit.inventory.ItemStack bukkitItemStack = player.getHeldItem();
-        ItemStack itemStack = bukkitItemStack == null ? null : CraftItemStack.asNMSCopy(bukkitItemStack);
+    private Event convertBlockPlaceEvent(final HoriPlayer player, final PacketPlayInUseItem packet) {
+        ItemStack itemStack = ((CraftPlayer) player.player).getHandle().b(packet.c());
         BlockPosition bPos = packet.a();
         int x = bPos.getX();
         int y = bPos.getY();
         int z = bPos.getZ();
         Vector targetedPosition = new Vector(x, y, z);
         BlockPlaceEvent.BlockFace face;
-        switch (packet.getFace()) {
-            case 0:
-                face = BlockPlaceEvent.BlockFace.BOTTOM;
+        switch (packet.b()) {
+            case DOWN:
                 y -= 1;
+                face = BlockPlaceEvent.BlockFace.BOTTOM;
                 break;
-            case 1:
-                face = BlockPlaceEvent.BlockFace.TOP;
+            case UP:
                 y += 1;
+                face = BlockPlaceEvent.BlockFace.TOP;
                 break;
-            case 2:
-                face = BlockPlaceEvent.BlockFace.NORTH;
+            case NORTH:
                 z -= 1;
+                face = BlockPlaceEvent.BlockFace.NORTH;
                 break;
-            case 3:
-                face = BlockPlaceEvent.BlockFace.SOUTH;
+            case SOUTH:
                 z += 1;
+                face = BlockPlaceEvent.BlockFace.SOUTH;
                 break;
-            case 4:
-                face = BlockPlaceEvent.BlockFace.WEST;
+            case WEST:
                 x -= 1;
+                face = BlockPlaceEvent.BlockFace.WEST;
                 break;
-            case 5:
-                face = BlockPlaceEvent.BlockFace.EAST;
+            case EAST:
                 x += 1;
+                face = BlockPlaceEvent.BlockFace.EAST;
                 break;
             default:
                 face = BlockPlaceEvent.BlockFace.INVALID;
@@ -188,13 +190,10 @@ public class PacketConvert_v1_8_R3 extends PacketConvert {
         Location placed = new Location(player.world, x, y, z);
         if (!targetedPosition.equals(new Vector(-1, -1, -1))) {
             BlockPlaceEvent.PlaceType placeType = itemStack != null && itemStack.getItem() instanceof ItemBlock ? BlockPlaceEvent.PlaceType.PLACE_BLOCK : BlockPlaceEvent.PlaceType.INTERACT_BLOCK;
-            return new BlockPlaceEvent(player, placed, face, CraftItemStack.asBukkitCopy(itemStack).getType(), interaction, placeType, new WrappedPacket(packet));
-        } else {
-            if (bukkitItemStack == null) {
-                return null;
-            }
-            return new InteractItemEvent(player, bukkitItemStack, InteractItemEvent.InteractType.START_USE_ITEM, new WrappedPacket(packet));
+            // Does CraftItemStack#asBukkitCopy perform well?
+            return new BlockPlaceEvent(player, placed, face, itemStack == null ? org.bukkit.Material.AIR : CraftItemStack.asBukkitCopy(itemStack).getType(), interaction, placeType, new WrappedPacket(packet));
         }
+        return null;
     }
 
     private Event convertInteractEntityEvent(final HoriPlayer player, final PacketPlayInUseEntity packet) {
@@ -214,7 +213,7 @@ public class PacketConvert_v1_8_R3 extends PacketConvert {
     }
 
     private Event convertSwingEvent(final HoriPlayer player, final PacketPlayInArmAnimation packet) {
-        return new SwingEvent(player, Hand.MAIN_HAND, new WrappedPacket(packet));
+        return new SwingEvent(player, Hand.valueOf(packet.a().name()), new WrappedPacket(packet));
     }
 
     private Event convertKeepAliveRespondEvent(final HoriPlayer player, final PacketPlayInKeepAlive packet) {
@@ -247,8 +246,8 @@ public class PacketConvert_v1_8_R3 extends PacketConvert {
 
     @Override
     public Event convertOut(final HoriPlayer player, final Object packet) {
-        if (packet instanceof PacketPlayOutAttachEntity) {
-            return convertAttachEvent(player, (PacketPlayOutAttachEntity) packet);
+        if (packet instanceof PacketPlayOutMount) {
+            return convertAttachEvent(player, (PacketPlayOutMount) packet);
         } else if (packet instanceof PacketPlayOutEntityVelocity) {
             return convertVelocityEvent(player, (PacketPlayOutEntityVelocity) packet);
         } else if (packet instanceof PacketPlayOutEntityMetadata) {
@@ -261,7 +260,7 @@ public class PacketConvert_v1_8_R3 extends PacketConvert {
         return null;
     }
 
-    private Event convertAttachEvent(final HoriPlayer player, final PacketPlayOutAttachEntity packet) {
+    private Event convertAttachEvent(final HoriPlayer player, final PacketPlayOutMount packet) {
         // Faster than reflection?
         PacketDataSerializer serializer = new PacketDataSerializer(Unpooled.buffer(16));
         try {
@@ -269,15 +268,15 @@ public class PacketConvert_v1_8_R3 extends PacketConvert {
         } catch (Exception e) {
             return null;
         }
-        int id = serializer.readInt();
-        // -1 = dismount/unleash
-        int vehicle = serializer.readInt();
-        // 0 = mount/dismount, 1 = leash/unleash
-        int action = serializer.readUnsignedByte();
-        if (action != 0 || id != player.player.getEntityId()) {
-            return null;
+        int vehicle = serializer.g();
+        int[] passengers = serializer.b();
+        // Is it efficient?
+        if (IntStream.of(passengers).anyMatch(i -> i == player.player.getEntityId())) {
+            return new VehicleEvent(player, vehicle, new WrappedPacket(packet));
+        } else if (player.vehicle == vehicle) {
+            return new VehicleEvent(player, -1, new WrappedPacket(packet));
         }
-        return new VehicleEvent(player, vehicle, new WrappedPacket(packet));
+        return null;
     }
 
     private Event convertVelocityEvent(final HoriPlayer player, final PacketPlayOutEntityVelocity packet) {
@@ -287,7 +286,7 @@ public class PacketConvert_v1_8_R3 extends PacketConvert {
         } catch (Exception e) {
             return null;
         }
-        int id = serializer.e();
+        int id = serializer.g();
         if (id != player.player.getEntityId()) {
             return null;
         }
@@ -301,17 +300,17 @@ public class PacketConvert_v1_8_R3 extends PacketConvert {
         PacketDataSerializer serializer = new PacketDataSerializer(Unpooled.buffer(0));
         try {
             packet.b(serializer);
-            int id = serializer.e();
+            int id = serializer.g();
             if (id != player.player.getEntityId()) {
                 return null;
             }
-            List<DataWatcher.WatchableObject> metaData = DataWatcher.b(serializer);
+            List<DataWatcher.Item<?>> metaData = DataWatcher.b(serializer);
             if (metaData == null) {
                 return null;
             }
             List<MetaEvent.WatchableObject> objects = new ArrayList<>();
-            for (DataWatcher.WatchableObject watchableObject : metaData) {
-                int index = watchableObject.a();
+            for (DataWatcher.Item watchableObject : metaData) {
+                int index = watchableObject.a().a();
                 Object object = watchableObject.b();
                 objects.add(new MetaEvent.WatchableObject(index, object));
             }

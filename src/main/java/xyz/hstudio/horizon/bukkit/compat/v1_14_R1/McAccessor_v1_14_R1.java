@@ -1,20 +1,20 @@
-package xyz.hstudio.horizon.bukkit.compat.v1_13_R2;
+package xyz.hstudio.horizon.bukkit.compat.v1_14_R1;
 
 import io.netty.channel.ChannelPipeline;
-import net.minecraft.server.v1_13_R2.*;
+import net.minecraft.server.v1_14_R1.*;
 import org.bukkit.Bukkit;
-import org.bukkit.craftbukkit.v1_13_R2.CraftServer;
-import org.bukkit.craftbukkit.v1_13_R2.CraftWorld;
-import org.bukkit.craftbukkit.v1_13_R2.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_14_R1.CraftServer;
+import org.bukkit.craftbukkit.v1_14_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_14_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
-import xyz.hstudio.horizon.bukkit.compat.McAccess;
+import xyz.hstudio.horizon.bukkit.compat.IMcAccessor;
 import xyz.hstudio.horizon.bukkit.util.AABB;
 import xyz.hstudio.horizon.bukkit.util.RandomUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class McAccess_v1_13_R2 extends McAccess {
+public class McAccessor_v1_14_R1 implements IMcAccessor {
 
     @Override
     public ChannelPipeline getPipeline(final Player player) {
@@ -42,7 +42,8 @@ public class McAccess_v1_13_R2 extends McAccess {
         if (chunk == null) {
             return 1.0F;
         }
-        return chunk.getBlockData(block.getX(), block.getY(), block.getZ()).getBlock().n();
+        BlockPosition bPos = new BlockPosition(block.getX(), block.getY(), block.getZ());
+        return chunk.getType(bPos).getBlock().m();
     }
 
     @Override
@@ -77,7 +78,7 @@ public class McAccess_v1_13_R2 extends McAccess {
             return new AABB[0];
         }
         BlockPosition bPos = new BlockPosition(block.getX(), block.getY(), block.getZ());
-        IBlockData data = chunk.getBlockData(block.getX(), block.getY(), block.getZ());
+        IBlockData data = chunk.getType(bPos);
 
         VoxelShape voxelShape = data.getCollisionShape(world, bPos);
         List<AxisAlignedBB> bbs = new ArrayList<>(voxelShape.d());

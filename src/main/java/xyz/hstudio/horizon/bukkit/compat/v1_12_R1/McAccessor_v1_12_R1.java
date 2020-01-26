@@ -1,20 +1,20 @@
-package xyz.hstudio.horizon.bukkit.compat.v1_8_R3;
+package xyz.hstudio.horizon.bukkit.compat.v1_12_R1;
 
 import io.netty.channel.ChannelPipeline;
-import net.minecraft.server.v1_8_R3.*;
+import net.minecraft.server.v1_12_R1.*;
 import org.bukkit.Bukkit;
-import org.bukkit.craftbukkit.v1_8_R3.CraftServer;
-import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
-import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_12_R1.CraftServer;
+import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
-import xyz.hstudio.horizon.bukkit.compat.McAccess;
+import xyz.hstudio.horizon.bukkit.compat.IMcAccessor;
 import xyz.hstudio.horizon.bukkit.util.AABB;
 import xyz.hstudio.horizon.bukkit.util.RandomUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class McAccess_v1_8_R3 extends McAccess {
+public class McAccessor_v1_12_R1 implements IMcAccessor {
 
     @Override
     public ChannelPipeline getPipeline(final Player player) {
@@ -64,9 +64,10 @@ public class McAccess_v1_8_R3 extends McAccess {
         });
     }
 
+
     @Override
     public org.bukkit.entity.Entity getEntity(org.bukkit.World world, int id) {
-        Entity nmsEntity = ((CraftWorld) world).getHandle().a(id);
+        Entity nmsEntity = ((CraftWorld) world).getHandle().getEntity(id);
         return nmsEntity == null ? null : nmsEntity.getBukkitEntity();
     }
 
@@ -82,10 +83,10 @@ public class McAccess_v1_8_R3 extends McAccess {
         Block b = data.getBlock();
 
         // Have to update shape
-        b.updateShape(world, bPos);
+        b.updateState(data, world, bPos);
         List<AxisAlignedBB> bbs = new ArrayList<>();
         AxisAlignedBB cube = new AxisAlignedBB(block.getX(), block.getY(), block.getZ(), block.getX() + 1, block.getY() + 1, block.getZ() + 1);
-        b.a(world, bPos, data, cube, bbs, null);
+        b.a(data, world, bPos, cube, bbs, null, true);
 
         AxisAlignedBB[] raw = bbs.toArray(new AxisAlignedBB[0]);
         AABB[] boxes = new AABB[bbs.size()];

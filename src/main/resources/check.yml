@@ -1,6 +1,3 @@
-autoswitch:
-  enabled: true
-  debug: true
 badpacket:
   enabled: true
   debug: true
@@ -27,8 +24,6 @@ inventory:
 killaura:
   enabled: true
   debug: true
-  typeF:
-    max_angle: 0.6
 scaffold:
   enabled: true
   debug: true

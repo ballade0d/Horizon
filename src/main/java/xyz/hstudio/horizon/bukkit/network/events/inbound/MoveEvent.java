@@ -3,14 +3,15 @@ package xyz.hstudio.horizon.bukkit.network.events.inbound;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
-import xyz.hstudio.horizon.bukkit.Logger;
-import xyz.hstudio.horizon.bukkit.compat.McAccess;
+import xyz.hstudio.horizon.bukkit.compat.IMcAccessor;
+import xyz.hstudio.horizon.bukkit.compat.McAccessor;
 import xyz.hstudio.horizon.bukkit.data.HoriPlayer;
 import xyz.hstudio.horizon.bukkit.network.events.Event;
 import xyz.hstudio.horizon.bukkit.network.events.WrappedPacket;
 import xyz.hstudio.horizon.bukkit.util.AABB;
 import xyz.hstudio.horizon.bukkit.util.Location;
 import xyz.hstudio.horizon.bukkit.util.MatUtils;
+import xyz.hstudio.horizon.bukkit.util.MathUtils;
 
 import java.util.Set;
 
@@ -30,8 +31,9 @@ public class MoveEvent extends Event {
     public final boolean isOnBed;
     public final float oldFriction;
     public final float newFriction;
+    public final Set<Material> collidingBlocks;
+    public final boolean strafeNormally;
     public boolean onGround;
-    public Set<Material> collidingBlocks;
     public boolean isTeleport;
 
     public MoveEvent(final HoriPlayer player, final Location to, final boolean onGround, final boolean updatePos, final boolean updateRot, final MoveType moveType, final WrappedPacket packet) {
@@ -40,14 +42,14 @@ public class MoveEvent extends Event {
         this.to = to;
         this.velocity = new Vector(to.x - from.x, to.y - from.y, to.z - from.z);
         // Get player's bounding box and move it to the update position.
-        this.cube = McAccess.getInst().getCube(player.player).add(this.velocity);
+        this.cube = McAccessor.INSTANCE.getCube(player.player).add(this.velocity);
         this.onGround = onGround;
         this.updatePos = updatePos;
         this.updateRot = updateRot;
         this.moveType = moveType;
 
         this.hitSlowdown = player.currentTick == player.hitSlowdownTick;
-        // TODO: A REAL on ground check.
+
         this.onGroundReally = this.to.isOnGround(false, 0.001);
         this.isUnderBlock = !this.cube.add(0, 1.5, 0, 0, 0.5, 0).isEmpty(to.world);
 
@@ -59,6 +61,8 @@ public class MoveEvent extends Event {
 
         // This will only get the blocks that are colliding horizontally.
         this.collidingBlocks = this.cube.add(-0.0001, 0.0001, -0.0001, 0.0001, 0, 0.0001).getMaterials(to.world);
+
+        this.strafeNormally = this.checkStrafe();
     }
 
     /**
@@ -87,9 +91,6 @@ public class MoveEvent extends Event {
             return false;
         }
         double bedExpect = -0.62F * player.prevPrevDeltaY;
-        if (standing.getType().name().contains("BED")) {
-            Logger.info("", "e:" + bedExpect + ", d:" + this.velocity.getY() + ", p:" + player.prevDeltaY);
-        }
         return standing.getType().name().contains("BED") && !player.isSneaking &&
                 player.prevDeltaY <= 0 && this.velocity.getY() > 0 && this.velocity.getY() <= bedExpect;
     }
@@ -99,10 +100,61 @@ public class MoveEvent extends Event {
         if (player.isOnGround) {
             Block b = player.position.add(0, -1, 0).getBlock();
             if (b != null) {
-                friction *= McAccess.getInst().getFriction(b);
+                friction *= McAccessor.INSTANCE.getFriction(b);
             }
         }
         return friction;
+    }
+
+    /**
+     * Check if player's strafing is normal.
+     * I learnt this from Islandscout, but much lighter than his.
+     * <p>
+     * TODO: Ignore when colliding entities
+     * TODO: Ignore the first tick player jump (Unimportant)
+     * TODO: Ignore when getting knock back
+     *
+     * @author Islandscout, MrCraftGoo
+     */
+    private boolean checkStrafe() {
+        if (!this.updateRot || player.getVehicle() != null || this.isUnderBlock || !this.collidingBlocks.isEmpty()) {
+            return true;
+        }
+        Block footBlock = player.position.add(0, -1, 0).getBlock();
+        if (footBlock == null) {
+            return true;
+        }
+        Vector velocity = this.velocity.clone().setY(0);
+        Vector prevVelocity = player.velocity.clone();
+        if (this.hitSlowdown) {
+            prevVelocity.multiply(0.6);
+        }
+        if (MathUtils.abs(prevVelocity.getX() * this.oldFriction) < 0.005) {
+            prevVelocity.setX(0);
+        }
+        if (MathUtils.abs(prevVelocity.getZ() * this.oldFriction) < 0.005) {
+            prevVelocity.setZ(0);
+        }
+        double dX = velocity.getX();
+        double dZ = velocity.getZ();
+        dX /= this.oldFriction;
+        dZ /= this.oldFriction;
+        dX -= prevVelocity.getX();
+        dZ -= prevVelocity.getZ();
+        Vector accelDir = new Vector(dX, 0, dZ);
+        Vector yaw = MathUtils.getDirection(this.to.yaw, 0);
+
+        if (velocity.length() < 0.15 || accelDir.lengthSquared() < 0.000001) {
+            return true;
+        }
+
+        boolean vectorDir = accelDir.clone().crossProduct(yaw).dot(new Vector(0, 1, 0)) >= 0;
+        double angle = (vectorDir ? 1 : -1) * MathUtils.angle(accelDir, yaw);
+
+        double multiple = angle / (Math.PI / 4);
+        double threshold = Math.toRadians(0.6);
+
+        return MathUtils.abs(multiple - Math.round(multiple)) <= threshold;
     }
 
     @Override

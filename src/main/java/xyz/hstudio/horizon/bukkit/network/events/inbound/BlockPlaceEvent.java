@@ -41,9 +41,9 @@ public class BlockPlaceEvent extends Event {
             case EAST:
                 return new Vector(-1, 0, 0);
             case INVALID:
+            default:
                 return new Vector(0, 0, 0);
         }
-        return null;
     }
 
     // against.getFace(placed)
@@ -62,9 +62,9 @@ public class BlockPlaceEvent extends Event {
             case EAST:
                 return new Vector(1, 0, 0);
             case INVALID:
+            default:
                 return new Vector(0, 0, 0);
         }
-        return null;
     }
 
     public Location getTargetLocation() {
@@ -82,9 +82,9 @@ public class BlockPlaceEvent extends Event {
             case BOTTOM:
                 return new Location(placed.world, placed.x, placed.y + 1, placed.z);
             case INVALID:
+            default:
                 return placed;
         }
-        return null;
     }
 
     public enum PlaceType {

@@ -35,7 +35,8 @@ public class BadPacket extends Module<BadPacketData, BadPacketConfig> {
         if (event instanceof KeepAliveRespondEvent) {
             // A player should send 20 move packets(1.8.8 or lower)
             // or 1 move packet (1.9 or higher) at least in one second.
-            // If player didn't send move packets in 2 sec but send KeepAlive packets, flag him.
+            // If player didn't send move packets in 2 sec (KeepAlive Interval)
+            // but send KeepAlive packets, the player is definitely cheating.
             if (player.currentTick == data.lastTick) {
                 this.debug("Failed: TypeA");
 
@@ -66,7 +67,7 @@ public class BadPacket extends Module<BadPacketData, BadPacketConfig> {
 
                 // Punish
                 this.punish(player, data, "TypeB", 5);
-            } else {
+            } else if (data.flyingCount == 0) {
                 reward("TypeB", data, 0.99);
             }
         }

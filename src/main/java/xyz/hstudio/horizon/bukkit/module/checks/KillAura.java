@@ -1,10 +1,8 @@
 package xyz.hstudio.horizon.bukkit.module.checks;
 
-import org.bukkit.block.Block;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.NumberConversions;
-import org.bukkit.util.Vector;
 import xyz.hstudio.horizon.bukkit.api.ModuleType;
 import xyz.hstudio.horizon.bukkit.config.checks.KillAuraConfig;
 import xyz.hstudio.horizon.bukkit.data.HoriPlayer;
@@ -13,7 +11,6 @@ import xyz.hstudio.horizon.bukkit.module.Module;
 import xyz.hstudio.horizon.bukkit.network.events.Event;
 import xyz.hstudio.horizon.bukkit.network.events.inbound.*;
 import xyz.hstudio.horizon.bukkit.util.MathUtils;
-import xyz.hstudio.horizon.bukkit.util.TimeUtils;
 
 public class KillAura extends Module<KillAuraData, KillAuraConfig> {
 
@@ -41,7 +38,7 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
     }
 
     /**
-     * An easy packet order check.
+     * A hit packet order check.
      * This will detect all post killaura,
      * Yes, it's like 10 lines.
      * <p>
@@ -52,7 +49,7 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
      */
     private void typeA(final Event event, final HoriPlayer player, final KillAuraData data, final KillAuraConfig config) {
         if (event instanceof MoveEvent) {
-            long now = TimeUtils.now();
+            long now = System.currentTimeMillis();
             data.lagging = now - data.lastMove < 5;
             data.lastMove = now;
         } else if (event instanceof InteractEntityEvent) {
@@ -62,12 +59,13 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
             }
             // Ignoring laggy players so this check won't false af like matrix while lagging
             // Inspired by funkemonkey
-            long deltaT = TimeUtils.now() - data.lastMove;
+            long deltaT = System.currentTimeMillis() - data.lastMove;
             if (data.lagging || deltaT >= 20) {
                 if (data.typeAFails > 0) {
                     data.typeAFails--;
+                } else {
+                    reward("TypeA", data, 0.999);
                 }
-                reward("TypeA", data, 0.999);
                 return;
             }
             if (++data.typeAFails > 5) {
@@ -94,25 +92,27 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
             ItemStack item = e.itemStack;
             // Check if the item can be used to block
             if (item == null || EnchantmentTarget.WEAPON.includes(item)) {
-                // TODO: Remember to skip 1.9+ because client tick disappeared
                 return;
             }
+            // Use time instead of client tick because client tick disappeared in 1.9+.
             switch (e.interactType) {
-                case START_USE_ITEM: {
-                    data.startBlockTick = player.currentTick;
-                }
-                case RELEASE_USE_ITEM: {
-                    data.failTypeBTick = data.startBlockTick;
-                }
+                case START_USE_ITEM:
+                    data.startBlockTime = System.currentTimeMillis();
+                    break;
+                case RELEASE_USE_ITEM:
+                    data.failTypeBTime = data.startBlockTime;
+                    break;
+                default:
+                    break;
             }
         } else if (event instanceof InteractEntityEvent) {
             InteractEntityEvent e = (InteractEntityEvent) event;
             if (e.action != InteractEntityEvent.InteractType.ATTACK) {
                 return;
             }
-            long deltaT = player.currentTick - data.failTypeBTick;
+            long deltaT = System.currentTimeMillis() - data.failTypeBTime;
             // Detect both pre and post AutoBlock.
-            if (deltaT <= 1) {
+            if (!data.lagging && deltaT <= 50) {
                 this.debug("Failed: TypeB, t:" + deltaT);
 
                 // Punish
@@ -138,12 +138,14 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
             // Don't need to skip 1.9+
             // because players can't start/stop sprinting while standing still
             switch (e.action) {
-                case START_SPRINTING: {
+                case START_SPRINTING:
                     data.startSprintTick = player.currentTick;
-                }
-                case STOP_SPRINTING: {
+                    break;
+                case STOP_SPRINTING:
                     data.failTypeCTick = data.startSprintTick;
-                }
+                    break;
+                default:
+                    break;
             }
         } else if (event instanceof InteractEntityEvent) {
             InteractEntityEvent e = (InteractEntityEvent) event;
@@ -193,10 +195,14 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
             long gcd = this.greatestCommonDivisor(pitch, lastPitch);
 
             if (gcd <= 131072) {
-                this.debug("Failed: TypeD, g:" + gcd);
+                if (++data.gcdFails > 5) {
+                    this.debug("Failed: TypeD, g:" + gcd);
 
-                // Punish
-                this.punish(player, data, "TypeD", 3);
+                    // Punish
+                    this.punish(player, data, "TypeD", 3);
+                }
+            } else if (data.gcdFails > 0) {
+                data.gcdFails--;
             } else {
                 reward("TypeD", data, 0.999);
             }
@@ -223,6 +229,7 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
      * @author MrCraftGoo
      */
     private void typeE(final Event event, final HoriPlayer player, final KillAuraData data, final KillAuraConfig config) {
+        // TODO: Recode this
         if (event instanceof MoveEvent) {
             if (!data.swung) {
                 data.moves++;
@@ -258,66 +265,24 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
 
     /**
      * A direction check. It can detect a large amount of killaura.
-     * I learnt this from Islandscout, but much lighter than his.
-     * <p>
-     * TODO: Ignore when colliding entities
-     * TODO: Ignore the first tick player jump (Unimportant)
-     * TODO: Ignore when getting knock back
      * <p>
      * Accuracy: 7/10 - It may have some false positives
      * Efficiency: 10/10 - Super fast
      *
-     * @author Islandscout, MrCraftGoo
+     * @author MrCraftGoo
      */
     private void typeF(final Event event, final HoriPlayer player, final KillAuraData data, final KillAuraConfig config) {
         if (event instanceof MoveEvent) {
             MoveEvent e = (MoveEvent) event;
-            if (!e.updateRot || player.currentTick - data.lastHitTick > 6 || player.getVehicle() != null || e.isUnderBlock || e.isTeleport || !e.collidingBlocks.isEmpty()) {
+            if (player.currentTick - data.lastHitTick > 6 || e.isTeleport) {
                 return;
             }
-
-            Block footBlock = player.position.add(0, -1, 0).getBlock();
-            if (footBlock == null) {
-                return;
-            }
-            Vector velocity = e.velocity.clone().setY(0);
-            double friction = e.oldFriction;
-            Vector prevVelocity = player.velocity.clone();
-            if (e.hitSlowdown) {
-                prevVelocity.multiply(0.6);
-            }
-            if (MathUtils.abs(prevVelocity.getX() * friction) < 0.005) {
-                prevVelocity.setX(0);
-            }
-            if (MathUtils.abs(prevVelocity.getZ() * friction) < 0.005) {
-                prevVelocity.setZ(0);
-            }
-            double dX = velocity.getX();
-            double dZ = velocity.getZ();
-            dX /= friction;
-            dZ /= friction;
-            dX -= prevVelocity.getX();
-            dZ -= prevVelocity.getZ();
-
-            Vector accelDir = new Vector(dX, 0, dZ);
-            Vector yaw = MathUtils.getDirection(e.to.yaw, 0);
-
-            if (velocity.length() < 0.15 || accelDir.lengthSquared() < 0.000001) {
-                return;
-            }
-
-            boolean vectorDir = accelDir.clone().crossProduct(yaw).dot(new Vector(0, 1, 0)) >= 0;
-            double angle = (vectorDir ? 1 : -1) * MathUtils.angle(accelDir, yaw);
-
-            double multiple = angle / (Math.PI / 4);
-            double threshold = Math.toRadians(config.typeF_max_angle);
-
             // TODO: Add a threshold
-            if (MathUtils.abs(multiple - Math.round(multiple)) > threshold) {
-                this.debug("Failed: TypeF, a:" + angle);
+            if (!e.strafeNormally) {
+                this.debug("Failed: TypeF");
 
                 // Punish
-                this.punish(player, data, "TypeF", 3);
+                this.punish(player, data, "TypeF", 4);
             } else {
                 reward("TypeF", data, 0.999);
             }

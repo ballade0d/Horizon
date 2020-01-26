@@ -1,20 +1,20 @@
-package xyz.hstudio.horizon.bukkit.compat.v1_15_R1;
+package xyz.hstudio.horizon.bukkit.compat.v1_8_R3;
 
 import io.netty.channel.ChannelPipeline;
-import net.minecraft.server.v1_15_R1.*;
+import net.minecraft.server.v1_8_R3.*;
 import org.bukkit.Bukkit;
-import org.bukkit.craftbukkit.v1_15_R1.CraftServer;
-import org.bukkit.craftbukkit.v1_15_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_15_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_8_R3.CraftServer;
+import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
+import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
-import xyz.hstudio.horizon.bukkit.compat.McAccess;
+import xyz.hstudio.horizon.bukkit.compat.IMcAccessor;
 import xyz.hstudio.horizon.bukkit.util.AABB;
 import xyz.hstudio.horizon.bukkit.util.RandomUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class McAccess_v1_15_R1 extends McAccess {
+public class McAccessor_v1_8_R3 implements IMcAccessor {
 
     @Override
     public ChannelPipeline getPipeline(final Player player) {
@@ -43,13 +43,13 @@ public class McAccess_v1_15_R1 extends McAccess {
             return 1.0F;
         }
         BlockPosition bPos = new BlockPosition(block.getX(), block.getY(), block.getZ());
-        return chunk.getType(bPos).getBlock().l();
+        return chunk.getBlockData(bPos).getBlock().frictionFactor;
     }
 
     @Override
     public AABB getCube(final Player player) {
         AxisAlignedBB cube = ((CraftPlayer) player).getHandle().getBoundingBox();
-        return new AABB(cube.minX, cube.minY, cube.minZ, cube.maxX, cube.maxY, cube.maxZ);
+        return new AABB(cube.a, cube.b, cube.c, cube.d, cube.e, cube.f);
     }
 
     @Override
@@ -66,7 +66,7 @@ public class McAccess_v1_15_R1 extends McAccess {
 
     @Override
     public org.bukkit.entity.Entity getEntity(org.bukkit.World world, int id) {
-        Entity nmsEntity = ((CraftWorld) world).getHandle().getEntity(id);
+        Entity nmsEntity = ((CraftWorld) world).getHandle().a(id);
         return nmsEntity == null ? null : nmsEntity.getBukkitEntity();
     }
 
@@ -78,16 +78,20 @@ public class McAccess_v1_15_R1 extends McAccess {
             return new AABB[0];
         }
         BlockPosition bPos = new BlockPosition(block.getX(), block.getY(), block.getZ());
-        IBlockData data = chunk.getType(bPos);
+        IBlockData data = chunk.getBlockData(bPos);
+        Block b = data.getBlock();
 
-        VoxelShape voxelShape = data.getCollisionShape(world, bPos);
-        List<AxisAlignedBB> bbs = new ArrayList<>(voxelShape.d());
+        // Have to update shape
+        b.updateShape(world, bPos);
+        List<AxisAlignedBB> bbs = new ArrayList<>();
+        AxisAlignedBB cube = new AxisAlignedBB(block.getX(), block.getY(), block.getZ(), block.getX() + 1, block.getY() + 1, block.getZ() + 1);
+        b.a(world, bPos, data, cube, bbs, null);
 
         AxisAlignedBB[] raw = bbs.toArray(new AxisAlignedBB[0]);
         AABB[] boxes = new AABB[bbs.size()];
 
         for (int i = 0; i < bbs.size(); i++) {
-            boxes[i] = new AABB(raw[i].minX, raw[i].minY, raw[i].minZ, raw[i].maxX, raw[i].maxY, raw[i].maxZ);
+            boxes[i] = new AABB(raw[i].a, raw[i].b, raw[i].c, raw[i].d, raw[i].e, raw[i].f);
         }
 
         return boxes;

@@ -89,14 +89,14 @@ class Handler extends ChannelDuplexHandler {
                 String decryptedMsg = AES.decrypt(encryptedMsg, kirin.clientKey);
                 switch (decryptedMsg) {
                     case "EXPIRED":
-                        Logger.info("Kirin", "Your licence is expired! Please contact the author to renew your licence.");
+                        Logger.msg("Kirin", "Your licence is expired! Please contact the author to renew your licence.");
                         break;
                     case "FAILED":
-                        Logger.info("Kirin", "Unknown licence!");
+                        Logger.msg("Kirin", "Unknown licence!");
                         break;
                     default:
                         // TODO: START CHECKS
-                        Logger.info("Kirin", "Login successfully! Hello " + decryptedMsg + " :)");
+                        Logger.msg("Kirin", "Login successfully! Hello " + decryptedMsg + " :)");
                         break;
                 }
                 write("CLOSE", channel);
@@ -104,7 +104,6 @@ class Handler extends ChannelDuplexHandler {
                 break;
             }
         }
-        super.channelRead(ctx, msg);
     }
 
     private byte[] read(final ByteBuf byteBuf) {

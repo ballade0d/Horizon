@@ -9,12 +9,13 @@ import xyz.hstudio.horizon.bukkit.data.HoriPlayer;
 import xyz.hstudio.horizon.bukkit.network.events.Event;
 import xyz.hstudio.horizon.bukkit.util.Pair;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class Module<K extends Data, V extends Config> {
 
-    private static final Map<ModuleType, Module<? extends Data, ? extends Config>> moduleMap = new ConcurrentHashMap<>();
+    // Use LinkedHashMap to keep the check order.
+    private static final Map<ModuleType, Module<? extends Data, ? extends Config>> moduleMap = new LinkedHashMap<>(16, 1);
 
     private final ModuleType moduleType;
     @Getter
@@ -58,10 +59,12 @@ public abstract class Module<K extends Data, V extends Config> {
      */
     protected void punish(final HoriPlayer player, final K data, final String type, final double weight, final Runnable... runnable) {
         Pair<Double, Double> pair = data.violationLevels.getOrDefault(type, new Pair<>(0D, 0D));
-        data.violationLevels.put(type, pair.setValue(pair.getKey()).setKey(pair.getKey() + weight));
+        pair.value = pair.key;
+        pair.key = pair.key + weight;
+        data.violationLevels.put(type, pair);
 
-        int prevVL = (int) data.violationLevels.values().stream().mapToDouble(Pair::getValue).sum();
-        int vL = (int) data.violationLevels.values().stream().mapToDouble(Pair::getKey).sum();
+        int prevVL = (int) data.violationLevels.values().stream().mapToDouble(p -> p.value).sum();
+        int vL = (int) data.violationLevels.values().stream().mapToDouble(p -> p.key).sum();
 
         data.lastFailTick = player.currentTick;
         // TODO: Punish
@@ -74,7 +77,7 @@ public abstract class Module<K extends Data, V extends Config> {
         if (!this.config.debug) {
             return;
         }
-        Logger.info("Debug|" + this.moduleType.name(), object);
+        Logger.msg("Debug|" + this.moduleType.name(), object);
     }
 
     protected void reward(final String type, final K data, final double multiplier) {
@@ -82,7 +85,9 @@ public abstract class Module<K extends Data, V extends Config> {
         if (pair == null) {
             return;
         }
-        data.violationLevels.put(type, pair.setValue(pair.getKey()).setKey(pair.getKey() * multiplier));
+        pair.value = pair.key;
+        pair.key = pair.key * multiplier;
+        data.violationLevels.put(type, pair);
     }
 
     public abstract K getData(final HoriPlayer player);

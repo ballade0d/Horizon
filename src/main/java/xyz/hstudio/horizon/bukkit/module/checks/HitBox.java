@@ -4,7 +4,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 import xyz.hstudio.horizon.bukkit.Horizon;
 import xyz.hstudio.horizon.bukkit.api.ModuleType;
-import xyz.hstudio.horizon.bukkit.compat.McAccess;
+import xyz.hstudio.horizon.bukkit.compat.IMcAccessor;
+import xyz.hstudio.horizon.bukkit.compat.McAccessor;
 import xyz.hstudio.horizon.bukkit.config.checks.HitBoxConfig;
 import xyz.hstudio.horizon.bukkit.data.HoriPlayer;
 import xyz.hstudio.horizon.bukkit.data.checks.HitBoxData;
@@ -76,7 +77,7 @@ public class HitBox extends Module<HitBoxData, HitBoxConfig> {
                 targetPos = this.getHistoryLocation(player.ping, this.getData(target).history);
             }
             Vector move = targetPos.toVector().subtract(targetPlayer.getLocation().toVector());
-            AABB targetCube = McAccess.getInst().getCube(targetPlayer).add(move);
+            AABB targetCube = McAccessor.INSTANCE.getCube(targetPlayer).add(move);
 
             // Get player's eye position instead of feet position.
             Vector playerPos = player.getHeadPosition();
@@ -90,7 +91,7 @@ public class HitBox extends Module<HitBoxData, HitBoxConfig> {
                 // Punish
                 this.punish(player, data, "TypeA", (reach - config.typeA_max_reach) * 10);
             } else {
-                reward("TypeA", data, 0.985);
+                reward("TypeA", data, 0.995);
             }
         }
     }

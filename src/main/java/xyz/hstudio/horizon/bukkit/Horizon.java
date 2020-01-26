@@ -5,8 +5,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import xyz.hstudio.horizon.bukkit.compat.McAccess;
-import xyz.hstudio.horizon.bukkit.compat.PacketConvert;
 import xyz.hstudio.horizon.bukkit.config.ConfigFile;
 import xyz.hstudio.horizon.bukkit.data.HoriPlayer;
 import xyz.hstudio.horizon.bukkit.kirin.Kirin;
@@ -25,7 +23,7 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 public class Horizon extends JavaPlugin {
@@ -50,7 +48,7 @@ public class Horizon extends JavaPlugin {
     public void onEnable() {
         if (Version.VERSION == Version.UNKNOWN) {
             // Unknown version
-            Logger.info("Info", "Your server version is not supported!");
+            Logger.msg("Info", "Your server version is not supported!");
             Bukkit.getPluginManager().disablePlugin(this);
             return;
         }
@@ -79,13 +77,11 @@ public class Horizon extends JavaPlugin {
             try {
                 new Kirin(this.config);
             } catch (Exception e) {
-                Logger.info("Kirin", "Failed to init Kirin! Please contact the author for help.");
+                Logger.msg("Kirin", "Failed to init Kirin! Please contact the author for help.");
                 e.printStackTrace();
             }
         }
 
-        McAccess.init();
-        PacketConvert.init();
         // Run every 50ms (1 tick)
         Thread thread = new Thread(new Async(), "Horizon Processing Thread");
         thread.setDaemon(true);
@@ -93,7 +89,6 @@ public class Horizon extends JavaPlugin {
         new Listeners();
 
         // Enable checks
-        new AutoSwitch();
         new BadPacket();
         new GroundSpoof();
         new HitBox();
@@ -119,8 +114,8 @@ public class Horizon extends JavaPlugin {
                 JSONParser parser = new JSONParser();
                 JSONObject object = (JSONObject) parser.parse(reader);
                 this.announcements = (List<String>) object.get("messages");
-                Logger.info("Annc", "Horizon Announcement");
-                announcements.forEach(s -> Logger.info("Annc", s));
+                Logger.msg("Annc", "Horizon Announcement");
+                announcements.forEach(s -> Logger.msg("Annc", s));
             } catch (Exception ignore) {
             }
         };
@@ -134,7 +129,7 @@ public class Horizon extends JavaPlugin {
             try {
                 yaml.save(new File(this.getDataFolder(), string));
             } catch (IOException e) {
-                Logger.info("Error", "Failed to save the file " + string + "!");
+                Logger.msg("Error", "Failed to save the file " + string + "!");
             }
         });
     }

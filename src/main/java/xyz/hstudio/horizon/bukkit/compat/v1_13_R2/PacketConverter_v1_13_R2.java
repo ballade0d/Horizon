@@ -7,7 +7,7 @@ import org.bukkit.craftbukkit.v1_13_R2.CraftWorld;
 import org.bukkit.craftbukkit.v1_13_R2.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_13_R2.inventory.CraftItemStack;
 import org.bukkit.util.Vector;
-import xyz.hstudio.horizon.bukkit.compat.PacketConvert;
+import xyz.hstudio.horizon.bukkit.compat.IPacketConverter;
 import xyz.hstudio.horizon.bukkit.data.HoriPlayer;
 import xyz.hstudio.horizon.bukkit.network.events.Event;
 import xyz.hstudio.horizon.bukkit.network.events.WrappedPacket;
@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
 
-public class PacketConvert_v1_13_R2 extends PacketConvert {
+public class PacketConverter_v1_13_R2 implements IPacketConverter {
 
     @Override
     public Event convertIn(final HoriPlayer player, final Object packet) {
