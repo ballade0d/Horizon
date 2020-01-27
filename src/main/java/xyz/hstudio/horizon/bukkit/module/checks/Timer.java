@@ -10,7 +10,7 @@ import xyz.hstudio.horizon.bukkit.network.events.inbound.MoveEvent;
 
 public class Timer extends Module<TimerData, TimerConfig> {
 
-    private static final long MULTIPLIER = 1000000L;
+    private static final long MULTIPLIER = (long) 1E6;
 
     public Timer() {
         super(ModuleType.Timer, new TimerConfig());

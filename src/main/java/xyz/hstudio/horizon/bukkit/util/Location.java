@@ -4,9 +4,9 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.util.NumberConversions;
 import org.bukkit.util.Vector;
-import xyz.hstudio.horizon.bukkit.compat.IMcAccessor;
 import xyz.hstudio.horizon.bukkit.compat.McAccessor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -58,25 +58,26 @@ public class Location {
     }
 
     public boolean isOnGround(final boolean ignoreOnGround, final double feetDepth) {
-        AABB surrounding = new AABB(this.x - 0.3, this.y - 1, this.z - 0.3, this.x + 0.3, this.y, this.z + 0.3);
+        List<Block> blocks = new ArrayList<>();
+        blocks.addAll(BlockUtils.getBlocksInLocation(this));
+        blocks.addAll(BlockUtils.getBlocksInLocation(this.add(0, -1, 0)));
         AABB underFeet = new AABB(this.x - 0.3, this.y - feetDepth, this.z - 0.3, this.x + 0.3, this.y, this.z + 0.3);
         AABB topFeet = underFeet.add(0, feetDepth + 0.00001, 0, 0, 0, 0);
-        List<Block> above = !ignoreOnGround ? null : topFeet.getBlocks(this.world);
-        for (Block block : surrounding.getBlocks(this.world)) {
-            if (block.isLiquid() || !block.getType().isSolid()) {
+        List<Block> aboveBlocks = !ignoreOnGround ? null : BlockUtils.getBlocksInLocation(this);
+        for (Block block : blocks) {
+            if (block.isLiquid() || !BlockUtils.isSolid(block.getType())) {
                 continue;
             }
-            // Ignore if player is in ground
             for (AABB bBox : McAccessor.INSTANCE.getBoxes(block)) {
                 if (!bBox.isColliding(underFeet)) {
                     continue;
                 }
                 if (ignoreOnGround) {
-                    for (Block aboveBlock : above) {
-                        if (aboveBlock.isLiquid() || !aboveBlock.getType().isSolid()) {
+                    for (Block above : aboveBlocks) {
+                        if (above.isLiquid() || !BlockUtils.isSolid(above.getType())) {
                             continue;
                         }
-                        for (AABB aboveBox : McAccessor.INSTANCE.getBoxes(aboveBlock)) {
+                        for (AABB aboveBox : McAccessor.INSTANCE.getBoxes(above)) {
                             if (aboveBox.isColliding(topFeet)) {
                                 return false;
                             }
@@ -144,5 +145,45 @@ public class Location {
 
     public int getBlockZ() {
         return NumberConversions.floor(this.z);
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 19 * hash + (this.world != null ? this.world.hashCode() : 0);
+        hash = 19 * hash + (int) (Double.doubleToLongBits(this.x) ^ (Double.doubleToLongBits(this.x) >>> 32));
+        hash = 19 * hash + (int) (Double.doubleToLongBits(this.y) ^ (Double.doubleToLongBits(this.y) >>> 32));
+        hash = 19 * hash + (int) (Double.doubleToLongBits(this.z) ^ (Double.doubleToLongBits(this.z) >>> 32));
+        hash = 19 * hash + Float.floatToIntBits(this.pitch);
+        hash = 19 * hash + Float.floatToIntBits(this.yaw);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (this.getClass() != obj.getClass()) {
+            return false;
+        }
+        Location other = (Location) obj;
+
+        if (this.world != other.world && (this.world == null || !this.world.equals(other.world))) {
+            return false;
+        }
+        if (Double.doubleToLongBits(this.x) != Double.doubleToLongBits(other.x)) {
+            return false;
+        }
+        if (Double.doubleToLongBits(this.y) != Double.doubleToLongBits(other.y)) {
+            return false;
+        }
+        if (Double.doubleToLongBits(this.z) != Double.doubleToLongBits(other.z)) {
+            return false;
+        }
+        if (Float.floatToIntBits(this.pitch) != Float.floatToIntBits(other.pitch)) {
+            return false;
+        }
+        return Float.floatToIntBits(this.yaw) == Float.floatToIntBits(other.yaw);
     }
 }

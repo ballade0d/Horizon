@@ -82,11 +82,15 @@ public class McAccessor_v1_12_R1 implements IMcAccessor {
         IBlockData data = chunk.getBlockData(bPos);
         Block b = data.getBlock();
 
-        // Have to update shape
-        b.updateState(data, world, bPos);
+        if (b instanceof BlockSnow && data.get(BlockSnow.LAYERS) == 1) {
+            AABB[] aabbarr = new AABB[1];
+            aabbarr[0] = new AABB(block.getX(), block.getY(), block.getZ(), block.getX() + 1, block.getY(), block.getZ() + 1);
+            return aabbarr;
+        }
+
         List<AxisAlignedBB> bbs = new ArrayList<>();
         AxisAlignedBB cube = new AxisAlignedBB(block.getX(), block.getY(), block.getZ(), block.getX() + 1, block.getY() + 1, block.getZ() + 1);
-        b.a(data, world, bPos, cube, bbs, null, true);
+        b.a(data, world, bPos, cube, bbs, null, false);
 
         AxisAlignedBB[] raw = bbs.toArray(new AxisAlignedBB[0]);
         AABB[] boxes = new AABB[bbs.size()];

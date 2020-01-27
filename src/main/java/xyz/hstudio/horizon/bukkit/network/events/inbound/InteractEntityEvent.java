@@ -4,7 +4,6 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import xyz.hstudio.horizon.bukkit.compat.IMcAccessor;
 import xyz.hstudio.horizon.bukkit.compat.McAccessor;
 import xyz.hstudio.horizon.bukkit.data.HoriPlayer;
 import xyz.hstudio.horizon.bukkit.network.events.Event;

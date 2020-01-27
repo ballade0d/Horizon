@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>xyz.hstudio</groupId>
-    <artifactId>horizon</artifactId>
+    <artifactId>Horizon</artifactId>
     <version>DEV</version>
 
     <properties>

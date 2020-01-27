@@ -8,14 +8,16 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.util.Vector;
 import xyz.hstudio.horizon.bukkit.Horizon;
-import xyz.hstudio.horizon.bukkit.compat.IMcAccessor;
 import xyz.hstudio.horizon.bukkit.compat.McAccessor;
 import xyz.hstudio.horizon.bukkit.data.checks.*;
 import xyz.hstudio.horizon.bukkit.network.ChannelHandler;
+import xyz.hstudio.horizon.bukkit.util.ClientBlock;
 import xyz.hstudio.horizon.bukkit.util.Location;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class HoriPlayer {
 
@@ -37,6 +39,7 @@ public class HoriPlayer {
     public double prevPrevDeltaY;
     public Vector velocity = new Vector(0, 0, 0);
     public List<Vector> velocities = new ArrayList<>();
+    public Map<Location, ClientBlock> clientBlocks = new ConcurrentHashMap<>();
     public boolean isSneaking;
     public boolean isSprinting;
     public boolean isEating;
@@ -64,6 +67,13 @@ public class HoriPlayer {
         ChannelHandler.register(this, this.pipeline);
 
         Horizon.PLAYERS.put(player.getUniqueId(), this);
+    }
+
+    public void addClientBlock(final Location location, final ClientBlock clientBlock) {
+        if (clientBlocks.size() >= 12) {
+            return;
+        }
+        clientBlocks.put(location, clientBlock);
     }
 
     /**

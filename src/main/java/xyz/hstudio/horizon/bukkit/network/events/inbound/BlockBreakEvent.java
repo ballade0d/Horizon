@@ -1,11 +1,14 @@
 package xyz.hstudio.horizon.bukkit.network.events.inbound;
 
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.inventory.ItemStack;
 import xyz.hstudio.horizon.bukkit.data.HoriPlayer;
 import xyz.hstudio.horizon.bukkit.network.events.Event;
 import xyz.hstudio.horizon.bukkit.network.events.WrappedPacket;
+import xyz.hstudio.horizon.bukkit.util.ClientBlock;
+import xyz.hstudio.horizon.bukkit.util.Location;
 
 public class BlockBreakEvent extends Event {
 
@@ -20,6 +23,14 @@ public class BlockBreakEvent extends Event {
         this.direction = direction;
         this.itemStack = itemStack;
         this.digType = digType;
+    }
+
+    @Override
+    public void post() {
+        if (this.digType == DigType.COMPLETE) {
+            ClientBlock clientBlock = new ClientBlock(player.currentTick, Material.AIR);
+            player.addClientBlock(new Location(this.block.getLocation()), clientBlock);
+        }
     }
 
     public enum DigType {

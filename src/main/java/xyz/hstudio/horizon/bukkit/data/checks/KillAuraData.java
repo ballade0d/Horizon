@@ -13,22 +13,18 @@ public class KillAuraData extends Data {
     public int typeAFails;
 
     // TypeB
-    public long startBlockTime;
-    public long failTypeBTime;
+    public long startSprintTick;
+    public long failTypeBTick;
 
     // TypeC
-    public long startSprintTick;
-    public long failTypeCTick;
-
-    // TypeD
     public float lastPitchChange;
     public int gcdFails;
 
-    // TypeE
+    // TypeD
     public List<Integer> moveInterval = new ArrayList<>();
     public int moves;
     public boolean swung;
 
-    // TypeF, TypeG
+    // TypeE
     public long lastHitTick = -10000;
 }

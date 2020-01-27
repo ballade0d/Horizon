@@ -82,8 +82,8 @@ public class Inventory extends Module<InventoryData, InventoryConfig> {
             if (!data.inventoryOpened) {
                 return;
             }
+            // Block Inventory Sprint/Sneak/Glide
             if (config.typeA_checkAction) {
-                // Block Inventory Sprint/Sneak/Glide
                 this.debug("Failed: TypeA");
 
                 // Punish

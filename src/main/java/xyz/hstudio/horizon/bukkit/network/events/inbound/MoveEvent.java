@@ -3,15 +3,11 @@ package xyz.hstudio.horizon.bukkit.network.events.inbound;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
-import xyz.hstudio.horizon.bukkit.compat.IMcAccessor;
 import xyz.hstudio.horizon.bukkit.compat.McAccessor;
 import xyz.hstudio.horizon.bukkit.data.HoriPlayer;
 import xyz.hstudio.horizon.bukkit.network.events.Event;
 import xyz.hstudio.horizon.bukkit.network.events.WrappedPacket;
-import xyz.hstudio.horizon.bukkit.util.AABB;
-import xyz.hstudio.horizon.bukkit.util.Location;
-import xyz.hstudio.horizon.bukkit.util.MatUtils;
-import xyz.hstudio.horizon.bukkit.util.MathUtils;
+import xyz.hstudio.horizon.bukkit.util.*;
 
 import java.util.Set;
 
@@ -32,6 +28,7 @@ public class MoveEvent extends Event {
     public final float oldFriction;
     public final float newFriction;
     public final Set<Material> collidingBlocks;
+    public final ClientBlock clientBlock;
     public final boolean strafeNormally;
     public boolean onGround;
     public boolean isTeleport;
@@ -61,6 +58,8 @@ public class MoveEvent extends Event {
 
         // This will only get the blocks that are colliding horizontally.
         this.collidingBlocks = this.cube.add(-0.0001, 0.0001, -0.0001, 0.0001, 0, 0.0001).getMaterials(to.world);
+
+        this.clientBlock = this.getClientBlock();
 
         this.strafeNormally = this.checkStrafe();
     }
@@ -104,6 +103,28 @@ public class MoveEvent extends Event {
             }
         }
         return friction;
+    }
+
+    /**
+     * Get player's client block.
+     *
+     * @author Islandscout
+     */
+    private ClientBlock getClientBlock() {
+        AABB feet = new AABB(to.toVector().add(new Vector(-0.3, -0.02, -0.3)), to.toVector().add(new Vector(0.3, 0, 0.3)));
+        AABB aboveFeet = feet.add(0, 0.20001, 0);
+        AABB cube = new AABB(new Vector(0, 0, 0), new Vector(1, 1, 1));
+        for (Location loc : player.clientBlocks.keySet()) {
+            if (!to.world.equals(loc.world)) {
+                continue;
+            }
+            ClientBlock cBlock = player.clientBlocks.get(loc);
+            AABB newAABB = cube.translateTo(loc.toVector());
+            if (BlockUtils.isSolid(cBlock.material) && feet.isColliding(newAABB) && !aboveFeet.isColliding(newAABB)) {
+                return cBlock;
+            }
+        }
+        return null;
     }
 
     /**
@@ -160,6 +181,12 @@ public class MoveEvent extends Event {
     @Override
     public boolean pre() {
         player.currentTick++;
+        for (Location loc : player.clientBlocks.keySet()) {
+            ClientBlock clientBlock = player.clientBlocks.get(loc);
+            if (player.currentTick - clientBlock.initTick > 3) {
+                player.clientBlocks.remove(loc);
+            }
+        }
 
         Location tpLoc = player.teleportPos;
         if (player.isTeleporting && tpLoc.world.equals(this.to.world) && to.distanceSquared(tpLoc) < 0.001) {

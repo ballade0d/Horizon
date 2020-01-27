@@ -1,7 +1,5 @@
 package xyz.hstudio.horizon.bukkit.module.checks;
 
-import org.bukkit.enchantments.EnchantmentTarget;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.NumberConversions;
 import xyz.hstudio.horizon.bukkit.api.ModuleType;
 import xyz.hstudio.horizon.bukkit.config.checks.KillAuraConfig;
@@ -9,7 +7,9 @@ import xyz.hstudio.horizon.bukkit.data.HoriPlayer;
 import xyz.hstudio.horizon.bukkit.data.checks.KillAuraData;
 import xyz.hstudio.horizon.bukkit.module.Module;
 import xyz.hstudio.horizon.bukkit.network.events.Event;
-import xyz.hstudio.horizon.bukkit.network.events.inbound.*;
+import xyz.hstudio.horizon.bukkit.network.events.inbound.ActionEvent;
+import xyz.hstudio.horizon.bukkit.network.events.inbound.InteractEntityEvent;
+import xyz.hstudio.horizon.bukkit.network.events.inbound.MoveEvent;
 import xyz.hstudio.horizon.bukkit.util.MathUtils;
 
 public class KillAura extends Module<KillAuraData, KillAuraConfig> {
@@ -33,7 +33,6 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
         typeD(event, player, data, config);
         typeE(event, player, data, config);
         typeF(event, player, data, config);
-        typeG(event, player, data, config);
         // TODO: Aim checks.
     }
 
@@ -78,52 +77,6 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
     }
 
     /**
-     * An AutoBlock check.
-     * This will detect most autoblock, probably all.
-     * <p>
-     * Accuracy: 10/10 - Should not have any false positives
-     * Efficiency: 10/10 - Detects autoblock instantly
-     *
-     * @author MrCraftGoo
-     */
-    private void typeB(final Event event, final HoriPlayer player, final KillAuraData data, final KillAuraConfig config) {
-        if (event instanceof InteractItemEvent) {
-            InteractItemEvent e = (InteractItemEvent) event;
-            ItemStack item = e.itemStack;
-            // Check if the item can be used to block
-            if (item == null || EnchantmentTarget.WEAPON.includes(item)) {
-                return;
-            }
-            // Use time instead of client tick because client tick disappeared in 1.9+.
-            switch (e.interactType) {
-                case START_USE_ITEM:
-                    data.startBlockTime = System.currentTimeMillis();
-                    break;
-                case RELEASE_USE_ITEM:
-                    data.failTypeBTime = data.startBlockTime;
-                    break;
-                default:
-                    break;
-            }
-        } else if (event instanceof InteractEntityEvent) {
-            InteractEntityEvent e = (InteractEntityEvent) event;
-            if (e.action != InteractEntityEvent.InteractType.ATTACK) {
-                return;
-            }
-            long deltaT = System.currentTimeMillis() - data.failTypeBTime;
-            // Detect both pre and post AutoBlock.
-            if (!data.lagging && deltaT <= 50) {
-                this.debug("Failed: TypeB, t:" + deltaT);
-
-                // Punish
-                this.punish(player, data, "TypeB", 3);
-            } else {
-                reward("TypeB", data, 0.999);
-            }
-        }
-    }
-
-    /**
      * A SuperKnockBack check.
      * It should detect all SuperKb.
      * <p>
@@ -132,7 +85,7 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
      *
      * @author MrCraftGoo
      */
-    private void typeC(final Event event, final HoriPlayer player, final KillAuraData data, final KillAuraConfig config) {
+    private void typeB(final Event event, final HoriPlayer player, final KillAuraData data, final KillAuraConfig config) {
         if (event instanceof ActionEvent) {
             ActionEvent e = (ActionEvent) event;
             // Don't need to skip 1.9+
@@ -142,7 +95,7 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
                     data.startSprintTick = player.currentTick;
                     break;
                 case STOP_SPRINTING:
-                    data.failTypeCTick = data.startSprintTick;
+                    data.failTypeBTick = data.startSprintTick;
                     break;
                 default:
                     break;
@@ -152,14 +105,14 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
             if (e.action != InteractEntityEvent.InteractType.ATTACK) {
                 return;
             }
-            long deltaT = player.currentTick - data.failTypeCTick;
+            long deltaT = player.currentTick - data.failTypeBTick;
             if (deltaT == 0) {
-                this.debug("Failed: TypeC, d:" + deltaT);
+                this.debug("Failed: TypeB, d:" + deltaT);
 
                 // Punish
-                this.punish(player, data, "TypeC", 5);
+                this.punish(player, data, "TypeB", 5);
             } else {
-                reward("TypeC", data, 0.999);
+                reward("TypeB", data, 0.999);
             }
         }
     }
@@ -173,7 +126,7 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
      *
      * @author MrCraftGoo
      */
-    private void typeD(final Event event, final HoriPlayer player, final KillAuraData data, final KillAuraConfig config) {
+    private void typeC(final Event event, final HoriPlayer player, final KillAuraData data, final KillAuraConfig config) {
         if (event instanceof MoveEvent) {
             MoveEvent e = (MoveEvent) event;
             if (!e.updateRot) {
@@ -196,15 +149,15 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
 
             if (gcd <= 131072) {
                 if (++data.gcdFails > 5) {
-                    this.debug("Failed: TypeD, g:" + gcd);
+                    this.debug("Failed: TypeC, g:" + gcd);
 
                     // Punish
-                    this.punish(player, data, "TypeD", 3);
+                    this.punish(player, data, "TypeC", 3);
                 }
             } else if (data.gcdFails > 0) {
                 data.gcdFails--;
             } else {
-                reward("TypeD", data, 0.999);
+                reward("TypeC", data, 0.999);
             }
 
             data.lastPitchChange = pitchChange;
@@ -228,7 +181,7 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
      *
      * @author MrCraftGoo
      */
-    private void typeE(final Event event, final HoriPlayer player, final KillAuraData data, final KillAuraConfig config) {
+    private void typeD(final Event event, final HoriPlayer player, final KillAuraData data, final KillAuraConfig config) {
         // TODO: Recode this
         if (event instanceof MoveEvent) {
             if (!data.swung) {
@@ -247,18 +200,18 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
 
                 // TODO: Customizable?
                 if (stdDeviation < 0.3) {
-                    this.debug("Failed: TypeE, s:" + stdDeviation);
+                    this.debug("Failed: TypeD, s:" + stdDeviation);
 
                     // Punish
-                    this.punish(player, data, "TypeE", 5);
+                    this.punish(player, data, "TypeD", 5);
                 } else {
-                    reward("TypeE", data, 0.999);
+                    reward("TypeD", data, 0.999);
                 }
                 data.moveInterval.clear();
             }
             data.swung = false;
             data.moves = 1;
-        } else if (event instanceof SwingEvent) {
+        } else if (event instanceof InteractEntityEvent) {
             data.swung = true;
         }
     }
@@ -271,7 +224,7 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
      *
      * @author MrCraftGoo
      */
-    private void typeF(final Event event, final HoriPlayer player, final KillAuraData data, final KillAuraConfig config) {
+    private void typeE(final Event event, final HoriPlayer player, final KillAuraData data, final KillAuraConfig config) {
         if (event instanceof MoveEvent) {
             MoveEvent e = (MoveEvent) event;
             if (player.currentTick - data.lastHitTick > 6 || e.isTeleport) {
@@ -282,9 +235,9 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
                 this.debug("Failed: TypeF");
 
                 // Punish
-                this.punish(player, data, "TypeF", 4);
+                this.punish(player, data, "TypeE", 4);
             } else {
-                reward("TypeF", data, 0.999);
+                reward("TypeE", data, 0.999);
             }
         } else if (event instanceof InteractEntityEvent) {
             InteractEntityEvent e = (InteractEntityEvent) event;
@@ -300,7 +253,7 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
      *
      * @author MrCraftGoo
      */
-    private void typeG(final Event event, final HoriPlayer player, final KillAuraData data, final KillAuraConfig config) {
+    private void typeF(final Event event, final HoriPlayer player, final KillAuraData data, final KillAuraConfig config) {
         if (event instanceof MoveEvent) {
             MoveEvent e = (MoveEvent) event;
             if (!e.updateRot) {
@@ -309,10 +262,10 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
             float diffYaw = MathUtils.abs(e.to.yaw - e.from.yaw);
             float diffPitch = MathUtils.abs(e.to.pitch - e.from.pitch);
             if (diffYaw >= 3.0 && diffPitch > 0.001 && diffPitch < 0.0995) {
-                this.debug("Failed: TypeG, p:1");
+                this.debug("Failed: TypeF, p:1");
 
                 // Punish
-                this.punish(player, data, "TypeG", 5);
+                this.punish(player, data, "TypeF", 5);
             }
         }
     }

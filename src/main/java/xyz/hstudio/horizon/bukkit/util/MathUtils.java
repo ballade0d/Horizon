@@ -1,7 +1,6 @@
 package xyz.hstudio.horizon.bukkit.util;
 
 import org.bukkit.util.Vector;
-import xyz.hstudio.horizon.bukkit.compat.IMcAccessor;
 import xyz.hstudio.horizon.bukkit.compat.McAccessor;
 
 public class MathUtils {

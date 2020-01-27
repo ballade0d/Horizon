@@ -1,6 +1,5 @@
 package xyz.hstudio.horizon.bukkit.module.checks;
 
-import xyz.hstudio.horizon.bukkit.compat.IMcAccessor;
 import xyz.hstudio.horizon.bukkit.compat.McAccessor;
 import xyz.hstudio.horizon.bukkit.data.HoriPlayer;
 

@@ -56,6 +56,7 @@ public class Bot_v1_8_R3 extends EntityPlayer implements IBot {
         packetCache = new PacketPlayOutEntityMetadata(getId(), this.getDataWatcher(), false);
         this.receiver.sendPacket(packetCache);
         packetCache = new PacketPlayOutAnimation(this, 1);
+        this.receiver.sendPacket(packetCache);
     }
 
     @Override
@@ -65,15 +66,15 @@ public class Bot_v1_8_R3 extends EntityPlayer implements IBot {
     }
 
     @Override
-    public void setSneak(final boolean sneak) {
-        this.setSneaking(sneak);
+    public void setSneaking(final boolean sneak) {
+        super.setSneaking(sneak);
         packetCache = new PacketPlayOutEntityMetadata(getId(), this.getDataWatcher(), false);
         this.receiver.sendPacket(packetCache);
     }
 
     @Override
-    public void setSprint(final boolean sprint) {
-        this.setSprinting(sprint);
+    public void setSprinting(final boolean sprint) {
+        super.setSprinting(sprint);
         packetCache = new PacketPlayOutEntityMetadata(getId(), this.getDataWatcher(), false);
         this.receiver.sendPacket(packetCache);
     }

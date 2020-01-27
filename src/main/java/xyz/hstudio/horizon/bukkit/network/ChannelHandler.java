@@ -5,7 +5,6 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.ChannelPromise;
 import lombok.RequiredArgsConstructor;
-import xyz.hstudio.horizon.bukkit.compat.IPacketConverter;
 import xyz.hstudio.horizon.bukkit.compat.PacketConverter;
 import xyz.hstudio.horizon.bukkit.data.HoriPlayer;
 import xyz.hstudio.horizon.bukkit.module.Module;

@@ -4,7 +4,9 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import xyz.hstudio.horizon.bukkit.Horizon;
 import xyz.hstudio.horizon.bukkit.data.HoriPlayer;
 
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 public class Async implements Runnable {
 
@@ -13,6 +15,7 @@ public class Async implements Runnable {
                     .setDaemon(true)
                     .setNameFormat("Horizon Processing Thread")
                     .build());
+    private long currentTick;
 
     public static Future<?> submit(final Runnable task) {
         return THREAD_POOL.submit(task);
@@ -21,8 +24,6 @@ public class Async implements Runnable {
     public static void execute(final Runnable command) {
         THREAD_POOL.execute(command);
     }
-
-    private long currentTick;
 
     @Override
     public void run() {

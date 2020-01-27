@@ -6,6 +6,7 @@ import org.bukkit.util.Vector;
 import xyz.hstudio.horizon.bukkit.data.HoriPlayer;
 import xyz.hstudio.horizon.bukkit.network.events.Event;
 import xyz.hstudio.horizon.bukkit.network.events.WrappedPacket;
+import xyz.hstudio.horizon.bukkit.util.ClientBlock;
 import xyz.hstudio.horizon.bukkit.util.Location;
 
 public class BlockPlaceEvent extends Event {
@@ -23,6 +24,14 @@ public class BlockPlaceEvent extends Event {
         this.material = material;
         this.interaction = interaction;
         this.placeType = placeType;
+    }
+
+    @Override
+    public void post() {
+        if (this.placeType == PlaceType.PLACE_BLOCK) {
+            ClientBlock clientBlock = new ClientBlock(player.currentTick, this.material);
+            player.addClientBlock(this.placed, clientBlock);
+        }
     }
 
     // placed.getFace(against)

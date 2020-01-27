@@ -78,6 +78,13 @@ public class McAccessor_v1_13_R2 implements IMcAccessor {
         }
         BlockPosition bPos = new BlockPosition(block.getX(), block.getY(), block.getZ());
         IBlockData data = chunk.getBlockData(block.getX(), block.getY(), block.getZ());
+        Block b = data.getBlock();
+
+        if (b instanceof BlockSnow && data.get(BlockSnow.LAYERS) == 1) {
+            AABB[] aabbarr = new AABB[1];
+            aabbarr[0] = new AABB(block.getX(), block.getY(), block.getZ(), block.getX() + 1, block.getY(), block.getZ() + 1);
+            return aabbarr;
+        }
 
         VoxelShape voxelShape = data.getCollisionShape(world, bPos);
         List<AxisAlignedBB> bbs = new ArrayList<>(voxelShape.d());

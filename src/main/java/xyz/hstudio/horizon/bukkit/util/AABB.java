@@ -67,6 +67,10 @@ public class AABB {
         return new AABB(this.minX + vec.getX(), this.minY + vec.getY(), this.minZ + vec.getZ(), this.maxX + vec.getX(), this.maxY + vec.getY(), this.maxZ + vec.getZ());
     }
 
+    public AABB translateTo(final Vector vector) {
+        return new AABB(vector.getX(), vector.getY(), vector.getZ(), vector.getX() + (maxX - minX), vector.getY() + (maxY - minY), vector.getZ() + (maxZ - minZ));
+    }
+
     public boolean isColliding(final AABB other) {
         if (this.maxX < other.minX || minX > other.maxX) {
             return false;
@@ -130,7 +134,7 @@ public class AABB {
             for (int y = NumberConversions.floor(this.minY); y < NumberConversions.ceil(this.maxY); y++) {
                 for (int z = NumberConversions.floor(this.minZ); z < NumberConversions.ceil(this.maxZ); z++) {
                     Block block = new Location(world, x, y, z).getBlock();
-                    if (block == null || block.isEmpty() || !block.getType().isSolid()) {
+                    if (block == null || block.isEmpty() || !BlockUtils.isSolid(block.getType())) {
                         continue;
                     }
                     return false;

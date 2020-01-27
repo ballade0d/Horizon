@@ -4,7 +4,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 import xyz.hstudio.horizon.bukkit.Horizon;
 import xyz.hstudio.horizon.bukkit.api.ModuleType;
-import xyz.hstudio.horizon.bukkit.compat.IMcAccessor;
 import xyz.hstudio.horizon.bukkit.compat.McAccessor;
 import xyz.hstudio.horizon.bukkit.config.checks.HitBoxConfig;
 import xyz.hstudio.horizon.bukkit.data.HoriPlayer;

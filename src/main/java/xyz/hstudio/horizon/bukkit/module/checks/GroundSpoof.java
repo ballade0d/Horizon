@@ -33,7 +33,10 @@ public class GroundSpoof extends Module<GroundSpoofData, GroundSpoofConfig> {
             }
             if (e.onGround) {
                 Location checkLoc = new Location(e.to.world, e.from.x, e.to.y, e.from.z);
-                if (checkLoc.isOnGround(false, 0.02)) {
+                if (checkLoc.isOnGround(false, 0.025)) {
+                    return;
+                }
+                if (e.clientBlock != null) {
                     return;
                 }
                 e.onGround = false;

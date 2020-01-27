@@ -4,10 +4,20 @@ import org.bukkit.Material;
 
 public enum MatUtils {
 
+    COCOA_BEANS("INK_SACK", "COCOA"),
+    CHORUS_FLOWER(),
+    CHORUS_PLANT(),
+    BAMBOO(),
+    END_ROD(),
+    FARMLAND("SOIL"),
     SLIME_BLOCK("SLIME_BLOCK"),
-    HONEY_BLOCK(),
     LADDER("LADDER"),
     VINE("VINE"),
+    SEA_PICKLE(),
+    SCAFFOLDING(),
+    COMPARATOR("REDSTONE_COMPARATOR", "REDSTONE_COMPARATOR_ON", "REDSTONE_COMPARATOR_OFF"),
+    LILY_PAD("WATER_LILY"),
+    REPEATER("DIODE", "DIODE_BLOCK_ON", "DIODE_BLOCK_OFF"),
     COBWEB("WEB");
 
     private final String[] legacy;
