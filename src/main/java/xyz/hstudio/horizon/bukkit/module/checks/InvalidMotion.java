@@ -1,5 +1,7 @@
 package xyz.hstudio.horizon.bukkit.module.checks;
 
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import xyz.hstudio.horizon.bukkit.api.ModuleType;
 import xyz.hstudio.horizon.bukkit.compat.McAccessor;
 import xyz.hstudio.horizon.bukkit.config.checks.InvalidMotionConfig;
@@ -30,7 +32,7 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionConfig
     /**
      * Basic y-axis motion check. Based on Minecraft moving mechanism.
      * <p>
-     * Accuracy: 8/10 - It may have some false positives.
+     * Accuracy: 7/10 - It may have some false positives.
      * Efficiency: 10/10 - Detects a lot of move related hacks instantly
      *
      * @author MrCraftGoo
@@ -38,110 +40,80 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionConfig
     private void typeA(final Event event, final HoriPlayer player, final InvalidMotionData data, final InvalidMotionConfig config) {
         if (event instanceof MoveEvent) {
             MoveEvent e = (MoveEvent) event;
-            if (!e.updatePos || player.isFlying()) {
-                return;
-            }
 
-            double deltaY = e.velocity.getY();
+            float deltaY = (float) (e.to.y - e.from.y);
 
-            // Use lastExpect to avoid some weird bugs.
-            double prevDeltaY = data.lastExpect;
-            // Magic number from MCP.
-            // Basically it's something like gravitational acceleration.
-            double expected = (prevDeltaY - 0.08) * 0.9800000190734863;
+            // TODO: Fix Cobweb, Slime handler
+            // TODO: Fix the false positives when joining
+            // TODO: Handle Water, Velocity, Vehicle
 
-            // TODO: Handle Water, Velocity, Step, Vehicle
+            if (!e.onGround && !e.jumpLegitly && !e.stepLegitly && !e.isTeleport && player.getVehicle() == null &&
+                    !player.isFlying() && !e.isOnSlime && !e.isOnBed) {
+                float prevEstimatedVelocity = data.estimatedVelocity;
+                float estimatedVelocity;
 
-            if (player.isGliding) {
-                // Gliding function, from MCP
-                expected = player.prevDeltaY;
-                float pitchRot = (float) Math.toRadians(e.to.pitch);
-                double magic = McAccessor.INSTANCE.cos(pitchRot);
-                magic = magic * magic * Math.min(1.0, e.to.getDirection().length() / 0.4);
-                expected += -0.08 + magic * 0.06;
-                if (expected < 0) {
-                    expected += expected * -0.1 * magic;
-                }
-                if (pitchRot < 0) {
-                    expected += player.velocity.clone().setY(0).length() *
-                            (-McAccessor.INSTANCE.sin(pitchRot)) * 0.04 * 3.2;
-                }
-                expected *= 0.9800000190734863;
-            } else if (player.getVehicle() != null) {
-                expected = deltaY;
-            } else if (e.isOnSlime || e.isOnBed) {
-                // Ignore because it is already predicated in MoveEvent
-                expected = deltaY;
-                data.inAir = true;
-            } else if (e.collidingBlocks.contains(MatUtils.COBWEB.parse())) {
-                // Y speed in web. Anything shouldn't affect it so it's a value.
-                // TODO: Fix the false positives when moving out from cobweb.
-                expected = -0.00196;
-            } else if (e.onGround || e.onGroundReally) {
-                // Have to be 0 because of some client bugs.
-                expected = 0;
-                data.inAir = false;
-            } else {
-                // This is updated after move, so in the tick player get/lose the potion this may false.
                 int levitation = player.getPotionEffectAmplifier("LEVITATION");
-                boolean onLadder = e.collidingBlocks.contains(MatUtils.LADDER.parse()) ||
-                        e.collidingBlocks.contains(MatUtils.VINE.parse());
-                if (levitation > 0) {
-                    // Levitation function
-                    expected = prevDeltaY + (0.05 * levitation - prevDeltaY) * 0.2;
-                } else if (!data.inAir && deltaY > 0) {
-                    // Jump init height.
-                    expected = 0.42 + player.getPotionEffectAmplifier("JUMP") * 0.1;
-                    // The first tick climbing ladder
-                    if (onLadder && MathUtils.abs(deltaY - 0.1176) < 0.001) {
-                        expected = 0.1176;
+                if (player.isGliding) {
+                    // Gliding function
+                    float pitchRot = (float) Math.toRadians(e.to.pitch);
+                    float magic = McAccessor.INSTANCE.cos(pitchRot);
+                    magic = (float) (magic * magic * Math.min(1, e.to.getDirection().length() / 0.4F));
+                    estimatedVelocity = prevEstimatedVelocity - 0.08F + magic * 0.06F;
+                    if (estimatedVelocity < 0) {
+                        estimatedVelocity += estimatedVelocity * -0.1F * magic;
                     }
-                } else if (onLadder) {
-                    if (player.isSneaking) {
-                        expected = 0;
-                        // Players can jump even if they're colliding with ladder on ground,
-                        // so I added this judgement.
-                    } else if (MathUtils.abs(expected - deltaY) > 0.001) {
-                        // -0.15 = max climbing down speed
-                        // 0.1176 = max climbing up speed (0.1176 = (0.2 - 0.08) * 0.98)
-                        expected = deltaY < 0 ? -0.15 : 0.1176;
+                    if (pitchRot < 0) {
+                        estimatedVelocity += player.velocity.clone().setY(0).length() *
+                                (-McAccessor.INSTANCE.sin(pitchRot)) * 0.04F * 3.2F;
                     }
+                    estimatedVelocity *= 0.98F;
+                } else if (levitation > 0) {
+                    estimatedVelocity = prevEstimatedVelocity + (0.05F * levitation - prevEstimatedVelocity) * 0.2F;
+                } else if (e.collidingBlocks.contains(MatUtils.COBWEB.parse())) {
+                    estimatedVelocity = -0.00392F;
+                } else {
+                    estimatedVelocity = (prevEstimatedVelocity - 0.08F) * 0.98F;
                 }
-                data.inAir = true;
-            }
-            // Fix the false positives when towering
-            if (data.inAir && player.prevDeltaY == 0 &&
-                    (MathUtils.abs(deltaY - 0.40444491418477) < 0.001 ||
-                            MathUtils.abs(deltaY - 0.39557589867329) < 0.001)) {
-                expected = deltaY = 0.42;
-            }
-            // Small movements are approximated to 0.
-            if (MathUtils.abs(expected) < 0.005 && expected != 0) {
-                expected = deltaY;
-            }
-            if (e.clientBlock != null) {
-                expected = deltaY = 0;
-            }
-            if (e.isTeleport) {
-                expected = 0;
-            }
+                if (Math.abs(estimatedVelocity) < 0.005 && estimatedVelocity != 0) {
+                    estimatedVelocity = deltaY;
+                }
+                boolean hitHead = e.touchingFaces.contains(BlockFace.UP);
+                boolean hasHitHead = player.touchingFaces.contains(BlockFace.UP);
+                if (hitHead && !hasHitHead) {
+                    deltaY = estimatedVelocity = 0;
+                }
 
-            // Check for absolute value so that FastFall and LowHop will also be detected.
-            // But 1.9+ is weird and some functions are not very accurate so absolute value can't be used.
-            double discrepancy = deltaY - expected;
-            // Don't check if onGroundReally is true to avoid false positives when chunks aren't sent to the player.
-            // Don't check if onGround is true to avoid some false positives.
-            // Don't check if ClientBlock isn't null to avoid false positives when player placing block under feet while landing.
-            if (!e.isTeleport && !e.onGround && !e.onGroundReally && e.clientBlock == null && discrepancy > config.typeA_tolerance) {
-                this.debug("Failed: TypeA, d:" + deltaY + ", e:" + expected + ", p:" + prevDeltaY);
+                // Fix the false positives when towering
+                if (player.isOnGround && player.prevDeltaY == 0 && (MathUtils.abs(deltaY - 0.40444491418477) < 0.001 || MathUtils.abs(deltaY - 0.39557589867329) < 0.001)) {
+                    deltaY = estimatedVelocity = 0.42F;
+                }
 
-                // Punish
-                this.punish(player, data, "TypeA", discrepancy * 5);
+                // I don't know why but client considers player is not on ground when walking on slime,
+                // client bug?
+                Block standing = e.to.add(0, -0.01, 0).getBlock();
+                if (e.onGroundReally && deltaY == 0 && standing != null && standing.getType() == MatUtils.SLIME_BLOCK.parse()) {
+                    estimatedVelocity = 0;
+                }
+
+                float discrepancy = deltaY - estimatedVelocity;
+
+                if (e.updatePos && e.velocity.lengthSquared() > 0 && MathUtils.abs(discrepancy) > 0.001) {
+                    this.debug("Failed: TypeA, d:" + deltaY + ", e:" + estimatedVelocity + ", p:" + discrepancy);
+
+                    // Punish
+                    this.punish(player, data, "TypeA", MathUtils.abs(discrepancy) * 5);
+                } else {
+                    reward("TypeA", data, 0.999);
+                }
+
+                data.estimatedVelocity = estimatedVelocity;
             } else {
-                reward("TypeA", data, 0.99);
+                if (e.onGround || (e.touchingFaces.contains(BlockFace.UP) && deltaY > 0)) {
+                    data.estimatedVelocity = 0;
+                } else {
+                    data.estimatedVelocity = deltaY;
+                }
             }
-
-            data.lastExpect = expected;
         }
     }
 }

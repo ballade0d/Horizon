@@ -14,6 +14,10 @@ import java.util.Set;
 
 public class AABB {
 
+    public static final AABB collisionBox = new AABB(new Vector(-0.3, 0, -0.3), new Vector(0.3, 1.8, 0.3));
+    public static final AABB waterCollisionBox = new AABB(new Vector(-0.299, 0.401, -0.299), new Vector(0.299, 1.399, 0.299));
+    public static final AABB swimmingBox = new AABB(new Vector(-0.3, 0, -0.3), new Vector(0.3, 0.6, 0.3));
+
     public final double minX, minY, minZ;
     public final double maxX, maxY, maxZ;
 
@@ -94,6 +98,61 @@ public class AABB {
         return this;
     }
 
+    /**
+     * Calculates intersection with the given ray between a certain distance
+     * interval.
+     *
+     * @author Islandscout, MrCraftGoo
+     */
+    public Vector intersectsRay(Ray ray, float minDist, float maxDist) {
+        Vector min = new Vector(this.minX, this.minY, this.minZ);
+        Vector max = new Vector(this.maxX, this.maxY, this.maxZ);
+
+        Vector invDir = new Vector(1F / ray.direction.getX(), 1F / ray.direction.getY(), 1F / ray.direction.getZ());
+
+        boolean signDirX = invDir.getX() < 0;
+        boolean signDirY = invDir.getY() < 0;
+        boolean signDirZ = invDir.getZ() < 0;
+
+        Vector bbox = signDirX ? max : min;
+        double tmin = (bbox.getX() - ray.origin.getX()) * invDir.getX();
+        bbox = signDirX ? min : max;
+        double tmax = (bbox.getX() - ray.origin.getX()) * invDir.getX();
+        bbox = signDirY ? max : min;
+        double tymin = (bbox.getY() - ray.origin.getY()) * invDir.getY();
+        bbox = signDirY ? min : max;
+        double tymax = (bbox.getY() - ray.origin.getY()) * invDir.getY();
+
+        if ((tmin > tymax) || (tymin > tmax)) {
+            return null;
+        }
+        if (tymin > tmin) {
+            tmin = tymin;
+        }
+        if (tymax < tmax) {
+            tmax = tymax;
+        }
+
+        bbox = signDirZ ? max : min;
+        double tzmin = (bbox.getZ() - ray.origin.getZ()) * invDir.getZ();
+        bbox = signDirZ ? min : max;
+        double tzmax = (bbox.getZ() - ray.origin.getZ()) * invDir.getZ();
+
+        if ((tmin > tzmax) || (tzmin > tmax)) {
+            return null;
+        }
+        if (tzmin > tmin) {
+            tmin = tzmin;
+        }
+        if (tzmax < tmax) {
+            tmax = tzmax;
+        }
+        if ((tmin < maxDist) && (tmax > minDist)) {
+            return ray.getPointAtDistance(tmin);
+        }
+        return null;
+    }
+
     // TODO: Any ways to optimize it?
     public List<Block> getBlocks(final World world) {
         List<Block> blocks = new ArrayList<>();
@@ -153,6 +212,6 @@ public class AABB {
 
     @Override
     public String toString() {
-        return "minX:" + this.minX + ", minY:" + this.minY + ", minZ:" + this.minZ + ", maxX:" + this.maxX + ", maxY:" + this.maxY + ", maxZ" + this.maxZ;
+        return "minX:" + this.minX + ", minY:" + this.minY + ", minZ:" + this.minZ + ", maxX:" + this.maxX + ", maxY:" + this.maxY + ", maxZ:" + this.maxZ;
     }
 }

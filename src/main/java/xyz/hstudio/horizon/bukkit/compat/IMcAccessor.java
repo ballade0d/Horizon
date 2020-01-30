@@ -32,9 +32,9 @@ public interface IMcAccessor {
     float getFriction(final Block block);
 
     /**
-     * Get the bounding box of a player.
+     * Get the bounding box of an entity.
      */
-    AABB getCube(final Player player);
+    AABB getCube(final Entity entity);
 
     /**
      * Run a task in the main thread.

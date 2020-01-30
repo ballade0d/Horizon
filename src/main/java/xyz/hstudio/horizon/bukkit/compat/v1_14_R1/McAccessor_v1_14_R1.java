@@ -5,6 +5,7 @@ import net.minecraft.server.v1_14_R1.*;
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_14_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_14_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_14_R1.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_14_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import xyz.hstudio.horizon.bukkit.compat.IMcAccessor;
@@ -47,8 +48,8 @@ public class McAccessor_v1_14_R1 implements IMcAccessor {
     }
 
     @Override
-    public AABB getCube(final Player player) {
-        AxisAlignedBB cube = ((CraftPlayer) player).getHandle().getBoundingBox();
+    public AABB getCube(final org.bukkit.entity.Entity entity) {
+        AxisAlignedBB cube = ((CraftEntity) entity).getHandle().getBoundingBox();
         return new AABB(cube.minX, cube.minY, cube.minZ, cube.maxX, cube.maxY, cube.maxZ);
     }
 
@@ -94,7 +95,7 @@ public class McAccessor_v1_14_R1 implements IMcAccessor {
         AABB[] boxes = new AABB[bbs.size()];
 
         for (int i = 0; i < bbs.size(); i++) {
-            boxes[i] = new AABB(raw[i].minX, raw[i].minY, raw[i].minZ, raw[i].maxX, raw[i].maxY, raw[i].maxZ);
+            boxes[i] = new AABB(raw[i].minX + bPos.getX(), raw[i].minY + bPos.getY(), raw[i].minZ + bPos.getZ(), raw[i].maxX + bPos.getX(), raw[i].maxY + bPos.getY(), raw[i].maxZ + bPos.getZ());
         }
 
         return boxes;

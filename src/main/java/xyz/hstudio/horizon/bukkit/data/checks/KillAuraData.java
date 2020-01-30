@@ -21,10 +21,5 @@ public class KillAuraData extends Data {
     public int gcdFails;
 
     // TypeD
-    public List<Integer> moveInterval = new ArrayList<>();
-    public int moves;
-    public boolean swung;
-
-    // TypeE
     public long lastHitTick = -10000;
 }

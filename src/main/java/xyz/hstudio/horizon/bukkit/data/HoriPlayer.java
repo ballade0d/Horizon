@@ -2,6 +2,7 @@ package xyz.hstudio.horizon.bukkit.data;
 
 import io.netty.channel.ChannelPipeline;
 import org.bukkit.World;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -14,9 +15,7 @@ import xyz.hstudio.horizon.bukkit.network.ChannelHandler;
 import xyz.hstudio.horizon.bukkit.util.ClientBlock;
 import xyz.hstudio.horizon.bukkit.util.Location;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class HoriPlayer {
@@ -40,11 +39,13 @@ public class HoriPlayer {
     public Vector velocity = new Vector(0, 0, 0);
     public List<Vector> velocities = new ArrayList<>();
     public Map<Location, ClientBlock> clientBlocks = new ConcurrentHashMap<>();
+    public Set<BlockFace> touchingFaces = new HashSet<>();
     public boolean isSneaking;
     public boolean isSprinting;
     public boolean isEating;
     public boolean isPullingBow;
     public boolean isOnGround;
+    public boolean onGroundReally;
     public boolean isGliding;
     public long toggleFlyTime;
     public long hitSlowdownTick = -1;

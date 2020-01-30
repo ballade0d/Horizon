@@ -31,9 +31,22 @@ public class MetaEvent extends Event {
                     break;
                 }
             }
-        } else {
+        } else if (Version.VERSION == Version.v1_12_R1) {
             for (WatchableObject object : this.objects) {
                 if (object.index == 6) {
+                    byte statue = (byte) object.object;
+                    if ((statue & 1) != 1) {
+                        player.isEating = false;
+                        player.isPullingBow = false;
+                    }
+                } else if (object.index == 0) {
+                    byte statue = (byte) object.object;
+                    player.isGliding = (statue & 128) == 128;
+                }
+            }
+        } else {
+            for (WatchableObject object : this.objects) {
+                if (object.index == 7) {
                     byte statue = (byte) object.object;
                     if ((statue & 1) != 1) {
                         player.isEating = false;

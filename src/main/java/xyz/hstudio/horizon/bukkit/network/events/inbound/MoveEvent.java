@@ -2,6 +2,7 @@ package xyz.hstudio.horizon.bukkit.network.events.inbound;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.util.Vector;
 import xyz.hstudio.horizon.bukkit.compat.McAccessor;
 import xyz.hstudio.horizon.bukkit.data.HoriPlayer;
@@ -29,7 +30,10 @@ public class MoveEvent extends Event {
     public final float newFriction;
     public final Set<Material> collidingBlocks;
     public final ClientBlock clientBlock;
+    public final Set<BlockFace> touchingFaces;
     public final boolean strafeNormally;
+    public final boolean stepLegitly;
+    public final boolean jumpLegitly;
     public boolean onGround;
     public boolean isTeleport;
 
@@ -40,7 +44,7 @@ public class MoveEvent extends Event {
         this.velocity = new Vector(to.x - from.x, to.y - from.y, to.z - from.z);
         // Get player's bounding box and move it to the update position.
         this.cube = McAccessor.INSTANCE.getCube(player.player).add(this.velocity);
-        this.onGround = onGround;
+        System.out.println(this.cube.add(-from.x, -from.y, -from.z).add(-this.velocity.getX(), -this.velocity.getY(), -this.velocity.getZ()));
         this.updatePos = updatePos;
         this.updateRot = updateRot;
         this.moveType = moveType;
@@ -60,8 +64,12 @@ public class MoveEvent extends Event {
         this.collidingBlocks = this.cube.add(-0.0001, 0.0001, -0.0001, 0.0001, 0, 0.0001).getMaterials(to.world);
 
         this.clientBlock = this.getClientBlock();
-
+        this.touchingFaces = BlockUtils.checkTouchingBlock(new AABB(to.x - 0.299999, to.y + 0.000001, to.z - 0.299999, to.x + 0.299999, to.y + 1.799999, to.z + 0.299999), to.world, 0.0001);
         this.strafeNormally = this.checkStrafe();
+        this.stepLegitly = this.checkStep();
+        this.jumpLegitly = this.checkJump();
+
+        this.onGround = onGround;
     }
 
     /**
@@ -74,9 +82,10 @@ public class MoveEvent extends Event {
         if (standing == null) {
             return false;
         }
-        double slimeExpect = -0.96 * player.prevPrevDeltaY;
+        float deltaY = (float) this.velocity.getY();
+        float slimeExpect = (float) (-0.96F * player.prevPrevDeltaY);
         return standing.getType() == MatUtils.SLIME_BLOCK.parse() && !player.isSneaking &&
-                player.prevDeltaY <= 0 && this.velocity.getY() > 0 && this.velocity.getY() <= slimeExpect;
+                player.prevDeltaY <= 0 && deltaY > 0 && deltaY <= slimeExpect;
     }
 
     /**
@@ -89,9 +98,10 @@ public class MoveEvent extends Event {
         if (standing == null) {
             return false;
         }
-        double bedExpect = -0.62F * player.prevPrevDeltaY;
+        float deltaY = (float) this.velocity.getY();
+        float bedExpect = (float) (-0.62F * player.prevPrevDeltaY);
         return standing.getType().name().contains("BED") && !player.isSneaking &&
-                player.prevDeltaY <= 0 && this.velocity.getY() > 0 && this.velocity.getY() <= bedExpect;
+                player.prevDeltaY <= 0 && deltaY > 0 && deltaY <= bedExpect;
     }
 
     private float computeFriction() {
@@ -178,6 +188,31 @@ public class MoveEvent extends Event {
         return MathUtils.abs(multiple - Math.round(multiple)) <= threshold;
     }
 
+    /**
+     * Check if player is stepping up stair/block.
+     *
+     * @author Islandscout, MrCraftGoo
+     */
+    private boolean checkStep() {
+        Vector extraVelocity = player.velocity.clone();
+        if (player.onGroundReally) {
+            extraVelocity.setY(-0.0784);
+        } else {
+            extraVelocity.setY((extraVelocity.getY() - 0.08) * 0.98);
+        }
+        Location extraPos = player.position.add(extraVelocity);
+        float deltaY = (float) (to.y - from.y);
+        return extraPos.isOnGround(false, 0.001) && onGroundReally && deltaY > 0.002F && deltaY <= 0.6F;
+    }
+
+    private boolean checkJump() {
+        int jumpBoostLvl = player.getPotionEffectAmplifier("JUMP");
+        float initJumpVelocity = 0.42F + jumpBoostLvl * 0.1F;
+        float deltaY = (float) (to.y - from.y);
+        boolean hitCeiling = touchingFaces.contains(BlockFace.UP);
+        return player.isOnGround && !onGround && (deltaY == initJumpVelocity || hitCeiling);
+    }
+
     @Override
     public boolean pre() {
         player.currentTick++;
@@ -201,10 +236,12 @@ public class MoveEvent extends Event {
     public void post() {
         player.position = this.to;
         player.isOnGround = this.onGround;
+        player.onGroundReally = this.onGroundReally;
         player.friction = this.newFriction;
         player.prevPrevDeltaY = player.prevDeltaY;
         player.prevDeltaY = this.velocity.getY();
         player.velocity = this.velocity;
+        player.touchingFaces = this.touchingFaces;
     }
 
     public enum MoveType {

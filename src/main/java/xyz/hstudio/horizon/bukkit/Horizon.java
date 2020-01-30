@@ -1,10 +1,11 @@
 package xyz.hstudio.horizon.bukkit;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import lombok.Getter;
+import org.apache.commons.io.IOUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 import xyz.hstudio.horizon.bukkit.config.ConfigFile;
 import xyz.hstudio.horizon.bukkit.data.HoriPlayer;
 import xyz.hstudio.horizon.bukkit.kirin.Kirin;
@@ -16,7 +17,6 @@ import xyz.hstudio.horizon.bukkit.thread.Async;
 import xyz.hstudio.horizon.bukkit.util.Version;
 import xyz.hstudio.horizon.bukkit.util.YamlLoader;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -110,12 +110,11 @@ public class Horizon extends JavaPlugin {
             try {
                 URL url = new URL("https://horizon.hstudio.xyz/horizon/announcement.json");
                 InputStreamReader stream = new InputStreamReader(url.openStream(), StandardCharsets.UTF_8);
-                BufferedReader reader = new BufferedReader(stream);
-                JSONParser parser = new JSONParser();
-                JSONObject object = (JSONObject) parser.parse(reader);
-                this.announcements = (List<String>) object.get("messages");
+                String text = IOUtils.toString(stream);
+                JSONObject object = JSON.parseObject(text);
+                this.announcements = object.getJSONArray("messages").toJavaList(String.class);
                 Logger.msg("Annc", "Horizon Announcement");
-                announcements.forEach(s -> Logger.msg("Annc", s));
+                this.announcements.forEach(s -> Logger.msg("Annc", s));
             } catch (Exception ignore) {
             }
         };

@@ -1,23 +1,32 @@
 package xyz.hstudio.horizon.bukkit.module.checks;
 
-import org.bukkit.util.NumberConversions;
+import org.bukkit.entity.Entity;
+import org.bukkit.util.Vector;
 import xyz.hstudio.horizon.bukkit.api.ModuleType;
+import xyz.hstudio.horizon.bukkit.compat.McAccessor;
 import xyz.hstudio.horizon.bukkit.config.checks.KillAuraConfig;
 import xyz.hstudio.horizon.bukkit.data.HoriPlayer;
 import xyz.hstudio.horizon.bukkit.data.checks.KillAuraData;
+import xyz.hstudio.horizon.bukkit.learning.core.KnnClassification;
+import xyz.hstudio.horizon.bukkit.learning.KnnVectorClassification;
 import xyz.hstudio.horizon.bukkit.module.Module;
 import xyz.hstudio.horizon.bukkit.network.events.Event;
 import xyz.hstudio.horizon.bukkit.network.events.inbound.ActionEvent;
 import xyz.hstudio.horizon.bukkit.network.events.inbound.InteractEntityEvent;
 import xyz.hstudio.horizon.bukkit.network.events.inbound.MoveEvent;
+import xyz.hstudio.horizon.bukkit.util.AABB;
 import xyz.hstudio.horizon.bukkit.util.MathUtils;
+import xyz.hstudio.horizon.bukkit.util.Ray;
 
 public class KillAura extends Module<KillAuraData, KillAuraConfig> {
 
     private static final double EXPANDER = Math.pow(2, 24);
 
+    private final KnnClassification<Vector> classification;
+
     public KillAura() {
         super(ModuleType.KillAura, new KillAuraConfig());
+        this.classification = new KnnVectorClassification();
     }
 
     @Override
@@ -32,7 +41,6 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
         typeC(event, player, data, config);
         typeD(event, player, data, config);
         typeE(event, player, data, config);
-        typeF(event, player, data, config);
         // TODO: Aim checks.
     }
 
@@ -174,49 +182,6 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
     }
 
     /**
-     * An AutoClicker check based on client tick.
-     * <p>
-     * Accuracy: 9/10 - Haven't found any false positives
-     * Efficiency: 6/10 - A bit slow
-     *
-     * @author MrCraftGoo
-     */
-    private void typeD(final Event event, final HoriPlayer player, final KillAuraData data, final KillAuraConfig config) {
-        // TODO: Recode this
-        if (event instanceof MoveEvent) {
-            if (!data.swung) {
-                data.moves++;
-                return;
-            }
-            if (data.moves < 8 && data.moveInterval.add(data.moves) && data.moveInterval.size() == 25) {
-                double average = data.moveInterval.stream()
-                        .mapToDouble(d -> d)
-                        .average()
-                        .orElse(0);
-                double stdDeviation = 0;
-                for (int i : data.moveInterval) {
-                    stdDeviation += NumberConversions.square(i - average);
-                }
-
-                // TODO: Customizable?
-                if (stdDeviation < 0.3) {
-                    this.debug("Failed: TypeD, s:" + stdDeviation);
-
-                    // Punish
-                    this.punish(player, data, "TypeD", 5);
-                } else {
-                    reward("TypeD", data, 0.999);
-                }
-                data.moveInterval.clear();
-            }
-            data.swung = false;
-            data.moves = 1;
-        } else if (event instanceof InteractEntityEvent) {
-            data.swung = true;
-        }
-    }
-
-    /**
      * A direction check. It can detect a large amount of killaura.
      * <p>
      * Accuracy: 7/10 - It may have some false positives
@@ -224,20 +189,20 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
      *
      * @author MrCraftGoo
      */
-    private void typeE(final Event event, final HoriPlayer player, final KillAuraData data, final KillAuraConfig config) {
+    private void typeD(final Event event, final HoriPlayer player, final KillAuraData data, final KillAuraConfig config) {
         if (event instanceof MoveEvent) {
             MoveEvent e = (MoveEvent) event;
-            if (player.currentTick - data.lastHitTick > 6 || e.isTeleport) {
+            if (player.currentTick - data.lastHitTick > 5 || e.isTeleport) {
                 return;
             }
             // TODO: Add a threshold
             if (!e.strafeNormally) {
-                this.debug("Failed: TypeF");
+                this.debug("Failed: TypeD");
 
                 // Punish
-                this.punish(player, data, "TypeE", 4);
+                this.punish(player, data, "TypeD", 4);
             } else {
-                reward("TypeE", data, 0.999);
+                reward("TypeD", data, 0.999);
             }
         } else if (event instanceof InteractEntityEvent) {
             InteractEntityEvent e = (InteractEntityEvent) event;
@@ -253,7 +218,7 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
      *
      * @author MrCraftGoo
      */
-    private void typeF(final Event event, final HoriPlayer player, final KillAuraData data, final KillAuraConfig config) {
+    private void typeE(final Event event, final HoriPlayer player, final KillAuraData data, final KillAuraConfig config) {
         if (event instanceof MoveEvent) {
             MoveEvent e = (MoveEvent) event;
             if (!e.updateRot) {
@@ -262,11 +227,39 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
             float diffYaw = MathUtils.abs(e.to.yaw - e.from.yaw);
             float diffPitch = MathUtils.abs(e.to.pitch - e.from.pitch);
             if (diffYaw >= 3.0 && diffPitch > 0.001 && diffPitch < 0.0995) {
-                this.debug("Failed: TypeF, p:1");
+                this.debug("Failed: TypeE, p:1");
 
                 // Punish
-                this.punish(player, data, "TypeF", 5);
+                this.punish(player, data, "TypeE", 5);
             }
+        }
+    }
+
+    /**
+     * Machine Learning check.
+     * TODO: Finish
+     *
+     * @author MrCraftGoo
+     */
+    private void typeF(final Event event, final HoriPlayer player, final KillAuraData data, final KillAuraConfig config) {
+        if (event instanceof InteractEntityEvent) {
+            InteractEntityEvent e = (InteractEntityEvent) event;
+            if (e.action != InteractEntityEvent.InteractType.ATTACK) {
+                return;
+            }
+            Entity victim = e.entity;
+            AABB victimAABB = McAccessor.INSTANCE.getCube(victim);
+
+            Vector eyePos = player.getHeadPosition();
+            Vector direction = MathUtils.getDirection(player.position.yaw, player.position.pitch);
+            Ray ray = new Ray(eyePos, direction);
+
+            Vector intersection = victimAABB.intersectsRay(ray, 0, Float.MAX_VALUE);
+            if (intersection == null) {
+                return;
+            }
+            intersection.subtract(victim.getLocation().toVector());
+            //
         }
     }
 }

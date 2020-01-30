@@ -5,6 +5,7 @@ import net.minecraft.server.v1_8_R3.*;
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_8_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
+import org.bukkit.craftbukkit.v1_8_R3.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import xyz.hstudio.horizon.bukkit.compat.IMcAccessor;
@@ -47,8 +48,8 @@ public class McAccessor_v1_8_R3 implements IMcAccessor {
     }
 
     @Override
-    public AABB getCube(final Player player) {
-        AxisAlignedBB cube = ((CraftPlayer) player).getHandle().getBoundingBox();
+    public AABB getCube(final org.bukkit.entity.Entity entity) {
+        AxisAlignedBB cube = ((CraftEntity) entity).getHandle().getBoundingBox();
         return new AABB(cube.a, cube.b, cube.c, cube.d, cube.e, cube.f);
     }
 

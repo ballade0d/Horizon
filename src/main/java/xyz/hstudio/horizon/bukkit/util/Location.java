@@ -1,7 +1,9 @@
 package xyz.hstudio.horizon.bukkit.util;
 
+import net.minecraft.server.v1_14_R1.EntityPose;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.event.entity.EntityPoseChangeEvent;
 import org.bukkit.util.NumberConversions;
 import org.bukkit.util.Vector;
 import xyz.hstudio.horizon.bukkit.compat.McAccessor;
