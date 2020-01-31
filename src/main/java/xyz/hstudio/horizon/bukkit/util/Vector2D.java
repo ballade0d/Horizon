@@ -2,31 +2,31 @@ package xyz.hstudio.horizon.bukkit.util;
 
 import org.bukkit.util.NumberConversions;
 
-public class Vec2D {
+public class Vector2D {
 
     public double x;
     public double y;
 
-    public Vec2D(final int x, final int y) {
+    public Vector2D(final int x, final int y) {
         this.x = x;
         this.y = y;
     }
 
-    public Vec2D(final double x, final double y) {
+    public Vector2D(final double x, final double y) {
         this.x = x;
         this.y = y;
     }
 
-    public Vec2D(final float x, final float y) {
+    public Vector2D(final float x, final float y) {
         this.x = x;
         this.y = y;
     }
 
-    public double distance(final Vec2D o) {
+    public double distance(final Vector2D o) {
         return Math.sqrt(this.distanceSquared(o));
     }
 
-    public double distanceSquared(final Vec2D o) {
+    public double distanceSquared(final Vector2D o) {
         return NumberConversions.square(x - o.x) + NumberConversions.square(y - o.y);
     }
 

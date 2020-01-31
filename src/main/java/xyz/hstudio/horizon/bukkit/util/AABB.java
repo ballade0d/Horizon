@@ -13,9 +13,9 @@ import java.util.Set;
 
 public class AABB {
 
-    public static final AABB collisionBox = new AABB(new Vec3D(-0.3, 0, -0.3), new Vec3D(0.3, 1.8, 0.3));
-    public static final AABB waterCollisionBox = new AABB(new Vec3D(-0.299, 0.401, -0.299), new Vec3D(0.299, 1.399, 0.299));
-    public static final AABB swimmingBox = new AABB(new Vec3D(-0.3, 0, -0.3), new Vec3D(0.3, 0.6, 0.3));
+    public static final AABB collisionBox = new AABB(new Vector3D(-0.3, 0, -0.3), new Vector3D(0.3, 1.8, 0.3));
+    public static final AABB waterCollisionBox = new AABB(new Vector3D(-0.299, 0.401, -0.299), new Vector3D(0.299, 1.399, 0.299));
+    public static final AABB swimmingBox = new AABB(new Vector3D(-0.3, 0, -0.3), new Vector3D(0.3, 0.6, 0.3));
 
     public final double minX, minY, minZ;
     public final double maxX, maxY, maxZ;
@@ -29,7 +29,7 @@ public class AABB {
         this.maxZ = maxZ;
     }
 
-    public AABB(final Vec3D min, final Vec3D max) {
+    public AABB(final Vector3D min, final Vector3D max) {
         this.minX = min.x;
         this.minY = min.y;
         this.minZ = min.z;
@@ -66,11 +66,11 @@ public class AABB {
         return new AABB(this.minX + minX, this.minY + minY, this.minZ + minZ, this.maxX + maxX, this.maxY + maxY, this.maxZ + maxZ);
     }
 
-    public AABB add(final Vec3D vec) {
+    public AABB add(final Vector3D vec) {
         return new AABB(this.minX + vec.x, this.minY + vec.y, this.minZ + vec.z, this.maxX + vec.x, this.maxY + vec.y, this.maxZ + vec.z);
     }
 
-    public AABB translateTo(final Vec3D vector) {
+    public AABB translateTo(final Vector3D vector) {
         return new AABB(vector.x, vector.y, vector.z, vector.x + (maxX - minX), vector.y + (maxY - minY), vector.z + (maxZ - minZ));
     }
 
@@ -88,7 +88,7 @@ public class AABB {
         for (double x = this.minX; x <= this.maxX; x += accuracy) {
             for (double y = this.minY; y <= this.maxY; y += accuracy) {
                 for (double z = this.minZ; z <= this.maxZ; z += accuracy) {
-                    Vec3D position = new Vec3D(x, y, z);
+                    Vector3D position = new Vector3D(x, y, z);
                     world.playEffect(position.toLocation(world), Effect.COLOURED_DUST, 1);
                     world.playEffect(position.toLocation(world), Effect.COLOURED_DUST, 1);
                 }
@@ -103,14 +103,14 @@ public class AABB {
      *
      * @author Islandscout, MrCraftGoo
      */
-    public Vec3D intersectsRay(final Ray ray, final float minDist, final float maxDist) {
-        Vec3D min = new Vec3D(this.minX, this.minY, this.minZ);
-        Vec3D max = new Vec3D(this.maxX, this.maxY, this.maxZ);
-        Vec3D invDir = new Vec3D(1F / ray.direction.x, 1F / ray.direction.y, 1F / ray.direction.z);
+    public Vector3D intersectsRay(final Ray ray, final float minDist, final float maxDist) {
+        Vector3D min = new Vector3D(this.minX, this.minY, this.minZ);
+        Vector3D max = new Vector3D(this.maxX, this.maxY, this.maxZ);
+        Vector3D invDir = new Vector3D(1F / ray.direction.x, 1F / ray.direction.y, 1F / ray.direction.z);
         boolean signDirX = invDir.x < 0;
         boolean signDirY = invDir.y < 0;
         boolean signDirZ = invDir.z < 0;
-        Vec3D bbox = signDirX ? max : min;
+        Vector3D bbox = signDirX ? max : min;
         double txmin = (bbox.x - ray.origin.x) * invDir.x;
         bbox = signDirX ? min : max;
         double txmax = (bbox.x - ray.origin.x) * invDir.x;
@@ -180,7 +180,7 @@ public class AABB {
         return blocks;
     }
 
-    public double distance(final Vec3D vector) {
+    public double distance(final Vector3D vector) {
         double distX = Math.max(this.minX - vector.x, Math.max(0, vector.x - this.maxX));
         double distY = Math.max(this.minY - vector.y, Math.max(0, vector.y - this.maxY));
         double distZ = Math.max(this.minZ - vector.z, Math.max(0, vector.z - this.maxZ));

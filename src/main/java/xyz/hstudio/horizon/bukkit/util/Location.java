@@ -96,7 +96,7 @@ public class Location {
         return new Location(this.world, newX, newY, newZ, yaw, pitch);
     }
 
-    public Location add(final Vec3D vec) {
+    public Location add(final Vector3D vec) {
         double newX = this.x + vec.x;
         double newY = this.y + vec.y;
         double newZ = this.z + vec.z;
@@ -110,7 +110,7 @@ public class Location {
         return new Location(this.world, newX, newY, newZ, yaw, pitch);
     }
 
-    public Vec3D getDirection() {
+    public Vector3D getDirection() {
         return MathUtils.getDirection(this.yaw, this.pitch);
     }
 
@@ -130,8 +130,8 @@ public class Location {
         return NumberConversions.square(this.x - loc.x) + NumberConversions.square(this.y - loc.y) + NumberConversions.square(this.z - loc.z);
     }
 
-    public Vec3D toVector() {
-        return new Vec3D(this.x, this.y, this.z);
+    public Vector3D toVector() {
+        return new Vector3D(this.x, this.y, this.z);
     }
 
     public int getBlockX() {

@@ -12,8 +12,8 @@ public class MathUtils {
 
     // Skidded from Bukkit lol.
     // But I switched Math.sin and Math.cos to NMS's for better performance.
-    public static Vec3D getDirection(final float yaw, final float pitch) {
-        Vec3D vector = new Vec3D();
+    public static Vector3D getDirection(final float yaw, final float pitch) {
+        Vector3D vector = new Vector3D();
         float rotX = (float) Math.toRadians(yaw);
         float rotY = (float) Math.toRadians(pitch);
         vector.setY(-McAccessor.INSTANCE.sin(rotY));
@@ -23,7 +23,7 @@ public class MathUtils {
         return vector;
     }
 
-    public static double angle(final Vec3D a, final Vec3D b) {
+    public static double angle(final Vector3D a, final Vector3D b) {
         double dot = Math.min(Math.max(a.dot(b) / (a.length() * b.length()), -1), 1);
         return Math.acos(dot);
     }

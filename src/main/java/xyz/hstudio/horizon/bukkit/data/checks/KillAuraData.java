@@ -1,7 +1,7 @@
 package xyz.hstudio.horizon.bukkit.data.checks;
 
 import xyz.hstudio.horizon.bukkit.data.Data;
-import xyz.hstudio.horizon.bukkit.util.Vec2D;
+import xyz.hstudio.horizon.bukkit.util.Vector2D;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,5 +21,5 @@ public class KillAuraData extends Data {
     // TypeD
     public long lastHitTick = -10000;
     // TypeF
-    public final List<Vec2D> vec2DList = new ArrayList<>(16);
+    public final List<Vector2D> vector2DList = new ArrayList<>(16);
 }

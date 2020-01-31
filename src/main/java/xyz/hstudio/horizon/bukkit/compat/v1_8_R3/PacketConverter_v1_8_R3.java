@@ -14,7 +14,7 @@ import xyz.hstudio.horizon.bukkit.network.events.outbound.*;
 import xyz.hstudio.horizon.bukkit.util.Hand;
 import xyz.hstudio.horizon.bukkit.util.Location;
 import xyz.hstudio.horizon.bukkit.util.MathUtils;
-import xyz.hstudio.horizon.bukkit.util.Vec3D;
+import xyz.hstudio.horizon.bukkit.util.Vector3D;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -153,7 +153,7 @@ public class PacketConverter_v1_8_R3 implements IPacketConverter {
         int x = bPos.getX();
         int y = bPos.getY();
         int z = bPos.getZ();
-        Vec3D targetedPosition = new Vec3D(x, y, z);
+        Vector3D targetedPosition = new Vector3D(x, y, z);
         BlockPlaceEvent.BlockFace face;
         switch (packet.getFace()) {
             case 0:
@@ -184,9 +184,9 @@ public class PacketConverter_v1_8_R3 implements IPacketConverter {
                 face = BlockPlaceEvent.BlockFace.INVALID;
                 break;
         }
-        Vec3D interaction = new Vec3D(packet.d(), packet.e(), packet.f());
+        Vector3D interaction = new Vector3D(packet.d(), packet.e(), packet.f());
         Location placed = new Location(player.world, x, y, z);
-        if (!targetedPosition.equals(new Vec3D(-1, -1, -1))) {
+        if (!targetedPosition.equals(new Vector3D(-1, -1, -1))) {
             BlockPlaceEvent.PlaceType placeType = itemStack != null && itemStack.getItem() instanceof ItemBlock ? BlockPlaceEvent.PlaceType.PLACE_BLOCK : BlockPlaceEvent.PlaceType.INTERACT_BLOCK;
             return new BlockPlaceEvent(player, placed, face, CraftItemStack.asBukkitCopy(itemStack).getType(), interaction, placeType, new WrappedPacket(packet));
         } else {

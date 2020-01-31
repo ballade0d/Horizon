@@ -15,7 +15,7 @@ public class MoveEvent extends Event {
 
     public final Location from;
     public final Location to;
-    public final Vec3D velocity;
+    public final Vector3D velocity;
     public final AABB cube;
     public final boolean updatePos;
     public final boolean updateRot;
@@ -40,7 +40,7 @@ public class MoveEvent extends Event {
         this.from = player.position;
         this.to = to;
         this.onGround = onGround;
-        this.velocity = new Vec3D(to.x - from.x, to.y - from.y, to.z - from.z);
+        this.velocity = new Vector3D(to.x - from.x, to.y - from.y, to.z - from.z);
         // Get player's bounding box and move it to the update position.
         this.cube = McAccessor.INSTANCE.getCube(player.player).add(this.velocity);
         this.updatePos = updatePos;
@@ -116,9 +116,9 @@ public class MoveEvent extends Event {
      * @author Islandscout
      */
     private ClientBlock getClientBlock() {
-        AABB feet = new AABB(to.toVector().add(new Vec3D(-0.3, -0.02, -0.3)), to.toVector().add(new Vec3D(0.3, 0, 0.3)));
+        AABB feet = new AABB(to.toVector().add(new Vector3D(-0.3, -0.02, -0.3)), to.toVector().add(new Vector3D(0.3, 0, 0.3)));
         AABB aboveFeet = feet.add(0, 0.20001, 0);
-        AABB cube = new AABB(new Vec3D(0, 0, 0), new Vec3D(1, 1, 1));
+        AABB cube = new AABB(new Vector3D(0, 0, 0), new Vector3D(1, 1, 1));
         for (Location loc : player.clientBlocks.keySet()) {
             if (!to.world.equals(loc.world)) {
                 continue;
@@ -150,8 +150,8 @@ public class MoveEvent extends Event {
         if (footBlock == null) {
             return true;
         }
-        Vec3D velocity = this.velocity.clone().setY(0);
-        Vec3D prevVelocity = player.velocity.clone();
+        Vector3D velocity = this.velocity.clone().setY(0);
+        Vector3D prevVelocity = player.velocity.clone();
         if (this.hitSlowdown) {
             prevVelocity.multiply(0.6);
         }
@@ -167,8 +167,8 @@ public class MoveEvent extends Event {
         dZ /= this.oldFriction;
         dX -= prevVelocity.x;
         dZ -= prevVelocity.z;
-        Vec3D accelDir = new Vec3D(dX, 0, dZ);
-        Vec3D yaw = MathUtils.getDirection(this.to.yaw, 0);
+        Vector3D accelDir = new Vector3D(dX, 0, dZ);
+        Vector3D yaw = MathUtils.getDirection(this.to.yaw, 0);
 
         if (velocity.length() < 0.15 || accelDir.lengthSquared() < 0.000001 || this.jumpLegitly ||
                 this.touchingFaces.contains(BlockFace.NORTH) || this.touchingFaces.contains(BlockFace.SOUTH) ||
@@ -176,7 +176,7 @@ public class MoveEvent extends Event {
             return true;
         }
 
-        boolean vectorDir = accelDir.clone().crossProduct(yaw).dot(new Vec3D(0, 1, 0)) >= 0;
+        boolean vectorDir = accelDir.clone().crossProduct(yaw).dot(new Vector3D(0, 1, 0)) >= 0;
         double angle = (vectorDir ? 1 : -1) * MathUtils.angle(accelDir, yaw);
 
         double multiple = angle / (Math.PI / 4);
@@ -191,7 +191,7 @@ public class MoveEvent extends Event {
      * @author Islandscout, MrCraftGoo
      */
     private boolean checkStep() {
-        Vec3D extraVelocity = player.velocity.clone();
+        Vector3D extraVelocity = player.velocity.clone();
         if (player.onGroundReally) {
             extraVelocity.setY(-0.0784);
         } else {

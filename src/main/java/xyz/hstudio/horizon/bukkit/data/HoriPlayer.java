@@ -13,7 +13,7 @@ import xyz.hstudio.horizon.bukkit.data.checks.*;
 import xyz.hstudio.horizon.bukkit.network.ChannelHandler;
 import xyz.hstudio.horizon.bukkit.util.ClientBlock;
 import xyz.hstudio.horizon.bukkit.util.Location;
-import xyz.hstudio.horizon.bukkit.util.Vec3D;
+import xyz.hstudio.horizon.bukkit.util.Vector3D;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -37,8 +37,8 @@ public class HoriPlayer {
     public float friction;
     public double prevDeltaY;
     public double prevPrevDeltaY;
-    public Vec3D velocity = new Vec3D(0, 0, 0);
-    public List<Vec3D> velocities = new ArrayList<>();
+    public Vector3D velocity = new Vector3D(0, 0, 0);
+    public List<Vector3D> velocities = new ArrayList<>();
     public Map<Location, ClientBlock> clientBlocks = new ConcurrentHashMap<>();
     public Set<BlockFace> touchingFaces = EnumSet.noneOf(BlockFace.class);
     public boolean isSneaking;
@@ -100,11 +100,11 @@ public class HoriPlayer {
      *
      * @return Player's head position.
      */
-    public Vec3D getHeadPosition() {
+    public Vector3D getHeadPosition() {
         if (this.getVehicle() != null) {
             return position.toVector().setY(position.y + player.getEyeHeight());
         }
-        Vec3D add = new Vec3D(0, this.isSneaking ? 1.54 : 1.62, 0);
+        Vector3D add = new Vector3D(0, this.isSneaking ? 1.54 : 1.62, 0);
         return this.position.toVector().add(add);
     }
 

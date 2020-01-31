@@ -76,8 +76,8 @@ public class BlockUtils {
      * @author Islandscout, MrCraftGoo
      */
     public static Set<BlockFace> checkTouchingBlock(final AABB box, final World world, final double borderSize) {
-        Vec3D min = new Vec3D(box.minX - borderSize, box.minY - borderSize, box.minZ - borderSize);
-        Vec3D max = new Vec3D(box.maxX + borderSize, box.maxY + borderSize, box.maxZ + borderSize);
+        Vector3D min = new Vector3D(box.minX - borderSize, box.minY - borderSize, box.minZ - borderSize);
+        Vector3D max = new Vector3D(box.maxX + borderSize, box.maxY + borderSize, box.maxZ + borderSize);
         Set<BlockFace> directions = EnumSet.noneOf(BlockFace.class);
         for (int x = (int) (min.x < 0 ? min.x - 1 : min.x); x <= max.x; x++) {
             for (int y = (int) min.y - 1; y <= max.y; y++) {

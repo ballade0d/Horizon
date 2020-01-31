@@ -255,12 +255,12 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
             // Relative AABB
             AABB relativeAABB = victimAABB.add(-victim.getLocation().getX(), -victim.getLocation().getY(), -victim.getLocation().getZ());
 
-            Vec3D eyePos = player.getHeadPosition();
-            Vec3D direction = MathUtils.getDirection(player.position.yaw, player.position.pitch);
+            Vector3D eyePos = player.getHeadPosition();
+            Vector3D direction = MathUtils.getDirection(player.position.yaw, player.position.pitch);
             Ray ray = new Ray(eyePos, direction);
 
             // The absolute intersection
-            Vec3D intersection = victimAABB.intersectsRay(ray, 0, Float.MAX_VALUE);
+            Vector3D intersection = victimAABB.intersectsRay(ray, 0, Float.MAX_VALUE);
             if (intersection == null) {
                 return;
             }
@@ -270,31 +270,31 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
                 return;
             }
 
-            Vec2D vec2D = new Vec2D(0, intersection.y);
+            Vector2D vector2D = new Vector2D(0, intersection.y);
             // Think of the entity hitbox as a flat plane
 
             // There must be a value in x and z that is the max or min value of entity hitbox
             // If it's X, use Z
             if (intersection.x == relativeAABB.minX || intersection.x == relativeAABB.maxX) {
-                vec2D.x = MathUtils.abs(intersection.z);
+                vector2D.x = MathUtils.abs(intersection.z);
             }
             // If it's Z, use X
             if (intersection.z == relativeAABB.minZ || intersection.z == relativeAABB.maxZ) {
-                vec2D.x = MathUtils.abs(intersection.x);
+                vector2D.x = MathUtils.abs(intersection.x);
             }
 
-            // System.out.println(vec2D);
+            // System.out.println(vector2D);
 
-            List<Vec2D> vec2DList = data.vec2DList;
-            vec2DList.add(vec2D);
+            List<Vector2D> vector2DList = data.vector2DList;
+            vector2DList.add(vector2D);
 
-            if (vec2DList.size() < 16) {
+            if (vector2DList.size() < 16) {
                 return;
             }
 
             // Finally, do the classification
-            Vec2D[] vec2Ds = vec2DList.toArray(new Vec2D[0]);
-            KnnValueSort[] knnValueSorts = machineLearning.getBase().sort(vec2Ds);
+            Vector2D[] vector2Ds = vector2DList.toArray(new Vector2D[0]);
+            KnnValueSort[] knnValueSorts = machineLearning.getBase().sort(vector2Ds);
 
             // Arrays.stream(knnValueSorts).forEach(System.out::println);
 
@@ -305,7 +305,7 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
                 // Punish
                 this.punish(player, data, "TypeF", 5);
             }
-            vec2DList.clear();
+            vector2DList.clear();
         }
     }
 }

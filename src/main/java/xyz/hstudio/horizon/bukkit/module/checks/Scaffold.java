@@ -9,7 +9,7 @@ import xyz.hstudio.horizon.bukkit.module.Module;
 import xyz.hstudio.horizon.bukkit.network.events.Event;
 import xyz.hstudio.horizon.bukkit.network.events.inbound.BlockPlaceEvent;
 import xyz.hstudio.horizon.bukkit.network.events.inbound.MoveEvent;
-import xyz.hstudio.horizon.bukkit.util.Vec3D;
+import xyz.hstudio.horizon.bukkit.util.Vector3D;
 
 import java.util.stream.DoubleStream;
 
@@ -48,7 +48,7 @@ public class Scaffold extends Module<ScaffoldData, ScaffoldConfig> {
                 return;
             }
 
-            Vec3D interaction = e.interaction;
+            Vector3D interaction = e.interaction;
             Block b = e.getTargetLocation().getBlock();
             if (e.face == BlockPlaceEvent.BlockFace.INVALID) {
                 this.debug("Failed: TypeA");

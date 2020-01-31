@@ -5,17 +5,17 @@ import org.bukkit.World;
 
 public class Ray implements Cloneable {
 
-    public Vec3D origin;
-    public Vec3D direction;
+    public Vector3D origin;
+    public Vector3D direction;
 
-    public Ray(Vec3D origin, Vec3D direction) {
+    public Ray(Vector3D origin, Vector3D direction) {
         this.origin = origin;
         this.direction = direction;
     }
 
-    public Vec3D getPointAtDistance(final double distance) {
-        Vec3D dir = new Vec3D(direction.x, direction.y, direction.z);
-        Vec3D orig = new Vec3D(origin.x, origin.y, origin.z);
+    public Vector3D getPointAtDistance(final double distance) {
+        Vector3D dir = new Vector3D(direction.x, direction.y, direction.z);
+        Vector3D orig = new Vector3D(origin.x, origin.y, origin.z);
         return orig.add(dir.multiply(distance));
     }
 
@@ -38,11 +38,11 @@ public class Ray implements Cloneable {
         }
     }
 
-    public Pair<Vec3D, Vec3D> closestPointsBetweenLines(final Ray other) {
-        Vec3D n1 = direction.clone().crossProduct(other.direction.clone().crossProduct(direction));
-        Vec3D n2 = other.direction.clone().crossProduct(direction.clone().crossProduct(other.direction));
-        Vec3D c1 = origin.clone().add(direction.clone().multiply(other.origin.clone().subtract(origin).dot(n2) / direction.dot(n2)));
-        Vec3D c2 = other.origin.clone().add(other.direction.clone().multiply(origin.clone().subtract(other.origin).dot(n1) / other.direction.dot(n1)));
+    public Pair<Vector3D, Vector3D> closestPointsBetweenLines(final Ray other) {
+        Vector3D n1 = direction.clone().crossProduct(other.direction.clone().crossProduct(direction));
+        Vector3D n2 = other.direction.clone().crossProduct(direction.clone().crossProduct(other.direction));
+        Vector3D c1 = origin.clone().add(direction.clone().multiply(other.origin.clone().subtract(origin).dot(n2) / direction.dot(n2)));
+        Vector3D c2 = other.origin.clone().add(other.direction.clone().multiply(origin.clone().subtract(other.origin).dot(n1) / other.direction.dot(n1)));
         return new Pair<>(c1, c2);
     }
 
