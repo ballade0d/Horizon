@@ -1,7 +1,6 @@
 package xyz.hstudio.horizon.bukkit.module.checks;
 
 import org.bukkit.entity.Player;
-import org.bukkit.util.Vector;
 import xyz.hstudio.horizon.bukkit.Horizon;
 import xyz.hstudio.horizon.bukkit.api.ModuleType;
 import xyz.hstudio.horizon.bukkit.compat.McAccessor;
@@ -14,6 +13,7 @@ import xyz.hstudio.horizon.bukkit.network.events.inbound.InteractEntityEvent;
 import xyz.hstudio.horizon.bukkit.network.events.inbound.MoveEvent;
 import xyz.hstudio.horizon.bukkit.util.AABB;
 import xyz.hstudio.horizon.bukkit.util.Location;
+import xyz.hstudio.horizon.bukkit.util.Vec3D;
 
 import java.util.AbstractMap;
 import java.util.List;
@@ -75,11 +75,11 @@ public class HitBox extends Module<HitBoxData, HitBoxConfig> {
                 // Get the history position to avoid false positives.
                 targetPos = this.getHistoryLocation(player.ping, this.getData(target).history);
             }
-            Vector move = targetPos.toVector().subtract(targetPlayer.getLocation().toVector());
+            Vec3D move = targetPos.toVector().subtract(targetPlayer.getLocation().toVector());
             AABB targetCube = McAccessor.INSTANCE.getCube(targetPlayer).add(move);
 
             // Get player's eye position instead of feet position.
-            Vector playerPos = player.getHeadPosition();
+            Vec3D playerPos = player.getHeadPosition();
 
             // Use Euclidean Distance
             double reach = targetCube.distance(playerPos);
@@ -106,7 +106,7 @@ public class HitBox extends Module<HitBoxData, HitBoxConfig> {
                 double nextMoveWeight = (elapsedTime - ping) / (double) (elapsedTime - (time - history.get(i + 1).getValue()));
                 Location before = history.get(i).getKey();
                 Location after = history.get(i + 1).getKey();
-                Vector interpolate = after.toVector().subtract(before.toVector());
+                Vec3D interpolate = after.toVector().subtract(before.toVector());
                 interpolate.multiply(nextMoveWeight);
                 before.add(interpolate);
                 return before;

@@ -1,27 +1,25 @@
 package xyz.hstudio.horizon.bukkit;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import lombok.Getter;
-import org.apache.commons.io.IOUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import xyz.hstudio.horizon.bukkit.config.ConfigFile;
 import xyz.hstudio.horizon.bukkit.data.HoriPlayer;
 import xyz.hstudio.horizon.bukkit.kirin.Kirin;
+import xyz.hstudio.horizon.bukkit.learning.MachineLearning;
 import xyz.hstudio.horizon.bukkit.listener.Listeners;
 import xyz.hstudio.horizon.bukkit.module.checks.Timer;
 import xyz.hstudio.horizon.bukkit.module.checks.*;
 import xyz.hstudio.horizon.bukkit.network.ChannelHandler;
 import xyz.hstudio.horizon.bukkit.thread.Async;
+import xyz.hstudio.horizon.bukkit.util.JsonUtils;
 import xyz.hstudio.horizon.bukkit.util.Version;
 import xyz.hstudio.horizon.bukkit.util.YamlLoader;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -39,6 +37,7 @@ public class Horizon extends JavaPlugin {
     public List<String> announcements = new ArrayList<>();
     public Set<String> aliases = new HashSet<>();
     public ConfigFile config;
+    public MachineLearning machineLearning;
 
     public Horizon() {
         Horizon.inst = this;
@@ -88,6 +87,8 @@ public class Horizon extends JavaPlugin {
         thread.start();
         new Listeners();
 
+        this.machineLearning = new MachineLearning();
+
         // Enable checks
         new BadPacket();
         new GroundSpoof();
@@ -96,6 +97,7 @@ public class Horizon extends JavaPlugin {
         new Inventory();
         new KillAura();
         new Scaffold();
+        new Speed();
         new Timer();
 
         // Enable commands
@@ -108,10 +110,7 @@ public class Horizon extends JavaPlugin {
         // Get announcements from the official server.
         Runnable command = () -> {
             try {
-                URL url = new URL("https://horizon.hstudio.xyz/horizon/announcement.json");
-                InputStreamReader stream = new InputStreamReader(url.openStream(), StandardCharsets.UTF_8);
-                String text = IOUtils.toString(stream);
-                JSONObject object = JSON.parseObject(text);
+                JSONObject object = JsonUtils.readAsObject(new URL("https://horizon.hstudio.xyz/horizon/announcement.json"));
                 this.announcements = object.getJSONArray("messages").toJavaList(String.class);
                 Logger.msg("Annc", "Horizon Announcement");
                 this.announcements.forEach(s -> Logger.msg("Annc", s));

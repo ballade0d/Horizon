@@ -7,13 +7,13 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
-import org.bukkit.util.Vector;
 import xyz.hstudio.horizon.bukkit.Horizon;
 import xyz.hstudio.horizon.bukkit.compat.McAccessor;
 import xyz.hstudio.horizon.bukkit.data.checks.*;
 import xyz.hstudio.horizon.bukkit.network.ChannelHandler;
 import xyz.hstudio.horizon.bukkit.util.ClientBlock;
 import xyz.hstudio.horizon.bukkit.util.Location;
+import xyz.hstudio.horizon.bukkit.util.Vec3D;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -27,6 +27,7 @@ public class HoriPlayer {
     public final InventoryData inventoryData = new InventoryData();
     public final KillAuraData killAuraData = new KillAuraData();
     public final ScaffoldData scaffoldData = new ScaffoldData();
+    public final SpeedData speedData = new SpeedData();
     public final TimerData timerData = new TimerData();
     public Player player;
     public long currentTick;
@@ -36,10 +37,10 @@ public class HoriPlayer {
     public float friction;
     public double prevDeltaY;
     public double prevPrevDeltaY;
-    public Vector velocity = new Vector(0, 0, 0);
-    public List<Vector> velocities = new ArrayList<>();
+    public Vec3D velocity = new Vec3D(0, 0, 0);
+    public List<Vec3D> velocities = new ArrayList<>();
     public Map<Location, ClientBlock> clientBlocks = new ConcurrentHashMap<>();
-    public Set<BlockFace> touchingFaces = new HashSet<>();
+    public Set<BlockFace> touchingFaces = EnumSet.noneOf(BlockFace.class);
     public boolean isSneaking;
     public boolean isSprinting;
     public boolean isEating;
@@ -99,11 +100,11 @@ public class HoriPlayer {
      *
      * @return Player's head position.
      */
-    public Vector getHeadPosition() {
+    public Vec3D getHeadPosition() {
         if (this.getVehicle() != null) {
             return position.toVector().setY(position.y + player.getEyeHeight());
         }
-        Vector add = new Vector(0, this.isSneaking ? 1.54 : 1.62, 0);
+        Vec3D add = new Vec3D(0, this.isSneaking ? 1.54 : 1.62, 0);
         return this.position.toVector().add(add);
     }
 

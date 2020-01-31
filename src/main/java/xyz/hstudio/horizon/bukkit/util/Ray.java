@@ -2,21 +2,20 @@ package xyz.hstudio.horizon.bukkit.util;
 
 import org.bukkit.Effect;
 import org.bukkit.World;
-import org.bukkit.util.Vector;
 
 public class Ray implements Cloneable {
 
-    public Vector origin;
-    public Vector direction;
+    public Vec3D origin;
+    public Vec3D direction;
 
-    public Ray(Vector origin, Vector direction) {
+    public Ray(Vec3D origin, Vec3D direction) {
         this.origin = origin;
         this.direction = direction;
     }
 
-    public Vector getPointAtDistance(double distance) {
-        Vector dir = new Vector(direction.getX(), direction.getY(), direction.getZ());
-        Vector orig = new Vector(origin.getX(), origin.getY(), origin.getZ());
+    public Vec3D getPointAtDistance(final double distance) {
+        Vec3D dir = new Vec3D(direction.x, direction.y, direction.z);
+        Vec3D orig = new Vec3D(origin.x, origin.y, origin.z);
         return orig.add(dir.multiply(distance));
     }
 
@@ -39,11 +38,11 @@ public class Ray implements Cloneable {
         }
     }
 
-    public Pair<Vector, Vector> closestPointsBetweenLines(final Ray other) {
-        Vector n1 = direction.clone().crossProduct(other.direction.clone().crossProduct(direction));
-        Vector n2 = other.direction.clone().crossProduct(direction.clone().crossProduct(other.direction));
-        Vector c1 = origin.clone().add(direction.clone().multiply(other.origin.clone().subtract(origin).dot(n2) / direction.dot(n2)));
-        Vector c2 = other.origin.clone().add(other.direction.clone().multiply(origin.clone().subtract(other.origin).dot(n1) / other.direction.dot(n1)));
+    public Pair<Vec3D, Vec3D> closestPointsBetweenLines(final Ray other) {
+        Vec3D n1 = direction.clone().crossProduct(other.direction.clone().crossProduct(direction));
+        Vec3D n2 = other.direction.clone().crossProduct(direction.clone().crossProduct(other.direction));
+        Vec3D c1 = origin.clone().add(direction.clone().multiply(other.origin.clone().subtract(origin).dot(n2) / direction.dot(n2)));
+        Vec3D c2 = other.origin.clone().add(other.direction.clone().multiply(origin.clone().subtract(other.origin).dot(n1) / other.direction.dot(n1)));
         return new Pair<>(c1, c2);
     }
 

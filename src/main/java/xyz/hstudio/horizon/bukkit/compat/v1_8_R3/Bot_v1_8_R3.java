@@ -6,10 +6,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_8_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
 import org.bukkit.util.NumberConversions;
-import org.bukkit.util.Vector;
 import xyz.hstudio.horizon.bukkit.compat.IBot;
 import xyz.hstudio.horizon.bukkit.data.HoriPlayer;
 import xyz.hstudio.horizon.bukkit.util.Location;
+import xyz.hstudio.horizon.bukkit.util.Vec3D;
 
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
@@ -93,15 +93,15 @@ public class Bot_v1_8_R3 extends EntityPlayer implements IBot {
         this.yaw = to.yaw;
         this.pitch = to.pitch;
 
-        Vector relativePos = new Vector(this.locX - this.lastX, this.locY - this.lastY, this.locZ - this.lastZ);
+        Vec3D relativePos = new Vec3D(this.locX - this.lastX, this.locY - this.lastY, this.locZ - this.lastZ);
         double posLength = relativePos.length();
         // 1.8.8: * 32
         // 1.12+: * 4096
-        byte deltaX = (byte) (relativePos.getX() * 32);
-        byte deltaY = (byte) (relativePos.getY() * 32);
-        byte deltaZ = (byte) (relativePos.getZ() * 32);
+        byte deltaX = (byte) (relativePos.x * 32);
+        byte deltaY = (byte) (relativePos.y * 32);
+        byte deltaZ = (byte) (relativePos.z * 32);
 
-        Vector relativeRot = new Vector(this.yaw - this.lastYaw, 0, this.pitch - this.lastPitch);
+        Vec3D relativeRot = new Vec3D(this.yaw - this.lastYaw, 0, this.pitch - this.lastPitch);
         double rotLength = relativeRot.length();
         // New angle, not delta
         byte newYaw = (byte) (NumberConversions.floor(this.yaw) * 256F / 360F);

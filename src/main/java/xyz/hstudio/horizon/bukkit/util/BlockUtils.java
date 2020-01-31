@@ -4,7 +4,6 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.util.Vector;
 import xyz.hstudio.horizon.bukkit.compat.McAccessor;
 
 import java.util.ArrayList;
@@ -77,33 +76,33 @@ public class BlockUtils {
      * @author Islandscout, MrCraftGoo
      */
     public static Set<BlockFace> checkTouchingBlock(final AABB box, final World world, final double borderSize) {
-        Vector min = new Vector(box.minX - borderSize, box.minY - borderSize, box.minZ - borderSize);
-        Vector max = new Vector(box.maxX + borderSize, box.maxY + borderSize, box.maxZ + borderSize);
+        Vec3D min = new Vec3D(box.minX - borderSize, box.minY - borderSize, box.minZ - borderSize);
+        Vec3D max = new Vec3D(box.maxX + borderSize, box.maxY + borderSize, box.maxZ + borderSize);
         Set<BlockFace> directions = EnumSet.noneOf(BlockFace.class);
-        for (int x = (int) (min.getX() < 0 ? min.getX() - 1 : min.getX()); x <= max.getX(); x++) {
-            for (int y = (int) min.getY() - 1; y <= max.getY(); y++) { //always subtract 1 so that fences/walls can be checked
-                for (int z = (int) (min.getZ() < 0 ? min.getZ() - 1 : min.getZ()); z <= max.getZ(); z++) {
+        for (int x = (int) (min.x < 0 ? min.x - 1 : min.x); x <= max.x; x++) {
+            for (int y = (int) min.y - 1; y <= max.y; y++) {
+                for (int z = (int) (min.z < 0 ? min.z - 1 : min.z); z <= max.z; z++) {
                     Block b = new Location(world, x, y, z).getBlock();
                     if (b == null) {
                         continue;
                     }
                     for (AABB blockBox : McAccessor.INSTANCE.getBoxes(b)) {
-                        if (blockBox.minX > box.maxX && blockBox.minX < max.getX()) {
+                        if (blockBox.minX > box.maxX && blockBox.minX < max.x) {
                             directions.add(BlockFace.EAST);
                         }
-                        if (blockBox.minY > box.maxY && blockBox.minY < max.getY()) {
+                        if (blockBox.minY > box.maxY && blockBox.minY < max.y) {
                             directions.add(BlockFace.UP);
                         }
-                        if (blockBox.minZ > box.maxZ && blockBox.minZ < max.getZ()) {
+                        if (blockBox.minZ > box.maxZ && blockBox.minZ < max.z) {
                             directions.add(BlockFace.SOUTH);
                         }
-                        if (blockBox.maxX > min.getX() && blockBox.maxX < box.minX) {
+                        if (blockBox.maxX > min.x && blockBox.maxX < box.minX) {
                             directions.add(BlockFace.WEST);
                         }
-                        if (blockBox.maxY > min.getY() && blockBox.maxY < box.minY) {
+                        if (blockBox.maxY > min.y && blockBox.maxY < box.minY) {
                             directions.add(BlockFace.DOWN);
                         }
-                        if (blockBox.maxZ > min.getZ() && blockBox.maxZ < box.minZ) {
+                        if (blockBox.maxZ > min.z && blockBox.maxZ < box.minZ) {
                             directions.add(BlockFace.NORTH);
                         }
                     }

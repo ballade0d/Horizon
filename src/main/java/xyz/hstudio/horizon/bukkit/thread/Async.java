@@ -4,21 +4,22 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import xyz.hstudio.horizon.bukkit.Horizon;
 import xyz.hstudio.horizon.bukkit.data.HoriPlayer;
 
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 public class Async implements Runnable {
 
-    private static final ExecutorService THREAD_POOL = Executors.newSingleThreadExecutor(
+    private static final ExecutorService THREAD_POOL = Executors.newFixedThreadPool(2,
             new ThreadFactoryBuilder()
                     .setDaemon(true)
                     .setNameFormat("Horizon Processing Thread")
                     .build());
     private long currentTick;
 
-    public static Future<?> submit(final Runnable task) {
-        return THREAD_POOL.submit(task);
+    public static <T> Future<T> submit(final Callable<T> callable) {
+        return THREAD_POOL.submit(callable);
     }
 
     public static void execute(final Runnable command) {

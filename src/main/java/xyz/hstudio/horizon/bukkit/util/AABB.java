@@ -5,18 +5,17 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.util.NumberConversions;
-import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
 public class AABB {
 
-    public static final AABB collisionBox = new AABB(new Vector(-0.3, 0, -0.3), new Vector(0.3, 1.8, 0.3));
-    public static final AABB waterCollisionBox = new AABB(new Vector(-0.299, 0.401, -0.299), new Vector(0.299, 1.399, 0.299));
-    public static final AABB swimmingBox = new AABB(new Vector(-0.3, 0, -0.3), new Vector(0.3, 0.6, 0.3));
+    public static final AABB collisionBox = new AABB(new Vec3D(-0.3, 0, -0.3), new Vec3D(0.3, 1.8, 0.3));
+    public static final AABB waterCollisionBox = new AABB(new Vec3D(-0.299, 0.401, -0.299), new Vec3D(0.299, 1.399, 0.299));
+    public static final AABB swimmingBox = new AABB(new Vec3D(-0.3, 0, -0.3), new Vec3D(0.3, 0.6, 0.3));
 
     public final double minX, minY, minZ;
     public final double maxX, maxY, maxZ;
@@ -30,13 +29,13 @@ public class AABB {
         this.maxZ = maxZ;
     }
 
-    public AABB(final Vector min, final Vector max) {
-        this.minX = min.getX();
-        this.minY = min.getY();
-        this.minZ = min.getZ();
-        this.maxX = max.getX();
-        this.maxY = max.getY();
-        this.maxZ = max.getZ();
+    public AABB(final Vec3D min, final Vec3D max) {
+        this.minX = min.x;
+        this.minY = min.y;
+        this.minZ = min.z;
+        this.maxX = max.x;
+        this.maxY = max.y;
+        this.maxZ = max.z;
     }
 
     public AABB expand(final double x, final double y, final double z) {
@@ -67,12 +66,12 @@ public class AABB {
         return new AABB(this.minX + minX, this.minY + minY, this.minZ + minZ, this.maxX + maxX, this.maxY + maxY, this.maxZ + maxZ);
     }
 
-    public AABB add(final Vector vec) {
-        return new AABB(this.minX + vec.getX(), this.minY + vec.getY(), this.minZ + vec.getZ(), this.maxX + vec.getX(), this.maxY + vec.getY(), this.maxZ + vec.getZ());
+    public AABB add(final Vec3D vec) {
+        return new AABB(this.minX + vec.x, this.minY + vec.y, this.minZ + vec.z, this.maxX + vec.x, this.maxY + vec.y, this.maxZ + vec.z);
     }
 
-    public AABB translateTo(final Vector vector) {
-        return new AABB(vector.getX(), vector.getY(), vector.getZ(), vector.getX() + (maxX - minX), vector.getY() + (maxY - minY), vector.getZ() + (maxZ - minZ));
+    public AABB translateTo(final Vec3D vector) {
+        return new AABB(vector.x, vector.y, vector.z, vector.x + (maxX - minX), vector.y + (maxY - minY), vector.z + (maxZ - minZ));
     }
 
     public boolean isColliding(final AABB other) {
@@ -89,7 +88,7 @@ public class AABB {
         for (double x = this.minX; x <= this.maxX; x += accuracy) {
             for (double y = this.minY; y <= this.maxY; y += accuracy) {
                 for (double z = this.minZ; z <= this.maxZ; z += accuracy) {
-                    Vector position = new Vector(x, y, z);
+                    Vec3D position = new Vec3D(x, y, z);
                     world.playEffect(position.toLocation(world), Effect.COLOURED_DUST, 1);
                     world.playEffect(position.toLocation(world), Effect.COLOURED_DUST, 1);
                 }
@@ -104,51 +103,45 @@ public class AABB {
      *
      * @author Islandscout, MrCraftGoo
      */
-    public Vector intersectsRay(Ray ray, float minDist, float maxDist) {
-        Vector min = new Vector(this.minX, this.minY, this.minZ);
-        Vector max = new Vector(this.maxX, this.maxY, this.maxZ);
-
-        Vector invDir = new Vector(1F / ray.direction.getX(), 1F / ray.direction.getY(), 1F / ray.direction.getZ());
-
-        boolean signDirX = invDir.getX() < 0;
-        boolean signDirY = invDir.getY() < 0;
-        boolean signDirZ = invDir.getZ() < 0;
-
-        Vector bbox = signDirX ? max : min;
-        double tmin = (bbox.getX() - ray.origin.getX()) * invDir.getX();
+    public Vec3D intersectsRay(final Ray ray, final float minDist, final float maxDist) {
+        Vec3D min = new Vec3D(this.minX, this.minY, this.minZ);
+        Vec3D max = new Vec3D(this.maxX, this.maxY, this.maxZ);
+        Vec3D invDir = new Vec3D(1F / ray.direction.x, 1F / ray.direction.y, 1F / ray.direction.z);
+        boolean signDirX = invDir.x < 0;
+        boolean signDirY = invDir.y < 0;
+        boolean signDirZ = invDir.z < 0;
+        Vec3D bbox = signDirX ? max : min;
+        double txmin = (bbox.x - ray.origin.x) * invDir.x;
         bbox = signDirX ? min : max;
-        double tmax = (bbox.getX() - ray.origin.getX()) * invDir.getX();
+        double txmax = (bbox.x - ray.origin.x) * invDir.x;
         bbox = signDirY ? max : min;
-        double tymin = (bbox.getY() - ray.origin.getY()) * invDir.getY();
+        double tymin = (bbox.y - ray.origin.y) * invDir.y;
         bbox = signDirY ? min : max;
-        double tymax = (bbox.getY() - ray.origin.getY()) * invDir.getY();
-
-        if ((tmin > tymax) || (tymin > tmax)) {
+        double tymax = (bbox.y - ray.origin.y) * invDir.y;
+        if (txmin > tymax || tymin > txmax) {
             return null;
         }
-        if (tymin > tmin) {
-            tmin = tymin;
+        if (tymin > txmin) {
+            txmin = tymin;
         }
-        if (tymax < tmax) {
-            tmax = tymax;
+        if (tymax < txmax) {
+            txmax = tymax;
         }
-
         bbox = signDirZ ? max : min;
-        double tzmin = (bbox.getZ() - ray.origin.getZ()) * invDir.getZ();
+        double tzmin = (bbox.z - ray.origin.z) * invDir.z;
         bbox = signDirZ ? min : max;
-        double tzmax = (bbox.getZ() - ray.origin.getZ()) * invDir.getZ();
-
-        if ((tmin > tzmax) || (tzmin > tmax)) {
+        double tzmax = (bbox.z - ray.origin.z) * invDir.z;
+        if (txmin > tzmax || tzmin > txmax) {
             return null;
         }
-        if (tzmin > tmin) {
-            tmin = tzmin;
+        if (tzmin > txmin) {
+            txmin = tzmin;
         }
-        if (tzmax < tmax) {
-            tmax = tzmax;
+        if (tzmax < txmax) {
+            txmax = tzmax;
         }
-        if ((tmin < maxDist) && (tmax > minDist)) {
-            return ray.getPointAtDistance(tmin);
+        if (txmin < maxDist && txmax > minDist) {
+            return ray.getPointAtDistance(txmin);
         }
         return null;
     }
@@ -172,7 +165,7 @@ public class AABB {
 
     // TODO: Any ways to optimize it?
     public Set<Material> getMaterials(final World world) {
-        Set<Material> blocks = new HashSet<>();
+        Set<Material> blocks = EnumSet.noneOf(Material.class);
         for (int x = NumberConversions.floor(this.minX); x < NumberConversions.ceil(this.maxX); x++) {
             for (int y = NumberConversions.floor(this.minY); y < NumberConversions.ceil(this.maxY); y++) {
                 for (int z = NumberConversions.floor(this.minZ); z < NumberConversions.ceil(this.maxZ); z++) {
@@ -187,26 +180,10 @@ public class AABB {
         return blocks;
     }
 
-    // TODO: Any ways to optimize it?
-    public boolean isEmpty(final World world) {
-        for (int x = NumberConversions.floor(this.minX); x < NumberConversions.ceil(this.maxX); x++) {
-            for (int y = NumberConversions.floor(this.minY); y < NumberConversions.ceil(this.maxY); y++) {
-                for (int z = NumberConversions.floor(this.minZ); z < NumberConversions.ceil(this.maxZ); z++) {
-                    Block block = new Location(world, x, y, z).getBlock();
-                    if (block == null || block.isEmpty() || !BlockUtils.isSolid(block.getType())) {
-                        continue;
-                    }
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
-    public double distance(final Vector vector) {
-        double distX = Math.max(this.minX - vector.getX(), Math.max(0, vector.getX() - this.maxX));
-        double distY = Math.max(this.minY - vector.getY(), Math.max(0, vector.getY() - this.maxY));
-        double distZ = Math.max(this.minZ - vector.getZ(), Math.max(0, vector.getZ() - this.maxZ));
+    public double distance(final Vec3D vector) {
+        double distX = Math.max(this.minX - vector.x, Math.max(0, vector.x - this.maxX));
+        double distY = Math.max(this.minY - vector.y, Math.max(0, vector.y - this.maxY));
+        double distZ = Math.max(this.minZ - vector.z, Math.max(0, vector.z - this.maxZ));
         return Math.sqrt(NumberConversions.square(distX) + NumberConversions.square(distY) + NumberConversions.square(distZ));
     }
 

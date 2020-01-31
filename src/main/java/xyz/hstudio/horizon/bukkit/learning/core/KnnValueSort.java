@@ -3,15 +3,15 @@ package xyz.hstudio.horizon.bukkit.learning.core;
 public class KnnValueSort {
 
     public final String typeId;
-    public final double score;
+    public final double distance;
 
-    public KnnValueSort(final String typeId, final double score) {
+    public KnnValueSort(final String typeId, final double distance) {
         this.typeId = typeId;
-        this.score = score;
+        this.distance = distance;
     }
 
     @Override
     public String toString() {
-        return typeId + ", Score:" + score;
+        return typeId + ", Distance:" + distance;
     }
 }

@@ -1,7 +1,6 @@
 package xyz.hstudio.horizon.bukkit.module.checks;
 
 import org.bukkit.block.Block;
-import org.bukkit.util.Vector;
 import xyz.hstudio.horizon.bukkit.api.ModuleType;
 import xyz.hstudio.horizon.bukkit.config.checks.ScaffoldConfig;
 import xyz.hstudio.horizon.bukkit.data.HoriPlayer;
@@ -10,6 +9,7 @@ import xyz.hstudio.horizon.bukkit.module.Module;
 import xyz.hstudio.horizon.bukkit.network.events.Event;
 import xyz.hstudio.horizon.bukkit.network.events.inbound.BlockPlaceEvent;
 import xyz.hstudio.horizon.bukkit.network.events.inbound.MoveEvent;
+import xyz.hstudio.horizon.bukkit.util.Vec3D;
 
 import java.util.stream.DoubleStream;
 
@@ -48,16 +48,15 @@ public class Scaffold extends Module<ScaffoldData, ScaffoldConfig> {
                 return;
             }
 
-            Vector interaction = e.interaction;
+            Vec3D interaction = e.interaction;
             Block b = e.getTargetLocation().getBlock();
             if (e.face == BlockPlaceEvent.BlockFace.INVALID) {
                 this.debug("Failed: TypeA");
 
                 // Punish
                 this.punish(player, data, "TypeA", 5);
-            } else if (DoubleStream.of(interaction.getX(), interaction.getY(), interaction.getZ())
+            } else if (DoubleStream.of(interaction.x, interaction.y, interaction.z)
                     .anyMatch(d -> d > 1 || d < 0)) {
-                // Stream Performance?
                 this.debug("Failed: TypeA, i:" + interaction.toString());
 
                 // Punish

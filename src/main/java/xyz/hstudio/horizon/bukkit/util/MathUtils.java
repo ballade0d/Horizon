@@ -1,7 +1,9 @@
 package xyz.hstudio.horizon.bukkit.util;
 
-import org.bukkit.util.Vector;
+import org.bukkit.util.NumberConversions;
 import xyz.hstudio.horizon.bukkit.compat.McAccessor;
+
+import java.util.Arrays;
 
 public class MathUtils {
 
@@ -10,8 +12,8 @@ public class MathUtils {
 
     // Skidded from Bukkit lol.
     // But I switched Math.sin and Math.cos to NMS's for better performance.
-    public static Vector getDirection(final float yaw, final float pitch) {
-        Vector vector = new Vector();
+    public static Vec3D getDirection(final float yaw, final float pitch) {
+        Vec3D vector = new Vec3D();
         float rotX = (float) Math.toRadians(yaw);
         float rotY = (float) Math.toRadians(pitch);
         vector.setY(-McAccessor.INSTANCE.sin(rotY));
@@ -21,7 +23,7 @@ public class MathUtils {
         return vector;
     }
 
-    public static double angle(final Vector a, final Vector b) {
+    public static double angle(final Vec3D a, final Vec3D b) {
         double dot = Math.min(Math.max(a.dot(b) / (a.length() * b.length()), -1), 1);
         return Math.acos(dot);
     }
@@ -46,5 +48,22 @@ public class MathUtils {
     // Faster than Math.abs
     public static double abs(final double v) {
         return Double.longBitsToDouble(MASK_NON_SIGN_LONG & Double.doubleToRawLongBits(v));
+    }
+
+    public static double average(final double[] data) {
+        return Arrays.stream(data).average().orElse(0);
+    }
+
+    public static double standardDeviation(final double[] data) {
+        double average = average(data);
+        double total = 0;
+        for (double num : data) {
+            total += NumberConversions.square(num - average);
+        }
+        return Math.sqrt(total / data.length);
+    }
+
+    public static double distance2d(final double xDiff, final double zDiff) {
+        return Math.sqrt(xDiff * xDiff + zDiff * zDiff);
     }
 }

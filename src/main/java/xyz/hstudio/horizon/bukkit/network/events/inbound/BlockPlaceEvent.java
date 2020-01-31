@@ -2,22 +2,22 @@ package xyz.hstudio.horizon.bukkit.network.events.inbound;
 
 import lombok.Getter;
 import org.bukkit.Material;
-import org.bukkit.util.Vector;
 import xyz.hstudio.horizon.bukkit.data.HoriPlayer;
 import xyz.hstudio.horizon.bukkit.network.events.Event;
 import xyz.hstudio.horizon.bukkit.network.events.WrappedPacket;
 import xyz.hstudio.horizon.bukkit.util.ClientBlock;
 import xyz.hstudio.horizon.bukkit.util.Location;
+import xyz.hstudio.horizon.bukkit.util.Vec3D;
 
 public class BlockPlaceEvent extends Event {
 
     public final Location placed;
     public final BlockFace face;
     public final Material material;
-    public final Vector interaction;
+    public final Vec3D interaction;
     public final PlaceType placeType;
 
-    public BlockPlaceEvent(final HoriPlayer player, final Location placed, final BlockFace face, final Material material, final Vector interaction, final PlaceType placeType, final WrappedPacket packet) {
+    public BlockPlaceEvent(final HoriPlayer player, final Location placed, final BlockFace face, final Material material, final Vec3D interaction, final PlaceType placeType, final WrappedPacket packet) {
         super(player, packet);
         this.placed = placed;
         this.face = face;
@@ -35,44 +35,44 @@ public class BlockPlaceEvent extends Event {
     }
 
     // placed.getFace(against)
-    public Vector getPlaceBlockFace() {
+    public Vec3D getPlaceBlockFace() {
         switch (face) {
             case TOP:
-                return new Vector(0, -1, 0);
+                return new Vec3D(0, -1, 0);
             case BOTTOM:
-                return new Vector(0, 1, 0);
+                return new Vec3D(0, 1, 0);
             case SOUTH:
-                return new Vector(0, 0, -1);
+                return new Vec3D(0, 0, -1);
             case NORTH:
-                return new Vector(0, 0, 1);
+                return new Vec3D(0, 0, 1);
             case WEST:
-                return new Vector(1, 0, 0);
+                return new Vec3D(1, 0, 0);
             case EAST:
-                return new Vector(-1, 0, 0);
+                return new Vec3D(-1, 0, 0);
             case INVALID:
             default:
-                return new Vector(0, 0, 0);
+                return new Vec3D(0, 0, 0);
         }
     }
 
     // against.getFace(placed)
-    public Vector getTargetBlockFace() {
+    public Vec3D getTargetBlockFace() {
         switch (face) {
             case TOP:
-                return new Vector(0, 1, 0);
+                return new Vec3D(0, 1, 0);
             case BOTTOM:
-                return new Vector(0, -1, 0);
+                return new Vec3D(0, -1, 0);
             case SOUTH:
-                return new Vector(0, 0, 1);
+                return new Vec3D(0, 0, 1);
             case NORTH:
-                return new Vector(0, 0, -1);
+                return new Vec3D(0, 0, -1);
             case WEST:
-                return new Vector(-1, 0, 0);
+                return new Vec3D(-1, 0, 0);
             case EAST:
-                return new Vector(1, 0, 0);
+                return new Vec3D(1, 0, 0);
             case INVALID:
             default:
-                return new Vector(0, 0, 0);
+                return new Vec3D(0, 0, 0);
         }
     }
 

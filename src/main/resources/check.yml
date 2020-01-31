@@ -29,6 +29,9 @@ scaffold:
   debug: true
   typeB:
     max_angle: 90.0
+speed:
+  enabled: true
+  debug: true
 timer:
   enabled: true
   debug: true

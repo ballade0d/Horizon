@@ -27,13 +27,15 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionConfig
     @Override
     public void doCheck(final Event event, final HoriPlayer player, final InvalidMotionData data, final InvalidMotionConfig config) {
         typeA(event, player, data, config);
+        typeB(event, player, data, config);
+        typeC(event, player, data, config);
     }
 
     /**
      * Basic y-axis motion check. Based on Minecraft moving mechanism.
      * <p>
      * Accuracy: 7/10 - It may have some false positives.
-     * Efficiency: 10/10 - Detects a lot of move related hacks instantly
+     * Efficiency: 10/10 - Detects a lot of move related hacks instantly.
      *
      * @author MrCraftGoo
      */
@@ -41,7 +43,7 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionConfig
         if (event instanceof MoveEvent) {
             MoveEvent e = (MoveEvent) event;
 
-            float deltaY = (float) (e.to.y - e.from.y);
+            float deltaY = (float) e.velocity.y;
 
             // TODO: Fix Cobweb, Slime handler
             // TODO: Fix the false positives when joining
@@ -84,7 +86,7 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionConfig
                 }
 
                 // Fix the false positives when towering
-                if (player.isOnGround && player.prevDeltaY == 0 && (MathUtils.abs(deltaY - 0.40444491418477) < 0.001 || MathUtils.abs(deltaY - 0.39557589867329) < 0.001)) {
+                if (!player.isOnGround && player.prevDeltaY == 0 && (MathUtils.abs(deltaY - 0.40444491418477) < 0.001 || MathUtils.abs(deltaY - 0.39557589867329) < 0.001)) {
                     deltaY = estimatedVelocity = 0.42F;
                 }
 
@@ -113,6 +115,64 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionConfig
                 } else {
                     data.estimatedVelocity = deltaY;
                 }
+            }
+        }
+    }
+
+    /**
+     * A simple Step check
+     *
+     * @author MrCraftGoo
+     */
+    private void typeB(final Event event, final HoriPlayer player, final InvalidMotionData data, final InvalidMotionConfig config) {
+        if (event instanceof MoveEvent) {
+            MoveEvent e = (MoveEvent) event;
+            // TODO: Handle Velocity
+            if (e.stepLegitly || !e.onGround || !player.isOnGround || e.isTeleport) {
+                return;
+            }
+            double deltaY = e.velocity.y;
+
+            if (deltaY > 0.6 || deltaY < -0.0784) {
+                this.debug("Failed: TypeB, d:" + deltaY);
+
+                // Punish
+                this.punish(player, data, "TypeB", 4);
+            } else {
+                reward("TypeB", data, 0.99);
+            }
+        }
+    }
+
+    /**
+     * A simple FastFall check.
+     * TypeA also checks for FastFall, but it only detects if onGround == false,
+     * however, if the client falls too fast, onGround will be true,
+     * this check will fix the bypass.
+     *
+     * @author MrCraftGoo
+     */
+    private void typeC(final Event event, final HoriPlayer player, final InvalidMotionData data, final InvalidMotionConfig config) {
+        if (event instanceof MoveEvent) {
+            MoveEvent e = (MoveEvent) event;
+
+            // TODO: Ignore Velocity and Liquid
+            if (e.isTeleport || e.touchingFaces.contains(BlockFace.UP) || e.collidingBlocks.contains(MatUtils.LADDER.parse()) ||
+                    e.collidingBlocks.contains(MatUtils.VINE.parse()) || player.isFlying() || player.player.isSleeping() ||
+                    player.position.isOnGround(false, 0.001)) {
+                return;
+            }
+            double deltaY = e.velocity.y;
+            double estimatedY = (player.velocity.y - 0.08) * 0.98;
+
+            double discrepancy = deltaY - estimatedY;
+            if (discrepancy < -0.02) {
+                this.debug("Failed: TypeC, d:" + deltaY);
+
+                // Punish
+                this.punish(player, data, "TypeC", 4);
+            } else {
+                reward("TypeC", data, 0.99);
             }
         }
     }

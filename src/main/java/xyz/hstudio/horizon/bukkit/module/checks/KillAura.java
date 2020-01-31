@@ -1,32 +1,29 @@
 package xyz.hstudio.horizon.bukkit.module.checks;
 
 import org.bukkit.entity.Entity;
-import org.bukkit.util.Vector;
+import xyz.hstudio.horizon.bukkit.Horizon;
 import xyz.hstudio.horizon.bukkit.api.ModuleType;
 import xyz.hstudio.horizon.bukkit.compat.McAccessor;
 import xyz.hstudio.horizon.bukkit.config.checks.KillAuraConfig;
 import xyz.hstudio.horizon.bukkit.data.HoriPlayer;
 import xyz.hstudio.horizon.bukkit.data.checks.KillAuraData;
-import xyz.hstudio.horizon.bukkit.learning.core.KnnClassification;
-import xyz.hstudio.horizon.bukkit.learning.KnnVectorClassification;
+import xyz.hstudio.horizon.bukkit.learning.MachineLearning;
+import xyz.hstudio.horizon.bukkit.learning.core.KnnValueSort;
 import xyz.hstudio.horizon.bukkit.module.Module;
 import xyz.hstudio.horizon.bukkit.network.events.Event;
 import xyz.hstudio.horizon.bukkit.network.events.inbound.ActionEvent;
 import xyz.hstudio.horizon.bukkit.network.events.inbound.InteractEntityEvent;
 import xyz.hstudio.horizon.bukkit.network.events.inbound.MoveEvent;
-import xyz.hstudio.horizon.bukkit.util.AABB;
-import xyz.hstudio.horizon.bukkit.util.MathUtils;
-import xyz.hstudio.horizon.bukkit.util.Ray;
+import xyz.hstudio.horizon.bukkit.util.*;
+
+import java.util.List;
 
 public class KillAura extends Module<KillAuraData, KillAuraConfig> {
 
     private static final double EXPANDER = Math.pow(2, 24);
 
-    private final KnnClassification<Vector> classification;
-
     public KillAura() {
         super(ModuleType.KillAura, new KillAuraConfig());
-        this.classification = new KnnVectorClassification();
     }
 
     @Override
@@ -41,6 +38,7 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
         typeC(event, player, data, config);
         typeD(event, player, data, config);
         typeE(event, player, data, config);
+        typeF(event, player, data, config);
         // TODO: Aim checks.
     }
 
@@ -237,7 +235,6 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
 
     /**
      * Machine Learning check.
-     * TODO: Finish
      *
      * @author MrCraftGoo
      */
@@ -247,19 +244,68 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
             if (e.action != InteractEntityEvent.InteractType.ATTACK) {
                 return;
             }
-            Entity victim = e.entity;
-            AABB victimAABB = McAccessor.INSTANCE.getCube(victim);
+            MachineLearning machineLearning = Horizon.getInst().machineLearning;
+            if (!machineLearning.isLoaded()) {
+                return;
+            }
 
-            Vector eyePos = player.getHeadPosition();
-            Vector direction = MathUtils.getDirection(player.position.yaw, player.position.pitch);
+            Entity victim = e.entity;
+            // Absolute AABB
+            AABB victimAABB = McAccessor.INSTANCE.getCube(victim);
+            // Relative AABB
+            AABB relativeAABB = victimAABB.add(-victim.getLocation().getX(), -victim.getLocation().getY(), -victim.getLocation().getZ());
+
+            Vec3D eyePos = player.getHeadPosition();
+            Vec3D direction = MathUtils.getDirection(player.position.yaw, player.position.pitch);
             Ray ray = new Ray(eyePos, direction);
 
-            Vector intersection = victimAABB.intersectsRay(ray, 0, Float.MAX_VALUE);
+            // The absolute intersection
+            Vec3D intersection = victimAABB.intersectsRay(ray, 0, Float.MAX_VALUE);
             if (intersection == null) {
                 return;
             }
+            // Change the absolute intersection to relative intersection
             intersection.subtract(victim.getLocation().toVector());
-            //
+            if (intersection.y == relativeAABB.minY || intersection.y == relativeAABB.maxY) {
+                return;
+            }
+
+            Vec2D vec2D = new Vec2D(0, intersection.y);
+            // Think of the entity hitbox as a flat plane
+
+            // There must be a value in x and z that is the max or min value of entity hitbox
+            // If it's X, use Z
+            if (intersection.x == relativeAABB.minX || intersection.x == relativeAABB.maxX) {
+                vec2D.x = MathUtils.abs(intersection.z);
+            }
+            // If it's Z, use X
+            if (intersection.z == relativeAABB.minZ || intersection.z == relativeAABB.maxZ) {
+                vec2D.x = MathUtils.abs(intersection.x);
+            }
+
+            // System.out.println(vec2D);
+
+            List<Vec2D> vec2DList = data.vec2DList;
+            vec2DList.add(vec2D);
+
+            if (vec2DList.size() < 16) {
+                return;
+            }
+
+            // Finally, do the classification
+            Vec2D[] vec2Ds = vec2DList.toArray(new Vec2D[0]);
+            KnnValueSort[] knnValueSorts = machineLearning.getBase().sort(vec2Ds);
+
+            // Arrays.stream(knnValueSorts).forEach(System.out::println);
+
+            if (knnValueSorts[0].typeId.equals("Cheat")) {
+                // TODO: Do the client classification
+                this.debug("Failed: TypeF, d:" + knnValueSorts[0].distance);
+
+                // Punish
+                this.punish(player, data, "TypeF", 5);
+            }
+            vec2DList.clear();
         }
     }
 }

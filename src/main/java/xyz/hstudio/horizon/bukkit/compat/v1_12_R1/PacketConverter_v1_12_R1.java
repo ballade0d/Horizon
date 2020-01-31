@@ -6,7 +6,6 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
-import org.bukkit.util.Vector;
 import xyz.hstudio.horizon.bukkit.compat.IPacketConverter;
 import xyz.hstudio.horizon.bukkit.data.HoriPlayer;
 import xyz.hstudio.horizon.bukkit.network.events.Event;
@@ -16,6 +15,7 @@ import xyz.hstudio.horizon.bukkit.network.events.outbound.*;
 import xyz.hstudio.horizon.bukkit.util.Hand;
 import xyz.hstudio.horizon.bukkit.util.Location;
 import xyz.hstudio.horizon.bukkit.util.MathUtils;
+import xyz.hstudio.horizon.bukkit.util.Vec3D;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -155,7 +155,7 @@ public class PacketConverter_v1_12_R1 implements IPacketConverter {
         int x = bPos.getX();
         int y = bPos.getY();
         int z = bPos.getZ();
-        Vector targetedPosition = new Vector(x, y, z);
+        Vec3D targetedPosition = new Vec3D(x, y, z);
         BlockPlaceEvent.BlockFace face;
         switch (packet.b()) {
             case DOWN:
@@ -186,9 +186,9 @@ public class PacketConverter_v1_12_R1 implements IPacketConverter {
                 face = BlockPlaceEvent.BlockFace.INVALID;
                 break;
         }
-        Vector interaction = new Vector(packet.d(), packet.e(), packet.f());
+        Vec3D interaction = new Vec3D(packet.d(), packet.e(), packet.f());
         Location placed = new Location(player.world, x, y, z);
-        if (!targetedPosition.equals(new Vector(-1, -1, -1))) {
+        if (!targetedPosition.equals(new Vec3D(-1, -1, -1))) {
             BlockPlaceEvent.PlaceType placeType = itemStack != null && itemStack.getItem() instanceof ItemBlock ? BlockPlaceEvent.PlaceType.PLACE_BLOCK : BlockPlaceEvent.PlaceType.INTERACT_BLOCK;
             // Does CraftItemStack#asBukkitCopy perform well?
             return new BlockPlaceEvent(player, placed, face, itemStack == null ? org.bukkit.Material.AIR : CraftItemStack.asBukkitCopy(itemStack).getType(), interaction, placeType, new WrappedPacket(packet));

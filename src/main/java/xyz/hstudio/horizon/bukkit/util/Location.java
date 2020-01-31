@@ -1,11 +1,8 @@
 package xyz.hstudio.horizon.bukkit.util;
 
-import net.minecraft.server.v1_14_R1.EntityPose;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.event.entity.EntityPoseChangeEvent;
 import org.bukkit.util.NumberConversions;
-import org.bukkit.util.Vector;
 import xyz.hstudio.horizon.bukkit.compat.McAccessor;
 
 import java.util.ArrayList;
@@ -99,10 +96,10 @@ public class Location {
         return new Location(this.world, newX, newY, newZ, yaw, pitch);
     }
 
-    public Location add(final Vector vec) {
-        double newX = this.x + vec.getX();
-        double newY = this.y + vec.getY();
-        double newZ = this.z + vec.getZ();
+    public Location add(final Vec3D vec) {
+        double newX = this.x + vec.x;
+        double newY = this.y + vec.y;
+        double newZ = this.z + vec.z;
         return new Location(this.world, newX, newY, newZ, yaw, pitch);
     }
 
@@ -113,7 +110,7 @@ public class Location {
         return new Location(this.world, newX, newY, newZ, yaw, pitch);
     }
 
-    public Vector getDirection() {
+    public Vec3D getDirection() {
         return MathUtils.getDirection(this.yaw, this.pitch);
     }
 
@@ -133,8 +130,8 @@ public class Location {
         return NumberConversions.square(this.x - loc.x) + NumberConversions.square(this.y - loc.y) + NumberConversions.square(this.z - loc.z);
     }
 
-    public Vector toVector() {
-        return new Vector(this.x, this.y, this.z);
+    public Vec3D toVector() {
+        return new Vec3D(this.x, this.y, this.z);
     }
 
     public int getBlockX() {
