@@ -3,6 +3,8 @@ package xyz.hstudio.horizon.bukkit.network.events.outbound;
 import xyz.hstudio.horizon.bukkit.data.HoriPlayer;
 import xyz.hstudio.horizon.bukkit.network.events.Event;
 import xyz.hstudio.horizon.bukkit.network.events.WrappedPacket;
+import xyz.hstudio.horizon.bukkit.util.Pair;
+import xyz.hstudio.horizon.bukkit.util.Vector3D;
 
 public class VelocityEvent extends Event {
 
@@ -15,5 +17,10 @@ public class VelocityEvent extends Event {
         this.x = x;
         this.y = y;
         this.z = z;
+    }
+
+    @Override
+    public void post() {
+        player.velocities.add(new Pair<>(new Vector3D(x, y, z), System.currentTimeMillis()));
     }
 }

@@ -25,7 +25,9 @@ public class Speed extends Module<SpeedData, SpeedConfig> {
 
     @Override
     public void doCheck(final Event event, final HoriPlayer player, final SpeedData data, final SpeedConfig config) {
-        typeA(event, player, data, config);
+        if (config.typeA_enabled) {
+            typeA(event, player, data, config);
+        }
     }
 
     /**
@@ -40,14 +42,12 @@ public class Speed extends Module<SpeedData, SpeedConfig> {
         if (event instanceof MoveEvent) {
             MoveEvent e = (MoveEvent) event;
 
-            double prevSpeed;
-            double speed;
-            if (e.updatePos) {
-                prevSpeed = data.prevSpeed;
-                speed = MathUtils.distance2d(e.to.x - e.from.x, e.to.z - e.from.z);
-            } else {
-                speed = 0;
-                prevSpeed = speed;
+            double prevSpeed = data.prevSpeed;
+            double speed = e.updatePos ? MathUtils.distance2d(e.to.x - e.from.x, e.to.z - e.from.z) : 0;
+
+            if (e.knockBack != null) {
+                data.prevSpeed = speed;
+                return;
             }
 
             boolean flying = player.isFlying();
@@ -60,8 +60,6 @@ public class Speed extends Module<SpeedData, SpeedConfig> {
 
             Set<Material> touchedBlocks = e.cube.add(-e.velocity.x, -e.velocity.y, -e.velocity.z).getMaterials(e.to.world);
 
-            // TODO: Handle velocities
-
             double multipliers = 1;
             if (e.hitSlowdown) {
                 multipliers *= 0.6;
@@ -72,8 +70,8 @@ public class Speed extends Module<SpeedData, SpeedConfig> {
             if (touchedBlocks.contains(Material.WEB)) {
                 multipliers *= 0.25;
             }
-            if (touchedBlocks.contains(Material.SLIME_BLOCK) && Math.abs(player.velocity.y) < 0.1 && !player.isSneaking) {
-                multipliers *= 0.4 + Math.abs(player.velocity.y) * 0.2;
+            if (touchedBlocks.contains(Material.SLIME_BLOCK) && MathUtils.abs(player.velocity.y) < 0.1 && !player.isSneaking) {
+                multipliers *= 0.4 + MathUtils.abs(player.velocity.y) * 0.2;
             }
 
             double adders = 0;
@@ -95,7 +93,7 @@ public class Speed extends Module<SpeedData, SpeedConfig> {
                     data.discrepancies = Math.max(data.discrepancies + discrepancy, 0);
                 }
                 double totalDiscrepancy = data.discrepancies;
-                if (discrepancy > 0 && totalDiscrepancy > 0.1) {
+                if (discrepancy > 0 && totalDiscrepancy > config.typeA_tolerance) {
                     this.debug("Failed: TypeA, s:" + speed + ", e:" + estimatedSpeed + ", p:" + prevSpeed + ", d:" + discrepancy);
 
                     // Punish
@@ -130,7 +128,7 @@ public class Speed extends Module<SpeedData, SpeedConfig> {
         if (player.isOnGround) {
             // float movementFactor = (float) McAccessor.INSTANCE.getMoveFactor(player.player);
             multiplier = 0.1F * 0.16277136F / (newFriction * newFriction * newFriction);
-            float groundMultiplier = (5 * (player.player.getWalkSpeed()));
+            float groundMultiplier = 5 * player.player.getWalkSpeed() * (1 + player.getPotionEffectAmplifier("SPEED") * 0.2F);
             multiplier *= groundMultiplier;
         } else {
             float flyMultiplier = 10 * player.player.getFlySpeed();

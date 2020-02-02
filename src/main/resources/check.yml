@@ -1,37 +1,77 @@
 badpacket:
   enabled: true
   debug: true
+  typeA:
+    enabled: true
+  typeB:
+    enabled: true
 groundspoof:
   enabled: true
   debug: true
+  typeA:
+    enabled: true
 hitbox:
   enabled: true
   debug: true
   typeA:
+    enabled: true
     max_reach: 3.1
 invalidmotion:
   enabled: true
   debug: true
   typeA:
+    enabled: true
     tolerance: 0.001
+  typeB:
+    enabled: true
+  typeC:
+    enabled: true
+    tolerance: -0.02
 inventory:
   enabled: true
   debug: true
   typeA:
+    enabled: true
     checkRotation: true
+    checkPosition: true
     checkAction: true
     checkHit: true
 killaura:
   enabled: true
   debug: true
+  typeA:
+    enabled: true
+  typeB:
+    enabled: true
+  typeC:
+    enabled: true
+  typeD:
+    enabled: true
+  typeE:
+    enabled: true
+  typeF:
+    enabled: true
 scaffold:
   enabled: true
   debug: true
+  typeA:
+    enabled: true
   typeB:
+    enabled: true
     max_angle: 90.0
+  typeC:
+    enabled: true
+  typeD:
+    enabled: true
 speed:
   enabled: true
   debug: true
+  typeA:
+    enabled: true
+    tolerance: 0.08
 timer:
   enabled: true
   debug: true
+  typeA:
+    enabled: true
+    allow_ms: 50

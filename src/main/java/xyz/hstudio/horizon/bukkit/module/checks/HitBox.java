@@ -1,5 +1,6 @@
 package xyz.hstudio.horizon.bukkit.module.checks;
 
+import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import xyz.hstudio.horizon.bukkit.Horizon;
 import xyz.hstudio.horizon.bukkit.api.ModuleType;
@@ -13,14 +14,10 @@ import xyz.hstudio.horizon.bukkit.network.events.inbound.InteractEntityEvent;
 import xyz.hstudio.horizon.bukkit.network.events.inbound.MoveEvent;
 import xyz.hstudio.horizon.bukkit.util.AABB;
 import xyz.hstudio.horizon.bukkit.util.Location;
+import xyz.hstudio.horizon.bukkit.util.Pair;
 import xyz.hstudio.horizon.bukkit.util.Vector3D;
 
-import java.util.AbstractMap;
 import java.util.List;
-import java.util.Map;
-
-import static org.bukkit.GameMode.ADVENTURE;
-import static org.bukkit.GameMode.SURVIVAL;
 
 public class HitBox extends Module<HitBoxData, HitBoxConfig> {
 
@@ -35,7 +32,9 @@ public class HitBox extends Module<HitBoxData, HitBoxConfig> {
 
     @Override
     public void doCheck(final Event event, final HoriPlayer player, final HitBoxData data, final HitBoxConfig config) {
-        typeA(event, player, data, config);
+        if (config.typeA_enabled) {
+            typeA(event, player, data, config);
+        }
     }
 
     /**
@@ -52,7 +51,7 @@ public class HitBox extends Module<HitBoxData, HitBoxConfig> {
             if (!e.updatePos) {
                 return;
             }
-            data.history.add(new AbstractMap.SimpleEntry<>(e.to, System.currentTimeMillis()));
+            data.history.add(new Pair<>(e.to, System.currentTimeMillis()));
             if (data.history.size() > 30) {
                 data.history.remove(0);
             }
@@ -64,7 +63,7 @@ public class HitBox extends Module<HitBoxData, HitBoxConfig> {
             if (!(e.entity instanceof Player)) {
                 return;
             }
-            if (player.player.getGameMode() != SURVIVAL && player.player.getGameMode() != ADVENTURE) {
+            if (player.player.getGameMode() != GameMode.SURVIVAL && player.player.getGameMode() != GameMode.ADVENTURE) {
                 return;
             }
             Player targetPlayer = (Player) e.entity;
@@ -95,23 +94,23 @@ public class HitBox extends Module<HitBoxData, HitBoxConfig> {
         }
     }
 
-    private Location getHistoryLocation(final long ping, final List<Map.Entry<Location, Long>> history) {
+    private Location getHistoryLocation(final long ping, final List<Pair<Location, Long>> history) {
         long time = System.currentTimeMillis();
         for (int i = history.size() - 1; i >= 0; i--) {
-            long elapsedTime = time - history.get(i).getValue();
+            long elapsedTime = time - history.get(i).value;
             if (elapsedTime >= ping) {
                 if (i == history.size() - 1) {
-                    return history.get(i).getKey();
+                    return history.get(i).key;
                 }
-                double nextMoveWeight = (elapsedTime - ping) / (double) (elapsedTime - (time - history.get(i + 1).getValue()));
-                Location before = history.get(i).getKey();
-                Location after = history.get(i + 1).getKey();
+                double nextMoveWeight = (elapsedTime - ping) / (double) (elapsedTime - (time - history.get(i + 1).value));
+                Location before = history.get(i).key;
+                Location after = history.get(i + 1).key;
                 Vector3D interpolate = after.toVector().subtract(before.toVector());
                 interpolate.multiply(nextMoveWeight);
                 before.add(interpolate);
                 return before;
             }
         }
-        return history.get(0).getKey();
+        return history.get(0).key;
     }
 }

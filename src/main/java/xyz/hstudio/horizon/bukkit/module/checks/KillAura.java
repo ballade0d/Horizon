@@ -33,12 +33,24 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
 
     @Override
     public void doCheck(final Event event, final HoriPlayer player, final KillAuraData data, final KillAuraConfig config) {
-        typeA(event, player, data, config);
-        typeB(event, player, data, config);
-        typeC(event, player, data, config);
-        typeD(event, player, data, config);
-        typeE(event, player, data, config);
-        typeF(event, player, data, config);
+        if (config.typeA_enabled) {
+            typeA(event, player, data, config);
+        }
+        if (config.typeB_enabled) {
+            typeB(event, player, data, config);
+        }
+        if (config.typeC_enabled) {
+            typeC(event, player, data, config);
+        }
+        if (config.typeD_enabled) {
+            typeD(event, player, data, config);
+        }
+        if (config.typeE_enabled) {
+            typeE(event, player, data, config);
+        }
+        if (config.typeF_enabled) {
+            // typeF(event, player, data, config);
+        }
         // TODO: Aim checks.
     }
 
@@ -94,8 +106,6 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
     private void typeB(final Event event, final HoriPlayer player, final KillAuraData data, final KillAuraConfig config) {
         if (event instanceof ActionEvent) {
             ActionEvent e = (ActionEvent) event;
-            // Don't need to skip 1.9+
-            // because players can't start/stop sprinting while standing still
             switch (e.action) {
                 case START_SPRINTING:
                     data.startSprintTick = player.currentTick;

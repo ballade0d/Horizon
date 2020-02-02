@@ -9,6 +9,7 @@ import xyz.hstudio.horizon.bukkit.network.events.Event;
 import xyz.hstudio.horizon.bukkit.network.events.WrappedPacket;
 import xyz.hstudio.horizon.bukkit.util.*;
 
+import java.util.List;
 import java.util.Set;
 
 public class MoveEvent extends Event {
@@ -32,6 +33,7 @@ public class MoveEvent extends Event {
     public final boolean stepLegitly;
     public final boolean jumpLegitly;
     public final boolean strafeNormally;
+    public final Vector3D knockBack;
     public boolean onGround;
     public boolean isTeleport;
 
@@ -65,6 +67,7 @@ public class MoveEvent extends Event {
         this.stepLegitly = this.checkStep();
         this.jumpLegitly = this.checkJump();
         this.strafeNormally = this.checkStrafe();
+        this.knockBack = this.checkKnockBack();
     }
 
     /**
@@ -133,6 +136,36 @@ public class MoveEvent extends Event {
     }
 
     /**
+     * Check if player is stepping up stair/block.
+     *
+     * @author Islandscout, MrCraftGoo
+     */
+    private boolean checkStep() {
+        Vector3D extraVelocity = player.velocity.clone();
+        if (player.onGroundReally) {
+            extraVelocity.setY(-0.0784);
+        } else {
+            extraVelocity.setY((extraVelocity.y - 0.08) * 0.98);
+        }
+        Location extraPos = player.position.add(extraVelocity);
+        float deltaY = (float) this.velocity.y;
+        return extraPos.isOnGround(false, 0.001) && onGroundReally && deltaY > 0.002F && deltaY <= 0.6F;
+    }
+
+    /**
+     * Check if player is jumping.
+     *
+     * @author Islandscout, MrCraftGoo
+     */
+    private boolean checkJump() {
+        int jumpBoostLvl = player.getPotionEffectAmplifier("JUMP");
+        float initJumpVelocity = 0.42F + jumpBoostLvl * 0.1F;
+        float deltaY = (float) this.velocity.y;
+        boolean hitCeiling = touchingFaces.contains(BlockFace.UP);
+        return player.isOnGround && !onGround && (deltaY == initJumpVelocity || hitCeiling);
+    }
+
+    /**
      * Check if player's strafing is normal.
      * I learnt this from Islandscout, but much lighter than his.
      * <p>
@@ -185,29 +218,70 @@ public class MoveEvent extends Event {
         return MathUtils.abs(multiple - Math.round(multiple)) <= threshold;
     }
 
-    /**
-     * Check if player is stepping up stair/block.
-     *
-     * @author Islandscout, MrCraftGoo
-     */
-    private boolean checkStep() {
-        Vector3D extraVelocity = player.velocity.clone();
-        if (player.onGroundReally) {
-            extraVelocity.setY(-0.0784);
-        } else {
-            extraVelocity.setY((extraVelocity.y - 0.08) * 0.98);
+    private Vector3D checkKnockBack() {
+        List<Pair<Vector3D, Long>> velocities = player.velocities;
+        if (velocities.size() <= 0) {
+            return null;
         }
-        Location extraPos = player.position.add(extraVelocity);
-        float deltaY = (float) this.velocity.y;
-        return extraPos.isOnGround(false, 0.001) && onGroundReally && deltaY > 0.002F && deltaY <= 0.6F;
+        long time = System.currentTimeMillis();
+
+        int expiredKbs = 0;
+
+        boolean jump = player.isOnGround && MathUtils.abs(0.42 - velocity.y) < 0.00001;
+        boolean flying = player.isFlying();
+
+        double sprintMultiplier = flying ? (player.isSprinting ? 2 : 1) : (player.isSprinting ? 1.3 : 1);
+        // TODO: Check for liquid
+        double weirdConstant = (jump && player.isSprinting ? 0.2518462 : 0.098);
+        double baseMultiplier = flying ? (10 * player.player.getFlySpeed()) : (5 * player.player.getWalkSpeed() * (1 + player.getPotionEffectAmplifier("SPEED") * 0.2));
+        double maxDiscrepancy = weirdConstant * baseMultiplier * sprintMultiplier + 0.003;
+
+        Pair<Vector3D, Long> kb;
+        for (int kbIndex = 0, size = velocities.size(); kbIndex < size; kbIndex++) {
+            kb = velocities.get(kbIndex);
+            if (time - kb.value > player.ping + 200) {
+                expiredKbs++;
+                continue;
+            }
+            Vector3D kbVelocity = kb.key;
+
+            double y = kbVelocity.y;
+
+            // TODO: Check for liquid
+            if (!((touchingFaces.contains(BlockFace.UP) && y > 0) || (touchingFaces.contains(BlockFace.DOWN) && y < 0)) &&
+                    MathUtils.abs(y - velocity.y) > 0.01 &&
+                    !jump && !this.stepLegitly) {
+                continue;
+            }
+
+            double x = hitSlowdown ? 0.6 * kbVelocity.x : kbVelocity.x;
+            double minThresX = x - maxDiscrepancy;
+            double maxThresX = x + maxDiscrepancy;
+            double z = hitSlowdown ? 0.6 * kbVelocity.z : kbVelocity.z;
+            double minThresZ = z - maxDiscrepancy;
+            double maxThresZ = z + maxDiscrepancy;
+
+            if (!((touchingFaces.contains(BlockFace.EAST) && x > 0) || (touchingFaces.contains(BlockFace.WEST) && x < 0)) &&
+                    !(velocity.x <= maxThresX && velocity.x >= minThresX)) {
+                continue;
+            }
+            if (!((touchingFaces.contains(BlockFace.SOUTH) && z > 0) || (touchingFaces.contains(BlockFace.NORTH) && z < 0)) &&
+                    !(velocity.z <= maxThresZ && velocity.z >= minThresZ)) {
+                continue;
+            }
+            velocities.subList(0, kbIndex + 1).clear();
+            return kbVelocity;
+        }
+        velocities.subList(0, expiredKbs).clear();
+        return null;
     }
 
-    private boolean checkJump() {
-        int jumpBoostLvl = player.getPotionEffectAmplifier("JUMP");
-        float initJumpVelocity = 0.42F + jumpBoostLvl * 0.1F;
-        float deltaY = (float) this.velocity.y;
-        boolean hitCeiling = touchingFaces.contains(BlockFace.UP);
-        return player.isOnGround && !onGround && (deltaY == initJumpVelocity || hitCeiling);
+    public boolean hasDeltaPos() {
+        return from.x != to.x || from.y != to.y || from.z != to.z;
+    }
+
+    public boolean hasDeltaRot() {
+        return from.yaw != to.yaw || from.pitch != to.pitch;
     }
 
     @Override

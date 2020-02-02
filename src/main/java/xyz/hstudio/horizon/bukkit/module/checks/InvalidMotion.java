@@ -26,9 +26,15 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionConfig
 
     @Override
     public void doCheck(final Event event, final HoriPlayer player, final InvalidMotionData data, final InvalidMotionConfig config) {
-        typeA(event, player, data, config);
-        typeB(event, player, data, config);
-        typeC(event, player, data, config);
+        if (config.typeA_enabled) {
+            typeA(event, player, data, config);
+        }
+        if (config.typeB_enabled) {
+            typeB(event, player, data, config);
+        }
+        if (config.typeC_enabled) {
+            typeC(event, player, data, config);
+        }
     }
 
     /**
@@ -47,10 +53,10 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionConfig
 
             // TODO: Fix Cobweb, Slime handler
             // TODO: Fix the false positives when joining
-            // TODO: Handle Water, Velocity, Vehicle
+            // TODO: Handle Water, Vehicle
 
-            if (!e.onGround && !e.jumpLegitly && !e.stepLegitly && !e.isTeleport && player.getVehicle() == null &&
-                    !player.isFlying() && !e.isOnSlime && !e.isOnBed) {
+            if (!e.onGround && !e.jumpLegitly && !e.stepLegitly && !e.isTeleport && e.knockBack == null &&
+                    player.getVehicle() == null && !player.isFlying() && !e.isOnSlime && !e.isOnBed) {
                 float prevEstimatedVelocity = data.estimatedVelocity;
                 float estimatedVelocity;
 
@@ -76,9 +82,11 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionConfig
                 } else {
                     estimatedVelocity = (prevEstimatedVelocity - 0.08F) * 0.98F;
                 }
-                if (Math.abs(estimatedVelocity) < 0.005 && estimatedVelocity != 0) {
+                if (MathUtils.abs(estimatedVelocity) < 0.005 && estimatedVelocity != 0) {
                     estimatedVelocity = deltaY;
                 }
+
+                // Fix the false positives when there're blocks above
                 boolean hitHead = e.touchingFaces.contains(BlockFace.UP);
                 boolean hasHitHead = player.touchingFaces.contains(BlockFace.UP);
                 if (hitHead && !hasHitHead) {
@@ -90,16 +98,15 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionConfig
                     deltaY = estimatedVelocity = 0.42F;
                 }
 
-                // I don't know why but client considers player is not on ground when walking on slime,
-                // client bug?
-                Block standing = e.to.add(0, -0.01, 0).getBlock();
+                // Idk why but client considers player is not on ground when walking on slime, client bug?
+                Block standing = e.to.add(0, -0.1, 0).getBlock();
                 if (e.onGroundReally && deltaY == 0 && standing != null && standing.getType() == MatUtils.SLIME_BLOCK.parse()) {
                     estimatedVelocity = 0;
                 }
 
                 float discrepancy = deltaY - estimatedVelocity;
 
-                if (e.updatePos && e.velocity.lengthSquared() > 0 && MathUtils.abs(discrepancy) > 0.001) {
+                if (e.updatePos && e.velocity.lengthSquared() > 0 && MathUtils.abs(discrepancy) > config.typeA_tolerance) {
                     this.debug("Failed: TypeA, d:" + deltaY + ", e:" + estimatedVelocity + ", p:" + discrepancy);
 
                     // Punish
@@ -121,14 +128,16 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionConfig
 
     /**
      * A simple Step check
+     * <p>
+     * Accuracy: 10/10 - Should not have any false positives.
+     * Efficiency: 8/10 - Detects a lot of types of step instantly.
      *
      * @author MrCraftGoo
      */
     private void typeB(final Event event, final HoriPlayer player, final InvalidMotionData data, final InvalidMotionConfig config) {
         if (event instanceof MoveEvent) {
             MoveEvent e = (MoveEvent) event;
-            // TODO: Handle Velocity
-            if (e.stepLegitly || !e.onGround || !player.isOnGround || e.isTeleport) {
+            if (e.stepLegitly || !e.onGround || !player.isOnGround || e.isTeleport || e.knockBack != null) {
                 return;
             }
             double deltaY = e.velocity.y;
@@ -149,6 +158,9 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionConfig
      * TypeA also checks for FastFall, but it only detects if onGround == false,
      * however, if the client falls too fast, onGround will be true,
      * this check will fix the bypass.
+     * <p>
+     * Accuracy: 9/10 - Should not have any false positives.
+     * Efficiency: 10/10 - Detects most FastFall instantly.
      *
      * @author MrCraftGoo
      */
@@ -156,17 +168,17 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionConfig
         if (event instanceof MoveEvent) {
             MoveEvent e = (MoveEvent) event;
 
-            // TODO: Ignore Velocity and Liquid
-            if (e.isTeleport || e.touchingFaces.contains(BlockFace.UP) || e.collidingBlocks.contains(MatUtils.LADDER.parse()) ||
-                    e.collidingBlocks.contains(MatUtils.VINE.parse()) || player.isFlying() || player.player.isSleeping() ||
-                    player.position.isOnGround(false, 0.001)) {
+            // TODO: Ignore Liquid
+            if (e.isTeleport || !e.onGround || e.knockBack != null || e.touchingFaces.contains(BlockFace.UP) || player.touchingFaces.contains(BlockFace.UP) ||
+                    e.collidingBlocks.contains(MatUtils.LADDER.parse()) || e.collidingBlocks.contains(MatUtils.VINE.parse()) ||
+                    player.isFlying() || player.player.isSleeping() || player.position.isOnGround(false, 0.001)) {
                 return;
             }
             double deltaY = e.velocity.y;
             double estimatedY = (player.velocity.y - 0.08) * 0.98;
 
             double discrepancy = deltaY - estimatedY;
-            if (discrepancy < -0.02) {
+            if (discrepancy < config.typeC_tolerance) {
                 this.debug("Failed: TypeC, d:" + deltaY);
 
                 // Punish

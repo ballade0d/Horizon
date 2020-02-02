@@ -13,6 +13,7 @@ import xyz.hstudio.horizon.bukkit.data.checks.*;
 import xyz.hstudio.horizon.bukkit.network.ChannelHandler;
 import xyz.hstudio.horizon.bukkit.util.ClientBlock;
 import xyz.hstudio.horizon.bukkit.util.Location;
+import xyz.hstudio.horizon.bukkit.util.Pair;
 import xyz.hstudio.horizon.bukkit.util.Vector3D;
 
 import java.util.*;
@@ -38,7 +39,7 @@ public class HoriPlayer {
     public double prevDeltaY;
     public double prevPrevDeltaY;
     public Vector3D velocity = new Vector3D(0, 0, 0);
-    public List<Vector3D> velocities = new ArrayList<>();
+    public List<Pair<Vector3D, Long>> velocities = new LinkedList<>();
     public Map<Location, ClientBlock> clientBlocks = new ConcurrentHashMap<>();
     public Set<BlockFace> touchingFaces = EnumSet.noneOf(BlockFace.class);
     public boolean isSneaking;

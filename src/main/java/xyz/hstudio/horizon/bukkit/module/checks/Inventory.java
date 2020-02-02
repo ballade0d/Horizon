@@ -22,7 +22,9 @@ public class Inventory extends Module<InventoryData, InventoryConfig> {
 
     @Override
     public void doCheck(final Event event, final HoriPlayer player, final InventoryData data, final InventoryConfig config) {
-        typeA(event, player, data, config);
+        if (config.typeA_enabled) {
+            typeA(event, player, data, config);
+        }
     }
 
     /**
@@ -69,16 +71,28 @@ public class Inventory extends Module<InventoryData, InventoryConfig> {
             // It's impossible to rotate if inventory is opened.
             if (config.typeA_checkRotation && e.updateRot) {
                 // Block Inventory Rotation
-                this.debug("Failed: TypeA");
+                this.debug("Failed: TypeA, t:rot");
 
                 // Punish
                 this.punish(player, data, "TypeA", 5);
             }
 
-            if (e.updatePos) {
-                // TODO: Inventory Position check
-                // Inventory Position check is harder to make
-                // because player can get velocity/push even if inventory is opened.
+            // TODO: Ignore if moving in water
+            // TODO: Ignore if colliding entities
+            if (config.typeA_checkPosition && e.updatePos) {
+                if (e.knockBack != null) {
+                    data.temporarilyBypass = true;
+                } else if (e.onGround) {
+                    data.temporarilyBypass = false;
+                    data.inventoryOpenTick = player.currentTick;
+                }
+                if (!data.temporarilyBypass) {
+                    // Block Inventory Position
+                    this.debug("Failed: TypeA, t:pos");
+
+                    // Punish
+                    this.punish(player, data, "TypeA", 5);
+                }
             }
         } else if (event instanceof ActionEvent) {
             if (!data.inventoryOpened) {
@@ -86,7 +100,7 @@ public class Inventory extends Module<InventoryData, InventoryConfig> {
             }
             // Block Inventory Sprint/Sneak/Glide
             if (config.typeA_checkAction) {
-                this.debug("Failed: TypeA");
+                this.debug("Failed: TypeA, t:action");
 
                 // Punish
                 this.punish(player, data, "TypeA", 5);
@@ -97,7 +111,7 @@ public class Inventory extends Module<InventoryData, InventoryConfig> {
             }
             if (config.typeA_checkHit) {
                 // Block Inventory Hit
-                this.debug("Failed: TypeA");
+                this.debug("Failed: TypeA, t:hit");
 
                 // Punish
                 this.punish(player, data, "TypeA", 5);

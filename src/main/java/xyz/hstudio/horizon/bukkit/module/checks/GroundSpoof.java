@@ -22,7 +22,9 @@ public class GroundSpoof extends Module<GroundSpoofData, GroundSpoofConfig> {
 
     @Override
     public void doCheck(Event event, HoriPlayer player, GroundSpoofData data, GroundSpoofConfig config) {
-        typeA(event, player, data, config);
+        if (config.typeA_enabled) {
+            typeA(event, player, data, config);
+        }
     }
 
     private void typeA(final Event event, final HoriPlayer player, final GroundSpoofData data, final GroundSpoofConfig config) {

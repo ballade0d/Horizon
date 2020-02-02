@@ -5,5 +5,6 @@ import xyz.hstudio.horizon.bukkit.data.Data;
 public class InventoryData extends Data {
 
     public boolean inventoryOpened;
+    public boolean temporarilyBypass;
     public long inventoryOpenTick = -10000;
 }

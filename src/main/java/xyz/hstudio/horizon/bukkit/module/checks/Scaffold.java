@@ -26,10 +26,18 @@ public class Scaffold extends Module<ScaffoldData, ScaffoldConfig> {
 
     @Override
     public void doCheck(final Event event, final HoriPlayer player, final ScaffoldData data, final ScaffoldConfig config) {
-        typeA(event, player, data, config);
-        typeB(event, player, data, config);
-        typeC(event, player, data, config);
-        typeD(event, player, data, config);
+        if (config.typeA_enabled) {
+            typeA(event, player, data, config);
+        }
+        if (config.typeB_enabled) {
+            typeB(event, player, data, config);
+        }
+        if (config.typeC_enabled) {
+            typeC(event, player, data, config);
+        }
+        if (config.typeD_enabled) {
+            typeD(event, player, data, config);
+        }
         // TODO: SafeWalk check
     }
 

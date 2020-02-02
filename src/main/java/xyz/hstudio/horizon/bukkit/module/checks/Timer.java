@@ -23,7 +23,9 @@ public class Timer extends Module<TimerData, TimerConfig> {
 
     @Override
     public void doCheck(final Event event, final HoriPlayer player, final TimerData data, final TimerConfig config) {
-        typeA(event, player, data, config);
+        if (config.typeA_enabled) {
+            typeA(event, player, data, config);
+        }
     }
 
     /**
@@ -59,7 +61,7 @@ public class Timer extends Module<TimerData, TimerConfig> {
             double diff = drift * 1E-6;
             // Player is 1 tick faster.
             // Also allowed network jitter.
-            if (diff < -50) {
+            if (diff < -config.typeA_allow_ms) {
                 this.debug("Failed: TypeA, d:" + diff + ", s:" + (-diff / 50));
 
                 // Punish

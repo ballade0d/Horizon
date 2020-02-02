@@ -22,8 +22,12 @@ public class BadPacket extends Module<BadPacketData, BadPacketConfig> {
 
     @Override
     public void doCheck(final Event event, final HoriPlayer player, final BadPacketData data, final BadPacketConfig config) {
-        typeA(event, player, data, config);
-        typeB(event, player, data, config);
+        if (config.typeA_enabled) {
+            typeA(event, player, data, config);
+        }
+        if (config.typeB_enabled) {
+            typeB(event, player, data, config);
+        }
     }
 
     /**
