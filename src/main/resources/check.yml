@@ -49,8 +49,6 @@ killaura:
     enabled: true
   typeE:
     enabled: true
-  typeF:
-    enabled: true
 scaffold:
   enabled: true
   debug: true
