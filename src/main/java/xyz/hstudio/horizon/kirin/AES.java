@@ -1,4 +1,4 @@
-package xyz.hstudio.horizon.kirin.secure;
+package xyz.hstudio.horizon.kirin;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;

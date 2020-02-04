@@ -72,7 +72,7 @@ public class Horizon extends JavaPlugin {
 
         if (this.config.kirin_enabled) {
             try {
-                new Kirin(this.config);
+                new Kirin(this.config.kirin_licence);
             } catch (Exception e) {
                 Logger.msg("Kirin", "Failed to init Kirin! Please contact the author for help.");
                 e.printStackTrace();
