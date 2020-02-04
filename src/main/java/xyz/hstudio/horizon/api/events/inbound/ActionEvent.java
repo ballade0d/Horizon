@@ -1,15 +1,14 @@
-package xyz.hstudio.horizon.network.events.inbound;
+package xyz.hstudio.horizon.api.events.inbound;
 
+import xyz.hstudio.horizon.api.events.Event;
 import xyz.hstudio.horizon.data.HoriPlayer;
-import xyz.hstudio.horizon.network.events.Event;
-import xyz.hstudio.horizon.network.events.WrappedPacket;
 
 public class ActionEvent extends Event {
 
     public Action action;
 
-    public ActionEvent(final HoriPlayer player, final Action action, final WrappedPacket packet) {
-        super(player, packet);
+    public ActionEvent(final HoriPlayer player, final Action action) {
+        super(player);
         this.action = action;
     }
 

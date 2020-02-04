@@ -8,4 +8,6 @@ public class BadPacketData extends Data {
     public long lastTick;
     // TypeB
     public int flyingCount;
+    // TypeC
+    public long lastPayloadTime;
 }

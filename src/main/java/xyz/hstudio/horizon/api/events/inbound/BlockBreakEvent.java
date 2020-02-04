@@ -1,12 +1,11 @@
-package xyz.hstudio.horizon.network.events.inbound;
+package xyz.hstudio.horizon.api.events.inbound;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.inventory.ItemStack;
+import xyz.hstudio.horizon.api.events.Event;
 import xyz.hstudio.horizon.data.HoriPlayer;
-import xyz.hstudio.horizon.network.events.Event;
-import xyz.hstudio.horizon.network.events.WrappedPacket;
 import xyz.hstudio.horizon.util.wrap.ClientBlock;
 import xyz.hstudio.horizon.util.wrap.Location;
 
@@ -17,8 +16,8 @@ public class BlockBreakEvent extends Event {
     public final ItemStack itemStack;
     public final DigType digType;
 
-    public BlockBreakEvent(final HoriPlayer player, final Block block, final BlockFace direction, final ItemStack itemStack, final DigType digType, final WrappedPacket packet) {
-        super(player, packet);
+    public BlockBreakEvent(final HoriPlayer player, final Block block, final BlockFace direction, final ItemStack itemStack, final DigType digType) {
+        super(player);
         this.block = block;
         this.direction = direction;
         this.itemStack = itemStack;

@@ -11,4 +11,7 @@ public class BadPacketConfig extends Config {
     // TypeB
     @Load(file = "check.yml", path = "typeB.enabled")
     public boolean typeB_enabled = true;
+    // TypeB
+    @Load(file = "check.yml", path = "typeC.enabled")
+    public boolean typeC_enabled = true;
 }

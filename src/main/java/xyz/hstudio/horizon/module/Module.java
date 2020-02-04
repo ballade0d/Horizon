@@ -3,10 +3,10 @@ package xyz.hstudio.horizon.module;
 import lombok.Getter;
 import xyz.hstudio.horizon.Logger;
 import xyz.hstudio.horizon.api.ModuleType;
+import xyz.hstudio.horizon.api.events.Event;
 import xyz.hstudio.horizon.config.Config;
 import xyz.hstudio.horizon.data.Data;
 import xyz.hstudio.horizon.data.HoriPlayer;
-import xyz.hstudio.horizon.network.events.Event;
 import xyz.hstudio.horizon.util.collect.Pair;
 
 import java.util.LinkedHashMap;

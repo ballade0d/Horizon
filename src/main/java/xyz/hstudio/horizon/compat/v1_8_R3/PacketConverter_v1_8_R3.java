@@ -5,12 +5,11 @@ import net.minecraft.server.v1_8_R3.*;
 import org.bukkit.block.BlockFace;
 import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
+import xyz.hstudio.horizon.api.events.Event;
+import xyz.hstudio.horizon.api.events.inbound.*;
+import xyz.hstudio.horizon.api.events.outbound.*;
 import xyz.hstudio.horizon.compat.IPacketConverter;
 import xyz.hstudio.horizon.data.HoriPlayer;
-import xyz.hstudio.horizon.network.events.Event;
-import xyz.hstudio.horizon.network.events.WrappedPacket;
-import xyz.hstudio.horizon.network.events.inbound.*;
-import xyz.hstudio.horizon.network.events.outbound.*;
 import xyz.hstudio.horizon.util.MathUtils;
 import xyz.hstudio.horizon.util.enums.Hand;
 import xyz.hstudio.horizon.util.wrap.Location;
@@ -71,7 +70,7 @@ public class PacketConverter_v1_8_R3 implements IPacketConverter {
             default:
                 return null;
         }
-        return new ActionEvent(player, action, new WrappedPacket(packet));
+        return new ActionEvent(player, action);
     }
 
     private Event convertMoveEvent(final HoriPlayer player, final PacketPlayInFlying packet) {
@@ -100,9 +99,10 @@ public class PacketConverter_v1_8_R3 implements IPacketConverter {
         Location to = new Location(player.player.getWorld(), x, y, z, yaw, pitch);
         if (MathUtils.abs(to.x) >= Integer.MAX_VALUE || MathUtils.abs(to.y) >= Integer.MAX_VALUE || MathUtils.abs(to.z) >= Integer.MAX_VALUE ||
                 Double.isNaN(to.x) || Double.isNaN(to.y) || Double.isNaN(to.z)) {
-            return new BadMoveEvent(player, new WrappedPacket(packet));
+            // Bad Move, will be blocked by the server.
+            return null;
         }
-        return new MoveEvent(player, to, onGround, updatePos, updateRot, moveType, new WrappedPacket(packet));
+        return new MoveEvent(player, to, onGround, updatePos, updateRot, moveType);
     }
 
     private Event convertBlockBreakEvent(final HoriPlayer player, final PacketPlayInBlockDig packet) {
@@ -137,13 +137,13 @@ public class PacketConverter_v1_8_R3 implements IPacketConverter {
             if (b == null) {
                 return null;
             }
-            return new BlockBreakEvent(player, b, BlockFace.valueOf(packet.b().name()), player.getHeldItem(), digType, new WrappedPacket(packet));
+            return new BlockBreakEvent(player, b, BlockFace.valueOf(packet.b().name()), player.getHeldItem(), digType);
         }
         org.bukkit.inventory.ItemStack item = player.getHeldItem();
         if (item == null) {
             return null;
         }
-        return new InteractItemEvent(player, item, interactType, new WrappedPacket(packet));
+        return new InteractItemEvent(player, item, interactType);
     }
 
     private Event convertBlockPlaceEvent(final HoriPlayer player, final PacketPlayInBlockPlace packet) {
@@ -188,12 +188,12 @@ public class PacketConverter_v1_8_R3 implements IPacketConverter {
         Location placed = new Location(player.world, x, y, z);
         if (!targetedPosition.equals(new Vector3D(-1, -1, -1))) {
             BlockPlaceEvent.PlaceType placeType = itemStack != null && itemStack.getItem() instanceof ItemBlock ? BlockPlaceEvent.PlaceType.PLACE_BLOCK : BlockPlaceEvent.PlaceType.INTERACT_BLOCK;
-            return new BlockPlaceEvent(player, placed, face, CraftItemStack.asBukkitCopy(itemStack).getType(), interaction, placeType, new WrappedPacket(packet));
+            return new BlockPlaceEvent(player, placed, face, CraftItemStack.asBukkitCopy(itemStack).getType(), interaction, placeType);
         } else {
             if (bukkitItemStack == null) {
                 return null;
             }
-            return new InteractItemEvent(player, bukkitItemStack, InteractItemEvent.InteractType.START_USE_ITEM, new WrappedPacket(packet));
+            return new InteractItemEvent(player, bukkitItemStack, InteractItemEvent.InteractType.START_USE_ITEM);
         }
     }
 
@@ -206,19 +206,19 @@ public class PacketConverter_v1_8_R3 implements IPacketConverter {
                 packet.a() == PacketPlayInUseEntity.EnumEntityUseAction.ATTACK ?
                         InteractEntityEvent.InteractType.ATTACK :
                         InteractEntityEvent.InteractType.INTERACT;
-        return new InteractEntityEvent(player, action, entity.getBukkitEntity(), Hand.MAIN_HAND, new WrappedPacket(packet));
+        return new InteractEntityEvent(player, action, entity.getBukkitEntity(), Hand.MAIN_HAND);
     }
 
     private Event convertHeldItemEvent(final HoriPlayer player, final PacketPlayInHeldItemSlot packet) {
-        return new HeldItemEvent(player, packet.a(), new WrappedPacket(packet));
+        return new HeldItemEvent(player, packet.a());
     }
 
     private Event convertSwingEvent(final HoriPlayer player, final PacketPlayInArmAnimation packet) {
-        return new SwingEvent(player, Hand.MAIN_HAND, new WrappedPacket(packet));
+        return new SwingEvent(player, Hand.MAIN_HAND);
     }
 
     private Event convertKeepAliveRespondEvent(final HoriPlayer player, final PacketPlayInKeepAlive packet) {
-        return new KeepAliveRespondEvent(player, packet.a(), new WrappedPacket(packet));
+        return new KeepAliveRespondEvent(player, packet.a());
     }
 
     private Event convertTransaction(final HoriPlayer player, final PacketPlayInTransaction packet) {
@@ -230,19 +230,19 @@ public class PacketConverter_v1_8_R3 implements IPacketConverter {
     }
 
     private Event convertWindowClickEvent(final HoriPlayer player, final PacketPlayInWindowClick packet) {
-        return new WindowClickEvent(player, packet.a(), packet.b(), packet.c(), new WrappedPacket(packet));
+        return new WindowClickEvent(player, packet.a(), packet.b(), packet.c());
     }
 
     private Event convertWindowCloseEvent(final HoriPlayer player, final PacketPlayInCloseWindow packet) {
-        return new WindowCloseEvent(player, new WrappedPacket(packet));
+        return new WindowCloseEvent(player);
     }
 
     private Event convertClientCommandEvent(final HoriPlayer player, final PacketPlayInClientCommand packet) {
-        return new ClientCommandEvent(player, ClientCommandEvent.ClientCommand.valueOf(packet.a().name()), new WrappedPacket(packet));
+        return new ClientCommandEvent(player, ClientCommandEvent.ClientCommand.valueOf(packet.a().name()));
     }
 
     private Event convertAbilitiesEvent(final HoriPlayer player, final PacketPlayInAbilities packet) {
-        return new AbilitiesEvent(player, packet.isFlying(), new WrappedPacket(packet));
+        return new AbilitiesEvent(player, packet.isFlying());
     }
 
     @Override
@@ -277,7 +277,7 @@ public class PacketConverter_v1_8_R3 implements IPacketConverter {
         if (action != 0 || id != player.player.getEntityId()) {
             return null;
         }
-        return new VehicleEvent(player, vehicle, new WrappedPacket(packet));
+        return new VehicleEvent(player, vehicle);
     }
 
     private Event convertVelocityEvent(final HoriPlayer player, final PacketPlayOutEntityVelocity packet) {
@@ -294,7 +294,7 @@ public class PacketConverter_v1_8_R3 implements IPacketConverter {
         double x = serializer.readShort() / 8000D;
         double y = serializer.readShort() / 8000D;
         double z = serializer.readShort() / 8000D;
-        return new VelocityEvent(player, x, y, z, new WrappedPacket(packet));
+        return new VelocityEvent(player, x, y, z);
     }
 
     private Event convertMetaEvent(final HoriPlayer player, final PacketPlayOutEntityMetadata packet) {
@@ -315,17 +315,17 @@ public class PacketConverter_v1_8_R3 implements IPacketConverter {
                 Object object = watchableObject.b();
                 objects.add(new MetaEvent.WatchableObject(index, object));
             }
-            return new MetaEvent(player, objects, new WrappedPacket(packet));
+            return new MetaEvent(player, objects);
         } catch (Exception e) {
             return null;
         }
     }
 
     private Event convertOpenWindowEvent(final HoriPlayer player, final PacketPlayOutOpenWindow packet) {
-        return new OpenWindowEvent(player, new WrappedPacket(packet));
+        return new OpenWindowEvent(player);
     }
 
     private Event convertCloseWindowEvent(final HoriPlayer player, final PacketPlayOutCloseWindow packet) {
-        return new CloseWindowEvent(player, new WrappedPacket(packet));
+        return new CloseWindowEvent(player);
     }
 }

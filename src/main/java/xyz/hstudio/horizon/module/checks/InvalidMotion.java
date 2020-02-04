@@ -3,13 +3,13 @@ package xyz.hstudio.horizon.module.checks;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import xyz.hstudio.horizon.api.ModuleType;
+import xyz.hstudio.horizon.api.events.Event;
+import xyz.hstudio.horizon.api.events.inbound.MoveEvent;
 import xyz.hstudio.horizon.compat.McAccessor;
 import xyz.hstudio.horizon.config.checks.InvalidMotionConfig;
 import xyz.hstudio.horizon.data.HoriPlayer;
 import xyz.hstudio.horizon.data.checks.InvalidMotionData;
 import xyz.hstudio.horizon.module.Module;
-import xyz.hstudio.horizon.network.events.Event;
-import xyz.hstudio.horizon.network.events.inbound.MoveEvent;
 import xyz.hstudio.horizon.util.MathUtils;
 import xyz.hstudio.horizon.util.enums.MatUtils;
 
@@ -194,5 +194,9 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionConfig
                 reward("TypeC", data, 0.99);
             }
         }
+    }
+
+    private void typeD(final Event event, final HoriPlayer player, final InvalidMotionData data, final InvalidMotionConfig config) {
+        // TODO: Finish this shit
     }
 }

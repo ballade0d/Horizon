@@ -1,12 +1,12 @@
 package xyz.hstudio.horizon.module.checks;
 
 import xyz.hstudio.horizon.api.ModuleType;
+import xyz.hstudio.horizon.api.events.Event;
+import xyz.hstudio.horizon.api.events.inbound.MoveEvent;
 import xyz.hstudio.horizon.config.checks.TimerConfig;
 import xyz.hstudio.horizon.data.HoriPlayer;
 import xyz.hstudio.horizon.data.checks.TimerData;
 import xyz.hstudio.horizon.module.Module;
-import xyz.hstudio.horizon.network.events.Event;
-import xyz.hstudio.horizon.network.events.inbound.MoveEvent;
 
 public class Timer extends Module<TimerData, TimerConfig> {
 
@@ -45,7 +45,8 @@ public class Timer extends Module<TimerData, TimerConfig> {
             data.prevMoveTime = time;
 
             // Skip if player is teleporting.
-            if (e.isTeleport || System.currentTimeMillis() - player.teleportTime < 2000L) {
+            // Ignore the first 2 second joining the server.
+            if (e.isTeleport || System.currentTimeMillis() - player.teleportTime < 3000L || player.currentTick < 40) {
                 data.drift = 50 * MULTIPLIER;
                 return;
             }

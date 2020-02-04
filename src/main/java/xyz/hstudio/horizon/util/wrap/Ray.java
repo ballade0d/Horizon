@@ -15,9 +15,9 @@ public class Ray implements Cloneable {
     }
 
     public Vector3D getPointAtDistance(final double distance) {
-        Vector3D dir = new Vector3D(direction.x, direction.y, direction.z);
-        Vector3D orig = new Vector3D(origin.x, origin.y, origin.z);
-        return orig.add(dir.multiply(distance));
+        Vector3D direction = this.direction.clone();
+        Vector3D origin = this.origin.clone();
+        return origin.add(direction.multiply(distance));
     }
 
     public Ray clone() {

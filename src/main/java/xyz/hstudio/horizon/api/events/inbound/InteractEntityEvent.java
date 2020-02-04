@@ -1,13 +1,12 @@
-package xyz.hstudio.horizon.network.events.inbound;
+package xyz.hstudio.horizon.api.events.inbound;
 
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import xyz.hstudio.horizon.api.events.Event;
 import xyz.hstudio.horizon.compat.McAccessor;
 import xyz.hstudio.horizon.data.HoriPlayer;
-import xyz.hstudio.horizon.network.events.Event;
-import xyz.hstudio.horizon.network.events.WrappedPacket;
 import xyz.hstudio.horizon.util.enums.Hand;
 
 public class InteractEntityEvent extends Event {
@@ -16,8 +15,8 @@ public class InteractEntityEvent extends Event {
     public final Entity entity;
     public final Hand hand;
 
-    public InteractEntityEvent(final HoriPlayer player, final InteractType action, final Entity entity, final Hand hand, final WrappedPacket packet) {
-        super(player, packet);
+    public InteractEntityEvent(final HoriPlayer player, final InteractType action, final Entity entity, final Hand hand) {
+        super(player);
         this.action = action;
         this.entity = entity;
         this.hand = hand;

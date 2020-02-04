@@ -2,13 +2,13 @@ package xyz.hstudio.horizon.module.checks;
 
 import org.bukkit.block.Block;
 import xyz.hstudio.horizon.api.ModuleType;
+import xyz.hstudio.horizon.api.events.Event;
+import xyz.hstudio.horizon.api.events.inbound.BlockPlaceEvent;
+import xyz.hstudio.horizon.api.events.inbound.MoveEvent;
 import xyz.hstudio.horizon.config.checks.ScaffoldConfig;
 import xyz.hstudio.horizon.data.HoriPlayer;
 import xyz.hstudio.horizon.data.checks.ScaffoldData;
 import xyz.hstudio.horizon.module.Module;
-import xyz.hstudio.horizon.network.events.Event;
-import xyz.hstudio.horizon.network.events.inbound.BlockPlaceEvent;
-import xyz.hstudio.horizon.network.events.inbound.MoveEvent;
 import xyz.hstudio.horizon.util.wrap.Vector3D;
 
 import java.util.stream.DoubleStream;

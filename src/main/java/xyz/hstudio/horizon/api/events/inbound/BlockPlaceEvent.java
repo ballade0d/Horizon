@@ -1,10 +1,9 @@
-package xyz.hstudio.horizon.network.events.inbound;
+package xyz.hstudio.horizon.api.events.inbound;
 
 import lombok.Getter;
 import org.bukkit.Material;
+import xyz.hstudio.horizon.api.events.Event;
 import xyz.hstudio.horizon.data.HoriPlayer;
-import xyz.hstudio.horizon.network.events.Event;
-import xyz.hstudio.horizon.network.events.WrappedPacket;
 import xyz.hstudio.horizon.util.wrap.ClientBlock;
 import xyz.hstudio.horizon.util.wrap.Location;
 import xyz.hstudio.horizon.util.wrap.Vector3D;
@@ -17,8 +16,8 @@ public class BlockPlaceEvent extends Event {
     public final Vector3D interaction;
     public final PlaceType placeType;
 
-    public BlockPlaceEvent(final HoriPlayer player, final Location placed, final BlockFace face, final Material material, final Vector3D interaction, final PlaceType placeType, final WrappedPacket packet) {
-        super(player, packet);
+    public BlockPlaceEvent(final HoriPlayer player, final Location placed, final BlockFace face, final Material material, final Vector3D interaction, final PlaceType placeType) {
+        super(player);
         this.placed = placed;
         this.face = face;
         this.material = material;

@@ -1,12 +1,11 @@
-package xyz.hstudio.horizon.network.events.inbound;
+package xyz.hstudio.horizon.api.events.inbound;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import xyz.hstudio.horizon.api.events.Event;
 import xyz.hstudio.horizon.compat.McAccessor;
 import xyz.hstudio.horizon.data.HoriPlayer;
-import xyz.hstudio.horizon.network.events.Event;
-import xyz.hstudio.horizon.network.events.WrappedPacket;
 import xyz.hstudio.horizon.util.BlockUtils;
 import xyz.hstudio.horizon.util.MathUtils;
 import xyz.hstudio.horizon.util.collect.Pair;
@@ -47,8 +46,8 @@ public class MoveEvent extends Event {
     public boolean onGround;
     public boolean isTeleport;
 
-    public MoveEvent(final HoriPlayer player, final Location to, final boolean onGround, final boolean updatePos, final boolean updateRot, final MoveType moveType, final WrappedPacket packet) {
-        super(player, packet);
+    public MoveEvent(final HoriPlayer player, final Location to, final boolean onGround, final boolean updatePos, final boolean updateRot, final MoveType moveType) {
+        super(player);
         this.from = player.position;
         this.to = to;
         this.onGround = onGround;

@@ -78,6 +78,14 @@
             <systemPath>D:/Minecraft/Plugin/Cores/Spigot1.15.1.jar</systemPath>
             <scope>system</scope>
         </dependency>
+
+        <dependency>
+            <groupId>plan</groupId>
+            <artifactId>com.djrapitops</artifactId>
+            <version>5.0</version>
+            <systemPath>D:/Minecraft/Plugin/Depends/Plan-5.0-build-382.jar</systemPath>
+            <scope>system</scope>
+        </dependency>
     </dependencies>
 
     <build>

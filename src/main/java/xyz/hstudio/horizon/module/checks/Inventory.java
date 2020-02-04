@@ -1,13 +1,13 @@
 package xyz.hstudio.horizon.module.checks;
 
 import xyz.hstudio.horizon.api.ModuleType;
+import xyz.hstudio.horizon.api.events.Event;
+import xyz.hstudio.horizon.api.events.inbound.*;
+import xyz.hstudio.horizon.api.events.outbound.CloseWindowEvent;
 import xyz.hstudio.horizon.config.checks.InventoryConfig;
 import xyz.hstudio.horizon.data.HoriPlayer;
 import xyz.hstudio.horizon.data.checks.InventoryData;
 import xyz.hstudio.horizon.module.Module;
-import xyz.hstudio.horizon.network.events.Event;
-import xyz.hstudio.horizon.network.events.inbound.*;
-import xyz.hstudio.horizon.network.events.outbound.CloseWindowEvent;
 
 public class Inventory extends Module<InventoryData, InventoryConfig> {
 

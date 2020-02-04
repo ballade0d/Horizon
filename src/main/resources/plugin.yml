@@ -2,6 +2,7 @@ name: Horizon
 main: xyz.hstudio.horizon.Horizon
 version: 'BETA'
 api-version: '1.13'
+softdepend: [Plan]
 commands:
   horizon:
     aliases: [hori, hz]

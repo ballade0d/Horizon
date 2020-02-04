@@ -1,19 +1,18 @@
-package xyz.hstudio.horizon.network.events.inbound;
+package xyz.hstudio.horizon.api.events.inbound;
 
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
+import xyz.hstudio.horizon.api.events.Event;
 import xyz.hstudio.horizon.data.HoriPlayer;
-import xyz.hstudio.horizon.network.events.Event;
-import xyz.hstudio.horizon.network.events.WrappedPacket;
 
 public class InteractItemEvent extends Event {
 
     public final ItemStack itemStack;
     public final InteractType interactType;
 
-    public InteractItemEvent(final HoriPlayer player, final ItemStack itemStack, final InteractType interactType, final WrappedPacket packet) {
-        super(player, packet);
+    public InteractItemEvent(final HoriPlayer player, final ItemStack itemStack, final InteractType interactType) {
+        super(player);
         this.itemStack = itemStack;
         this.interactType = interactType;
     }

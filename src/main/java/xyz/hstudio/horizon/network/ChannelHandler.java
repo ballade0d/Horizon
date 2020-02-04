@@ -5,10 +5,10 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.ChannelPromise;
 import lombok.RequiredArgsConstructor;
+import xyz.hstudio.horizon.api.events.Event;
 import xyz.hstudio.horizon.compat.PacketConverter;
 import xyz.hstudio.horizon.data.HoriPlayer;
 import xyz.hstudio.horizon.module.Module;
-import xyz.hstudio.horizon.network.events.Event;
 
 @RequiredArgsConstructor
 public class ChannelHandler extends ChannelDuplexHandler {

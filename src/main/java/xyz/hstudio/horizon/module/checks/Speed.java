@@ -2,13 +2,13 @@ package xyz.hstudio.horizon.module.checks;
 
 import org.bukkit.Material;
 import xyz.hstudio.horizon.api.ModuleType;
+import xyz.hstudio.horizon.api.events.Event;
+import xyz.hstudio.horizon.api.events.inbound.MoveEvent;
 import xyz.hstudio.horizon.compat.McAccessor;
 import xyz.hstudio.horizon.config.checks.SpeedConfig;
 import xyz.hstudio.horizon.data.HoriPlayer;
 import xyz.hstudio.horizon.data.checks.SpeedData;
 import xyz.hstudio.horizon.module.Module;
-import xyz.hstudio.horizon.network.events.Event;
-import xyz.hstudio.horizon.network.events.inbound.MoveEvent;
 import xyz.hstudio.horizon.util.MathUtils;
 import xyz.hstudio.horizon.util.wrap.Vector3D;
 
@@ -60,6 +60,7 @@ public class Speed extends Module<SpeedData, SpeedConfig> {
 
             double discrepancy;
             if (swimming && !flying) {
+                // Water function
                 Vector3D move = e.velocity.clone().setY(0);
                 Vector3D waterForce = e.waterFlowForce.clone().setY(0).normalize().multiply(0.014);
                 double waterForceLength = waterForce.length();
@@ -68,6 +69,7 @@ public class Speed extends Module<SpeedData, SpeedConfig> {
                 estimatedSpeed = this.waterMapping(prevSpeed, computedForce,
                         player.getEnchantmentEffectAmplifier("DEPTH_STRIDER"), player.isSprinting, e.onGround);
             } else {
+                // Normal function
                 boolean jump = e.jumpLegitly || (e.stepLegitly && player.isOnGround && player.isSprinting);
 
                 float friction = e.oldFriction;

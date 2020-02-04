@@ -49,6 +49,11 @@ killaura:
     enabled: true
   typeE:
     enabled: true
+noswing:
+  enabled: true
+  debug: true
+  typeA:
+    enabled: true
 scaffold:
   enabled: true
   debug: true

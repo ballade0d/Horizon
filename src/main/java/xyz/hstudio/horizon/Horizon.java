@@ -92,6 +92,7 @@ public class Horizon extends JavaPlugin {
         new InvalidMotion();
         new Inventory();
         new KillAura();
+        new NoSwing();
         new Scaffold();
         new Speed();
         new Timer();

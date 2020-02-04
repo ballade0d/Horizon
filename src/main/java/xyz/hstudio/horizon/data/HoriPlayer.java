@@ -29,6 +29,7 @@ public class HoriPlayer {
     public final InvalidMotionData invalidMotionData = new InvalidMotionData();
     public final InventoryData inventoryData = new InventoryData();
     public final KillAuraData killAuraData = new KillAuraData();
+    public final NoSwingData noSwingData = new NoSwingData();
     public final ScaffoldData scaffoldData = new ScaffoldData();
     public final SpeedData speedData = new SpeedData();
     public final TimerData timerData = new TimerData();
