@@ -67,7 +67,11 @@ public class MoveEvent extends Event {
 
         this.waterFlowForce = this.computeWaterFlowForce();
 
-        this.isInLiquid1_8 = this.waterFlowForce.lengthSquared() > 0;
+        this.isInLiquid1_8 = AABB.waterCollisionBox
+                .add(this.to.toVector())
+                .getMaterials(to.world)
+                .stream()
+                .anyMatch(MatUtils::isLiquid);
         this.isInLiquid1_13 = AABB.collisionBox
                 .shrink(0.001, 0.001, 0.001)
                 .add(this.from.toVector())
@@ -102,7 +106,7 @@ public class MoveEvent extends Event {
         float deltaY = (float) this.velocity.y;
         float slimeExpect = (float) (-0.96F * player.prevPrevDeltaY);
         return standing.getType() == MatUtils.SLIME_BLOCK.parse() && !player.isSneaking &&
-                player.prevDeltaY <= 0 && deltaY > 0 && deltaY <= slimeExpect;
+                player.velocity.y <= 0 && deltaY > 0 && deltaY <= slimeExpect;
     }
 
     /**
@@ -118,13 +122,13 @@ public class MoveEvent extends Event {
         float deltaY = (float) this.velocity.y;
         float bedExpect = (float) (-0.62F * player.prevPrevDeltaY);
         return standing.getType().name().contains("BED") && !player.isSneaking &&
-                player.prevDeltaY <= 0 && deltaY > 0 && deltaY <= bedExpect;
+                player.velocity.y <= 0 && deltaY > 0 && deltaY <= bedExpect;
     }
 
     private Vector3D computeWaterFlowForce() {
         Vector3D finalForce = new Vector3D();
         for (Block block : AABB.waterCollisionBox.add(this.to.toVector()).getBlocks(to.world)) {
-            if (!block.getType().name().contains("WATER")) {
+            if (!MatUtils.isLiquid(block.getType())) {
                 continue;
             }
             finalForce.add(McAccessor.INSTANCE.getFlowDirection(block));
@@ -343,8 +347,7 @@ public class MoveEvent extends Event {
         player.isOnGround = this.onGround;
         player.onGroundReally = this.onGroundReally;
         player.friction = this.newFriction;
-        player.prevPrevDeltaY = player.prevDeltaY;
-        player.prevDeltaY = this.velocity.y;
+        player.prevPrevDeltaY = player.velocity.y;
         player.velocity = this.velocity;
         player.touchingFaces = this.touchingFaces;
         player.isInLiquid1_8 = this.isInLiquid1_8;

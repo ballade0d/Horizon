@@ -13,6 +13,8 @@ import xyz.hstudio.horizon.module.Module;
 import xyz.hstudio.horizon.util.MathUtils;
 import xyz.hstudio.horizon.util.enums.MatUtils;
 
+import java.util.Set;
+
 public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionConfig> {
 
     public InvalidMotion() {
@@ -60,11 +62,11 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionConfig
 
             if (!e.onGround && !e.jumpLegitly && !e.stepLegitly && !e.isTeleport && e.knockBack == null &&
                     player.getVehicle() == null && !player.isFlying() && !e.isOnSlime && !e.isOnBed &&
-                    !player.isInLiquid1_13 && !e.isInLiquid1_13) {
+                    !e.isInLiquid1_13 && !player.isInLiquid1_13) {
 
                 int levitation = player.getPotionEffectAmplifier("LEVITATION");
                 // Supports SLOW_FALLING potion effect
-                float gravity = player.getPotionEffectAmplifier("SLOW_FALLING") > 0 && player.prevDeltaY < 0 ? 0.01F : 0.08F;
+                float gravity = player.getPotionEffectAmplifier("SLOW_FALLING") > 0 && player.velocity.y < 0 ? 0.01F : 0.08F;
                 float prevEstimatedVelocity = data.estimatedVelocity;
                 float estimatedVelocity;
 
@@ -101,7 +103,7 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionConfig
                 }
 
                 // Fix the false positives when towering
-                if (!player.isOnGround && player.prevDeltaY == 0 && (MathUtils.abs(deltaY - 0.40444491418477) < 0.001 || MathUtils.abs(deltaY - 0.39557589867329) < 0.001)) {
+                if (!player.isOnGround && player.velocity.y == 0 && (MathUtils.abs(deltaY - 0.40444491418477) < 0.001 || MathUtils.abs(deltaY - 0.39557589867329) < 0.001)) {
                     deltaY = estimatedVelocity = 0.42F;
                 }
 
@@ -196,7 +198,137 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionConfig
         }
     }
 
-    private void typeD(final Event event, final HoriPlayer player, final InvalidMotionData data, final InvalidMotionConfig config) {
-        // TODO: Finish this shit
+    private void typeD_V1_8(final Event event, final HoriPlayer player, final InvalidMotionData data, final InvalidMotionConfig config) {
+        if (event instanceof MoveEvent) {
+            MoveEvent e = (MoveEvent) event;
+
+            if (!e.isInLiquid1_8 && !player.isInLiquid1_8 || e.knockBack != null) {
+                return;
+            }
+
+            float deltaY = (float) e.velocity.y;
+            float prevDeltaY = (float) player.velocity.y;
+            // TODO: Handle Lava (0.8F = water, 0.5F = lava)
+            float multiplier = prevDeltaY * 0.8F;
+
+            float estimatedY;
+
+            if (!e.isInLiquid1_8) {
+                estimatedY = multiplier - 0.02F + 0.04F;
+            } else if (!player.isInLiquid1_8) {
+                // TODO: Replace 0.08F with gravity
+                estimatedY = (prevDeltaY - 0.08F) * 0.98F;
+                data.waterMagic1_8 = true;
+            } else if (data.waterMagic1_8) {
+                float estimation1 = (prevDeltaY - 0.08F) * 0.98F;
+                float estimation2 = prevDeltaY * 0.98F - 0.0384F;
+                estimatedY = MathUtils.abs(deltaY - estimation1) < MathUtils.abs(deltaY - estimation2) ?
+                        estimation1 : estimation2;
+                data.waterMagic1_8 = false;
+            } else if (e.onGround) {
+                estimatedY = deltaY;
+            } else {
+                float estimation1 = multiplier - 0.02F + 0.04F;
+                estimation1 = MathUtils.abs(estimation1) < 0.005 ? 0 : estimation1;
+                float estimation2 = multiplier - 0.02F;
+                estimation2 = MathUtils.abs(estimation2) < 0.005 ? 0 : estimation2;
+                estimatedY = MathUtils.abs(deltaY - estimation1) < MathUtils.abs(deltaY - estimation2) ?
+                        estimation1 : estimation2;
+            }
+            if (!e.isInLiquid1_8 && collidingHorizontally(e.touchingFaces) && e.cube.add(0, 0.6, 0).getMaterials(e.to.world).stream().noneMatch(MatUtils::isLiquid)) {
+                // Player is exiting liquid
+                float estimation1 = 0.3F;
+                float estimation2 = 0.3F + 0.04F;
+                estimatedY = MathUtils.abs(deltaY - estimation1) < MathUtils.abs(deltaY - estimation2) ?
+                        estimation1 : estimation2;
+            }
+
+            double discrepancy = deltaY - estimatedY;
+
+            if (MathUtils.abs(discrepancy) > 0.01F) {
+                this.debug("Failed: TypeD, d:" + deltaY + ", e:" + estimatedY + ", d:" + discrepancy + ", p:" + prevDeltaY);
+
+                // Punish
+                this.punish(player, data, "TypeD", 3);
+            } else {
+                reward("TypeD", data, 0.99);
+            }
+        }
+    }
+
+    private void typeD_V1_13(final Event event, final HoriPlayer player, final InvalidMotionData data, final InvalidMotionConfig config) {
+        if (event instanceof MoveEvent) {
+            MoveEvent e = (MoveEvent) event;
+
+            if (!e.isInLiquid1_13 && !player.isInLiquid1_13 || e.knockBack != null) {
+                return;
+            }
+
+            float deltaY = (float) e.velocity.y;
+            float prevDeltaY = (float) player.velocity.y;
+            // TODO: Handle Lava (0.8F = water, 0.5F = lava)
+            // TODO: Handle Sneaking in water.
+            float multiplier = prevDeltaY * 0.8F;
+
+            this.debug("d:" + deltaY + ", p:" + prevDeltaY + ", inL:" + e.isInLiquid1_13 + ", wL:" + player.isInLiquid1_13);
+
+            float estimatedY;
+
+            if (!e.isInLiquid1_13) {
+                float estimation1 = multiplier - 0.005F;
+                float estimation2 = (prevDeltaY - 0.08F) * 0.98F;
+                estimatedY = MathUtils.abs(deltaY - estimation1) < MathUtils.abs(deltaY - estimation2) ?
+                        estimation1 : estimation2;
+            } else if (!player.isInLiquid1_13) {
+                // TODO: Replace 0.08F with gravity
+                float estimation1 = (prevDeltaY - 0.08F) * 0.98F;
+                float estimation2 = prevDeltaY * 0.98F - 0.0384F;
+                estimatedY = MathUtils.abs(deltaY - estimation1) < MathUtils.abs(deltaY - estimation2) ?
+                        estimation1 : estimation2;
+                data.waterMagic1_13 = true;
+            } else if (data.waterMagic1_13) {
+                //float estimation1 = prevDeltaY * 0.8F - 0.005F;
+                //float estimation2 = prevDeltaY * 0.98F - 0.0384F;
+                //estimatedY = MathUtils.abs(deltaY - estimation1) < MathUtils.abs(deltaY - estimation2) ?
+                //        estimation1 : estimation2;
+                //data.waterMagic1_13 = false;
+                estimatedY = deltaY;
+                data.waterMagic1_13 = false;
+            } else if (e.onGround) {
+                estimatedY = deltaY;
+            } else {
+                // TODO: Fix false positive when standing still in water.
+                float estimation1 = multiplier - 0.005F + 0.04F;
+                estimation1 = MathUtils.abs(estimation1) < 0.005 ? 0 : estimation1;
+                float estimation2 = multiplier - 0.005F;
+                estimation2 = MathUtils.abs(estimation2) < 0.005 ? 0 : estimation2;
+                estimatedY = MathUtils.abs(deltaY - estimation1) < MathUtils.abs(deltaY - estimation2) ?
+                        estimation1 : estimation2;
+            }
+            if (!e.isInLiquid1_13 && collidingHorizontally(e.touchingFaces) && e.cube.add(0, 0.6, 0).getMaterials(e.to.world).stream().noneMatch(MatUtils::isLiquid)) {
+                // Player is exiting liquid
+                // TODO: This broken in 1.13, fix this.
+                float estimation1 = 0.3F;
+                float estimation2 = 0.3F + 0.04F;
+                estimatedY = MathUtils.abs(deltaY - estimation1) < MathUtils.abs(deltaY - estimation2) ?
+                        estimation1 : estimation2;
+            }
+
+            double discrepancy = deltaY - estimatedY;
+
+            if (MathUtils.abs(discrepancy) > 0.01F) {
+                this.debug("Failed: TypeD, d:" + deltaY + ", e:" + estimatedY + ", d:" + discrepancy + ", p:" + prevDeltaY);
+
+                // Punish
+                this.punish(player, data, "TypeD", 3);
+            } else {
+                reward("TypeD", data, 0.99);
+            }
+        }
+    }
+
+    private boolean collidingHorizontally(final Set<BlockFace> touchingFaces) {
+        return touchingFaces.contains(BlockFace.NORTH) || touchingFaces.contains(BlockFace.SOUTH) ||
+                touchingFaces.contains(BlockFace.WEST) || touchingFaces.contains(BlockFace.EAST);
     }
 }

@@ -56,15 +56,15 @@ public class Inventory extends Module<InventoryData, InventoryConfig> {
             data.inventoryOpened = false;
         } else if (event instanceof MoveEvent) {
             MoveEvent e = (MoveEvent) event;
-            if (!data.inventoryOpened || e.isTeleport || (!e.hasDeltaPos() && !e.hasDeltaRot()) || (!e.updatePos && !e.updateRot)) {
+            if (!data.inventoryOpened || e.isTeleport || (!e.updatePos && !e.updateRot)) {
                 return;
             }
 
             // Client still sends rotation/position packet after 1~3 tick player open inventory
             // if player open inventory while moving/rotating
 
-            // Allowing 22 ticks to avoid false positives
-            if (player.currentTick - data.inventoryOpenTick < 22) {
+            // Allowing 21 ticks to avoid false positives
+            if (player.currentTick - data.inventoryOpenTick < 21) {
                 return;
             }
 
@@ -79,7 +79,7 @@ public class Inventory extends Module<InventoryData, InventoryConfig> {
 
             // TODO: Ignore if moving in water
             // TODO: Ignore if colliding entities
-            if (config.typeA_checkPosition && e.hasDeltaPos()) {
+            if (config.typeA_checkPosition && e.hasDeltaPos() && e.velocity.length() > 0.1) {
                 if (e.knockBack != null) {
                     data.temporarilyBypass = true;
                 } else if (e.onGround) {

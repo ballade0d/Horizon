@@ -39,7 +39,6 @@ public class HoriPlayer {
     public Location position;
     public int heldSlot;
     public float friction;
-    public double prevDeltaY;
     public double prevPrevDeltaY;
     public Vector3D velocity = new Vector3D(0, 0, 0);
     public List<Pair<Vector3D, Long>> velocities = new LinkedList<>();

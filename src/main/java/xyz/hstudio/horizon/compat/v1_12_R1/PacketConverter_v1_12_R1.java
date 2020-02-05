@@ -50,6 +50,8 @@ public class PacketConverter_v1_12_R1 implements IPacketConverter {
             return convertClientCommandEvent(player, (PacketPlayInClientCommand) packet);
         } else if (packet instanceof PacketPlayInAbilities) {
             return convertAbilitiesEvent(player, (PacketPlayInAbilities) packet);
+        } else if (packet instanceof PacketPlayInCustomPayload) {
+            return convertCustomPayloadEvent(player, (PacketPlayInCustomPayload) packet);
         }
         return null;
     }
@@ -242,6 +244,10 @@ public class PacketConverter_v1_12_R1 implements IPacketConverter {
 
     private Event convertAbilitiesEvent(final HoriPlayer player, final PacketPlayInAbilities packet) {
         return new AbilitiesEvent(player, packet.isFlying());
+    }
+
+    private Event convertCustomPayloadEvent(final HoriPlayer player, final PacketPlayInCustomPayload packet) {
+        return new CustomPayloadEvent(player, packet.a(), packet.b().readableBytes());
     }
 
     @Override
