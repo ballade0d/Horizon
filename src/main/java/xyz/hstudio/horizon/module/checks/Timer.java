@@ -7,6 +7,7 @@ import xyz.hstudio.horizon.config.checks.TimerConfig;
 import xyz.hstudio.horizon.data.HoriPlayer;
 import xyz.hstudio.horizon.data.checks.TimerData;
 import xyz.hstudio.horizon.module.Module;
+import xyz.hstudio.horizon.thread.Sync;
 
 public class Timer extends Module<TimerData, TimerConfig> {
 
@@ -19,6 +20,12 @@ public class Timer extends Module<TimerData, TimerConfig> {
     @Override
     public TimerData getData(final HoriPlayer player) {
         return player.timerData;
+    }
+
+    @Override
+    public void cancel(final Event event, final String type, final HoriPlayer player, final TimerData data, final TimerConfig config) {
+        event.setCancelled(true);
+        Sync.teleport(player, player.position);
     }
 
     @Override
@@ -46,8 +53,8 @@ public class Timer extends Module<TimerData, TimerConfig> {
 
             // Skip if player is teleporting.
             // Ignore the first 2 second joining the server.
-            if (e.isTeleport || System.currentTimeMillis() - player.teleportTime < 3000L || player.currentTick < 40) {
-                data.drift = 50 * MULTIPLIER;
+            if (e.isTeleport || System.currentTimeMillis() - player.teleportTime < 1000L || player.currentTick < 40) {
+                data.drift = 0L;
                 return;
             }
 
@@ -66,7 +73,7 @@ public class Timer extends Module<TimerData, TimerConfig> {
                 this.debug("Failed: TypeA, d:" + diff + ", s:" + (-diff / 50));
 
                 // Punish
-                this.punish(player, data, "TypeA", -diff / 50 * 3);
+                this.punish(event, player, data, "TypeA", (float) (-diff / 50 * 3));
 
                 // Reset drift to -45 to stop spam-flagging.
                 drift = -45 * MULTIPLIER;

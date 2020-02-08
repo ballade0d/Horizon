@@ -9,6 +9,7 @@ import xyz.hstudio.horizon.config.checks.SpeedConfig;
 import xyz.hstudio.horizon.data.HoriPlayer;
 import xyz.hstudio.horizon.data.checks.SpeedData;
 import xyz.hstudio.horizon.module.Module;
+import xyz.hstudio.horizon.thread.Sync;
 import xyz.hstudio.horizon.util.MathUtils;
 import xyz.hstudio.horizon.util.wrap.Vector3D;
 
@@ -23,6 +24,12 @@ public class Speed extends Module<SpeedData, SpeedConfig> {
     @Override
     public SpeedData getData(final HoriPlayer player) {
         return player.speedData;
+    }
+
+    @Override
+    public void cancel(final Event event, final String type, final HoriPlayer player, final SpeedData data, final SpeedConfig config) {
+        event.setCancelled(true);
+        Sync.teleport(player, player.position);
     }
 
     @Override
@@ -44,21 +51,22 @@ public class Speed extends Module<SpeedData, SpeedConfig> {
         if (event instanceof MoveEvent) {
             MoveEvent e = (MoveEvent) event;
 
+            // TODO: Handle Speed Attribute
+
             double prevSpeed = data.prevSpeed;
             double speed = e.updatePos ? MathUtils.distance2d(e.to.x - e.from.x, e.to.z - e.from.z) : 0;
 
-            if (e.knockBack != null) {
+            if (e.isTeleport || e.knockBack != null) {
                 data.prevSpeed = speed;
                 return;
             }
 
             boolean flying = player.isFlying();
-            // TODO: Swim Handler
-            boolean swimming = player.isInLiquid1_8;
+            boolean swimming = player.isInLiquid;
 
             double estimatedSpeed;
-
             double discrepancy;
+
             if (swimming && !flying) {
                 // Water function
                 Vector3D move = e.velocity.clone().setY(0);
@@ -108,7 +116,7 @@ public class Speed extends Module<SpeedData, SpeedConfig> {
                     this.debug("Failed: TypeA, s:" + speed + ", e:" + estimatedSpeed + ", p:" + prevSpeed + ", d:" + discrepancy);
 
                     // Punish
-                    this.punish(player, data, "TypeA", totalDiscrepancy * 10);
+                    this.punish(event, player, data, "TypeA", (float) (totalDiscrepancy * 10));
                     data.discrepancies = 0;
                 } else {
                     reward("TypeA", data, 0.99);

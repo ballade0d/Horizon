@@ -1,6 +1,7 @@
 badpacket:
   enabled: true
   debug: true
+  cancel_vl: 0
   typeA:
     enabled: true
   typeB:
@@ -8,17 +9,20 @@ badpacket:
 groundspoof:
   enabled: true
   debug: true
+  cancel_vl: 0
   typeA:
     enabled: true
 hitbox:
   enabled: true
   debug: true
+  cancel_vl: 1
   typeA:
     enabled: true
     max_reach: 3.1
 invalidmotion:
   enabled: true
   debug: true
+  cancel_vl: 1
   typeA:
     enabled: true
     tolerance: 0.001
@@ -30,6 +34,7 @@ invalidmotion:
 inventory:
   enabled: true
   debug: true
+  cancel_vl: 0
   typeA:
     enabled: true
     checkRotation: true
@@ -39,6 +44,7 @@ inventory:
 killaura:
   enabled: true
   debug: true
+  cancel_vl: 0
   typeA:
     enabled: true
   typeB:
@@ -52,11 +58,13 @@ killaura:
 noswing:
   enabled: true
   debug: true
+  cancel_vl: 0
   typeA:
     enabled: true
 scaffold:
   enabled: true
   debug: true
+  cancel_vl: 0
   typeA:
     enabled: true
   typeB:
@@ -69,12 +77,14 @@ scaffold:
 speed:
   enabled: true
   debug: true
+  cancel_vl: 1
   typeA:
     enabled: true
     tolerance: 0.08
 timer:
   enabled: true
   debug: true
+  cancel_vl: 1
   typeA:
     enabled: true
     allow_ms: 50

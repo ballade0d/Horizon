@@ -8,16 +8,19 @@ import xyz.hstudio.horizon.api.events.Event;
 import xyz.hstudio.horizon.compat.McAccessor;
 import xyz.hstudio.horizon.data.HoriPlayer;
 import xyz.hstudio.horizon.util.enums.Hand;
+import xyz.hstudio.horizon.util.wrap.Vector3D;
 
 public class InteractEntityEvent extends Event {
 
     public final InteractType action;
+    public final Vector3D intersection;
     public final Entity entity;
     public final Hand hand;
 
-    public InteractEntityEvent(final HoriPlayer player, final InteractType action, final Entity entity, final Hand hand) {
+    public InteractEntityEvent(final HoriPlayer player, final InteractType action, final Vector3D intersection, final Entity entity, final Hand hand) {
         super(player);
         this.action = action;
+        this.intersection = intersection;
         this.entity = entity;
         this.hand = hand;
     }

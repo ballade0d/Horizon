@@ -31,6 +31,11 @@ public class HitBox extends Module<HitBoxData, HitBoxConfig> {
     }
 
     @Override
+    public void cancel(final Event event, final String type, final HoriPlayer player, final HitBoxData data, final HitBoxConfig config) {
+        event.setCancelled(true);
+    }
+
+    @Override
     public void doCheck(final Event event, final HoriPlayer player, final HitBoxData data, final HitBoxConfig config) {
         if (config.typeA_enabled) {
             typeA(event, player, data, config);
@@ -87,7 +92,7 @@ public class HitBox extends Module<HitBoxData, HitBoxConfig> {
                 this.debug("Failed: TypeA, r:" + reach);
 
                 // Punish
-                this.punish(player, data, "TypeA", (reach - config.typeA_max_reach) * 10);
+                this.punish(event, player, data, "TypeA", (float) ((reach - config.typeA_max_reach) * 10));
             } else {
                 reward("TypeA", data, 0.995);
             }

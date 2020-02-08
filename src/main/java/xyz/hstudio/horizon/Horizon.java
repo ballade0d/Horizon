@@ -1,17 +1,18 @@
 package xyz.hstudio.horizon;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
-import xyz.hstudio.horizon.config.ConfigFile;
+import xyz.hstudio.horizon.config.DefaultConfig;
 import xyz.hstudio.horizon.data.HoriPlayer;
 import xyz.hstudio.horizon.kirin.Kirin;
 import xyz.hstudio.horizon.listener.Listeners;
-import xyz.hstudio.horizon.module.checks.Timer;
 import xyz.hstudio.horizon.module.checks.*;
 import xyz.hstudio.horizon.network.ChannelHandler;
 import xyz.hstudio.horizon.thread.Async;
+import xyz.hstudio.horizon.thread.Sync;
 import xyz.hstudio.horizon.util.JsonUtils;
 import xyz.hstudio.horizon.util.enums.Version;
 import xyz.hstudio.horizon.util.wrap.YamlLoader;
@@ -19,7 +20,10 @@ import xyz.hstudio.horizon.util.wrap.YamlLoader;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -33,9 +37,9 @@ public class Horizon extends JavaPlugin {
     private static Horizon inst;
 
     public final Map<String, YamlLoader> configMap = new ConcurrentHashMap<>();
-    public List<String> announcements = new ArrayList<>();
+    public JSONArray announcements = new JSONArray();
     public Set<String> aliases = new HashSet<>();
-    public ConfigFile config;
+    public DefaultConfig config;
 
     public Horizon() {
         Horizon.inst = this;
@@ -68,7 +72,7 @@ public class Horizon extends JavaPlugin {
         }
         YamlLoader configYaml = YamlLoader.loadConfiguration(configFile);
         this.configMap.put("config.yml", configYaml);
-        this.config = new ConfigFile().load();
+        this.config = new DefaultConfig().load();
 
         if (this.config.kirin_enabled) {
             try {
@@ -83,6 +87,7 @@ public class Horizon extends JavaPlugin {
         Thread thread = new Thread(new Async(), "Horizon Processing Thread");
         thread.setDaemon(true);
         thread.start();
+        Bukkit.getScheduler().runTaskTimer(this, new Sync(), 1L, 1L);
         new Listeners();
 
         // Enable checks
@@ -108,7 +113,7 @@ public class Horizon extends JavaPlugin {
         Runnable command = () -> {
             try {
                 JSONObject object = JsonUtils.readAsObject(new URL("https://horizon.hstudio.xyz/horizon/announcement.json"));
-                this.announcements = object.getJSONArray("messages").toJavaList(String.class);
+                this.announcements = object.getJSONArray("messages");
                 Logger.msg("Annc", "Horizon Announcement");
                 this.announcements.forEach(s -> Logger.msg("Annc", s));
             } catch (Exception ignore) {

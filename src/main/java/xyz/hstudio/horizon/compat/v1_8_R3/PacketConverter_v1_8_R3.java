@@ -204,11 +204,18 @@ public class PacketConverter_v1_8_R3 implements IPacketConverter {
         if (entity == null) {
             return null;
         }
+        Vec3D vec3D = packet.b();
+        Vector3D intersection;
+        if (vec3D == null) {
+            intersection = null;
+        } else {
+            intersection = new Vector3D(vec3D.a, vec3D.b, vec3D.c);
+        }
         InteractEntityEvent.InteractType action =
                 packet.a() == PacketPlayInUseEntity.EnumEntityUseAction.ATTACK ?
                         InteractEntityEvent.InteractType.ATTACK :
                         InteractEntityEvent.InteractType.INTERACT;
-        return new InteractEntityEvent(player, action, entity.getBukkitEntity(), Hand.MAIN_HAND);
+        return new InteractEntityEvent(player, action, intersection, entity.getBukkitEntity(), Hand.MAIN_HAND);
     }
 
     private Event convertHeldItemEvent(final HoriPlayer player, final PacketPlayInHeldItemSlot packet) {

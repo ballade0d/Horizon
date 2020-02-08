@@ -15,6 +15,7 @@ public class Kirin {
     private final String licence;
 
     public Kirin(final String licence) throws Exception {
+        this.licence = licence;
         NioEventLoopGroup boss = new NioEventLoopGroup(1);
         Bootstrap client = new Bootstrap();
         client.group(boss).channel(NioSocketChannel.class).handler(new ChannelInitializer<SocketChannel>() {
@@ -28,7 +29,6 @@ public class Kirin {
         ChannelFuture future = client.connect("49.235.221.123", 8888).sync();
         future.channel().closeFuture().sync();
         boss.shutdownGracefully();
-        this.licence = licence;
     }
 
     private class SSLHandler extends ChannelDuplexHandler {
@@ -48,7 +48,7 @@ public class Kirin {
         @Override
         public void write(final ChannelHandlerContext ctx, final Object msg, final ChannelPromise promise) throws Exception {
             if (receivedPublicKey) {
-                super.write(ctx, AES.encrypt((String) msg, clientKey), promise);
+                super.write(ctx, Unpooled.wrappedBuffer(AES.encrypt((String) msg, clientKey)), promise);
             } else {
                 receivedPublicKey = true;
                 super.write(ctx, msg, promise);
@@ -61,7 +61,8 @@ public class Kirin {
         public void channelRead(final ChannelHandlerContext ctx, final Object msg) throws Exception {
             String info = (String) msg;
             if (info.equals("LICENCE")) {
-                ctx.writeAndFlush(licence);
+                ctx.channel().writeAndFlush(licence);
+                System.out.println("Sent Licence");
             } else if (info.equals("EXPIRED")) {
                 Logger.msg("Kirin", "Your licence is expired! Please contact the author to renew your licence.");
             } else if (info.equals("FAILED")) {

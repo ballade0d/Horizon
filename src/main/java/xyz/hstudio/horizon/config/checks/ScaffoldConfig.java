@@ -1,9 +1,10 @@
 package xyz.hstudio.horizon.config.checks;
 
-import xyz.hstudio.horizon.config.Config;
+import xyz.hstudio.horizon.api.ModuleType;
+import xyz.hstudio.horizon.config.CheckConfig;
 import xyz.hstudio.horizon.config.annotation.Load;
 
-public class ScaffoldConfig extends Config {
+public class ScaffoldConfig extends CheckConfig<ScaffoldConfig> {
 
     // TypeA
     @Load(file = "check.yml", path = "typeA.enabled")
@@ -19,4 +20,9 @@ public class ScaffoldConfig extends Config {
     // TypeD
     @Load(file = "check.yml", path = "typeD.enabled")
     public boolean typeD_enabled = true;
+
+    @Override
+    public ScaffoldConfig load() {
+        return super.load(ModuleType.Scaffold.name(), this);
+    }
 }

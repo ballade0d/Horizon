@@ -1,9 +1,10 @@
 package xyz.hstudio.horizon.config.checks;
 
-import xyz.hstudio.horizon.config.Config;
+import xyz.hstudio.horizon.api.ModuleType;
+import xyz.hstudio.horizon.config.CheckConfig;
 import xyz.hstudio.horizon.config.annotation.Load;
 
-public class BadPacketConfig extends Config {
+public class BadPacketConfig extends CheckConfig<BadPacketConfig> {
 
     // TypeA
     @Load(file = "check.yml", path = "typeA.enabled")
@@ -14,4 +15,9 @@ public class BadPacketConfig extends Config {
     // TypeB
     @Load(file = "check.yml", path = "typeC.enabled")
     public boolean typeC_enabled = true;
+
+    @Override
+    public BadPacketConfig load() {
+        return super.load(ModuleType.BadPacket.name(), this);
+    }
 }

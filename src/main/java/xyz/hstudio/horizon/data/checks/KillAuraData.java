@@ -1,6 +1,7 @@
 package xyz.hstudio.horizon.data.checks;
 
 import xyz.hstudio.horizon.data.Data;
+import xyz.hstudio.horizon.util.wrap.Vector3D;
 
 public class KillAuraData extends Data {
 
@@ -16,4 +17,6 @@ public class KillAuraData extends Data {
     public int gcdFails;
     // TypeD
     public long lastHitTick = -10000;
+    // TypeF
+    public Vector3D intersection;
 }

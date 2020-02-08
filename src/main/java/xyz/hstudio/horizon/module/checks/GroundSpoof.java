@@ -21,6 +21,11 @@ public class GroundSpoof extends Module<GroundSpoofData, GroundSpoofConfig> {
     }
 
     @Override
+    public void cancel(final Event event, final String type, final HoriPlayer player, final GroundSpoofData data, final GroundSpoofConfig config) {
+        // TODO: Modify packet
+    }
+
+    @Override
     public void doCheck(Event event, HoriPlayer player, GroundSpoofData data, GroundSpoofConfig config) {
         if (config.typeA_enabled) {
             typeA(event, player, data, config);
@@ -58,7 +63,7 @@ public class GroundSpoof extends Module<GroundSpoofData, GroundSpoofConfig> {
                 this.debug("Failed: TypeA");
 
                 // Punish
-                this.punish(player, data, "TypeA", 4);
+                this.punish(event, player, data, "TypeA", 4);
             } else {
                 reward("TypeA", data, 0.999);
             }

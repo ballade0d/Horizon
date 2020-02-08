@@ -25,6 +25,11 @@ public class Scaffold extends Module<ScaffoldData, ScaffoldConfig> {
     }
 
     @Override
+    public void cancel(final Event event, final String type, final HoriPlayer player, final ScaffoldData data, final ScaffoldConfig config) {
+        // TODO: Finish this
+    }
+
+    @Override
     public void doCheck(final Event event, final HoriPlayer player, final ScaffoldData data, final ScaffoldConfig config) {
         if (config.typeA_enabled) {
             typeA(event, player, data, config);
@@ -62,18 +67,18 @@ public class Scaffold extends Module<ScaffoldData, ScaffoldConfig> {
                 this.debug("Failed: TypeA");
 
                 // Punish
-                this.punish(player, data, "TypeA", 5);
+                this.punish(event, player, data, "TypeA", 5);
             } else if (DoubleStream.of(interaction.x, interaction.y, interaction.z)
                     .anyMatch(d -> d > 1 || d < 0)) {
                 this.debug("Failed: TypeA, i:" + interaction.toString());
 
                 // Punish
-                this.punish(player, data, "TypeA", 5);
+                this.punish(event, player, data, "TypeA", 5);
             } else if (b != null && b.getType().name().contains("AIR")) {
                 this.debug("Failed: TypeA");
 
                 // Punish
-                this.punish(player, data, "TypeA", 5);
+                this.punish(event, player, data, "TypeA", 5);
             } else {
                 reward("TypeA", data, 0.999);
             }
@@ -99,7 +104,7 @@ public class Scaffold extends Module<ScaffoldData, ScaffoldConfig> {
                 this.debug("Failed: TypeB, a:" + angle);
 
                 // Punish
-                this.punish(player, data, "TypeB", 4);
+                this.punish(event, player, data, "TypeB", 4);
             } else {
                 reward("TypeB", data, 0.999);
             }
@@ -134,7 +139,7 @@ public class Scaffold extends Module<ScaffoldData, ScaffoldConfig> {
                 this.debug("Failed: TypeC, d:" + deltaT);
 
                 // Punish
-                this.punish(player, data, "TypeC", 4);
+                this.punish(event, player, data, "TypeC", 4);
             }
         } else if (event instanceof MoveEvent) {
             long now = System.currentTimeMillis();
@@ -157,12 +162,11 @@ public class Scaffold extends Module<ScaffoldData, ScaffoldConfig> {
             if (player.currentTick - data.lastPlaceTick > 6 || e.isTeleport) {
                 return;
             }
-            // TODO: Add a threshold
             if (!e.strafeNormally) {
                 this.debug("Failed: TypeD");
 
                 // Punish
-                this.punish(player, data, "TypeD", 4);
+                this.punish(event, player, data, "TypeD", 4);
             } else {
                 reward("TypeD", data, 0.999);
             }

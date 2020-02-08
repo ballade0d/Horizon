@@ -8,6 +8,7 @@ import xyz.hstudio.horizon.config.checks.InventoryConfig;
 import xyz.hstudio.horizon.data.HoriPlayer;
 import xyz.hstudio.horizon.data.checks.InventoryData;
 import xyz.hstudio.horizon.module.Module;
+import xyz.hstudio.horizon.thread.Sync;
 
 public class Inventory extends Module<InventoryData, InventoryConfig> {
 
@@ -18,6 +19,16 @@ public class Inventory extends Module<InventoryData, InventoryConfig> {
     @Override
     public InventoryData getData(final HoriPlayer player) {
         return player.inventoryData;
+    }
+
+    @Override
+    public void cancel(final Event event, final String type, final HoriPlayer player, final InventoryData data, final InventoryConfig config) {
+        if (event instanceof MoveEvent) {
+            event.setCancelled(true);
+            Sync.teleport(player, data.legitLocation);
+        } else if (event instanceof InteractEntityEvent) {
+            event.setCancelled(true);
+        }
     }
 
     @Override
@@ -41,13 +52,15 @@ public class Inventory extends Module<InventoryData, InventoryConfig> {
             // In 1.8.8 or lower, client will send this packet when opening player inventory.
             // However, this won't work in 1.9+.
             if (e.command == ClientCommandEvent.ClientCommand.OPEN_INVENTORY_ACHIEVEMENT) {
-                data.inventoryOpened = true;
+                data.inventoryOpened = data.temporarilyBypass = true;
                 data.inventoryOpenTick = player.currentTick;
+                data.legitLocation = player.position;
             }
         } else if (event instanceof WindowClickEvent) {
             // Client clicked window, so there should be a window opened.
-            data.inventoryOpened = true;
+            data.inventoryOpened = data.temporarilyBypass = true;
             data.inventoryOpenTick = player.currentTick;
+            data.legitLocation = player.position;
         } else if (event instanceof WindowCloseEvent) {
             // Client closed window
             data.inventoryOpened = false;
@@ -74,12 +87,11 @@ public class Inventory extends Module<InventoryData, InventoryConfig> {
                 this.debug("Failed: TypeA, t:rot");
 
                 // Punish
-                this.punish(player, data, "TypeA", 5);
+                this.punish(event, player, data, "TypeA", 5);
             }
 
-            // TODO: Ignore if moving in water
             // TODO: Ignore if colliding entities
-            if (config.typeA_checkPosition && e.hasDeltaPos() && e.velocity.length() > 0.1) {
+            if (config.typeA_checkPosition && e.hasDeltaPos() && e.velocity.length() > 0.1 && !e.isInLiquid) {
                 if (e.knockBack != null) {
                     data.temporarilyBypass = true;
                 } else if (e.onGround) {
@@ -91,21 +103,24 @@ public class Inventory extends Module<InventoryData, InventoryConfig> {
                     this.debug("Failed: TypeA, t:pos");
 
                     // Punish
-                    this.punish(player, data, "TypeA", 5);
+                    this.punish(event, player, data, "TypeA", 5);
                 }
             }
         } else if (event instanceof ActionEvent) {
+            ActionEvent e = (ActionEvent) event;
             if (!data.inventoryOpened) {
                 return;
             }
             // Block Inventory Sprint/Sneak/Glide
-            if (config.typeA_checkAction) {
+            if (config.typeA_checkAction && (e.action == ActionEvent.Action.START_SNEAKING ||
+                    e.action == ActionEvent.Action.START_SPRINTING || e.action == ActionEvent.Action.START_GLIDING)) {
                 this.debug("Failed: TypeA, t:action");
 
                 // Punish
-                this.punish(player, data, "TypeA", 5);
+                this.punish(event, player, data, "TypeA", 5);
             }
         } else if (event instanceof InteractEntityEvent) {
+            InteractEntityEvent e = (InteractEntityEvent) event;
             if (!data.inventoryOpened) {
                 return;
             }
@@ -114,7 +129,7 @@ public class Inventory extends Module<InventoryData, InventoryConfig> {
                 this.debug("Failed: TypeA, t:hit");
 
                 // Punish
-                this.punish(player, data, "TypeA", 5);
+                this.punish(event, player, data, "TypeA", 5);
             }
         }
     }

@@ -1,9 +1,10 @@
 package xyz.hstudio.horizon.config.checks;
 
-import xyz.hstudio.horizon.config.Config;
+import xyz.hstudio.horizon.api.ModuleType;
+import xyz.hstudio.horizon.config.CheckConfig;
 import xyz.hstudio.horizon.config.annotation.Load;
 
-public class KillAuraConfig extends Config {
+public class KillAuraConfig extends CheckConfig<KillAuraConfig> {
 
     // TypeA
     @Load(file = "check.yml", path = "typeA.enabled")
@@ -20,7 +21,9 @@ public class KillAuraConfig extends Config {
     // TypeE
     @Load(file = "check.yml", path = "typeE.enabled")
     public boolean typeE_enabled = true;
-    // TypeF
-    @Load(file = "check.yml", path = "typeF.enabled")
-    public boolean typeF_enabled = true;
+
+    @Override
+    public KillAuraConfig load() {
+        return super.load(ModuleType.KillAura.name(), this);
+    }
 }

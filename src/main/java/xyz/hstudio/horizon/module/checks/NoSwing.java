@@ -21,6 +21,11 @@ public class NoSwing extends Module<NoSwingData, NoSwingConfig> {
     }
 
     @Override
+    public void cancel(final Event event, final String type, final HoriPlayer player, final NoSwingData data, final NoSwingConfig config) {
+        event.setCancelled(true);
+    }
+
+    @Override
     public void doCheck(final Event event, final HoriPlayer player, final NoSwingData data, final NoSwingConfig config) {
         if (config.typeA_enabled) {
             typeA(event, player, data, config);
@@ -39,7 +44,7 @@ public class NoSwing extends Module<NoSwingData, NoSwingConfig> {
                 this.debug("Failed: TypeA");
 
                 // Punish
-                this.punish(player, data, "TypeA", 6);
+                this.punish(event, player, data, "TypeA", 6);
             } else {
                 reward("TypeA", data, 0.999);
             }

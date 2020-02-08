@@ -10,10 +10,9 @@ import xyz.hstudio.horizon.config.checks.InvalidMotionConfig;
 import xyz.hstudio.horizon.data.HoriPlayer;
 import xyz.hstudio.horizon.data.checks.InvalidMotionData;
 import xyz.hstudio.horizon.module.Module;
+import xyz.hstudio.horizon.thread.Sync;
 import xyz.hstudio.horizon.util.MathUtils;
 import xyz.hstudio.horizon.util.enums.MatUtils;
-
-import java.util.Set;
 
 public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionConfig> {
 
@@ -24,6 +23,12 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionConfig
     @Override
     public InvalidMotionData getData(final HoriPlayer player) {
         return player.invalidMotionData;
+    }
+
+    @Override
+    public void cancel(final Event event, final String type, final HoriPlayer player, final InvalidMotionData data, final InvalidMotionConfig config) {
+        event.setCancelled(true);
+        Sync.teleport(player, player.position);
     }
 
     @Override
@@ -51,18 +56,22 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionConfig
         if (event instanceof MoveEvent) {
             MoveEvent e = (MoveEvent) event;
 
+            if (player.currentTick - player.lastTeleportAcceptTick < 3) {
+                data.estimatedVelocity = 0;
+                return;
+            }
+
             float deltaY = (float) e.velocity.y;
 
             // TODO: Fix Cobweb, Slime handler
-            // TODO: Fix the false positives when joining
             // TODO: Handle Vehicle
 
             // 1.8.8 Enter Water: prev * 0.8 - 0.02
             // 1.13.2 Enter Water: prev * 0.8 - 0.005
 
-            if (!e.onGround && !e.jumpLegitly && !e.stepLegitly && !e.isTeleport && e.knockBack == null &&
+            if (!e.onGround && !e.jumpLegitly && !e.stepLegitly && e.knockBack == null &&
                     player.getVehicle() == null && !player.isFlying() && !e.isOnSlime && !e.isOnBed &&
-                    !e.isInLiquid1_13 && !player.isInLiquid1_13) {
+                    !e.isInLiquid && !player.isInLiquid) {
 
                 int levitation = player.getPotionEffectAmplifier("LEVITATION");
                 // Supports SLOW_FALLING potion effect
@@ -119,7 +128,7 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionConfig
                     this.debug("Failed: TypeA, d:" + deltaY + ", e:" + estimatedVelocity + ", p:" + discrepancy);
 
                     // Punish
-                    this.punish(player, data, "TypeA", MathUtils.abs(discrepancy) * 5);
+                    this.punish(event, player, data, "TypeA", MathUtils.abs(discrepancy) * 5F);
                 } else {
                     reward("TypeA", data, 0.999);
                 }
@@ -155,7 +164,7 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionConfig
                 this.debug("Failed: TypeB, d:" + deltaY);
 
                 // Punish
-                this.punish(player, data, "TypeB", 4);
+                this.punish(event, player, data, "TypeB", 4);
             } else {
                 reward("TypeB", data, 0.99);
             }
@@ -191,144 +200,10 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionConfig
                 this.debug("Failed: TypeC, d:" + deltaY);
 
                 // Punish
-                this.punish(player, data, "TypeC", 4);
+                this.punish(event, player, data, "TypeC", 4);
             } else {
                 reward("TypeC", data, 0.99);
             }
         }
-    }
-
-    private void typeD_V1_8(final Event event, final HoriPlayer player, final InvalidMotionData data, final InvalidMotionConfig config) {
-        if (event instanceof MoveEvent) {
-            MoveEvent e = (MoveEvent) event;
-
-            if (!e.isInLiquid1_8 && !player.isInLiquid1_8 || e.knockBack != null) {
-                return;
-            }
-
-            float deltaY = (float) e.velocity.y;
-            float prevDeltaY = (float) player.velocity.y;
-            // TODO: Handle Lava (0.8F = water, 0.5F = lava)
-            float multiplier = prevDeltaY * 0.8F;
-
-            float estimatedY;
-
-            if (!e.isInLiquid1_8) {
-                estimatedY = multiplier - 0.02F + 0.04F;
-            } else if (!player.isInLiquid1_8) {
-                // TODO: Replace 0.08F with gravity
-                estimatedY = (prevDeltaY - 0.08F) * 0.98F;
-                data.waterMagic1_8 = true;
-            } else if (data.waterMagic1_8) {
-                float estimation1 = (prevDeltaY - 0.08F) * 0.98F;
-                float estimation2 = prevDeltaY * 0.98F - 0.0384F;
-                estimatedY = MathUtils.abs(deltaY - estimation1) < MathUtils.abs(deltaY - estimation2) ?
-                        estimation1 : estimation2;
-                data.waterMagic1_8 = false;
-            } else if (e.onGround) {
-                estimatedY = deltaY;
-            } else {
-                float estimation1 = multiplier - 0.02F + 0.04F;
-                estimation1 = MathUtils.abs(estimation1) < 0.005 ? 0 : estimation1;
-                float estimation2 = multiplier - 0.02F;
-                estimation2 = MathUtils.abs(estimation2) < 0.005 ? 0 : estimation2;
-                estimatedY = MathUtils.abs(deltaY - estimation1) < MathUtils.abs(deltaY - estimation2) ?
-                        estimation1 : estimation2;
-            }
-            if (!e.isInLiquid1_8 && collidingHorizontally(e.touchingFaces) && e.cube.add(0, 0.6, 0).getMaterials(e.to.world).stream().noneMatch(MatUtils::isLiquid)) {
-                // Player is exiting liquid
-                float estimation1 = 0.3F;
-                float estimation2 = 0.3F + 0.04F;
-                estimatedY = MathUtils.abs(deltaY - estimation1) < MathUtils.abs(deltaY - estimation2) ?
-                        estimation1 : estimation2;
-            }
-
-            double discrepancy = deltaY - estimatedY;
-
-            if (MathUtils.abs(discrepancy) > 0.01F) {
-                this.debug("Failed: TypeD, d:" + deltaY + ", e:" + estimatedY + ", d:" + discrepancy + ", p:" + prevDeltaY);
-
-                // Punish
-                this.punish(player, data, "TypeD", 3);
-            } else {
-                reward("TypeD", data, 0.99);
-            }
-        }
-    }
-
-    private void typeD_V1_13(final Event event, final HoriPlayer player, final InvalidMotionData data, final InvalidMotionConfig config) {
-        if (event instanceof MoveEvent) {
-            MoveEvent e = (MoveEvent) event;
-
-            if (!e.isInLiquid1_13 && !player.isInLiquid1_13 || e.knockBack != null) {
-                return;
-            }
-
-            float deltaY = (float) e.velocity.y;
-            float prevDeltaY = (float) player.velocity.y;
-            // TODO: Handle Lava (0.8F = water, 0.5F = lava)
-            // TODO: Handle Sneaking in water.
-            float multiplier = prevDeltaY * 0.8F;
-
-            this.debug("d:" + deltaY + ", p:" + prevDeltaY + ", inL:" + e.isInLiquid1_13 + ", wL:" + player.isInLiquid1_13);
-
-            float estimatedY;
-
-            if (!e.isInLiquid1_13) {
-                float estimation1 = multiplier - 0.005F;
-                float estimation2 = (prevDeltaY - 0.08F) * 0.98F;
-                estimatedY = MathUtils.abs(deltaY - estimation1) < MathUtils.abs(deltaY - estimation2) ?
-                        estimation1 : estimation2;
-            } else if (!player.isInLiquid1_13) {
-                // TODO: Replace 0.08F with gravity
-                float estimation1 = (prevDeltaY - 0.08F) * 0.98F;
-                float estimation2 = prevDeltaY * 0.98F - 0.0384F;
-                estimatedY = MathUtils.abs(deltaY - estimation1) < MathUtils.abs(deltaY - estimation2) ?
-                        estimation1 : estimation2;
-                data.waterMagic1_13 = true;
-            } else if (data.waterMagic1_13) {
-                //float estimation1 = prevDeltaY * 0.8F - 0.005F;
-                //float estimation2 = prevDeltaY * 0.98F - 0.0384F;
-                //estimatedY = MathUtils.abs(deltaY - estimation1) < MathUtils.abs(deltaY - estimation2) ?
-                //        estimation1 : estimation2;
-                //data.waterMagic1_13 = false;
-                estimatedY = deltaY;
-                data.waterMagic1_13 = false;
-            } else if (e.onGround) {
-                estimatedY = deltaY;
-            } else {
-                // TODO: Fix false positive when standing still in water.
-                float estimation1 = multiplier - 0.005F + 0.04F;
-                estimation1 = MathUtils.abs(estimation1) < 0.005 ? 0 : estimation1;
-                float estimation2 = multiplier - 0.005F;
-                estimation2 = MathUtils.abs(estimation2) < 0.005 ? 0 : estimation2;
-                estimatedY = MathUtils.abs(deltaY - estimation1) < MathUtils.abs(deltaY - estimation2) ?
-                        estimation1 : estimation2;
-            }
-            if (!e.isInLiquid1_13 && collidingHorizontally(e.touchingFaces) && e.cube.add(0, 0.6, 0).getMaterials(e.to.world).stream().noneMatch(MatUtils::isLiquid)) {
-                // Player is exiting liquid
-                // TODO: This broken in 1.13, fix this.
-                float estimation1 = 0.3F;
-                float estimation2 = 0.3F + 0.04F;
-                estimatedY = MathUtils.abs(deltaY - estimation1) < MathUtils.abs(deltaY - estimation2) ?
-                        estimation1 : estimation2;
-            }
-
-            double discrepancy = deltaY - estimatedY;
-
-            if (MathUtils.abs(discrepancy) > 0.01F) {
-                this.debug("Failed: TypeD, d:" + deltaY + ", e:" + estimatedY + ", d:" + discrepancy + ", p:" + prevDeltaY);
-
-                // Punish
-                this.punish(player, data, "TypeD", 3);
-            } else {
-                reward("TypeD", data, 0.99);
-            }
-        }
-    }
-
-    private boolean collidingHorizontally(final Set<BlockFace> touchingFaces) {
-        return touchingFaces.contains(BlockFace.NORTH) || touchingFaces.contains(BlockFace.SOUTH) ||
-                touchingFaces.contains(BlockFace.WEST) || touchingFaces.contains(BlockFace.EAST);
     }
 }

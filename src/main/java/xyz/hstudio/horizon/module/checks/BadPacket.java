@@ -22,6 +22,11 @@ public class BadPacket extends Module<BadPacketData, BadPacketConfig> {
     }
 
     @Override
+    public void cancel(final Event event, final String type, final HoriPlayer player, final BadPacketData data, final BadPacketConfig config) {
+        event.setCancelled(true);
+    }
+
+    @Override
     public void doCheck(final Event event, final HoriPlayer player, final BadPacketData data, final BadPacketConfig config) {
         if (config.typeA_enabled) {
             typeA(event, player, data, config);
@@ -52,7 +57,7 @@ public class BadPacket extends Module<BadPacketData, BadPacketConfig> {
                 this.debug("Failed: TypeA");
 
                 // Punish
-                this.punish(player, data, "TypeA", 5);
+                this.punish(event, player, data, "TypeA", 5);
             } else {
                 reward("TypeA", data, 0.99);
             }
@@ -80,7 +85,7 @@ public class BadPacket extends Module<BadPacketData, BadPacketConfig> {
                 this.debug("Failed: TypeB");
 
                 // Punish
-                this.punish(player, data, "TypeB", 5);
+                this.punish(event, player, data, "TypeB", 5);
             } else if (data.flyingCount == 0) {
                 reward("TypeB", data, 0.99);
             }
@@ -110,7 +115,7 @@ public class BadPacket extends Module<BadPacketData, BadPacketConfig> {
                 this.debug("Failed: TypeC");
 
                 // Punish
-                this.punish(player, data, "TypeC", 5);
+                this.punish(event, player, data, "TypeC", 5);
             } else {
                 reward("TypeC", data, 0.999);
             }

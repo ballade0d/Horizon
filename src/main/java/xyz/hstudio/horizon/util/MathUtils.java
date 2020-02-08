@@ -67,4 +67,8 @@ public class MathUtils {
     public static double distance2d(final double xDiff, final double zDiff) {
         return Math.sqrt(xDiff * xDiff + zDiff * zDiff);
     }
+
+    public static double distance3d(final double xDiff, final double yDiff, final double zDiff) {
+        return Math.sqrt(xDiff * xDiff + yDiff * yDiff + zDiff * zDiff);
+    }
 }

@@ -1,21 +1,22 @@
 package xyz.hstudio.horizon.module;
 
 import lombok.Getter;
+import org.bukkit.Bukkit;
 import xyz.hstudio.horizon.Logger;
 import xyz.hstudio.horizon.api.ModuleType;
+import xyz.hstudio.horizon.api.PlayerViolateEvent;
 import xyz.hstudio.horizon.api.events.Event;
-import xyz.hstudio.horizon.config.Config;
+import xyz.hstudio.horizon.config.CheckConfig;
 import xyz.hstudio.horizon.data.Data;
 import xyz.hstudio.horizon.data.HoriPlayer;
-import xyz.hstudio.horizon.util.collect.Pair;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public abstract class Module<K extends Data, V extends Config> {
+public abstract class Module<K extends Data, V extends CheckConfig<V>> {
 
     // Use LinkedHashMap to keep the check order.
-    private static final Map<ModuleType, Module<? extends Data, ? extends Config>> moduleMap = new LinkedHashMap<>(16, 1);
+    private static final Map<ModuleType, Module<? extends Data, ? extends CheckConfig>> moduleMap = new LinkedHashMap<>(16, 1);
 
     private final ModuleType moduleType;
     @Getter
@@ -24,7 +25,7 @@ public abstract class Module<K extends Data, V extends Config> {
     public Module(final ModuleType moduleType, final V config) {
         // This throws a warn in IDE, tell me any suggestion if you have.
         this.moduleType = moduleType;
-        this.config = Config.load(moduleType, config);
+        this.config = config.load();
         Module.moduleMap.put(moduleType, this);
     }
 
@@ -37,37 +38,45 @@ public abstract class Module<K extends Data, V extends Config> {
      * @return Should the packet of the event pass.
      * @author MrCraftGoo
      */
-    public static boolean doCheck(final Event event, final HoriPlayer player) {
+    public static void doCheck(final Event event, final HoriPlayer player) {
         for (Module modules : Module.moduleMap.values()) {
             if (!modules.config.enabled) {
                 continue;
             }
+            if (event.isCancelled()) {
+                return;
+            }
             modules.doCheck(event, player, modules.getData(player), modules.config);
         }
-        return true;
     }
 
     /**
      * Punish a player. Still have not been finished yet.
      *
-     * @param player   The player.
-     * @param data     Player's data of this check.
-     * @param type     Check type.
-     * @param weight   Violation level addition.
-     * @param runnable The tasks will be executed.
+     * @param player The player.
+     * @param data   Player's data of this check.
+     * @param type   Check type.
+     * @param weight Violation level addition.
      * @author MrCraftGoo
      */
-    protected void punish(final HoriPlayer player, final K data, final String type, final double weight, final Runnable... runnable) {
-        Pair<Double, Double> pair = data.violationLevels.getOrDefault(type, new Pair<>(0D, 0D));
-        pair.value = pair.key;
-        pair.key = pair.key + weight;
-        data.violationLevels.put(type, pair);
+    protected void punish(final Event event, final HoriPlayer player, final K data, final String type, final float weight) {
+        float oldViolation = data.violations.getOrDefault(type, 0F);
+        float nowViolation = oldViolation + weight;
 
-        int prevVL = (int) data.violationLevels.values().stream().mapToDouble(p -> p.value).sum();
-        int vL = (int) data.violationLevels.values().stream().mapToDouble(p -> p.key).sum();
+        PlayerViolateEvent violateEvent = new PlayerViolateEvent(player.player, this.moduleType, nowViolation, oldViolation);
+        Bukkit.getPluginManager().callEvent(violateEvent);
+        if (violateEvent.isCancelled()) {
+            return;
+        }
 
-        data.lastFailTick = player.currentTick;
         // TODO: Punish
+
+        if (nowViolation > config.cancel_vl) {
+            this.cancel(event, type, player, data, config);
+        }
+
+        data.violations.put(type, nowViolation);
+        data.lastFailTick = player.currentTick;
     }
 
     /**
@@ -81,16 +90,14 @@ public abstract class Module<K extends Data, V extends Config> {
     }
 
     protected void reward(final String type, final K data, final double multiplier) {
-        Pair<Double, Double> pair = data.violationLevels.get(type);
-        if (pair == null) {
-            return;
-        }
-        pair.value = pair.key;
-        pair.key = pair.key * multiplier;
-        data.violationLevels.put(type, pair);
+        float nowViolation = data.violations.getOrDefault(type, 0F);
+        nowViolation *= multiplier;
+        data.violations.put(type, nowViolation);
     }
 
     public abstract K getData(final HoriPlayer player);
+
+    public abstract void cancel(final Event event, final String type, final HoriPlayer player, final K data, final V config);
 
     public abstract void doCheck(final Event event, final HoriPlayer player, final K data, final V config);
 

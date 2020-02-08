@@ -146,7 +146,6 @@ public class AABB {
         return null;
     }
 
-    // TODO: Any ways to optimize it?
     public List<Block> getBlocks(final World world) {
         List<Block> blocks = new ArrayList<>();
         for (int x = NumberConversions.floor(this.minX); x < NumberConversions.ceil(this.maxX); x++) {
@@ -163,7 +162,6 @@ public class AABB {
         return blocks;
     }
 
-    // TODO: Any ways to optimize it?
     public Set<Material> getMaterials(final World world) {
         Set<Material> blocks = EnumSet.noneOf(Material.class);
         for (int x = NumberConversions.floor(this.minX); x < NumberConversions.ceil(this.maxX); x++) {

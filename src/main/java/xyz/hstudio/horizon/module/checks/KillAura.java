@@ -31,6 +31,11 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
     }
 
     @Override
+    public void cancel(final Event event, final String type, final HoriPlayer player, final KillAuraData data, final KillAuraConfig config) {
+        // TODO: Finish this
+    }
+
+    @Override
     public void doCheck(final Event event, final HoriPlayer player, final KillAuraData data, final KillAuraConfig config) {
         if (config.typeA_enabled) {
             typeA(event, player, data, config);
@@ -47,6 +52,7 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
         if (config.typeE_enabled) {
             typeE(event, player, data, config);
         }
+        typeF(event, player, data, config);
         // TODO: Aim checks.
     }
 
@@ -85,7 +91,7 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
                 this.debug("Failed: TypeA, d:" + deltaT);
 
                 // Punish
-                this.punish(player, data, "TypeA", 4);
+                this.punish(event, player, data, "TypeA", 4);
             }
         }
     }
@@ -122,7 +128,7 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
                 this.debug("Failed: TypeB, d:" + deltaT);
 
                 // Punish
-                this.punish(player, data, "TypeB", 5);
+                this.punish(event, player, data, "TypeB", 5);
             } else {
                 reward("TypeB", data, 0.999);
             }
@@ -164,7 +170,7 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
                     this.debug("Failed: TypeC, g:" + gcd);
 
                     // Punish
-                    this.punish(player, data, "TypeC", 3);
+                    this.punish(event, player, data, "TypeC", 3);
                 }
             } else if (data.gcdFails > 0) {
                 data.gcdFails--;
@@ -199,12 +205,11 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
             if (player.currentTick - data.lastHitTick > 5 || e.isTeleport) {
                 return;
             }
-            // TODO: Add a threshold
             if (!e.strafeNormally) {
                 this.debug("Failed: TypeD");
 
                 // Punish
-                this.punish(player, data, "TypeD", 4);
+                this.punish(event, player, data, "TypeD", 4);
             } else {
                 reward("TypeD", data, 0.999);
             }
@@ -234,8 +239,46 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
                 this.debug("Failed: TypeE, p:1");
 
                 // Punish
-                this.punish(player, data, "TypeE", 5);
+                this.punish(event, player, data, "TypeE", 5);
             }
+        }
+    }
+
+    /**
+     * An amazing InteractAutoBlock check. May also detect related hacks.
+     * <p>
+     * Accuracy: 10/10 - It shouldn't have any false positives
+     * Efficiency: 10/10 - Super fast
+     *
+     * @author MrCraftGoo
+     */
+    private void typeF(final Event event, final HoriPlayer player, final KillAuraData data, final KillAuraConfig config) {
+        if (event instanceof InteractEntityEvent) {
+            InteractEntityEvent e = (InteractEntityEvent) event;
+            if (e.action != InteractEntityEvent.InteractType.INTERACT || e.intersection == null) {
+                return;
+            }
+            data.intersection = e.intersection.clone().add(e.entity.getLocation().toVector());
+        } else if (event instanceof MoveEvent) {
+            MoveEvent e = (MoveEvent) event;
+            if (data.intersection == null) {
+                return;
+            }
+
+            Vector3D headPos = player.getHeadPosition();
+            Vector3D dirA = MathUtils.getDirection(e.from.yaw, e.to.pitch);
+            Vector3D dirB = data.intersection.subtract(headPos).normalize();
+
+            if (dirA.dot(dirB) < 0) {
+                this.debug("Failed: TypeF");
+
+                // Punish
+                this.punish(event, player, data, "TypeF", 5);
+            } else {
+                reward("TypeF", data, 0.99);
+            }
+
+            data.intersection = null;
         }
     }
 

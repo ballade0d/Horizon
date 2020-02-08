@@ -9,6 +9,7 @@ import xyz.hstudio.horizon.util.MathUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * A wrapped Location class. Remember to use this instead of using bukkit's.
@@ -170,7 +171,7 @@ public class Location {
         }
         Location other = (Location) obj;
 
-        if (this.world != other.world && (this.world == null || !this.world.equals(other.world))) {
+        if (!Objects.equals(this.world, other.world)) {
             return false;
         }
         if (Double.doubleToLongBits(this.x) != Double.doubleToLongBits(other.x)) {

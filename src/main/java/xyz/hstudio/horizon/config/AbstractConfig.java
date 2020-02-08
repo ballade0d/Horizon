@@ -8,26 +8,17 @@ import xyz.hstudio.horizon.util.wrap.YamlLoader;
 
 import java.lang.reflect.Field;
 
-public class ConfigFile {
-
-    @Load(file = "config.yml", path = "prefix")
-    public String prefix = "§9§lHorizon §1§l>> §r§3";
-
-    @Load(file = "config.yml", path = "kirin.enabled")
-    public boolean kirin_enabled = false;
-    @Load(file = "config.yml", path = "kirin.licence")
-    public String kirin_licence = "";
-
+public abstract class AbstractConfig {
 
     /**
      * A nice and easy way to load values from configuration
      *
-     * @return Config instance
+     * @return CheckConfig instance
      * @throws IllegalStateException When config is miss
      * @author MrCraftGoo
      */
-    public ConfigFile load() throws IllegalStateException {
-        FieldAccess access = FieldAccess.get(this.getClass());
+    public <T extends AbstractConfig> T load(final String pathPrefix, final T conf) {
+        FieldAccess access = FieldAccess.get(conf.getClass());
         Field[] fields = access.getFields();
         for (int i = 0; i < fields.length; i++) {
             Field field = fields[i];
@@ -37,7 +28,7 @@ public class ConfigFile {
             }
 
             String file = annotation.file();
-            String path = annotation.path();
+            String path = pathPrefix == null ? annotation.path() : pathPrefix + "." + annotation.path();
 
             YamlLoader config = Horizon.getInst().configMap.get(file);
             if (config == null) {
@@ -46,16 +37,17 @@ public class ConfigFile {
 
             Object value = config.get(path);
             if (value == null) {
-                config.set(path, value = access.get(this, i));
+                config.set(path, value = access.get(conf, i));
             }
 
             // Double.class.isAssignableFrom(double.class) is false :/
-            if (!Primitives.unwrap(value.getClass()).isAssignableFrom(access.getFieldTypes()[i])) {
+            if (!Primitives.unwrap(value.getClass()).isAssignableFrom(field.getType())) {
                 throw new IllegalStateException("Failed to load value: " + path + " [2]");
             }
 
-            access.set(this, i, value);
+            access.set(conf, i, value);
         }
-        return this;
+
+        return conf;
     }
 }

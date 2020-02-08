@@ -32,8 +32,7 @@ public class MoveEvent extends Event {
     public final boolean isOnSlime;
     public final boolean isOnBed;
     public final Vector3D waterFlowForce;
-    public final boolean isInLiquid1_8;
-    public final boolean isInLiquid1_13;
+    public final boolean isInLiquid;
     public final float oldFriction;
     public final float newFriction;
     public final Set<Material> collidingBlocks;
@@ -67,12 +66,7 @@ public class MoveEvent extends Event {
 
         this.waterFlowForce = this.computeWaterFlowForce();
 
-        this.isInLiquid1_8 = AABB.waterCollisionBox
-                .add(this.to.toVector())
-                .getMaterials(to.world)
-                .stream()
-                .anyMatch(MatUtils::isLiquid);
-        this.isInLiquid1_13 = AABB.collisionBox
+        this.isInLiquid = AABB.collisionBox
                 .shrink(0.001, 0.001, 0.001)
                 .add(this.from.toVector())
                 .getMaterials(to.world)
@@ -208,13 +202,13 @@ public class MoveEvent extends Event {
      * I learnt this from Islandscout, but much lighter than his.
      * <p>
      * TODO: Ignore when colliding entities
-     * TODO: Ignore the first tick player jump (Unimportant)
-     * TODO: Ignore when getting knock back
      *
      * @author Islandscout, MrCraftGoo
      */
     private boolean checkStrafe() {
-        if (!this.updateRot || player.getVehicle() != null || this.touchingFaces.contains(BlockFace.UP) || !this.collidingBlocks.isEmpty()) {
+        if (!this.updateRot || this.knockBack != null || this.jumpLegitly || player.getVehicle() != null || this.touchingFaces.contains(BlockFace.UP) ||
+                this.touchingFaces.contains(BlockFace.NORTH) || this.touchingFaces.contains(BlockFace.SOUTH) ||
+                this.touchingFaces.contains(BlockFace.WEST) || this.touchingFaces.contains(BlockFace.EAST)) {
             return true;
         }
         Block footBlock = player.position.add(0, -1, 0).getBlock();
@@ -241,9 +235,7 @@ public class MoveEvent extends Event {
         Vector3D accelDir = new Vector3D(dX, 0, dZ);
         Vector3D yaw = MathUtils.getDirection(this.to.yaw, 0);
 
-        if (velocity.length() < 0.15 || accelDir.lengthSquared() < 0.000001 || this.jumpLegitly ||
-                this.touchingFaces.contains(BlockFace.NORTH) || this.touchingFaces.contains(BlockFace.SOUTH) ||
-                this.touchingFaces.contains(BlockFace.WEST) || this.touchingFaces.contains(BlockFace.EAST)) {
+        if (velocity.length() < 0.15 || accelDir.lengthSquared() < 0.000001) {
             return true;
         }
 
@@ -269,8 +261,8 @@ public class MoveEvent extends Event {
         boolean flying = player.isFlying();
 
         double sprintMultiplier = flying ? (player.isSprinting ? 2 : 1) : (player.isSprinting ? 1.3 : 1);
-        // TODO: Check for liquid
-        double weirdConstant = (jump && player.isSprinting ? 0.2518462 : 0.098);
+        double weirdConstant = (jump && player.isSprinting ? 0.2518462 : (player.isInLiquid ? 0.0196 : 0.098));
+        ;
         double baseMultiplier = flying ? (10 * player.player.getFlySpeed()) : (5 * player.player.getWalkSpeed() * (1 + player.getPotionEffectAmplifier("SPEED") * 0.2));
         double maxDiscrepancy = weirdConstant * baseMultiplier * sprintMultiplier + 0.003;
 
@@ -285,10 +277,9 @@ public class MoveEvent extends Event {
 
             double y = kbVelocity.y;
 
-            // TODO: Check for liquid
             if (!((touchingFaces.contains(BlockFace.UP) && y > 0) || (touchingFaces.contains(BlockFace.DOWN) && y < 0)) &&
                     MathUtils.abs(y - velocity.y) > 0.01 &&
-                    !jump && !this.stepLegitly) {
+                    !jump && !player.isInLiquid && !this.stepLegitly) {
                 continue;
             }
 
@@ -336,6 +327,7 @@ public class MoveEvent extends Event {
         if (player.isTeleporting && tpLoc.world.equals(this.to.world) && to.distanceSquared(tpLoc) < 0.001) {
             player.isTeleporting = false;
             player.position = tpLoc;
+            player.lastTeleportAcceptTick = player.currentTick;
             this.isTeleport = true;
         }
         return true;
@@ -350,8 +342,7 @@ public class MoveEvent extends Event {
         player.prevPrevDeltaY = player.velocity.y;
         player.velocity = this.velocity;
         player.touchingFaces = this.touchingFaces;
-        player.isInLiquid1_8 = this.isInLiquid1_8;
-        player.isInLiquid1_13 = this.isInLiquid1_13;
+        player.isInLiquid = this.isInLiquid;
     }
 
     public enum MoveType {

@@ -51,8 +51,8 @@ public class HoriPlayer {
     public boolean isOnGround;
     public boolean onGroundReally;
     public boolean isGliding;
-    public boolean isInLiquid1_8;
-    public boolean isInLiquid1_13;
+    public boolean isInLiquid;
+    public long lastTeleportAcceptTick = -1;
     public long toggleFlyTime;
     public long hitSlowdownTick = -1;
     public long teleportTime = -1;
@@ -113,6 +113,10 @@ public class HoriPlayer {
         return this.position.toVector().add(add);
     }
 
+    public void teleport(final Location location) {
+        this.player.teleport(new org.bukkit.Location(location.world, location.x, location.y, location.z, location.yaw, location.pitch));
+    }
+
     public void sendMessage(final String msg) {
         McAccessor.INSTANCE.ensureMainThread(() -> this.player.sendMessage(msg));
     }
@@ -168,6 +172,6 @@ public class HoriPlayer {
      * Send a packet to the player
      */
     public void sendPacket(final Object packet) {
-        this.pipeline.writeAndFlush(packet);
+        McAccessor.INSTANCE.ensureMainThread(() -> this.pipeline.writeAndFlush(packet));
     }
 }

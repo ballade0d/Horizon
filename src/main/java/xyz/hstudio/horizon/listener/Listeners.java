@@ -5,9 +5,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.event.player.*;
 import xyz.hstudio.horizon.Horizon;
 import xyz.hstudio.horizon.data.HoriPlayer;
 import xyz.hstudio.horizon.util.wrap.Location;
@@ -39,6 +37,32 @@ public class Listeners implements Listener {
         player.isTeleporting = true;
         player.world = e.getTo().getWorld();
         player.teleportPos = new Location(e.getTo());
+        player.teleportTime = System.currentTimeMillis();
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onPlayerRespawn(final PlayerRespawnEvent e) {
+        Player p = e.getPlayer();
+        HoriPlayer player = Horizon.PLAYERS.get(p.getUniqueId());
+        if (player == null) {
+            return;
+        }
+        player.isTeleporting = true;
+        player.world = e.getRespawnLocation().getWorld();
+        player.teleportPos = new Location(e.getRespawnLocation());
+        player.teleportTime = System.currentTimeMillis();
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onPlayerChangedWorld(final PlayerChangedWorldEvent e) {
+        Player p = e.getPlayer();
+        HoriPlayer player = Horizon.PLAYERS.get(p.getUniqueId());
+        if (player == null) {
+            return;
+        }
+        player.isTeleporting = true;
+        player.world = p.getWorld();
+        player.teleportPos = new Location(e.getPlayer().getLocation());
         player.teleportTime = System.currentTimeMillis();
     }
 }
