@@ -87,7 +87,7 @@ public class Inventory extends Module<InventoryData, InventoryConfig> {
                 this.debug("Failed: TypeA, t:rot");
 
                 // Punish
-                this.punish(event, player, data, "TypeA", 5);
+                this.punish(event, player, data, "TypeA", 3);
             }
 
             // TODO: Ignore if colliding entities
@@ -103,7 +103,7 @@ public class Inventory extends Module<InventoryData, InventoryConfig> {
                     this.debug("Failed: TypeA, t:pos");
 
                     // Punish
-                    this.punish(event, player, data, "TypeA", 5);
+                    this.punish(event, player, data, "TypeA", 3);
                 }
             }
         } else if (event instanceof ActionEvent) {

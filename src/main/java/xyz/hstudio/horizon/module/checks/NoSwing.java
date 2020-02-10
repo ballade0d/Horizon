@@ -44,7 +44,7 @@ public class NoSwing extends Module<NoSwingData, NoSwingConfig> {
                 this.debug("Failed: TypeA");
 
                 // Punish
-                this.punish(event, player, data, "TypeA", 6);
+                this.punish(event, player, data, "TypeA", 5);
             } else {
                 reward("TypeA", data, 0.999);
             }

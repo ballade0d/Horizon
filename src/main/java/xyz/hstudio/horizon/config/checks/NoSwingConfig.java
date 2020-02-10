@@ -12,6 +12,6 @@ public class NoSwingConfig extends CheckConfig<NoSwingConfig> {
 
     @Override
     public NoSwingConfig load() {
-        return super.load(ModuleType.NoSwing.name(), this);
+        return super.load(ModuleType.NoSwing.name().toLowerCase(), this);
     }
 }

@@ -14,6 +14,6 @@ public class HitBoxConfig extends CheckConfig<HitBoxConfig> {
 
     @Override
     public HitBoxConfig load() {
-        return super.load(ModuleType.HitBox.name(), this);
+        return super.load(ModuleType.HitBox.name().toLowerCase(), this);
     }
 }

@@ -12,6 +12,6 @@ public class GroundSpoofConfig extends CheckConfig<GroundSpoofConfig> {
 
     @Override
     public GroundSpoofConfig load() {
-        return super.load(ModuleType.GroundSpoof.name(), this);
+        return super.load(ModuleType.GroundSpoof.name().toLowerCase(), this);
     }
 }

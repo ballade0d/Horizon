@@ -209,7 +209,7 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
                 this.debug("Failed: TypeD");
 
                 // Punish
-                this.punish(event, player, data, "TypeD", 4);
+                this.punish(event, player, data, "TypeD", 3);
             } else {
                 reward("TypeD", data, 0.999);
             }
@@ -233,9 +233,9 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
             if (!e.updateRot) {
                 return;
             }
-            float diffYaw = MathUtils.abs(e.to.yaw - e.from.yaw);
-            float diffPitch = MathUtils.abs(e.to.pitch - e.from.pitch);
-            if (diffYaw >= 3.0 && diffPitch > 0.001 && diffPitch < 0.0995) {
+            float yawDiff = MathUtils.abs(e.to.yaw - e.from.yaw);
+            float pitchDiff = MathUtils.abs(e.to.pitch - e.from.pitch);
+            if (yawDiff >= 3.0 && pitchDiff > 0.001 && pitchDiff < 0.0995) {
                 this.debug("Failed: TypeE, p:1");
 
                 // Punish

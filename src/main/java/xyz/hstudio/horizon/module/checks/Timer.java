@@ -73,7 +73,7 @@ public class Timer extends Module<TimerData, TimerConfig> {
                 this.debug("Failed: TypeA, d:" + diff + ", s:" + (-diff / 50));
 
                 // Punish
-                this.punish(event, player, data, "TypeA", (float) (-diff / 50 * 3));
+                this.punish(event, player, data, "TypeA", (float) (-diff / 50F * 2F));
 
                 // Reset drift to -45 to stop spam-flagging.
                 drift = -45 * MULTIPLIER;

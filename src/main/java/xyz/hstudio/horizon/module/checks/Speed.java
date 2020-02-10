@@ -11,6 +11,7 @@ import xyz.hstudio.horizon.data.checks.SpeedData;
 import xyz.hstudio.horizon.module.Module;
 import xyz.hstudio.horizon.thread.Sync;
 import xyz.hstudio.horizon.util.MathUtils;
+import xyz.hstudio.horizon.util.enums.MatUtils;
 import xyz.hstudio.horizon.util.wrap.Vector3D;
 
 import java.util.Set;
@@ -92,7 +93,7 @@ public class Speed extends Module<SpeedData, SpeedConfig> {
                 if (touchedBlocks.contains(Material.SOUL_SAND)) {
                     multipliers *= 0.4;
                 }
-                if (touchedBlocks.contains(Material.WEB)) {
+                if (touchedBlocks.contains(MatUtils.COBWEB.parse())) {
                     multipliers *= 0.25;
                 }
                 if (touchedBlocks.contains(Material.SLIME_BLOCK) && MathUtils.abs(player.velocity.y) < 0.1 && !player.isSneaking) {

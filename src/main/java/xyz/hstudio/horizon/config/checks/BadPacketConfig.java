@@ -12,12 +12,15 @@ public class BadPacketConfig extends CheckConfig<BadPacketConfig> {
     // TypeB
     @Load(file = "check.yml", path = "typeB.enabled")
     public boolean typeB_enabled = true;
-    // TypeB
+    // TypeC
     @Load(file = "check.yml", path = "typeC.enabled")
     public boolean typeC_enabled = true;
+    // TypeD
+    @Load(file = "check.yml", path = "typeD.enabled")
+    public boolean typeD_enabled = true;
 
     @Override
     public BadPacketConfig load() {
-        return super.load(ModuleType.BadPacket.name(), this);
+        return super.load(ModuleType.BadPacket.name().toLowerCase(), this);
     }
 }

@@ -91,6 +91,7 @@ public class Horizon extends JavaPlugin {
         new Listeners();
 
         // Enable checks
+        new AntiVelocity();
         new BadPacket();
         new GroundSpoof();
         new HitBox();

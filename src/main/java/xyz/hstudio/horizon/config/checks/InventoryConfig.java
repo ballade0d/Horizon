@@ -20,6 +20,6 @@ public class InventoryConfig extends CheckConfig<InventoryConfig> {
 
     @Override
     public InventoryConfig load() {
-        return super.load(ModuleType.Inventory.name(), this);
+        return super.load(ModuleType.Inventory.name().toLowerCase(), this);
     }
 }

@@ -22,6 +22,6 @@ public class InvalidMotionConfig extends CheckConfig<InvalidMotionConfig> {
 
     @Override
     public InvalidMotionConfig load() {
-        return super.load(ModuleType.InvalidMotion.name(), this);
+        return super.load(ModuleType.InvalidMotion.name().toLowerCase(), this);
     }
 }

@@ -6,11 +6,13 @@ import xyz.hstudio.horizon.Logger;
 import xyz.hstudio.horizon.api.ModuleType;
 import xyz.hstudio.horizon.api.PlayerViolateEvent;
 import xyz.hstudio.horizon.api.events.Event;
+import xyz.hstudio.horizon.compat.McAccessor;
 import xyz.hstudio.horizon.config.CheckConfig;
 import xyz.hstudio.horizon.data.Data;
 import xyz.hstudio.horizon.data.HoriPlayer;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 public abstract class Module<K extends Data, V extends CheckConfig<V>> {
@@ -69,10 +71,17 @@ public abstract class Module<K extends Data, V extends CheckConfig<V>> {
             return;
         }
 
-        // TODO: Punish
-
         if (nowViolation > config.cancel_vl) {
             this.cancel(event, type, player, data, config);
+        }
+
+        for (Map.Entry<Integer, List<String>> entry : config.action.entrySet()) {
+            int vl = entry.getKey();
+            if (oldViolation < vl && nowViolation >= vl) {
+                McAccessor.INSTANCE.ensureMainThread(() -> entry.getValue().forEach(cmd ->
+                        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd)));
+                break;
+            }
         }
 
         data.violations.put(type, nowViolation);

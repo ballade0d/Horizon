@@ -23,6 +23,6 @@ public class ScaffoldConfig extends CheckConfig<ScaffoldConfig> {
 
     @Override
     public ScaffoldConfig load() {
-        return super.load(ModuleType.Scaffold.name(), this);
+        return super.load(ModuleType.Scaffold.name().toLowerCase(), this);
     }
 }

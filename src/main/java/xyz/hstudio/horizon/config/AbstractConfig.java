@@ -2,11 +2,16 @@ package xyz.hstudio.horizon.config;
 
 import com.esotericsoftware.reflectasm.FieldAccess;
 import com.google.common.primitives.Primitives;
+import org.apache.commons.lang.StringUtils;
 import xyz.hstudio.horizon.Horizon;
 import xyz.hstudio.horizon.config.annotation.Load;
 import xyz.hstudio.horizon.util.wrap.YamlLoader;
 
 import java.lang.reflect.Field;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public abstract class AbstractConfig {
 
@@ -36,13 +41,32 @@ public abstract class AbstractConfig {
             }
 
             Object value = config.get(path);
-            if (value == null) {
-                config.set(path, value = access.get(conf, i));
-            }
 
-            // Double.class.isAssignableFrom(double.class) is false :/
-            if (!Primitives.unwrap(value.getClass()).isAssignableFrom(field.getType())) {
-                throw new IllegalStateException("Failed to load value: " + path + " [2]");
+            if (field.getType() == Map.class) {
+                if (value == null) {
+                    config.set(path, value = new HashMap<>());
+                } else {
+                    Map<Integer, List<String>> map = new HashMap<>();
+                    for (String s : config.getConfigurationSection(path).getKeys(false)) {
+                        if (!StringUtils.isNumeric(s)) {
+                            continue;
+                        }
+                        List<String> list = config.isList(path + s) ?
+                                config.getStringList(path + s) :
+                                Collections.singletonList(config.getString(path + s));
+                        map.put(Integer.parseInt(s), list);
+                    }
+                    value = map;
+                }
+            } else {
+                if (value == null) {
+                    config.set(path, value = access.get(conf, i));
+                }
+
+                // Double.class.isAssignableFrom(double.class) is false :/
+                if (!Primitives.unwrap(value.getClass()).isAssignableFrom(field.getType())) {
+                    throw new IllegalStateException("Failed to load value: " + path + " [2]");
+                }
             }
 
             access.set(conf, i, value);

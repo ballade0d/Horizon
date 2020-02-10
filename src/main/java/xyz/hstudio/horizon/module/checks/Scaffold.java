@@ -166,7 +166,7 @@ public class Scaffold extends Module<ScaffoldData, ScaffoldConfig> {
                 this.debug("Failed: TypeD");
 
                 // Punish
-                this.punish(event, player, data, "TypeD", 4);
+                this.punish(event, player, data, "TypeD", 3);
             } else {
                 reward("TypeD", data, 0.999);
             }

@@ -42,6 +42,7 @@ public class MoveEvent extends Event {
     public final boolean jumpLegitly;
     public final boolean strafeNormally;
     public final Vector3D knockBack;
+    public boolean failedKnockBack;
     public boolean onGround;
     public boolean isTeleport;
 
@@ -262,7 +263,6 @@ public class MoveEvent extends Event {
 
         double sprintMultiplier = flying ? (player.isSprinting ? 2 : 1) : (player.isSprinting ? 1.3 : 1);
         double weirdConstant = (jump && player.isSprinting ? 0.2518462 : (player.isInLiquid ? 0.0196 : 0.098));
-        ;
         double baseMultiplier = flying ? (10 * player.player.getFlySpeed()) : (5 * player.player.getWalkSpeed() * (1 + player.getPotionEffectAmplifier("SPEED") * 0.2));
         double maxDiscrepancy = weirdConstant * baseMultiplier * sprintMultiplier + 0.003;
 
@@ -270,6 +270,7 @@ public class MoveEvent extends Event {
         for (int kbIndex = 0, size = velocities.size(); kbIndex < size; kbIndex++) {
             kb = velocities.get(kbIndex);
             if (time - kb.value > player.ping + 200) {
+                failedKnockBack = true;
                 expiredKbs++;
                 continue;
             }

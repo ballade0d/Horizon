@@ -14,6 +14,6 @@ public class SpeedConfig extends CheckConfig<SpeedConfig> {
 
     @Override
     public SpeedConfig load() {
-        return super.load(ModuleType.Speed.name(), this);
+        return super.load(ModuleType.Speed.name().toLowerCase(), this);
     }
 }

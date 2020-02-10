@@ -9,6 +9,7 @@ import xyz.hstudio.horizon.config.checks.BadPacketConfig;
 import xyz.hstudio.horizon.data.HoriPlayer;
 import xyz.hstudio.horizon.data.checks.BadPacketData;
 import xyz.hstudio.horizon.module.Module;
+import xyz.hstudio.horizon.thread.Sync;
 
 public class BadPacket extends Module<BadPacketData, BadPacketConfig> {
 
@@ -23,7 +24,12 @@ public class BadPacket extends Module<BadPacketData, BadPacketConfig> {
 
     @Override
     public void cancel(final Event event, final String type, final HoriPlayer player, final BadPacketData data, final BadPacketConfig config) {
-        event.setCancelled(true);
+        if (type.equals("TypeB") || type.equals("TypeC")) {
+            event.setCancelled(true);
+        } else if (type.equals("TypeD")) {
+            event.setCancelled(true);
+            Sync.teleport(player, data.legitLocation);
+        }
     }
 
     @Override
@@ -36,6 +42,9 @@ public class BadPacket extends Module<BadPacketData, BadPacketConfig> {
         }
         if (config.typeC_enabled) {
             typeC(event, player, data, config);
+        }
+        if (config.typeD_enabled) {
+            typeD(event, player, data, config);
         }
     }
 
@@ -120,6 +129,29 @@ public class BadPacket extends Module<BadPacketData, BadPacketConfig> {
                 reward("TypeC", data, 0.999);
             }
             data.lastPayloadTime = now;
+        }
+    }
+
+    /**
+     * A Derp/HeadLess check.
+     * <p>
+     * Accuracy: 10/10 - Should not have any false positive.
+     * Efficiency: 10/10 - Detects related hacks really fast.
+     *
+     * @author MrCraftGoo
+     */
+    private void typeD(final Event event, final HoriPlayer player, final BadPacketData data, final BadPacketConfig config) {
+        if (event instanceof MoveEvent) {
+            MoveEvent e = (MoveEvent) event;
+            if (e.to.pitch > 90.1F || e.to.pitch < -90.1F) {
+                this.debug("Failed: TypeD");
+
+                // Punish
+                this.punish(event, player, data, "TypeD", 6);
+            } else {
+                reward("TypeD", data, 0.999);
+                data.legitLocation = e.to;
+            }
         }
     }
 }

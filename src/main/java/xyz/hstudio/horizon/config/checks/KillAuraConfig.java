@@ -24,6 +24,6 @@ public class KillAuraConfig extends CheckConfig<KillAuraConfig> {
 
     @Override
     public KillAuraConfig load() {
-        return super.load(ModuleType.KillAura.name(), this);
+        return super.load(ModuleType.KillAura.name().toLowerCase(), this);
     }
 }

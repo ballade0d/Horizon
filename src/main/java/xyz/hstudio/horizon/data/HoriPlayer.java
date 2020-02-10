@@ -23,6 +23,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class HoriPlayer {
 
+    public final AntiVelocityData antiVelocityData = new AntiVelocityData();
     public final BadPacketData badPacketData = new BadPacketData();
     public final GroundSpoofData groundSpoofData = new GroundSpoofData();
     public final HitBoxData hitBoxData = new HitBoxData();
