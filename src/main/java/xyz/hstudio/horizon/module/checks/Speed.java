@@ -54,8 +54,24 @@ public class Speed extends Module<SpeedData, SpeedConfig> {
 
             // TODO: Handle Speed Attribute
 
-            double prevSpeed = data.prevSpeed;
-            double speed = e.updatePos ? MathUtils.distance2d(e.to.x - e.from.x, e.to.z - e.from.z) : 0;
+            double prevSpeed;
+            double speed;
+            if (e.updatePos) {
+                prevSpeed = data.prevSpeed;
+                if (data.noMoves > 0) {
+                    prevSpeed = Math.min(prevSpeed, 0.03);
+                }
+                speed = MathUtils.distance2d(e.to.x - e.from.x, e.to.z - e.from.z);
+            } else {
+                speed = data.prevSpeed - data.negativeDiscrepancies + 0.000001;
+                prevSpeed = speed;
+            }
+
+            if (e.updatePos) {
+                data.noMoves = 0;
+            } else {
+                data.noMoves++;
+            }
 
             if (e.isTeleport || e.knockBack != null) {
                 data.prevSpeed = speed;
@@ -122,6 +138,9 @@ public class Speed extends Module<SpeedData, SpeedConfig> {
                 } else {
                     reward("TypeA", data, 0.99);
                 }
+                data.negativeDiscrepancies = 0;
+            } else {
+                data.negativeDiscrepancies = discrepancy;
             }
             data.prevSpeed = speed;
         }

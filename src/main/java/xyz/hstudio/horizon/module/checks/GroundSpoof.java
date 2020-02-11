@@ -52,7 +52,7 @@ public class GroundSpoof extends Module<GroundSpoofData, GroundSpoofConfig> {
                 Location checkLoc = new Location(e.to.world, e.from.x, e.to.y, e.from.z);
                 // Do another check to make sure if player is really not on ground
                 // to avoid some false positives.
-                if (checkLoc.isOnGround(false, 0.025)) {
+                if (checkLoc.isOnGround(player, false, 0.025)) {
                     return;
                 }
                 if (e.clientBlock != null) {

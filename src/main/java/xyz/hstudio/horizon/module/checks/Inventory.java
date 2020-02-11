@@ -120,7 +120,6 @@ public class Inventory extends Module<InventoryData, InventoryConfig> {
                 this.punish(event, player, data, "TypeA", 5);
             }
         } else if (event instanceof InteractEntityEvent) {
-            InteractEntityEvent e = (InteractEntityEvent) event;
             if (!data.inventoryOpened) {
                 return;
             }

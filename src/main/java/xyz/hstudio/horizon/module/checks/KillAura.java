@@ -1,20 +1,15 @@
 package xyz.hstudio.horizon.module.checks;
 
-import org.bukkit.entity.Entity;
 import xyz.hstudio.horizon.api.ModuleType;
 import xyz.hstudio.horizon.api.events.Event;
 import xyz.hstudio.horizon.api.events.inbound.ActionEvent;
 import xyz.hstudio.horizon.api.events.inbound.InteractEntityEvent;
 import xyz.hstudio.horizon.api.events.inbound.MoveEvent;
-import xyz.hstudio.horizon.compat.McAccessor;
 import xyz.hstudio.horizon.config.checks.KillAuraConfig;
 import xyz.hstudio.horizon.data.HoriPlayer;
 import xyz.hstudio.horizon.data.checks.KillAuraData;
 import xyz.hstudio.horizon.module.Module;
 import xyz.hstudio.horizon.util.MathUtils;
-import xyz.hstudio.horizon.util.wrap.AABB;
-import xyz.hstudio.horizon.util.wrap.Ray;
-import xyz.hstudio.horizon.util.wrap.Vector2D;
 import xyz.hstudio.horizon.util.wrap.Vector3D;
 
 public class KillAura extends Module<KillAuraData, KillAuraConfig> {
@@ -279,54 +274,6 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
             }
 
             data.intersection = null;
-        }
-    }
-
-    /**
-     * Machine Learning check. Unused for now
-     *
-     * @author MrCraftGoo
-     */
-    private void machineLearning(final Event event, final HoriPlayer player, final KillAuraData data, final KillAuraConfig config) {
-        if (event instanceof InteractEntityEvent) {
-            InteractEntityEvent e = (InteractEntityEvent) event;
-            if (e.action != InteractEntityEvent.InteractType.ATTACK) {
-                return;
-            }
-
-            Entity victim = e.entity;
-            // Absolute AABB
-            AABB victimAABB = McAccessor.INSTANCE.getCube(victim);
-            // Relative AABB
-            AABB relativeAABB = victimAABB.add(-victim.getLocation().getX(), -victim.getLocation().getY(), -victim.getLocation().getZ());
-
-            Vector3D eyePos = player.getHeadPosition();
-            Vector3D direction = MathUtils.getDirection(player.position.yaw, player.position.pitch);
-            Ray ray = new Ray(eyePos, direction);
-
-            // The absolute intersection
-            Vector3D intersection = victimAABB.intersectsRay(ray, 0, Float.MAX_VALUE);
-            if (intersection == null) {
-                return;
-            }
-            // Change the absolute intersection to relative intersection
-            intersection.subtract(victim.getLocation().toVector());
-            if (intersection.y == relativeAABB.minY || intersection.y == relativeAABB.maxY) {
-                return;
-            }
-
-            Vector2D vector2D = new Vector2D(0, intersection.y);
-            // Think of the entity hitbox as a flat plane
-
-            // There must be a value in x and z that is the max or min value of entity hitbox
-            // If it's X, use Z
-            if (intersection.x == relativeAABB.minX || intersection.x == relativeAABB.maxX) {
-                vector2D.x = MathUtils.abs(intersection.z);
-            }
-            // If it's Z, use X
-            if (intersection.z == relativeAABB.minZ || intersection.z == relativeAABB.maxZ) {
-                vector2D.x = MathUtils.abs(intersection.x);
-            }
         }
     }
 }

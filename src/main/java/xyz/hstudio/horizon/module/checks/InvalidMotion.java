@@ -1,5 +1,6 @@
 package xyz.hstudio.horizon.module.checks;
 
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import xyz.hstudio.horizon.api.ModuleType;
@@ -11,8 +12,11 @@ import xyz.hstudio.horizon.data.HoriPlayer;
 import xyz.hstudio.horizon.data.checks.InvalidMotionData;
 import xyz.hstudio.horizon.module.Module;
 import xyz.hstudio.horizon.thread.Sync;
+import xyz.hstudio.horizon.util.BlockUtils;
 import xyz.hstudio.horizon.util.MathUtils;
 import xyz.hstudio.horizon.util.enums.MatUtils;
+
+import java.util.Objects;
 
 public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionConfig> {
 
@@ -66,12 +70,10 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionConfig
             // TODO: Fix Cobweb, Slime handler
             // TODO: Handle Vehicle
 
-            // 1.8.8 Enter Water: prev * 0.8 - 0.02
-            // 1.13.2 Enter Water: prev * 0.8 - 0.005
-
             if (!e.onGround && !e.jumpLegitly && !e.stepLegitly && e.knockBack == null &&
                     player.getVehicle() == null && !player.isFlying() && !e.isOnSlime && !e.isOnBed &&
-                    !e.isInLiquid && !player.isInLiquid) {
+                    !e.isInLiquid && !player.isInLiquid && !e.collidingBlocks.contains(Material.LADDER) &&
+                    !e.collidingBlocks.contains(Material.VINE)) {
 
                 int levitation = player.getPotionEffectAmplifier("LEVITATION");
                 // Supports SLOW_FALLING potion effect
@@ -117,8 +119,10 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionConfig
                 }
 
                 // Idk why but client considers player is not on ground when walking on slime, client bug?
-                Block standing = e.to.add(0, -0.1, 0).getBlock();
-                if (e.onGroundReally && deltaY == 0 && standing != null && standing.getType() == MatUtils.SLIME_BLOCK.parse()) {
+                if (e.onGroundReally && !e.onGround && deltaY == 0 && BlockUtils.getBlocksInLocation(e.to.add(0, -0.1, 0))
+                        .stream()
+                        .filter(Objects::nonNull)
+                        .anyMatch(b -> b.getType() == MatUtils.SLIME_BLOCK.parse())) {
                     estimatedVelocity = 0;
                 }
 
@@ -189,7 +193,7 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionConfig
             // TODO: Ignore Liquid
             if (e.isTeleport || !e.onGround || e.knockBack != null || e.touchingFaces.contains(BlockFace.UP) || player.touchingFaces.contains(BlockFace.UP) ||
                     e.collidingBlocks.contains(MatUtils.LADDER.parse()) || e.collidingBlocks.contains(MatUtils.VINE.parse()) ||
-                    player.isFlying() || player.player.isSleeping() || player.position.isOnGround(false, 0.001)) {
+                    player.isFlying() || player.player.isSleeping() || player.position.isOnGround(player, false, 0.001)) {
                 return;
             }
             double deltaY = e.velocity.y;

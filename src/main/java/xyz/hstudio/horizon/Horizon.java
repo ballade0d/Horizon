@@ -1,7 +1,7 @@
 package xyz.hstudio.horizon;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -37,7 +37,7 @@ public class Horizon extends JavaPlugin {
     private static Horizon inst;
 
     public final Map<String, YamlLoader> configMap = new ConcurrentHashMap<>();
-    public JSONArray announcements = new JSONArray();
+    public JsonArray announcements = new JsonArray();
     public Set<String> aliases = new HashSet<>();
     public DefaultConfig config;
 
@@ -113,10 +113,10 @@ public class Horizon extends JavaPlugin {
         // Get announcements from the official server.
         Runnable command = () -> {
             try {
-                JSONObject object = JsonUtils.readAsObject(new URL("https://horizon.hstudio.xyz/horizon/announcement.json"));
-                this.announcements = object.getJSONArray("messages");
+                JsonObject object = JsonUtils.readAsObject(new URL("https://horizon.hstudio.xyz/horizon/announcement.json"));
+                this.announcements = object.getAsJsonArray("messages");
                 Logger.msg("Annc", "Horizon Announcement");
-                this.announcements.forEach(s -> Logger.msg("Annc", s));
+                this.announcements.forEach(s -> Logger.msg("Annc", s.getAsString()));
             } catch (Exception ignore) {
             }
         };

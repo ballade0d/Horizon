@@ -4,6 +4,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.util.NumberConversions;
 import xyz.hstudio.horizon.compat.McAccessor;
+import xyz.hstudio.horizon.data.HoriPlayer;
 import xyz.hstudio.horizon.util.BlockUtils;
 import xyz.hstudio.horizon.util.MathUtils;
 
@@ -59,7 +60,7 @@ public class Location {
         return this.world.getBlockAt(this.getBlockX(), this.getBlockY(), this.getBlockZ());
     }
 
-    public boolean isOnGround(final boolean ignoreOnGround, final double feetDepth) {
+    public boolean isOnGround(final HoriPlayer player, final boolean ignoreOnGround, final double feetDepth) {
         List<Block> blocks = new ArrayList<>();
         blocks.addAll(BlockUtils.getBlocksInLocation(this));
         blocks.addAll(BlockUtils.getBlocksInLocation(this.add(0, -1, 0)));

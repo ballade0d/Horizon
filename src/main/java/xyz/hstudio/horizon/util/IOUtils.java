@@ -16,7 +16,7 @@ public class IOUtils {
             return stringBuilder.toString();
         } catch (Exception e) {
             e.printStackTrace();
-            return null;
+            return "";
         }
     }
 }

@@ -52,8 +52,8 @@ public abstract class AbstractConfig {
                             continue;
                         }
                         List<String> list = config.isList(path + s) ?
-                                config.getStringList(path + s) :
-                                Collections.singletonList(config.getString(path + s));
+                                config.getStringList(path + "." + s) :
+                                Collections.singletonList(config.getString(path + "." + s));
                         map.put(Integer.parseInt(s), list);
                     }
                     value = map;

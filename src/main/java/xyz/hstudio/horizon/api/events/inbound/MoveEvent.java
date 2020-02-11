@@ -60,7 +60,7 @@ public class MoveEvent extends Event {
 
         this.hitSlowdown = player.currentTick == player.hitSlowdownTick;
 
-        this.onGroundReally = this.to.isOnGround(false, 0.001);
+        this.onGroundReally = this.to.isOnGround(player, false, 0.001);
 
         this.isOnSlime = this.checkSlime();
         this.isOnBed = this.checkBed();
@@ -182,7 +182,7 @@ public class MoveEvent extends Event {
         }
         Location extraPos = player.position.add(extraVelocity);
         float deltaY = (float) this.velocity.y;
-        return extraPos.isOnGround(false, 0.001) && onGroundReally && deltaY > 0.002F && deltaY <= 0.6F;
+        return extraPos.isOnGround(player, false, 0.001) && onGroundReally && deltaY > 0.002F && deltaY <= 0.6F;
     }
 
     /**
