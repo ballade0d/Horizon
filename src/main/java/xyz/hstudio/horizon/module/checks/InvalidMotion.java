@@ -1,7 +1,6 @@
 package xyz.hstudio.horizon.module.checks;
 
 import org.bukkit.Material;
-import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import xyz.hstudio.horizon.api.ModuleType;
 import xyz.hstudio.horizon.api.events.Event;
@@ -60,12 +59,12 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionConfig
         if (event instanceof MoveEvent) {
             MoveEvent e = (MoveEvent) event;
 
+            float deltaY = (float) e.velocity.y;
+
             if (player.currentTick - player.lastTeleportAcceptTick < 3) {
-                data.estimatedVelocity = 0;
+                data.estimatedVelocity = deltaY;
                 return;
             }
-
-            float deltaY = (float) e.velocity.y;
 
             // TODO: Fix Cobweb, Slime handler
             // TODO: Handle Vehicle
@@ -119,11 +118,17 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionConfig
                 }
 
                 // Idk why but client considers player is not on ground when walking on slime, client bug?
-                if (e.onGroundReally && !e.onGround && deltaY == 0 && BlockUtils.getBlocksInLocation(e.to.add(0, -0.1, 0))
+                if (e.onGroundReally && !e.onGround && deltaY == 0 && BlockUtils
+                        .getBlocksInLocation(e.to.add(0, -0.1, 0))
                         .stream()
                         .filter(Objects::nonNull)
                         .anyMatch(b -> b.getType() == MatUtils.SLIME_BLOCK.parse())) {
                     estimatedVelocity = 0;
+                }
+
+                // Fix a weird bug in 1.9+
+                if (deltaY < 0 && player.prevPrevDeltaY >= 0 && MathUtils.distance2d(e.to.x - e.from.x, e.to.z - e.from.z) < 0.1) {
+                    estimatedVelocity = deltaY;
                 }
 
                 float discrepancy = deltaY - estimatedVelocity;
