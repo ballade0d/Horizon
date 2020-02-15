@@ -9,4 +9,7 @@ public class SpeedData extends Data {
     public double prevSpeed;
     public double discrepancies;
     public double negativeDiscrepancies;
+    // TypeB
+    public long lastSprintTick;
+    public boolean collisionHorizontal;
 }

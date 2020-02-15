@@ -113,13 +113,13 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionConfig
                 }
 
                 // Fix the false positives when towering
-                if (!player.isOnGround && player.velocity.y == 0 && (MathUtils.abs(deltaY - 0.40444491418477) < 0.001 || MathUtils.abs(deltaY - 0.39557589867329) < 0.001)) {
+                if (player.isOnGround && !e.onGround && player.velocity.y == 0 && (MathUtils.abs(deltaY - 0.4044449) < 0.001 || MathUtils.abs(deltaY - 0.3955759) < 0.001)) {
                     deltaY = estimatedVelocity = 0.42F;
                 }
 
                 // Idk why but client considers player is not on ground when walking on slime, client bug?
                 if (e.onGroundReally && !e.onGround && deltaY == 0 && BlockUtils
-                        .getBlocksInLocation(e.to.add(0, -0.1, 0))
+                        .getBlocksInLocation(e.to.add(0, -0.2, 0))
                         .stream()
                         .filter(Objects::nonNull)
                         .anyMatch(b -> b.getType() == MatUtils.SLIME_BLOCK.parse())) {
@@ -134,7 +134,7 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionConfig
                 float discrepancy = deltaY - estimatedVelocity;
 
                 if (e.updatePos && e.velocity.lengthSquared() > 0 && MathUtils.abs(discrepancy) > config.typeA_tolerance) {
-                    this.debug("Failed: TypeA, d:" + deltaY + ", e:" + estimatedVelocity + ", p:" + discrepancy);
+                    this.debug("Failed: TypeA, d:" + deltaY + ", e:" + estimatedVelocity + ", p:" + discrepancy + ", p:" + player.velocity.y);
 
                     // Punish
                     this.punish(event, player, data, "TypeA", MathUtils.abs(discrepancy) * 5F);

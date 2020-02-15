@@ -191,8 +191,7 @@ public class MoveEvent extends Event {
      * @author Islandscout, MrCraftGoo
      */
     private boolean checkJump() {
-        int jumpBoostLvl = player.getPotionEffectAmplifier("JUMP");
-        float initJumpVelocity = 0.42F + jumpBoostLvl * 0.1F;
+        float initJumpVelocity = 0.42F + player.getPotionEffectAmplifier("JUMP") * 0.1F;
         float deltaY = (float) this.velocity.y;
         boolean hitCeiling = touchingFaces.contains(BlockFace.UP);
         return player.isOnGround && !onGround && (deltaY == initJumpVelocity || hitCeiling);

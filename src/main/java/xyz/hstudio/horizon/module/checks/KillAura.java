@@ -47,7 +47,6 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
         if (config.typeE_enabled) {
             typeE(event, player, data, config);
         }
-        typeF(event, player, data, config);
         // TODO: Aim checks.
     }
 
@@ -218,28 +217,6 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
     }
 
     /**
-     * An AimBot/Rotation Pattern check.
-     *
-     * @author MrCraftGoo
-     */
-    private void typeE(final Event event, final HoriPlayer player, final KillAuraData data, final KillAuraConfig config) {
-        if (event instanceof MoveEvent) {
-            MoveEvent e = (MoveEvent) event;
-            if (!e.updateRot) {
-                return;
-            }
-            float yawDiff = MathUtils.abs(e.to.yaw - e.from.yaw);
-            float pitchDiff = MathUtils.abs(e.to.pitch - e.from.pitch);
-            if (yawDiff >= 3.0 && pitchDiff > 0.001 && pitchDiff < 0.0995) {
-                this.debug("Failed: TypeE, p:1");
-
-                // Punish
-                this.punish(event, player, data, "TypeE", 5);
-            }
-        }
-    }
-
-    /**
      * An amazing InteractAutoBlock check. May also detect related hacks.
      * <p>
      * Accuracy: 10/10 - It shouldn't have any false positives
@@ -247,7 +224,7 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
      *
      * @author MrCraftGoo
      */
-    private void typeF(final Event event, final HoriPlayer player, final KillAuraData data, final KillAuraConfig config) {
+    private void typeE(final Event event, final HoriPlayer player, final KillAuraData data, final KillAuraConfig config) {
         if (event instanceof InteractEntityEvent) {
             InteractEntityEvent e = (InteractEntityEvent) event;
             if (e.action != InteractEntityEvent.InteractType.INTERACT || e.intersection == null) {

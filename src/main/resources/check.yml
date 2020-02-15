@@ -145,6 +145,8 @@ speed:
   typeA:
     enabled: true
     tolerance: 0.08
+  typeB:
+    enabled: true
   action:
     15:
       - 'horizon notify %player% might be moving faster than legit'

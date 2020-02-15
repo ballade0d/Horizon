@@ -1,6 +1,7 @@
 package xyz.hstudio.horizon.module.checks;
 
 import org.bukkit.Material;
+import org.bukkit.block.BlockFace;
 import xyz.hstudio.horizon.api.ModuleType;
 import xyz.hstudio.horizon.api.events.Event;
 import xyz.hstudio.horizon.api.events.inbound.MoveEvent;
@@ -38,6 +39,9 @@ public class Speed extends Module<SpeedData, SpeedConfig> {
         if (config.typeA_enabled) {
             typeA(event, player, data, config);
         }
+        if (config.typeB_enabled) {
+            typeB(event, player, data, config);
+        }
     }
 
     /**
@@ -73,8 +77,11 @@ public class Speed extends Module<SpeedData, SpeedConfig> {
                 data.noMoves++;
             }
 
-            if (e.isTeleport || e.knockBack != null) {
+            if (e.knockBack != null) {
                 data.prevSpeed = speed;
+                return;
+            }
+            if (e.isTeleport) {
                 return;
             }
 
@@ -197,5 +204,59 @@ public class Speed extends Module<SpeedData, SpeedConfig> {
         float componentForce = initForce * multiplier / diagonal;
         float finalForce = (float) Math.sqrt(2 * componentForce * componentForce);
         return finalForce * (sprinting ? (flying ? 2 : 1.3F) : 1);
+    }
+
+    private void typeB(final Event event, final HoriPlayer player, final SpeedData data, final SpeedConfig config) {
+        if (event instanceof MoveEvent) {
+            MoveEvent e = (MoveEvent) event;
+
+            boolean collisionHorizontal = e.touchingFaces.contains(BlockFace.NORTH) || e.touchingFaces.contains(BlockFace.SOUTH) ||
+                    e.touchingFaces.contains(BlockFace.WEST) || e.touchingFaces.contains(BlockFace.EAST);
+
+            if (!player.isSprinting) {
+                data.lastSprintTick = player.currentTick;
+            }
+
+            if (e.isInLiquid || e.isTeleport || e.knockBack != null ||
+                    (collisionHorizontal && !data.collisionHorizontal) ||
+                    player.currentTick - data.lastSprintTick < 2 ||
+                    e.velocity.clone().setY(0).lengthSquared() < 0.04) {
+                return;
+            }
+
+            float yaw = e.to.yaw;
+            Vector3D prevVelocity = player.velocity.clone();
+            if (e.hitSlowdown) {
+                prevVelocity.multiply(0.6);
+            }
+            double dX = e.to.x - e.from.x;
+            double dZ = e.to.z - e.from.z;
+            float friction = e.oldFriction;
+            dX /= friction;
+            dZ /= friction;
+            if (e.jumpLegitly) {
+                float yawRadians = yaw * 0.017453292F;
+                dX += (McAccessor.INSTANCE.sin(yawRadians) * 0.2F);
+                dZ -= (McAccessor.INSTANCE.cos(yawRadians) * 0.2F);
+            }
+
+            dX -= prevVelocity.x;
+            dZ -= prevVelocity.z;
+
+            Vector3D moveForce = new Vector3D(dX, 0, dZ);
+            Vector3D yawVec = MathUtils.getDirection(yaw, 0);
+
+            double angle = MathUtils.angle(yawVec, moveForce);
+            if (angle > Math.PI / 4 + 0.3) {
+                this.debug("Failed: TypeB, a:" + angle + ", y:" + yaw);
+
+                // Punish
+                this.punish(event, player, data, "TypeB", 4);
+            } else {
+                reward("TypeB", data, 0.99);
+            }
+
+            data.collisionHorizontal = collisionHorizontal;
+        }
     }
 }
