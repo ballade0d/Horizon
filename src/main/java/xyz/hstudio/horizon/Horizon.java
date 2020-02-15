@@ -5,7 +5,9 @@ import com.google.gson.JsonObject;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
+import xyz.hstudio.horizon.command.Commands;
 import xyz.hstudio.horizon.config.DefaultConfig;
+import xyz.hstudio.horizon.config.Language;
 import xyz.hstudio.horizon.data.HoriPlayer;
 import xyz.hstudio.horizon.kirin.Kirin;
 import xyz.hstudio.horizon.listener.Listeners;
@@ -18,7 +20,6 @@ import xyz.hstudio.horizon.util.enums.Version;
 import xyz.hstudio.horizon.util.wrap.YamlLoader;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
 import java.util.HashSet;
 import java.util.Map;
@@ -40,6 +41,7 @@ public class Horizon extends JavaPlugin {
     public JsonArray announcements = new JsonArray();
     public Set<String> aliases = new HashSet<>();
     public DefaultConfig config;
+    public Language language;
 
     public Horizon() {
         Horizon.inst = this;
@@ -74,6 +76,14 @@ public class Horizon extends JavaPlugin {
         this.configMap.put("config.yml", configYaml);
         this.config = new DefaultConfig().load();
 
+        File langFile = new File(folder, "language.yml");
+        if (!langFile.exists()) {
+            saveResource("language.yml", true);
+        }
+        YamlLoader langYaml = YamlLoader.loadConfiguration(langFile);
+        this.configMap.put("language.yml", langYaml);
+        this.language = new Language().load();
+
         if (this.config.kirin_enabled) {
             try {
                 new Kirin(this.config.kirin_licence);
@@ -89,6 +99,7 @@ public class Horizon extends JavaPlugin {
         thread.start();
         Bukkit.getScheduler().runTaskTimer(this, new Sync(), 1L, 1L);
         new Listeners();
+        new Commands();
 
         // Enable checks
         new AntiVelocity();
@@ -126,12 +137,5 @@ public class Horizon extends JavaPlugin {
     @Override
     public void onDisable() {
         Horizon.PLAYERS.values().forEach(ChannelHandler::unregister);
-        this.configMap.forEach((string, yaml) -> {
-            try {
-                yaml.save(new File(this.getDataFolder(), string));
-            } catch (IOException e) {
-                Logger.msg("Error", "Failed to save the file " + string + "!");
-            }
-        });
     }
 }

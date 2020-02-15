@@ -2,7 +2,6 @@ package xyz.hstudio.horizon.module;
 
 import lombok.Getter;
 import org.bukkit.Bukkit;
-import xyz.hstudio.horizon.Logger;
 import xyz.hstudio.horizon.api.ModuleType;
 import xyz.hstudio.horizon.api.PlayerViolateEvent;
 import xyz.hstudio.horizon.api.events.Event;
@@ -18,7 +17,7 @@ import java.util.Map;
 public abstract class Module<K extends Data, V extends CheckConfig<V>> {
 
     // Use LinkedHashMap to keep the check order.
-    private static final Map<ModuleType, Module<? extends Data, ? extends CheckConfig>> moduleMap = new LinkedHashMap<>(16, 1);
+    private static final Map<ModuleType, Module<? extends Data, ? extends CheckConfig<?>>> moduleMap = new LinkedHashMap<>(16, 1);
 
     private final ModuleType moduleType;
     @Getter
@@ -95,7 +94,7 @@ public abstract class Module<K extends Data, V extends CheckConfig<V>> {
         if (!this.config.debug) {
             return;
         }
-        Logger.msg("Debug|" + this.moduleType.name(), object);
+        Bukkit.broadcastMessage("Debug|" + this.moduleType.name() + object);
     }
 
     protected void reward(final String type, final K data, final double multiplier) {

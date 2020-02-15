@@ -1,6 +1,5 @@
 package xyz.hstudio.horizon.config;
 
-import com.esotericsoftware.reflectasm.FieldAccess;
 import com.google.common.primitives.Primitives;
 import org.apache.commons.lang.StringUtils;
 import xyz.hstudio.horizon.Horizon;
@@ -23,8 +22,7 @@ public abstract class AbstractConfig {
      * @author MrCraftGoo
      */
     public <T extends AbstractConfig> T load(final String pathPrefix, final T conf) {
-        FieldAccess access = FieldAccess.get(conf.getClass());
-        Field[] fields = access.getFields();
+        Field[] fields = conf.getClass().getFields();
         for (int i = 0; i < fields.length; i++) {
             Field field = fields[i];
             Load annotation = field.getAnnotation(Load.class);
@@ -60,7 +58,7 @@ public abstract class AbstractConfig {
                 }
             } else {
                 if (value == null) {
-                    config.set(path, value = access.get(conf, i));
+                    continue;
                 }
 
                 // Double.class.isAssignableFrom(double.class) is false :/
@@ -69,9 +67,12 @@ public abstract class AbstractConfig {
                 }
             }
 
-            access.set(conf, i, value);
+            try {
+                conf.getClass().getFields()[i].set(conf, value);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
-
         return conf;
     }
 }

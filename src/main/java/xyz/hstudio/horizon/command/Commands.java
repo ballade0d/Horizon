@@ -1,12 +1,13 @@
 package xyz.hstudio.horizon.command;
 
-import com.esotericsoftware.reflectasm.MethodAccess;
 import org.apache.commons.lang.ArrayUtils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import xyz.hstudio.horizon.Horizon;
 import xyz.hstudio.horizon.command.annotation.Cmd;
+import xyz.hstudio.horizon.config.Language;
 import xyz.hstudio.horizon.util.collect.Pair;
 
 import java.lang.reflect.Method;
@@ -17,7 +18,6 @@ public class Commands implements CommandExecutor {
 
     // CommandSender, String, String[], Language
     private final List<Pair<Cmd, Integer>> commands = new ArrayList<>();
-    private final MethodAccess methodAccess = MethodAccess.get(this.getClass());
 
     public Commands() {
         Method[] methods = this.getClass().getMethods();
@@ -33,10 +33,12 @@ public class Commands implements CommandExecutor {
 
     @Override
     public boolean onCommand(final CommandSender sender, final Command command, final String label, final String[] args) {
+        String prefix = Horizon.getInst().config.prefix;
         if (args.length == 0) {
-            // Send brand
+            sender.sendMessage(prefix + "Horizon by MrCraftGoo");
             return true;
         }
+        Language language = Horizon.getInst().language;
         String subName = args[0];
         String[] subArgs = (String[]) ArrayUtils.remove(args, 0);
         for (Pair<Cmd, Integer> pair : this.commands) {
@@ -52,7 +54,11 @@ public class Commands implements CommandExecutor {
                 // Send info
                 return true;
             }
-            this.methodAccess.invoke(this, pair.value, sender, subName, subArgs, null);
+            try {
+                this.getClass().getMethods()[pair.value].invoke(this, sender, subArgs, language, prefix);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
         return true;
     }
