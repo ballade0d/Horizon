@@ -13,6 +13,7 @@ import xyz.hstudio.horizon.module.Module;
 import xyz.hstudio.horizon.thread.Sync;
 import xyz.hstudio.horizon.util.MathUtils;
 import xyz.hstudio.horizon.util.enums.MatUtils;
+import xyz.hstudio.horizon.util.wrap.AABB;
 import xyz.hstudio.horizon.util.wrap.Vector3D;
 
 import java.util.Set;
@@ -77,7 +78,8 @@ public class Speed extends Module<SpeedData, SpeedConfig> {
                 data.noMoves++;
             }
 
-            if (e.knockBack != null || e.touchingFaces.contains(BlockFace.UP) || player.touchingFaces.contains(BlockFace.UP)) {
+            if (e.knockBack != null || e.touchingFaces.contains(BlockFace.UP) ||
+                    player.touchingFaces.contains(BlockFace.UP) || player.invalidMotionData.magic) {
                 data.prevSpeed = speed;
                 return;
             }
@@ -86,7 +88,13 @@ public class Speed extends Module<SpeedData, SpeedConfig> {
             }
 
             boolean flying = player.isFlying();
-            boolean swimming = player.isInLiquid;
+            boolean swimming = AABB.waterCollisionBox
+                    .shrink(0.001, 0.001, 0.001)
+                    .add(e.from.toVector())
+                    .getMaterials(e.to.world)
+                    .stream()
+                    .anyMatch(MatUtils::isLiquid);
+            boolean usingItem = player.isEating || player.isPullingBow;
 
             double estimatedSpeed;
             double discrepancy;
@@ -97,6 +105,12 @@ public class Speed extends Module<SpeedData, SpeedConfig> {
                 Vector3D waterForce = e.waterFlowForce.clone().setY(0).normalize().multiply(0.014);
                 double waterForceLength = waterForce.length();
                 double computedForce = McAccessor.INSTANCE.cos(move.angle(waterForce)) * waterForceLength + 0.003;
+                if (Double.isNaN(computedForce)) {
+                    computedForce = waterForceLength;
+                    if (Double.isNaN(computedForce)) {
+                        computedForce = 0;
+                    }
+                }
 
                 estimatedSpeed = this.waterMapping(prevSpeed, computedForce,
                         player.getEnchantmentEffectAmplifier("DEPTH_STRIDER"), player.isSprinting, e.onGround);
@@ -105,7 +119,7 @@ public class Speed extends Module<SpeedData, SpeedConfig> {
                 boolean jump = e.jumpLegitly || (e.stepLegitly && player.isOnGround && player.isSprinting);
 
                 float friction = e.oldFriction;
-                float maxForce = this.computeMaxInputForce(player, e.newFriction);
+                float maxForce = this.computeMaxInputForce(player, e.newFriction, usingItem);
 
                 Set<Material> touchedBlocks = e.cube.add(-e.velocity.x, -e.velocity.y, -e.velocity.z).getMaterials(e.to.world);
 
@@ -174,12 +188,11 @@ public class Speed extends Module<SpeedData, SpeedConfig> {
      *
      * @author Islandscout, MrCraftGoo
      */
-    private float computeMaxInputForce(final HoriPlayer player, final float newFriction) {
+    private float computeMaxInputForce(final HoriPlayer player, final float newFriction, final boolean usingItem) {
         float initForce = 0.98F;
         if (player.isSneaking) {
             initForce *= 0.3;
         }
-        boolean usingItem = player.isEating || player.isPullingBow;
         if (usingItem) {
             initForce *= 0.2;
         }

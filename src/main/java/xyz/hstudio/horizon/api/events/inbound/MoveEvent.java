@@ -206,7 +206,7 @@ public class MoveEvent extends Event {
      * @author Islandscout, MrCraftGoo
      */
     private boolean checkStrafe() {
-        if (!this.updateRot || this.knockBack != null || this.jumpLegitly || player.getVehicle() != null ||
+        if (!this.updateRot || this.knockBack != null || this.jumpLegitly || this.isInLiquid || player.getVehicle() != null ||
                 player.isFlying() || player.isSneaking || player.isPullingBow || player.isEating ||
                 player.touchingFaces.contains(BlockFace.UP) || this.touchingFaces.contains(BlockFace.UP) ||
                 this.touchingFaces.contains(BlockFace.NORTH) || this.touchingFaces.contains(BlockFace.SOUTH) ||

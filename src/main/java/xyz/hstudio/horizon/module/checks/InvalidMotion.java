@@ -36,6 +36,7 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionConfig
 
     @Override
     public void doCheck(final Event event, final HoriPlayer player, final InvalidMotionData data, final InvalidMotionConfig config) {
+        data.magic = false;
         if (config.typeA_enabled) {
             typeA(event, player, data, config);
         }
@@ -113,6 +114,7 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionConfig
                 }
                 if (player.velocity.y == 0F && (estimatedVelocity == -0.0784F || estimatedVelocity == 0F) && player.isOnGround && deltaY >= 0 && deltaY < 0.419F) {
                     estimatedVelocity = deltaY;
+                    data.magic = true;
                 }
 
                 // Fix the false positives when towering

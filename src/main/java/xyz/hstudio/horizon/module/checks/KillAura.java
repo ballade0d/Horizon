@@ -200,10 +200,14 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
                 return;
             }
             if (!e.strafeNormally) {
-                this.debug("Failed: TypeD");
+                if (++data.typeDFails > 4) {
+                    this.debug("Failed: TypeD");
 
-                // Punish
-                this.punish(event, player, data, "TypeD", 3);
+                    // Punish
+                    this.punish(event, player, data, "TypeD", 3);
+                }
+            } else if (data.typeDFails > 0) {
+                data.typeDFails--;
             } else {
                 reward("TypeD", data, 0.999);
             }

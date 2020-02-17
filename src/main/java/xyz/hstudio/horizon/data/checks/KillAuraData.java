@@ -17,6 +17,7 @@ public class KillAuraData extends Data {
     public int gcdFails;
     // TypeD
     public long lastHitTick = -10000;
+    public int typeDFails;
     // TypeE
     public Vector3D intersection;
 }

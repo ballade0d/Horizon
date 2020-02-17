@@ -6,4 +6,6 @@ public class InvalidMotionData extends Data {
 
     // TypeA
     public float estimatedVelocity;
+    // Magic
+    public boolean magic;
 }
