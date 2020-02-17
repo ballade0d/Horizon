@@ -1,5 +1,6 @@
 package xyz.hstudio.horizon.module.checks;
 
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import xyz.hstudio.horizon.api.ModuleType;
 import xyz.hstudio.horizon.api.events.Event;
@@ -64,7 +65,7 @@ public class Scaffold extends Module<ScaffoldData, ScaffoldConfig> {
             Vector3D interaction = e.interaction;
             Block b = e.getTargetLocation().getBlock();
             if (e.face == BlockPlaceEvent.BlockFace.INVALID) {
-                this.debug("Failed: TypeA");
+                this.debug("Failed: TypeA, p:1");
 
                 // Punish
                 this.punish(event, player, data, "TypeA", 5);
@@ -74,8 +75,8 @@ public class Scaffold extends Module<ScaffoldData, ScaffoldConfig> {
 
                 // Punish
                 this.punish(event, player, data, "TypeA", 5);
-            } else if (b != null && b.getType().name().contains("AIR")) {
-                this.debug("Failed: TypeA");
+            } else if (b != null && b.getType() == Material.AIR) {
+                this.debug("Failed: TypeA, p:3");
 
                 // Punish
                 this.punish(event, player, data, "TypeA", 5);

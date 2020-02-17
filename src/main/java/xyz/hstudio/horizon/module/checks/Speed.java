@@ -77,7 +77,7 @@ public class Speed extends Module<SpeedData, SpeedConfig> {
                 data.noMoves++;
             }
 
-            if (e.knockBack != null) {
+            if (e.knockBack != null || e.touchingFaces.contains(BlockFace.UP) || player.touchingFaces.contains(BlockFace.UP)) {
                 data.prevSpeed = speed;
                 return;
             }

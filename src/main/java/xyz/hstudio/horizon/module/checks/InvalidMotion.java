@@ -111,6 +111,9 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionConfig
                 if (hitHead && !hasHitHead) {
                     deltaY = estimatedVelocity = 0;
                 }
+                if (player.velocity.y == 0F && (estimatedVelocity == -0.0784F || estimatedVelocity == 0F) && player.isOnGround && deltaY >= 0 && deltaY < 0.419F) {
+                    estimatedVelocity = deltaY;
+                }
 
                 // Fix the false positives when towering
                 if (player.isOnGround && !e.onGround && player.velocity.y == 0 && (MathUtils.abs(deltaY - 0.4044449) < 0.001 || MathUtils.abs(deltaY - 0.3955759) < 0.001)) {

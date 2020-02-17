@@ -206,9 +206,12 @@ public class MoveEvent extends Event {
      * @author Islandscout, MrCraftGoo
      */
     private boolean checkStrafe() {
-        if (!this.updateRot || this.knockBack != null || this.jumpLegitly || player.getVehicle() != null || this.touchingFaces.contains(BlockFace.UP) ||
+        if (!this.updateRot || this.knockBack != null || this.jumpLegitly || player.getVehicle() != null ||
+                player.isFlying() || player.isSneaking || player.isPullingBow || player.isEating ||
+                player.touchingFaces.contains(BlockFace.UP) || this.touchingFaces.contains(BlockFace.UP) ||
                 this.touchingFaces.contains(BlockFace.NORTH) || this.touchingFaces.contains(BlockFace.SOUTH) ||
-                this.touchingFaces.contains(BlockFace.WEST) || this.touchingFaces.contains(BlockFace.EAST)) {
+                this.touchingFaces.contains(BlockFace.WEST) || this.touchingFaces.contains(BlockFace.EAST) ||
+                this.collidingBlocks.contains(Material.LADDER) || this.collidingBlocks.contains(Material.VINE)) {
             return true;
         }
         Block footBlock = player.position.add(0, -1, 0).getBlock();
