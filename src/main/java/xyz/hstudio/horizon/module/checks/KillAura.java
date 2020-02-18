@@ -4,12 +4,16 @@ import xyz.hstudio.horizon.api.ModuleType;
 import xyz.hstudio.horizon.api.events.Event;
 import xyz.hstudio.horizon.api.events.inbound.ActionEvent;
 import xyz.hstudio.horizon.api.events.inbound.InteractEntityEvent;
+import xyz.hstudio.horizon.api.events.inbound.InteractItemEvent;
 import xyz.hstudio.horizon.api.events.inbound.MoveEvent;
+import xyz.hstudio.horizon.compat.McAccessor;
 import xyz.hstudio.horizon.config.checks.KillAuraConfig;
 import xyz.hstudio.horizon.data.HoriPlayer;
 import xyz.hstudio.horizon.data.checks.KillAuraData;
 import xyz.hstudio.horizon.module.Module;
 import xyz.hstudio.horizon.util.MathUtils;
+import xyz.hstudio.horizon.util.wrap.AABB;
+import xyz.hstudio.horizon.util.wrap.Ray;
 import xyz.hstudio.horizon.util.wrap.Vector3D;
 
 public class KillAura extends Module<KillAuraData, KillAuraConfig> {
@@ -46,6 +50,9 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
         }
         if (config.typeE_enabled) {
             typeE(event, player, data, config);
+        }
+        if (config.typeF_enabled) {
+            typeF(event, player, data, config);
         }
         // TODO: Aim checks.
     }
@@ -196,7 +203,7 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
     private void typeD(final Event event, final HoriPlayer player, final KillAuraData data, final KillAuraConfig config) {
         if (event instanceof MoveEvent) {
             MoveEvent e = (MoveEvent) event;
-            if (player.currentTick - data.lastHitTick > 5 || e.isTeleport) {
+            if (player.currentTick - data.lastHitTickD > 5 || e.isTeleport) {
                 return;
             }
             if (!e.strafeNormally) {
@@ -216,7 +223,7 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
             if (e.action != InteractEntityEvent.InteractType.ATTACK) {
                 return;
             }
-            data.lastHitTick = player.currentTick;
+            data.lastHitTickD = player.currentTick;
         }
     }
 
@@ -246,6 +253,56 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
             Vector3D dirB = data.intersection.subtract(headPos).normalize();
 
             if (dirA.dot(dirB) < 0) {
+                this.debug("Failed: TypeE");
+
+                // Punish
+                this.punish(event, player, data, "TypeE", 5);
+            } else {
+                reward("TypeE", data, 0.99);
+            }
+
+            data.intersection = null;
+        }
+    }
+
+    /**
+     * An amazing AutoBlock check. May also detect related hacks.
+     * <p>
+     * Accuracy: 10/10 - It shouldn't have any false positives
+     * Efficiency: 10/10 - Super fast
+     *
+     * @author MrCraftGoo
+     */
+    private void typeF(final Event event, final HoriPlayer player, final KillAuraData data, final KillAuraConfig config) {
+        if (event instanceof InteractEntityEvent) {
+            InteractEntityEvent e = (InteractEntityEvent) event;
+            if (e.action != InteractEntityEvent.InteractType.ATTACK) {
+                data.interactEntity = true;
+                return;
+            }
+            data.interactEntity = false;
+            AABB victimAABB = McAccessor.INSTANCE.getCube(e.entity);
+
+            Vector3D eyePos = player.getHeadPosition();
+            Vector3D direction = MathUtils.getDirection(player.position.yaw, player.position.pitch);
+            Ray ray = new Ray(eyePos, direction);
+
+            Vector3D intersection = victimAABB.intersectsRay(ray, 0, 3);
+
+            if (intersection == null) {
+                return;
+            }
+
+            data.lastHitTickF = player.currentTick;
+        } else if (event instanceof InteractItemEvent) {
+            InteractItemEvent e = (InteractItemEvent) event;
+            if (e.interactType != InteractItemEvent.InteractType.START_USE_ITEM) {
+                return;
+            }
+            if (data.interactEntity) {
+                return;
+            }
+            if (player.currentTick - data.lastHitTickF < 2) {
                 this.debug("Failed: TypeF");
 
                 // Punish
@@ -253,8 +310,6 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
             } else {
                 reward("TypeF", data, 0.99);
             }
-
-            data.intersection = null;
         }
     }
 }

@@ -39,9 +39,9 @@ public class MoveEvent extends Event {
     public final ClientBlock clientBlock;
     public final Set<BlockFace> touchingFaces;
     public final boolean stepLegitly;
+    public final Vector3D knockBack;
     public final boolean jumpLegitly;
     public final boolean strafeNormally;
-    public final Vector3D knockBack;
     public boolean failedKnockBack;
     public boolean onGround;
     public boolean isTeleport;
@@ -83,9 +83,9 @@ public class MoveEvent extends Event {
         this.clientBlock = this.getClientBlock();
         this.touchingFaces = BlockUtils.checkTouchingBlock(new AABB(to.x - 0.299999, to.y + 0.000001, to.z - 0.299999, to.x + 0.299999, to.y + 1.799999, to.z + 0.299999), to.world, 0.0001);
         this.stepLegitly = this.checkStep();
+        this.knockBack = this.checkKnockBack();
         this.jumpLegitly = this.checkJump();
         this.strafeNormally = this.checkStrafe();
-        this.knockBack = this.checkKnockBack();
     }
 
     /**
@@ -185,72 +185,6 @@ public class MoveEvent extends Event {
         return extraPos.isOnGround(player, false, 0.001) && onGroundReally && deltaY > 0.002F && deltaY <= 0.6F;
     }
 
-    /**
-     * Check if player is jumping.
-     *
-     * @author Islandscout, MrCraftGoo
-     */
-    private boolean checkJump() {
-        float initJumpVelocity = 0.42F + player.getPotionEffectAmplifier("JUMP") * 0.1F;
-        float deltaY = (float) this.velocity.y;
-        boolean hitCeiling = touchingFaces.contains(BlockFace.UP);
-        return player.isOnGround && !onGround && (deltaY == initJumpVelocity || hitCeiling);
-    }
-
-    /**
-     * Check if player's strafing is normal.
-     * I learnt this from Islandscout, but much lighter than his.
-     * <p>
-     * TODO: Ignore when colliding entities
-     *
-     * @author Islandscout, MrCraftGoo
-     */
-    private boolean checkStrafe() {
-        if (!this.updateRot || this.knockBack != null || this.jumpLegitly || this.isInLiquid || player.getVehicle() != null ||
-                player.isFlying() || player.isSneaking || player.isPullingBow || player.isEating ||
-                player.touchingFaces.contains(BlockFace.UP) || this.touchingFaces.contains(BlockFace.UP) ||
-                this.touchingFaces.contains(BlockFace.NORTH) || this.touchingFaces.contains(BlockFace.SOUTH) ||
-                this.touchingFaces.contains(BlockFace.WEST) || this.touchingFaces.contains(BlockFace.EAST) ||
-                this.collidingBlocks.contains(Material.LADDER) || this.collidingBlocks.contains(Material.VINE)) {
-            return true;
-        }
-        Block footBlock = player.position.add(0, -1, 0).getBlock();
-        if (footBlock == null) {
-            return true;
-        }
-        Vector3D velocity = this.velocity.clone().setY(0);
-        Vector3D prevVelocity = player.velocity.clone();
-        if (this.hitSlowdown) {
-            prevVelocity.multiply(0.6);
-        }
-        if (MathUtils.abs(prevVelocity.x * this.oldFriction) < 0.005) {
-            prevVelocity.setX(0);
-        }
-        if (MathUtils.abs(prevVelocity.z * this.oldFriction) < 0.005) {
-            prevVelocity.setZ(0);
-        }
-        double dX = velocity.x;
-        double dZ = velocity.z;
-        dX /= this.oldFriction;
-        dZ /= this.oldFriction;
-        dX -= prevVelocity.x;
-        dZ -= prevVelocity.z;
-        Vector3D accelDir = new Vector3D(dX, 0, dZ);
-        Vector3D yaw = MathUtils.getDirection(this.to.yaw, 0);
-
-        if (velocity.length() < 0.15 || accelDir.lengthSquared() < 0.000001) {
-            return true;
-        }
-
-        boolean vectorDir = accelDir.clone().crossProduct(yaw).dot(new Vector3D(0, 1, 0)) >= 0;
-        double angle = (vectorDir ? 1 : -1) * MathUtils.angle(accelDir, yaw);
-
-        double multiple = angle / (Math.PI / 4);
-        double threshold = Math.toRadians(0.6);
-
-        return MathUtils.abs(multiple - Math.round(multiple)) <= threshold;
-    }
-
     private Vector3D checkKnockBack() {
         List<Pair<Vector3D, Long>> velocities = player.velocities;
         if (velocities.size() <= 0) {
@@ -306,6 +240,73 @@ public class MoveEvent extends Event {
         }
         velocities.subList(0, expiredKbs).clear();
         return null;
+    }
+
+    /**
+     * Check if player is jumping.
+     *
+     * @author Islandscout, MrCraftGoo
+     */
+    private boolean checkJump() {
+        float initJumpVelocity = 0.42F + player.getPotionEffectAmplifier("JUMP") * 0.1F;
+        float deltaY = (float) this.velocity.y;
+        boolean hitCeiling = touchingFaces.contains(BlockFace.UP);
+        boolean kbSimilarToJump = this.knockBack != null && (MathUtils.abs(knockBack.y - initJumpVelocity) < 0.001 || hitCeiling);
+        return !kbSimilarToJump && player.isOnGround && !onGround && (deltaY == initJumpVelocity || hitCeiling);
+    }
+
+    /**
+     * Check if player's strafing is normal.
+     * I learnt this from Islandscout, but much lighter than his.
+     * <p>
+     * TODO: Ignore when colliding entities
+     *
+     * @author Islandscout, MrCraftGoo
+     */
+    private boolean checkStrafe() {
+        if (!this.updateRot || this.knockBack != null || this.jumpLegitly || this.isInLiquid || player.getVehicle() != null ||
+                player.isFlying() || player.isSneaking || player.isPullingBow || player.isEating ||
+                player.touchingFaces.contains(BlockFace.UP) || this.touchingFaces.contains(BlockFace.UP) ||
+                this.touchingFaces.contains(BlockFace.NORTH) || this.touchingFaces.contains(BlockFace.SOUTH) ||
+                this.touchingFaces.contains(BlockFace.WEST) || this.touchingFaces.contains(BlockFace.EAST) ||
+                this.collidingBlocks.contains(Material.LADDER) || this.collidingBlocks.contains(Material.VINE)) {
+            return true;
+        }
+        Block footBlock = player.position.add(0, -1, 0).getBlock();
+        if (footBlock == null) {
+            return true;
+        }
+        Vector3D velocity = this.velocity.clone().setY(0);
+        Vector3D prevVelocity = player.velocity.clone();
+        if (this.hitSlowdown) {
+            prevVelocity.multiply(0.6);
+        }
+        if (MathUtils.abs(prevVelocity.x * this.oldFriction) < 0.005) {
+            prevVelocity.setX(0);
+        }
+        if (MathUtils.abs(prevVelocity.z * this.oldFriction) < 0.005) {
+            prevVelocity.setZ(0);
+        }
+        double dX = velocity.x;
+        double dZ = velocity.z;
+        dX /= this.oldFriction;
+        dZ /= this.oldFriction;
+        dX -= prevVelocity.x;
+        dZ -= prevVelocity.z;
+        Vector3D accelDir = new Vector3D(dX, 0, dZ);
+        Vector3D yaw = MathUtils.getDirection(this.to.yaw, 0);
+
+        if (velocity.length() < 0.15 || accelDir.lengthSquared() < 0.000001) {
+            return true;
+        }
+
+        boolean vectorDir = accelDir.clone().crossProduct(yaw).dot(new Vector3D(0, 1, 0)) >= 0;
+        double angle = (vectorDir ? 1 : -1) * MathUtils.angle(accelDir, yaw);
+
+        double multiple = angle / (Math.PI / 4);
+        double threshold = Math.toRadians(0.6);
+
+        return MathUtils.abs(multiple - Math.round(multiple)) <= threshold;
     }
 
     public boolean hasDeltaPos() {

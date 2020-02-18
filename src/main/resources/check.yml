@@ -101,6 +101,8 @@ killaura:
     enabled: true
   typeE:
     enabled: true
+  typeF:
+    enabled: true
   action:
     10:
       - 'horizon notify %player% might be using KillAura'

@@ -36,7 +36,6 @@ public abstract class Module<K extends Data, V extends CheckConfig<V>> {
      *
      * @param event  The event.
      * @param player The player.
-     * @return Should the packet of the event pass.
      * @author MrCraftGoo
      */
     public static void doCheck(final Event event, final HoriPlayer player) {

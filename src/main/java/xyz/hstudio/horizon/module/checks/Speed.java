@@ -231,9 +231,9 @@ public class Speed extends Module<SpeedData, SpeedConfig> {
             }
 
             // TODO: Ignore if colliding entities
-            if (e.isInLiquid || e.isTeleport || e.knockBack != null ||
-                    (collisionHorizontal && !data.collisionHorizontal) || player.isFlying() ||
-                    player.currentTick - data.lastSprintTick < 2 || player.getVehicle() != null ||
+            if (e.isInLiquid || e.isTeleport || e.knockBack != null || e.collidingBlocks.contains(Material.LADDER) ||
+                    e.collidingBlocks.contains(Material.VINE) || (collisionHorizontal && !data.collisionHorizontal) ||
+                    player.isFlying() || player.currentTick - data.lastSprintTick < 2 || player.getVehicle() != null ||
                     e.velocity.clone().setY(0).lengthSquared() < 0.04) {
                 return;
             }
