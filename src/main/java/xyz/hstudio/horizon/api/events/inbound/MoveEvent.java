@@ -35,6 +35,7 @@ public class MoveEvent extends Event {
     public final boolean isInLiquid;
     public final float oldFriction;
     public final float newFriction;
+    public final List<AABB> piston;
     public final Set<Material> collidingBlocks;
     public final ClientBlock clientBlock;
     public final Set<BlockFace> touchingFaces;
@@ -77,6 +78,8 @@ public class MoveEvent extends Event {
         this.oldFriction = player.friction;
         this.newFriction = this.computeFriction();
 
+        this.piston = this.checkBlock();
+
         // This will only get the blocks that are colliding horizontally.
         this.collidingBlocks = this.cube.add(-0.0001, 0.0001, -0.0001, 0.0001, 0, 0.0001).getMaterials(to.world);
 
@@ -86,6 +89,17 @@ public class MoveEvent extends Event {
         this.knockBack = this.checkKnockBack();
         this.jumpLegitly = this.checkJump();
         this.strafeNormally = this.checkStrafe();
+    }
+
+    private List<AABB> checkBlock() {
+        List<AABB> piston = player.piston;
+        AABB cube = this.cube.add(-velocity.x, -velocity.y, -velocity.z);
+        for (int i = piston.size() - 1; i >= 0; i--) {
+            if (!piston.get(i).isColliding(cube)) {
+                piston.remove(i);
+            }
+        }
+        return piston;
     }
 
     /**

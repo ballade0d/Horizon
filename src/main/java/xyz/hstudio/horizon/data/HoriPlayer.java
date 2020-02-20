@@ -14,6 +14,7 @@ import xyz.hstudio.horizon.compat.McAccessor;
 import xyz.hstudio.horizon.data.checks.*;
 import xyz.hstudio.horizon.network.ChannelHandler;
 import xyz.hstudio.horizon.util.collect.Pair;
+import xyz.hstudio.horizon.util.wrap.AABB;
 import xyz.hstudio.horizon.util.wrap.ClientBlock;
 import xyz.hstudio.horizon.util.wrap.Location;
 import xyz.hstudio.horizon.util.wrap.Vector3D;
@@ -44,6 +45,7 @@ public class HoriPlayer {
     public Vector3D velocity = new Vector3D(0, 0, 0);
     public List<Pair<Vector3D, Long>> velocities = new LinkedList<>();
     public Map<Location, ClientBlock> clientBlocks = new ConcurrentHashMap<>();
+    public List<AABB> piston = new ArrayList<>();
     public Set<BlockFace> touchingFaces = EnumSet.noneOf(BlockFace.class);
     public boolean isSneaking;
     public boolean isSprinting;

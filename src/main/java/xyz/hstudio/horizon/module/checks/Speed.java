@@ -78,7 +78,7 @@ public class Speed extends Module<SpeedData, SpeedConfig> {
                 data.noMoves++;
             }
 
-            if (e.knockBack != null || e.touchingFaces.contains(BlockFace.UP) ||
+            if (e.knockBack != null || e.piston.size() > 0 || e.touchingFaces.contains(BlockFace.UP) ||
                     player.touchingFaces.contains(BlockFace.UP) || player.invalidMotionData.magic) {
                 data.prevSpeed = speed;
                 return;
@@ -234,7 +234,7 @@ public class Speed extends Module<SpeedData, SpeedConfig> {
             if (e.isInLiquid || e.isTeleport || e.knockBack != null || e.collidingBlocks.contains(Material.LADDER) ||
                     e.collidingBlocks.contains(Material.VINE) || (collisionHorizontal && !data.collisionHorizontal) ||
                     player.isFlying() || player.currentTick - data.lastSprintTick < 2 || player.getVehicle() != null ||
-                    e.velocity.clone().setY(0).lengthSquared() < 0.04) {
+                    e.velocity.clone().setY(0).lengthSquared() < 0.04 || e.piston.size() > 0) {
                 return;
             }
 

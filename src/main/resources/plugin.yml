@@ -1,6 +1,6 @@
 name: Horizon
 main: xyz.hstudio.horizon.Horizon
-version: 'BETA1'
+version: '${project.version}'
 api-version: '1.13'
 commands:
   horizon:
