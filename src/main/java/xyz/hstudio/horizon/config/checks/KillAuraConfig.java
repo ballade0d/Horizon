@@ -21,9 +21,13 @@ public class KillAuraConfig extends CheckConfig<KillAuraConfig> {
     // TypeE
     @Load(file = "check.yml", path = "typeE.enabled")
     public boolean typeE_enabled = true;
+    @Load(file = "check.yml", path = "typeE.cancel_type")
+    public int typeE_cancel_type = 2;
     // TypeF
     @Load(file = "check.yml", path = "typeF.enabled")
     public boolean typeF_enabled = true;
+    @Load(file = "check.yml", path = "typeF.cancel_type")
+    public int typeF_cancel_type = 2;
 
     @Override
     public KillAuraConfig load() {

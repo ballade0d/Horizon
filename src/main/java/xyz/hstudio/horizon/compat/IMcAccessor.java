@@ -66,4 +66,9 @@ public interface IMcAccessor {
      * Get the flow direction of liquid
      */
     Vector3D getFlowDirection(final Block block);
+
+    /**
+     * Stop a player from using item.
+     */
+    void releaseItem(final Player player);
 }

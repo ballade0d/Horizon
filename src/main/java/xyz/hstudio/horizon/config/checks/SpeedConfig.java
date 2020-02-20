@@ -11,6 +11,8 @@ public class SpeedConfig extends CheckConfig<SpeedConfig> {
     public boolean typeA_enabled = true;
     @Load(file = "check.yml", path = "typeA.tolerance")
     public double typeA_tolerance = 0.08;
+    @Load(file = "check.yml", path = "typeA.cancel_type")
+    public int typeA_cancel_type = 2;
     // TypeB
     @Load(file = "check.yml", path = "typeB.enabled")
     public boolean typeB_enabled = true;

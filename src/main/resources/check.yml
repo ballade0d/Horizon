@@ -101,8 +101,16 @@ killaura:
     enabled: true
   typeE:
     enabled: true
+    # How will Horizon cancel player's action?
+    # 1: Swap item slot
+    # (Default) 2: Release item
+    cancel_type: 2
   typeF:
     enabled: true
+    # How will Horizon cancel player's action?
+    # 1: Swap item slot
+    # (Default) 2: Release item
+    cancel_type: 2
   action:
     10:
       - 'horizon notify %player% might be using KillAura'
@@ -147,6 +155,10 @@ speed:
   typeA:
     enabled: true
     tolerance: 0.08
+    # How will Horizon cancel player's action if player is detected for NoSlow?
+    # 1: Swap item slot
+    # (Default) 2: Release item
+    cancel_type: 2
   typeB:
     enabled: true
   action:

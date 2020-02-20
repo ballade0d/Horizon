@@ -33,6 +33,14 @@ public class Speed extends Module<SpeedData, SpeedConfig> {
     public void cancel(final Event event, final String type, final HoriPlayer player, final SpeedData data, final SpeedConfig config) {
         event.setCancelled(true);
         Sync.teleport(player, player.position);
+        if (type.equals("TypeA") && (player.isEating || player.isPullingBow)) {
+            if (config.typeA_cancel_type == 1) {
+                int slot = player.heldSlot + 1 > 8 ? 0 : player.heldSlot + 1;
+                player.player.getInventory().setHeldItemSlot(slot);
+            } else {
+                McAccessor.INSTANCE.releaseItem(player.player);
+            }
+        }
     }
 
     @Override

@@ -143,4 +143,9 @@ public class McAccessor_v1_8_R3 implements IMcAccessor {
         vec.setZ(nmsVec.c);
         return vec;
     }
+
+    @Override
+    public void releaseItem(final Player player) {
+        ((CraftPlayer) player).getHandle().bU();
+    }
 }

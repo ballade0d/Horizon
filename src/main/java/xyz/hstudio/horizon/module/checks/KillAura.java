@@ -32,6 +32,26 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
     @Override
     public void cancel(final Event event, final String type, final HoriPlayer player, final KillAuraData data, final KillAuraConfig config) {
         // TODO: Finish this
+        switch (type) {
+            case "TypeE": {
+                if (config.typeE_cancel_type == 1) {
+                    int slot = player.heldSlot + 1 > 8 ? 0 : player.heldSlot + 1;
+                    player.player.getInventory().setHeldItemSlot(slot);
+                } else {
+                    McAccessor.INSTANCE.releaseItem(player.player);
+                }
+                break;
+            }
+            case "TypeF": {
+                if (config.typeF_cancel_type == 1) {
+                    int slot = player.heldSlot + 1 > 8 ? 0 : player.heldSlot + 1;
+                    player.player.getInventory().setHeldItemSlot(slot);
+                } else {
+                    McAccessor.INSTANCE.releaseItem(player.player);
+                }
+                break;
+            }
+        }
     }
 
     @Override
