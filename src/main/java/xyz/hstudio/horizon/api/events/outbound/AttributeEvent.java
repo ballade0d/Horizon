@@ -26,7 +26,7 @@ public class AttributeEvent extends Event {
                 continue;
             }
             if (snapshot.modifiers.size() == 0) {
-                player.moveFactor = 0.1F;
+                player.moveFactor = (float) snapshot.baseValue;
                 break;
             }
             snapshot.modifiers.sort(Comparator.comparingInt(o -> o.operation));
@@ -52,7 +52,7 @@ public class AttributeEvent extends Event {
     @RequiredArgsConstructor
     public static class AttributeSnapshot {
         public final String key;
-        public final double value;
+        public final double baseValue;
         public final int size;
         public final List<AttributeModifier> modifiers;
     }

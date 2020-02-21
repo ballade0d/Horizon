@@ -355,19 +355,18 @@ public class PacketConverter_v1_8_R3 implements IPacketConverter {
             }
             List<AttributeEvent.AttributeSnapshot> snapshots = new ArrayList<>();
             int size = serializer.readInt();
-            for (int i = 0; i < size; ++i) {
-                // generic.movementSpeed
+            for (int var1 = 0; var1 < size; ++var1) {
                 String key = serializer.c(64);
-                double value = serializer.readDouble();
+                double baseValue = serializer.readDouble();
                 int magic = serializer.e();
                 List<AttributeEvent.AttributeModifier> modifiers = new ArrayList<>();
-                for (int var9 = 0; var9 < magic; ++var9) {
+                for (int var2 = 0; var2 < magic; ++var2) {
                     UUID uuid = serializer.g();
-                    double val = serializer.readDouble();
+                    double value = serializer.readDouble();
                     byte operation = serializer.readByte();
-                    modifiers.add(new AttributeEvent.AttributeModifier(uuid, val, operation));
+                    modifiers.add(new AttributeEvent.AttributeModifier(uuid, value, operation));
                 }
-                snapshots.add(new AttributeEvent.AttributeSnapshot(key, value, magic, modifiers));
+                snapshots.add(new AttributeEvent.AttributeSnapshot(key, baseValue, magic, modifiers));
             }
             return new AttributeEvent(player, snapshots);
         } catch (Exception e) {
