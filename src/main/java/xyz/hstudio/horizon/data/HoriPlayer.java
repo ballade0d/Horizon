@@ -64,6 +64,7 @@ public class HoriPlayer {
     public int vehicle = -1;
     public long ping;
     public long lastRequestSent;
+    public float moveFactor = 0.1F;
     public ChannelPipeline pipeline;
 
     public HoriPlayer(final Player player) {

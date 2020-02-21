@@ -209,22 +209,29 @@ public class Speed extends Module<SpeedData, SpeedConfig> {
 
         float multiplier;
         if (player.isOnGround) {
-            // float movementFactor = (float) McAccessor.INSTANCE.getMoveFactor(player.player);
-            multiplier = 0.1F * 0.16277136F / (newFriction * newFriction * newFriction);
-            float groundMultiplier = 5 * player.player.getWalkSpeed() * (1 + player.getPotionEffectAmplifier("SPEED") * 0.2F);
+            multiplier = player.moveFactor * 0.16277136F / (newFriction * newFriction * newFriction);
+            // float groundMultiplier = 5 * player.player.getWalkSpeed() * (1 + player.getPotionEffectAmplifier("SPEED") * 0.2F);
+            float groundMultiplier = 5 * player.player.getWalkSpeed();
             multiplier *= groundMultiplier;
+
+            float diagonal = (float) Math.sqrt(2 * initForce * initForce);
+            if (diagonal < 1) {
+                diagonal = 1F;
+            }
+            float componentForce = initForce * multiplier / diagonal;
+            return (float) Math.sqrt(2 * componentForce * componentForce);
         } else {
             float flyMultiplier = 10 * player.player.getFlySpeed();
             multiplier = (flying ? 0.05F : 0.02F) * flyMultiplier;
-        }
 
-        float diagonal = (float) Math.sqrt(2 * initForce * initForce);
-        if (diagonal < 1.0F) {
-            diagonal = 1.0F;
+            float diagonal = (float) Math.sqrt(2 * initForce * initForce);
+            if (diagonal < 1) {
+                diagonal = 1F;
+            }
+            float componentForce = initForce * multiplier / diagonal;
+            float finalForce = (float) Math.sqrt(2 * componentForce * componentForce);
+            return finalForce * (sprinting ? (flying ? 2 : 1.3F) : 1);
         }
-        float componentForce = initForce * multiplier / diagonal;
-        float finalForce = (float) Math.sqrt(2 * componentForce * componentForce);
-        return finalForce * (sprinting ? (flying ? 2 : 1.3F) : 1);
     }
 
     private void typeB(final Event event, final HoriPlayer player, final SpeedData data, final SpeedConfig config) {

@@ -14,6 +14,7 @@ import xyz.hstudio.horizon.thread.Sync;
 import xyz.hstudio.horizon.util.BlockUtils;
 import xyz.hstudio.horizon.util.MathUtils;
 import xyz.hstudio.horizon.util.enums.MatUtils;
+import xyz.hstudio.horizon.util.wrap.Vector3D;
 
 import java.util.Objects;
 
@@ -83,18 +84,24 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionConfig
 
                 if (player.isGliding) {
                     // Gliding function
-                    float pitchRot = (float) Math.toRadians(e.to.pitch);
-                    float magic = McAccessor.INSTANCE.cos(pitchRot);
-                    magic = (float) (magic * magic * Math.min(1, e.to.getDirection().length() / 0.4F));
-                    estimatedVelocity = prevEstimatedVelocity - 0.08F + magic * 0.06F;
-                    if (estimatedVelocity < 0) {
-                        estimatedVelocity += estimatedVelocity * -0.1F * magic;
+                    if (data.prevGliding) {
+                        Vector3D lookDir = e.to.getDirection();
+                        float lookDist = (float) MathUtils.distance2d(lookDir.x, lookDir.z);
+                        float pitchRot = (float) Math.toRadians(e.to.pitch);
+                        float magic = McAccessor.INSTANCE.cos(pitchRot);
+                        magic = (float) (magic * magic * Math.min(1, e.to.getDirection().length() / 0.4F));
+                        estimatedVelocity = (prevEstimatedVelocity - 0.08F + magic * 0.06F);
+                        if (estimatedVelocity < 0 && lookDist > 0) {
+                            estimatedVelocity += estimatedVelocity * -0.1F * magic;
+                        }
+                        if (pitchRot < 0) {
+                            estimatedVelocity += player.velocity.clone().setY(0).length() *
+                                    (-McAccessor.INSTANCE.sin(pitchRot)) * 0.04F * 3.2F;
+                        }
+                        estimatedVelocity *= 0.98F;
+                    } else {
+                        estimatedVelocity = deltaY;
                     }
-                    if (pitchRot < 0) {
-                        estimatedVelocity += player.velocity.clone().setY(0).length() *
-                                (-McAccessor.INSTANCE.sin(pitchRot)) * 0.04F * 3.2F;
-                    }
-                    estimatedVelocity *= 0.98F;
                 } else if (levitation > 0) {
                     estimatedVelocity = prevEstimatedVelocity + (0.05F * levitation - prevEstimatedVelocity) * 0.2F;
                 } else if (e.collidingBlocks.contains(MatUtils.COBWEB.parse())) {
@@ -155,6 +162,7 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionConfig
                     data.estimatedVelocity = deltaY;
                 }
             }
+            data.prevGliding = player.isGliding;
         }
     }
 

@@ -93,7 +93,7 @@ public abstract class Module<K extends Data, V extends CheckConfig<V>> {
         if (!this.config.debug) {
             return;
         }
-        Bukkit.broadcastMessage("Debug|" + this.moduleType.name() + object);
+        McAccessor.INSTANCE.ensureMainThread(() -> Bukkit.broadcastMessage("Debug|" + this.moduleType.name() + object));
     }
 
     protected void reward(final String type, final K data, final double multiplier) {

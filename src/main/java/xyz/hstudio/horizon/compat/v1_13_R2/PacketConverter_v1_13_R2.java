@@ -18,6 +18,7 @@ import xyz.hstudio.horizon.util.wrap.Vector3D;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.IntStream;
 
 public class PacketConverter_v1_13_R2 implements IPacketConverter {
@@ -269,6 +270,8 @@ public class PacketConverter_v1_13_R2 implements IPacketConverter {
             return convertOpenWindowEvent(player, (PacketPlayOutOpenWindow) packet);
         } else if (packet instanceof PacketPlayOutCloseWindow) {
             return convertCloseWindowEvent(player, (PacketPlayOutCloseWindow) packet);
+        } else if (packet instanceof PacketPlayOutUpdateAttributes) {
+            return convertAttributeEvent(player, (PacketPlayOutUpdateAttributes) packet);
         }
         return null;
     }
@@ -322,7 +325,7 @@ public class PacketConverter_v1_13_R2 implements IPacketConverter {
                 return null;
             }
             List<MetaEvent.WatchableObject> objects = new ArrayList<>();
-            for (DataWatcher.Item watchableObject : metaData) {
+            for (DataWatcher.Item<?> watchableObject : metaData) {
                 int index = watchableObject.a().a();
                 Object object = watchableObject.b();
                 objects.add(new MetaEvent.WatchableObject(index, object));
@@ -339,5 +342,35 @@ public class PacketConverter_v1_13_R2 implements IPacketConverter {
 
     private Event convertCloseWindowEvent(final HoriPlayer player, final PacketPlayOutCloseWindow packet) {
         return new CloseWindowEvent(player);
+    }
+
+    private Event convertAttributeEvent(final HoriPlayer player, final PacketPlayOutUpdateAttributes packet) {
+        PacketDataSerializer serializer = new PacketDataSerializer(Unpooled.buffer(0));
+        try {
+            packet.b(serializer);
+            int id = serializer.g();
+            if (id != player.player.getEntityId()) {
+                return null;
+            }
+            List<AttributeEvent.AttributeSnapshot> snapshots = new ArrayList<>();
+            int size = serializer.readInt();
+            for (int i = 0; i < size; ++i) {
+                // generic.movementSpeed
+                String key = serializer.e(64);
+                double value = serializer.readDouble();
+                int magic = serializer.g();
+                List<AttributeEvent.AttributeModifier> modifiers = new ArrayList<>();
+                for (int var9 = 0; var9 < magic; ++var9) {
+                    UUID uuid = serializer.i();
+                    double val = serializer.readDouble();
+                    byte operation = serializer.readByte();
+                    modifiers.add(new AttributeEvent.AttributeModifier(uuid, val, operation));
+                }
+                snapshots.add(new AttributeEvent.AttributeSnapshot(key, value, magic, modifiers));
+            }
+            return new AttributeEvent(player, snapshots);
+        } catch (Exception e) {
+            return null;
+        }
     }
 }

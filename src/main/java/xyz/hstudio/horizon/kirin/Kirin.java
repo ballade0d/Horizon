@@ -62,7 +62,6 @@ public class Kirin {
             String info = (String) msg;
             if (info.equals("LICENCE")) {
                 ctx.channel().writeAndFlush(licence);
-                System.out.println("Sent Licence");
             } else if (info.equals("EXPIRED")) {
                 Logger.msg("Kirin", "Your licence is expired! Please contact the author to renew your licence.");
             } else if (info.equals("FAILED")) {

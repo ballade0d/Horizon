@@ -11,4 +11,5 @@ public class ScaffoldData extends Data {
 
     // TypeD
     public long lastPlaceTick = -10000;
+    public int typeDFails;
 }

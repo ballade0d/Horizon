@@ -23,6 +23,7 @@ public class ActionEvent extends Event {
                 break;
             case START_SPRINTING:
                 player.isSprinting = true;
+                player.moveFactor += player.moveFactor * 0.3F;
                 break;
             case STOP_SPRINTING:
                 player.isSprinting = false;
