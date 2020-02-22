@@ -17,7 +17,7 @@ import java.util.Map;
 public abstract class Module<K extends Data, V extends CheckConfig<V>> {
 
     // Use LinkedHashMap to keep the check order.
-    private static final Map<ModuleType, Module<? extends Data, ? extends CheckConfig<?>>> moduleMap = new LinkedHashMap<>(16, 1);
+    public static final Map<ModuleType, Module<? extends Data, ? extends CheckConfig<?>>> MODULE_MAP = new LinkedHashMap<>(16, 1);
 
     private final ModuleType moduleType;
     @Getter
@@ -27,7 +27,7 @@ public abstract class Module<K extends Data, V extends CheckConfig<V>> {
         // This throws a warn in IDE, tell me any suggestion if you have.
         this.moduleType = moduleType;
         this.config = config.load();
-        Module.moduleMap.put(moduleType, this);
+        Module.MODULE_MAP.put(moduleType, this);
     }
 
     /**
@@ -39,7 +39,7 @@ public abstract class Module<K extends Data, V extends CheckConfig<V>> {
      * @author MrCraftGoo
      */
     public static void doCheck(final Event event, final HoriPlayer player) {
-        for (Module modules : Module.moduleMap.values()) {
+        for (Module modules : Module.MODULE_MAP.values()) {
             if (!modules.config.enabled) {
                 continue;
             }

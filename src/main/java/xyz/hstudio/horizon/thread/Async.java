@@ -9,14 +9,13 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-public class Async implements Runnable {
+public class Async extends Thread {
 
     private static final ExecutorService THREAD_POOL = Executors.newFixedThreadPool(2,
             new ThreadFactoryBuilder()
                     .setDaemon(true)
                     .setNameFormat("Horizon Processing Thread")
                     .build());
-    private long currentTick;
 
     public static <T> Future<T> submit(final Callable<T> callable) {
         return THREAD_POOL.submit(callable);
@@ -26,11 +25,17 @@ public class Async implements Runnable {
         THREAD_POOL.execute(command);
     }
 
+    public Async() {
+        super("Horizon Processing Thread");
+    }
+
+    private long currentTick;
+
     @Override
     public void run() {
         try {
             long current = System.nanoTime();
-            while (true) {
+            while (!this.isInterrupted()) {
 
                 // Run every 80 tick
                 if (currentTick % 80 == 0) {

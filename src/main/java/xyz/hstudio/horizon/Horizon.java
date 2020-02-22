@@ -5,12 +5,14 @@ import com.google.gson.JsonObject;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitTask;
 import xyz.hstudio.horizon.command.Commands;
 import xyz.hstudio.horizon.config.DefaultConfig;
 import xyz.hstudio.horizon.config.Language;
 import xyz.hstudio.horizon.data.HoriPlayer;
 import xyz.hstudio.horizon.kirin.Kirin;
 import xyz.hstudio.horizon.listener.Listeners;
+import xyz.hstudio.horizon.module.Module;
 import xyz.hstudio.horizon.module.checks.*;
 import xyz.hstudio.horizon.network.ChannelHandler;
 import xyz.hstudio.horizon.thread.Async;
@@ -42,6 +44,9 @@ public class Horizon extends JavaPlugin {
     public Set<String> aliases = new HashSet<>();
     public DefaultConfig config;
     public Language language;
+
+    private BukkitTask task;
+    private Thread thread;
 
     public Horizon() {
         Horizon.inst = this;
@@ -94,10 +99,10 @@ public class Horizon extends JavaPlugin {
         }
 
         // Run every 50ms (1 tick)
-        Thread thread = new Thread(new Async(), "Horizon Processing Thread");
+        thread = new Async();
         thread.setDaemon(true);
         thread.start();
-        Bukkit.getScheduler().runTaskTimer(this, new Sync(), 1L, 1L);
+        this.task = Bukkit.getScheduler().runTaskTimer(this, new Sync(), 1L, 1L);
         new Listeners();
         new Commands();
 
@@ -137,5 +142,10 @@ public class Horizon extends JavaPlugin {
     @Override
     public void onDisable() {
         Horizon.PLAYERS.values().forEach(ChannelHandler::unregister);
+
+        Module.MODULE_MAP.clear();
+
+        this.task.cancel();
+        this.thread.interrupt();
     }
 }
