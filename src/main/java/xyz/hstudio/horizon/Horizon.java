@@ -45,8 +45,8 @@ public class Horizon extends JavaPlugin {
     public DefaultConfig config;
     public Language language;
 
-    private BukkitTask task;
-    private Async thread;
+    private BukkitTask syncTask;
+    private Async asyncTask;
 
     public Horizon() {
         Horizon.inst = this;
@@ -99,8 +99,8 @@ public class Horizon extends JavaPlugin {
         }
 
         // Run every 50ms (1 tick)
-        this.thread = new Async();
-        this.task = Bukkit.getScheduler().runTaskTimerAsynchronously(this, new Sync(), 1L, 1L);
+        this.asyncTask = new Async();
+        this.syncTask = Bukkit.getScheduler().runTaskTimer(this, new Sync(), 1L, 1L);
 
         new Listeners();
         new Commands();
@@ -144,7 +144,7 @@ public class Horizon extends JavaPlugin {
 
         Module.MODULE_MAP.clear();
 
-        this.task.cancel();
-        this.thread.running = false;
+        this.syncTask.cancel();
+        this.asyncTask.running = false;
     }
 }
