@@ -27,15 +27,18 @@ public class Async extends Thread {
 
     public Async() {
         super("Horizon Processing Thread");
+        this.setDaemon(true);
+        this.start();
     }
 
     private long currentTick;
+    public volatile boolean running = true;
 
     @Override
     public void run() {
         try {
             long current = System.nanoTime();
-            while (!this.isInterrupted()) {
+            while (running) {
 
                 // Run every 80 tick
                 if (currentTick % 80 == 0) {
