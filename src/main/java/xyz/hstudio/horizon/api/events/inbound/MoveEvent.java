@@ -6,6 +6,7 @@ import org.bukkit.block.BlockFace;
 import xyz.hstudio.horizon.api.events.Event;
 import xyz.hstudio.horizon.compat.McAccessor;
 import xyz.hstudio.horizon.data.HoriPlayer;
+import xyz.hstudio.horizon.thread.Sync;
 import xyz.hstudio.horizon.util.BlockUtils;
 import xyz.hstudio.horizon.util.MathUtils;
 import xyz.hstudio.horizon.util.collect.Pair;
@@ -214,7 +215,7 @@ public class MoveEvent extends Event {
         double sprintMultiplier = flying ? (player.isSprinting ? 2 : 1) : (player.isSprinting ? 1.3 : 1);
         double weirdConstant = (jump && player.isSprinting ? 0.2518462 : (player.isInLiquid ? 0.0196 : 0.098));
         double baseMultiplier = flying ? (10 * player.player.getFlySpeed()) : (5 * player.player.getWalkSpeed() * (1 + player.getPotionEffectAmplifier("SPEED") * 0.2));
-        double maxDiscrepancy = weirdConstant * baseMultiplier * sprintMultiplier + 0.003;
+        double maxDiscrepancy = weirdConstant * baseMultiplier * sprintMultiplier + 0.001;
 
         Pair<Vector3D, Long> kb;
         for (int kbIndex = 0, size = velocities.size(); kbIndex < size; kbIndex++) {
@@ -341,12 +342,22 @@ public class MoveEvent extends Event {
             }
         }
 
-        Location tpLoc = player.teleportPos;
-        if (player.isTeleporting && tpLoc.world.equals(this.to.world) && to.distanceSquared(tpLoc) < 0.001) {
-            player.isTeleporting = false;
-            player.position = tpLoc;
-            player.lastTeleportAcceptTick = player.currentTick;
-            this.isTeleport = true;
+        if (player.isTeleporting) {
+            Location tpLoc = player.teleportPos;
+            long now = System.currentTimeMillis();
+            if (tpLoc.world.equals(this.to.world) && this.to.distanceSquared(tpLoc) < 0.001) {
+                if (now - player.teleportTime > player.ping - 50) {
+                    player.isTeleporting = false;
+                    player.position = tpLoc;
+                    player.lastTeleportAcceptTick = player.currentTick;
+                    this.isTeleport = true;
+                } else {
+                    return false;
+                }
+            } else if (!player.player.isSleeping() && player.currentTick - player.teleportTime > player.ping + 250) {
+                Sync.teleport(player, tpLoc);
+                return false;
+            }
         }
         return true;
     }

@@ -71,8 +71,8 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionConfig
             // TODO: Fix Cobweb, Slime handler
             // TODO: Handle Vehicle
 
-            if (!e.onGround && !e.jumpLegitly && !e.stepLegitly && e.knockBack == null &&
-                    e.piston.size() == 0 && player.getVehicle() == null && !player.isFlying() && !e.isOnSlime && !e.isOnBed &&
+            if (!e.onGround && !e.jumpLegitly && !e.stepLegitly && e.knockBack == null && e.piston.size() == 0 &&
+                    player.getVehicle() == null && !player.isFlying() && !player.player.isDead() && !e.isOnSlime && !e.isOnBed &&
                     !e.isInLiquid && !player.isInLiquid && !e.collidingBlocks.contains(Material.LADDER) &&
                     !e.collidingBlocks.contains(Material.VINE)) {
 
@@ -227,5 +227,9 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionConfig
                 reward("TypeC", data, 0.99);
             }
         }
+    }
+
+    private void typeD(final Event event, final HoriPlayer player, final InvalidMotionData data, final InvalidMotionConfig config) {
+
     }
 }

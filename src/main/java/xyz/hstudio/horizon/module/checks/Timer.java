@@ -53,7 +53,7 @@ public class Timer extends Module<TimerData, TimerConfig> {
 
             // Skip if player is teleporting.
             // Ignore the first 2 second joining the server.
-            if (e.isTeleport || System.currentTimeMillis() - player.teleportTime < 800L || player.currentTick < 40) {
+            if (e.isTeleport || System.currentTimeMillis() - player.teleportTime < 1000L || player.currentTick < 40) {
                 return;
             }
 
@@ -82,9 +82,9 @@ public class Timer extends Module<TimerData, TimerConfig> {
             // Reduce drift
             // Inspired by Islandscout, I'll credit him.
             if (drift < 0) {
-                drift = (long) Math.min(0, drift + (50 - (50 / 1.005)) * MULTIPLIER);
+                drift = (long) Math.min(0, drift + (50 - (50 / 1.02)) * MULTIPLIER);
             } else {
-                drift = (long) Math.max(0, drift + (50 - (50 / 0.995)) * MULTIPLIER);
+                drift = (long) Math.max(0, drift + (50 - (50 / 0.98)) * MULTIPLIER);
             }
 
             data.drift = drift;
