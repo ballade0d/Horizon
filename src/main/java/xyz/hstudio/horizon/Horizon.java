@@ -44,6 +44,7 @@ public class Horizon extends JavaPlugin {
     public Set<String> aliases = new HashSet<>();
     public DefaultConfig config;
     public Language language;
+    public boolean usePapi;
 
     private BukkitTask syncTask;
     private Async asyncTask;
@@ -88,6 +89,8 @@ public class Horizon extends JavaPlugin {
         YamlLoader langYaml = YamlLoader.loadConfiguration(langFile);
         this.configMap.put("language.yml", langYaml);
         this.language = new Language().load();
+
+        this.usePapi = Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI");
 
         if (this.config.kirin_enabled) {
             try {

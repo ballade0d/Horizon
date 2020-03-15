@@ -21,6 +21,8 @@ import java.util.Set;
 
 public class MoveEvent extends Event {
 
+    private static final double STRAFE_THRESHOLD = Math.toRadians(0.6);
+
     public final Location from;
     public final Location to;
     public final Vector3D velocity;
@@ -209,7 +211,7 @@ public class MoveEvent extends Event {
 
         int expiredKbs = 0;
 
-        boolean jump = player.isOnGround && MathUtils.abs(0.42 - velocity.y) < 0.00001;
+        boolean jump = player.isOnGround && Math.abs(0.42 - velocity.y) < 0.00001;
         boolean flying = player.isFlying();
 
         double sprintMultiplier = flying ? (player.isSprinting ? 2 : 1) : (player.isSprinting ? 1.3 : 1);
@@ -230,7 +232,7 @@ public class MoveEvent extends Event {
             double y = kbVelocity.y;
 
             if (!((touchingFaces.contains(BlockFace.UP) && y > 0) || (touchingFaces.contains(BlockFace.DOWN) && y < 0)) &&
-                    MathUtils.abs(y - velocity.y) > 0.01 &&
+                    Math.abs(y - velocity.y) > 0.01 &&
                     !jump && !player.isInLiquid && !this.stepLegitly) {
                 continue;
             }
@@ -266,7 +268,7 @@ public class MoveEvent extends Event {
         float initJumpVelocity = 0.42F + player.getPotionEffectAmplifier("JUMP") * 0.1F;
         float deltaY = (float) this.velocity.y;
         boolean hitCeiling = touchingFaces.contains(BlockFace.UP);
-        boolean kbSimilarToJump = this.knockBack != null && (MathUtils.abs(knockBack.y - initJumpVelocity) < 0.001 || hitCeiling);
+        boolean kbSimilarToJump = this.knockBack != null && (Math.abs(knockBack.y - initJumpVelocity) < 0.001 || hitCeiling);
         return !kbSimilarToJump && player.isOnGround && !onGround && (deltaY == initJumpVelocity || hitCeiling);
     }
 
@@ -296,10 +298,10 @@ public class MoveEvent extends Event {
         if (this.hitSlowdown) {
             prevVelocity.multiply(0.6);
         }
-        if (MathUtils.abs(prevVelocity.x * this.oldFriction) < 0.005) {
+        if (Math.abs(prevVelocity.x * this.oldFriction) < 0.005) {
             prevVelocity.setX(0);
         }
-        if (MathUtils.abs(prevVelocity.z * this.oldFriction) < 0.005) {
+        if (Math.abs(prevVelocity.z * this.oldFriction) < 0.005) {
             prevVelocity.setZ(0);
         }
         double dX = velocity.x;
@@ -318,10 +320,13 @@ public class MoveEvent extends Event {
         boolean vectorDir = accelDir.clone().crossProduct(yaw).dot(new Vector3D(0, 1, 0)) >= 0;
         double angle = (vectorDir ? 1 : -1) * MathUtils.angle(accelDir, yaw);
 
-        double multiple = angle / (Math.PI / 4);
-        double threshold = Math.toRadians(0.6);
+        // double multiple = angle / (Math.PI / 4);
 
-        return MathUtils.abs(multiple - Math.round(multiple)) <= threshold;
+        // return Math.abs(multiple - Math.round(multiple)) <= STRAFE_THRESHOLD;
+
+        double modulo = (angle % (Math.PI / 4)) * (4 / Math.PI);
+        double error = Math.abs(modulo - Math.round(modulo)) * (Math.PI / 4);
+        return error <= STRAFE_THRESHOLD;
     }
 
     public boolean hasDeltaPos() {

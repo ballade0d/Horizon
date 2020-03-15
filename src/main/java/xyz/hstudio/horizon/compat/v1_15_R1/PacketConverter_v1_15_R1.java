@@ -11,7 +11,6 @@ import xyz.hstudio.horizon.api.events.inbound.*;
 import xyz.hstudio.horizon.api.events.outbound.*;
 import xyz.hstudio.horizon.compat.IPacketConverter;
 import xyz.hstudio.horizon.data.HoriPlayer;
-import xyz.hstudio.horizon.util.MathUtils;
 import xyz.hstudio.horizon.util.enums.Hand;
 import xyz.hstudio.horizon.util.wrap.Location;
 import xyz.hstudio.horizon.util.wrap.Vector3D;
@@ -103,7 +102,7 @@ public class PacketConverter_v1_15_R1 implements IPacketConverter {
         float pitch = packet.b(player.position.pitch);
         boolean onGround = packet.b();
         Location to = new Location(player.player.getWorld(), x, y, z, yaw, pitch);
-        if (MathUtils.abs(to.x) >= Integer.MAX_VALUE || MathUtils.abs(to.y) >= Integer.MAX_VALUE || MathUtils.abs(to.z) >= Integer.MAX_VALUE ||
+        if (Math.abs(to.x) >= Integer.MAX_VALUE || Math.abs(to.y) >= Integer.MAX_VALUE || Math.abs(to.z) >= Integer.MAX_VALUE ||
                 Double.isNaN(to.x) || Double.isNaN(to.y) || Double.isNaN(to.z)) {
             // Bad Move, will be blocked by the server.
             return null;

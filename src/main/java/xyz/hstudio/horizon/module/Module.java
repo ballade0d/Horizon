@@ -1,7 +1,9 @@
 package xyz.hstudio.horizon.module;
 
 import lombok.Getter;
+import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
+import xyz.hstudio.horizon.Horizon;
 import xyz.hstudio.horizon.api.ModuleType;
 import xyz.hstudio.horizon.api.PlayerViolateEvent;
 import xyz.hstudio.horizon.api.events.Event;
@@ -75,11 +77,18 @@ public abstract class Module<K extends Data, V extends CheckConfig<V>> {
 
         for (Map.Entry<Integer, List<String>> entry : config.action.entrySet()) {
             int vl = entry.getKey();
-            if (oldViolation < vl && nowViolation >= vl) {
-                McAccessor.INSTANCE.ensureMainThread(() -> entry.getValue().forEach(cmd ->
-                        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd)));
-                break;
+            if (!(oldViolation < vl && nowViolation >= vl)) {
+                continue;
             }
+            McAccessor.INSTANCE.ensureMainThread(() -> {
+                for (String rawCmd : entry.getValue()) {
+                    String cmd = rawCmd
+                            .replace("%player%", player.player.getName());
+                    cmd = Horizon.getInst().usePapi ? PlaceholderAPI.setPlaceholders(player.player, cmd) : cmd;
+                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd);
+                }
+            });
+            break;
         }
 
         data.violations.put(type, nowViolation);

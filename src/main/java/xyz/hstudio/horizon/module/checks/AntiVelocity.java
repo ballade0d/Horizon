@@ -7,6 +7,7 @@ import xyz.hstudio.horizon.config.checks.AntiVelocityConfig;
 import xyz.hstudio.horizon.data.HoriPlayer;
 import xyz.hstudio.horizon.data.checks.AntiVelocityData;
 import xyz.hstudio.horizon.module.Module;
+import xyz.hstudio.horizon.util.enums.MatUtils;
 
 public class AntiVelocity extends Module<AntiVelocityData, AntiVelocityConfig> {
 
@@ -41,7 +42,7 @@ public class AntiVelocity extends Module<AntiVelocityData, AntiVelocityConfig> {
     private void typeA(final Event event, final HoriPlayer player, final AntiVelocityData data, final AntiVelocityConfig config) {
         if (event instanceof MoveEvent) {
             MoveEvent e = (MoveEvent) event;
-            if (e.failedKnockBack) {
+            if (e.failedKnockBack && !e.collidingBlocks.contains(MatUtils.COBWEB.parse())) {
                 this.debug("Failed: TypeA");
 
                 // Punish

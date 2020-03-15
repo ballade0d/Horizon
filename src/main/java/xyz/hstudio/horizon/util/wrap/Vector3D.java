@@ -3,7 +3,6 @@ package xyz.hstudio.horizon.util.wrap;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.util.NumberConversions;
-import xyz.hstudio.horizon.util.MathUtils;
 
 public class Vector3D implements Cloneable {
 
@@ -241,7 +240,7 @@ public class Vector3D implements Cloneable {
             return false;
         }
         Vector3D other = (Vector3D) obj;
-        return MathUtils.abs(x - other.x) < EPSILON && MathUtils.abs(y - other.y) < EPSILON && MathUtils.abs(z - other.z) < EPSILON && (this.getClass().equals(obj.getClass()));
+        return Math.abs(x - other.x) < EPSILON && Math.abs(y - other.y) < EPSILON && Math.abs(z - other.z) < EPSILON && (this.getClass().equals(obj.getClass()));
     }
 
     @Override

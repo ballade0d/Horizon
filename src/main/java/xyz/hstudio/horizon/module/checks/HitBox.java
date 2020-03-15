@@ -17,8 +17,6 @@ import xyz.hstudio.horizon.util.wrap.AABB;
 import xyz.hstudio.horizon.util.wrap.Location;
 import xyz.hstudio.horizon.util.wrap.Vector3D;
 
-import java.util.List;
-
 public class HitBox extends Module<HitBoxData, HitBoxConfig> {
 
     public HitBox() {
@@ -77,7 +75,7 @@ public class HitBox extends Module<HitBoxData, HitBoxConfig> {
             Location targetPos = new Location(targetPlayer.getLocation());
             if (target != null && this.getData(target).history.size() != 0) {
                 // Get the history position to avoid false positives.
-                targetPos = this.getHistoryLocation(player.ping, this.getData(target).history);
+                targetPos = this.getData(target).getHistoryLocation(player.ping, true);
             }
             Vector3D move = targetPos.toVector().subtract(targetPlayer.getLocation().toVector());
             AABB targetCube = McAccessor.INSTANCE.getCube(targetPlayer).add(move);
@@ -97,25 +95,5 @@ public class HitBox extends Module<HitBoxData, HitBoxConfig> {
                 reward("TypeA", data, 0.995);
             }
         }
-    }
-
-    private Location getHistoryLocation(final long ping, final List<Pair<Location, Long>> history) {
-        long time = System.currentTimeMillis();
-        for (int i = history.size() - 1; i >= 0; i--) {
-            long elapsedTime = time - history.get(i).value;
-            if (elapsedTime >= ping) {
-                if (i == history.size() - 1) {
-                    return history.get(i).key;
-                }
-                double nextMoveWeight = (elapsedTime - ping) / (double) (elapsedTime - (time - history.get(i + 1).value));
-                Location before = history.get(i).key;
-                Location after = history.get(i + 1).key;
-                Vector3D interpolate = after.toVector().subtract(before.toVector());
-                interpolate.multiply(nextMoveWeight);
-                before.add(interpolate);
-                return before;
-            }
-        }
-        return history.get(0).key;
     }
 }

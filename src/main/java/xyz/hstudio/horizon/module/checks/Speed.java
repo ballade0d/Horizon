@@ -39,6 +39,7 @@ public class Speed extends Module<SpeedData, SpeedConfig> {
                 player.player.getInventory().setHeldItemSlot(slot);
             } else {
                 McAccessor.INSTANCE.releaseItem(player.player);
+                player.player.updateInventory();
             }
         }
     }
@@ -56,7 +57,7 @@ public class Speed extends Module<SpeedData, SpeedConfig> {
     /**
      * Basic x/z-axis motion check. Based on Minecraft moving mechanism.
      * <p>
-     * Accuracy: 9/10 - It may have some rare false positives.
+     * Accuracy: 9/10 - It has some rare false positives.
      * Efficiency: 9/10 - Detects most move related hacks instantly.
      *
      * @author MrCraftGoo
@@ -64,8 +65,6 @@ public class Speed extends Module<SpeedData, SpeedConfig> {
     private void typeA(final Event event, final HoriPlayer player, final SpeedData data, final SpeedConfig config) {
         if (event instanceof MoveEvent) {
             MoveEvent e = (MoveEvent) event;
-
-            // TODO: Handle Speed Attribute
 
             double prevSpeed;
             double speed;
@@ -141,8 +140,8 @@ public class Speed extends Module<SpeedData, SpeedConfig> {
                 if (touchedBlocks.contains(MatUtils.COBWEB.parse())) {
                     multipliers *= 0.25;
                 }
-                if (touchedBlocks.contains(Material.SLIME_BLOCK) && MathUtils.abs(player.velocity.y) < 0.1 && !player.isSneaking) {
-                    multipliers *= 0.4 + MathUtils.abs(player.velocity.y) * 0.2;
+                if (touchedBlocks.contains(Material.SLIME_BLOCK) && Math.abs(player.velocity.y) < 0.1 && !player.isSneaking) {
+                    multipliers *= 0.4 + Math.abs(player.velocity.y) * 0.2;
                 }
 
                 double adders = 0;

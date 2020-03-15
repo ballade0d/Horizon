@@ -74,7 +74,7 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionConfig
             if (!e.onGround && !e.jumpLegitly && !e.stepLegitly && e.knockBack == null && e.piston.size() == 0 &&
                     player.getVehicle() == null && !player.isFlying() && !player.player.isDead() && !e.isOnSlime && !e.isOnBed &&
                     !e.isInLiquid && !player.isInLiquid && !e.collidingBlocks.contains(Material.LADDER) &&
-                    !e.collidingBlocks.contains(Material.VINE)) {
+                    !e.collidingBlocks.contains(Material.VINE) && !e.collidingBlocks.contains(MatUtils.SCAFFOLDING.parse())) {
 
                 int levitation = player.getPotionEffectAmplifier("LEVITATION");
                 // Supports SLOW_FALLING potion effect
@@ -84,6 +84,7 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionConfig
 
                 if (player.isGliding) {
                     // Gliding function
+                    // Fix this, this creates possibility of bypass
                     if (data.prevGliding) {
                         Vector3D lookDir = e.to.getDirection();
                         float lookDist = (float) MathUtils.distance2d(lookDir.x, lookDir.z);
@@ -109,7 +110,7 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionConfig
                 } else {
                     estimatedVelocity = (prevEstimatedVelocity - gravity) * 0.98F;
                 }
-                if (MathUtils.abs(estimatedVelocity) < 0.005 && estimatedVelocity != 0) {
+                if (Math.abs(estimatedVelocity) < 0.005 && estimatedVelocity != 0) {
                     estimatedVelocity = deltaY;
                 }
 
@@ -125,7 +126,7 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionConfig
                 }
 
                 // Fix the false positives when towering
-                if (player.isOnGround && !e.onGround && player.velocity.y == 0 && (MathUtils.abs(deltaY - 0.4044449) < 0.001 || MathUtils.abs(deltaY - 0.3955759) < 0.001)) {
+                if (player.isOnGround && !e.onGround && player.velocity.y == 0 && (Math.abs(deltaY - 0.4044449) < 0.001 || Math.abs(deltaY - 0.3955759) < 0.001)) {
                     deltaY = estimatedVelocity = 0.42F;
                 }
 
@@ -145,11 +146,11 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionConfig
 
                 float discrepancy = deltaY - estimatedVelocity;
 
-                if (e.updatePos && e.velocity.lengthSquared() > 0 && MathUtils.abs(discrepancy) > config.typeA_tolerance) {
+                if (e.updatePos && e.velocity.lengthSquared() > 0 && Math.abs(discrepancy) > config.typeA_tolerance) {
                     this.debug("Failed: TypeA, d:" + deltaY + ", e:" + estimatedVelocity + ", p:" + discrepancy + ", p:" + player.velocity.y);
 
                     // Punish
-                    this.punish(event, player, data, "TypeA", MathUtils.abs(discrepancy) * 5F);
+                    this.punish(event, player, data, "TypeA", Math.abs(discrepancy) * 5F);
                 } else {
                     reward("TypeA", data, 0.999);
                 }
@@ -208,7 +209,6 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionConfig
         if (event instanceof MoveEvent) {
             MoveEvent e = (MoveEvent) event;
 
-            // TODO: Ignore Liquid
             if (e.isTeleport || !e.onGround || e.knockBack != null || e.touchingFaces.contains(BlockFace.UP) || player.touchingFaces.contains(BlockFace.UP) ||
                     e.collidingBlocks.contains(MatUtils.LADDER.parse()) || e.collidingBlocks.contains(MatUtils.VINE.parse()) ||
                     player.isFlying() || player.player.isSleeping() || player.position.isOnGround(player, false, 0.001)) {
@@ -229,7 +229,13 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionConfig
         }
     }
 
+    // Liquid function
     private void typeD(final Event event, final HoriPlayer player, final InvalidMotionData data, final InvalidMotionConfig config) {
+
+    }
+
+    // Ladder function
+    private void typeE(final Event event, final HoriPlayer player, final InvalidMotionData data, final InvalidMotionConfig config) {
 
     }
 }

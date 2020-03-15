@@ -2,6 +2,8 @@ name: Horizon
 main: xyz.hstudio.horizon.Horizon
 version: '${project.version}'
 api-version: '1.13'
+softdepend:
+  - PlaceholderAPI
 commands:
   horizon:
     aliases: [hori, hz]

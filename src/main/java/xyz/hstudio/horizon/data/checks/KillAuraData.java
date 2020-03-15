@@ -1,6 +1,7 @@
 package xyz.hstudio.horizon.data.checks;
 
 import xyz.hstudio.horizon.data.Data;
+import xyz.hstudio.horizon.data.HoriPlayer;
 import xyz.hstudio.horizon.util.wrap.Vector3D;
 
 public class KillAuraData extends Data {

@@ -39,6 +39,7 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
                     player.player.getInventory().setHeldItemSlot(slot);
                 } else {
                     McAccessor.INSTANCE.releaseItem(player.player);
+                    player.player.updateInventory();
                 }
                 break;
             }
@@ -48,6 +49,7 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
                     player.player.getInventory().setHeldItemSlot(slot);
                 } else {
                     McAccessor.INSTANCE.releaseItem(player.player);
+                    player.player.updateInventory();
                 }
                 break;
             }
@@ -160,8 +162,8 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
      * A GCD check.
      * It detects a large amount of killaura.
      * <p>
-     * Accuracy: 7/10 - It may have false positives, though it only works when player fails other killaura check
-     * Efficiency: 9/10 - Almost instantly
+     * Accuracy: 7/10 - It may have false positives, though it only works when player fails other aura check
+     * Efficiency: 9/10 - Detects a large amount of aura almost instantly
      *
      * @author MrCraftGoo
      */
@@ -208,15 +210,15 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
     }
 
     private float getDistance(final float from, final float to) {
-        float distance = MathUtils.abs(to - from) % 360F;
+        float distance = Math.abs(to - from) % 360F;
         return distance > 180 ? 360 - distance : distance;
     }
 
     /**
-     * A direction check. It can detect a large amount of killaura.
+     * A direction check. It can detect a large amount of aura.
      * <p>
-     * Accuracy: 7/10 - It may have some false positives
-     * Efficiency: 10/10 - Super fast
+     * Accuracy: 7/10 - It has some false positives in some situation, will fix soon.
+     * Efficiency: 9/10 - Detects all poorly made auras super fast
      *
      * @author MrCraftGoo
      */
