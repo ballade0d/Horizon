@@ -3,11 +3,14 @@ package xyz.hstudio.horizon.thread;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import xyz.hstudio.horizon.Horizon;
 import xyz.hstudio.horizon.data.HoriPlayer;
+import xyz.hstudio.horizon.util.DateUtils;
 
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Deque;
+import java.util.concurrent.*;
 
 public class Async extends Thread {
 
@@ -16,6 +19,7 @@ public class Async extends Thread {
                     .setDaemon(true)
                     .setNameFormat("Horizon Processing Thread")
                     .build());
+    public static final Deque<String> LOG = new ConcurrentLinkedDeque<>();
 
     public static <T> Future<T> submit(final Callable<T> callable) {
         return THREAD_POOL.submit(callable);
@@ -25,9 +29,27 @@ public class Async extends Thread {
         THREAD_POOL.execute(command);
     }
 
+    private BufferedWriter logWriter;
+
     public Async() {
         super("Horizon Processing Thread");
         this.setDaemon(true);
+
+        try {
+            File logs = new File(Horizon.getInst().getDataFolder(), "logs");
+            if (!logs.exists()) {
+                logs.mkdirs();
+            }
+            String date = DateUtils.now(false);
+            File log = new File(logs, date + ".log");
+            if (!log.exists()) {
+                log.createNewFile();
+            }
+            this.logWriter = new BufferedWriter(new FileWriter(log, true));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         this.start();
     }
 
@@ -44,6 +66,14 @@ public class Async extends Thread {
                 if (currentTick % 80 == 0) {
                     Horizon.PLAYERS.values().forEach(HoriPlayer::sendRequest);
                 }
+
+                String time = "[" + DateUtils.now(true) + "] ";
+                for (String message : Async.LOG) {
+                    this.logWriter.write(time + message);
+                    this.logWriter.newLine();
+                }
+                Async.LOG.clear();
+
                 currentTick++;
 
                 current = (current + 50000000L - System.nanoTime()) / 1000000L;

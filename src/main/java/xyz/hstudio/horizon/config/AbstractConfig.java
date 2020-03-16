@@ -40,27 +40,23 @@ public abstract class AbstractConfig {
 
             Object value = config.get(path);
 
-            if (field.getType() == Map.class) {
-                if (value == null) {
-                    config.set(path, value = new HashMap<>());
-                } else {
-                    Map<Integer, List<String>> map = new HashMap<>();
-                    for (String s : config.getConfigurationSection(path).getKeys(false)) {
-                        if (!StringUtils.isNumeric(s)) {
-                            continue;
-                        }
-                        List<String> list = config.isList(path + s) ?
-                                config.getStringList(path + "." + s) :
-                                Collections.singletonList(config.getString(path + "." + s));
-                        map.put(Integer.parseInt(s), list);
-                    }
-                    value = map;
-                }
-            } else {
-                if (value == null) {
-                    continue;
-                }
+            if (value == null) {
+                continue;
+            }
 
+            if (field.getType() == Map.class) {
+                Map<Integer, List<String>> map = new HashMap<>();
+                for (String s : config.getConfigurationSection(path).getKeys(false)) {
+                    if (!StringUtils.isNumeric(s)) {
+                        continue;
+                    }
+                    List<String> list = config.isList(path + s) ?
+                            config.getStringList(path + "." + s) :
+                            Collections.singletonList(config.getString(path + "." + s));
+                    map.put(Integer.parseInt(s), list);
+                }
+                value = map;
+            } else {
                 // Double.class.isAssignableFrom(double.class) is false :/
                 if (!Primitives.unwrap(value.getClass()).isAssignableFrom(field.getType())) {
                     throw new IllegalStateException("Failed to load value: " + path + " [2]");

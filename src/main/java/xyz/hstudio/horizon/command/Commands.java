@@ -7,7 +7,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import xyz.hstudio.horizon.Horizon;
 import xyz.hstudio.horizon.command.annotation.Cmd;
-import xyz.hstudio.horizon.config.Language;
+import xyz.hstudio.horizon.lang.Lang;
 import xyz.hstudio.horizon.util.collect.Pair;
 
 import java.lang.reflect.Method;
@@ -38,7 +38,7 @@ public class Commands implements CommandExecutor {
             sender.sendMessage(prefix + "Horizon by MrCraftGoo");
             return true;
         }
-        Language language = Horizon.getInst().language;
+        Lang lang = Lang.getLang(Horizon.getInst().config.personalized_themes_default_lang);
         String subName = args[0];
         String[] subArgs = (String[]) ArrayUtils.remove(args, 0);
         for (Pair<Cmd, Integer> pair : this.commands) {
@@ -55,7 +55,7 @@ public class Commands implements CommandExecutor {
                 return true;
             }
             try {
-                this.getClass().getMethods()[pair.value].invoke(this, sender, subArgs, language, prefix);
+                this.getClass().getMethods()[pair.value].invoke(this, sender, subArgs, lang, prefix);
             } catch (Exception e) {
                 e.printStackTrace();
             }

@@ -41,8 +41,6 @@ public class NoSwing extends Module<NoSwingData, NoSwingConfig> {
                 return;
             }
             if (data.animationExpected) {
-                this.debug("Failed: TypeA");
-
                 // Punish
                 this.punish(event, player, data, "TypeA", 5);
             } else {

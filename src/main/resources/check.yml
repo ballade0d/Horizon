@@ -1,6 +1,5 @@
 antivelocity:
   enabled: true
-  debug: true
   cancel_vl: 1
   typeA:
     enabled: true
@@ -12,7 +11,6 @@ antivelocity:
       - 'horizon kick %player% Did not take knock back.'
 badpacket:
   enabled: true
-  debug: true
   cancel_vl: 0
   typeA:
     enabled: true
@@ -30,7 +28,6 @@ badpacket:
       - 'horizon kick %player% Invalid packets.'
 groundspoof:
   enabled: true
-  debug: true
   cancel_vl: 0
   typeA:
     enabled: true
@@ -42,7 +39,6 @@ groundspoof:
       - 'horizon kick %player% Spoof on ground.'
 hitbox:
   enabled: true
-  debug: true
   cancel_vl: 1
   typeA:
     enabled: true
@@ -55,7 +51,6 @@ hitbox:
       - 'horizon kick %player% Did not hit hitbox.'
 invalidmotion:
   enabled: true
-  debug: true
   cancel_vl: 1
   typeA:
     enabled: true
@@ -73,7 +68,6 @@ invalidmotion:
       - 'horizon kick %player% Moving unexpectedly.'
 inventory:
   enabled: true
-  debug: true
   cancel_vl: 0
   typeA:
     enabled: true
@@ -89,7 +83,6 @@ inventory:
       - 'horizon kick %player% Impossible inventory action'
 killaura:
   enabled: true
-  debug: true
   cancel_vl: 0
   typeA:
     enabled: true
@@ -119,7 +112,6 @@ killaura:
       - 'horizon kick %player% Unfair advantages.'
 noswing:
   enabled: true
-  debug: true
   cancel_vl: 0
   typeA:
     enabled: true
@@ -131,7 +123,6 @@ noswing:
       - 'horizon kick %player% Did not swing arm.'
 scaffold:
   enabled: true
-  debug: true
   cancel_vl: 0
   typeA:
     enabled: true
@@ -150,7 +141,6 @@ scaffold:
       - 'horizon kick %player% Unfair advantages.'
 speed:
   enabled: true
-  debug: true
   cancel_vl: 1
   typeA:
     enabled: true
@@ -169,7 +159,6 @@ speed:
       - 'horizon kick %player% Moving too fast.'
 timer:
   enabled: true
-  debug: true
   cancel_vl: 1
   typeA:
     enabled: true

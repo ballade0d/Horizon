@@ -158,10 +158,9 @@ public class Speed extends Module<SpeedData, SpeedConfig> {
                 }
                 double totalDiscrepancy = data.discrepancies;
                 if (discrepancy > 0 && totalDiscrepancy > config.typeA_tolerance) {
-                    this.debug("Failed: TypeA, s:" + speed + ", e:" + estimatedSpeed + ", p:" + prevSpeed + ", d:" + discrepancy);
-
                     // Punish
-                    this.punish(event, player, data, "TypeA", (float) (totalDiscrepancy * 10));
+                    this.punish(event, player, data, "TypeA", (float) (totalDiscrepancy * 10),
+                            "s:" + speed, "e:" + estimatedSpeed, "p:" + prevSpeed, "d:" + discrepancy);
                     data.discrepancies = 0;
                 } else {
                     reward("TypeA", data, 0.99);
@@ -276,10 +275,8 @@ public class Speed extends Module<SpeedData, SpeedConfig> {
 
             double angle = MathUtils.angle(yawVec, moveForce);
             if (angle > Math.PI / 4 + 0.3) {
-                this.debug("Failed: TypeB, a:" + angle + ", y:" + yaw);
-
                 // Punish
-                this.punish(event, player, data, "TypeB", 4);
+                this.punish(event, player, data, "TypeB", 4, "a:" + angle, "y:" + yaw);
             } else {
                 reward("TypeB", data, 0.99);
             }

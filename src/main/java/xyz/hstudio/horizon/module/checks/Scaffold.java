@@ -65,21 +65,15 @@ public class Scaffold extends Module<ScaffoldData, ScaffoldConfig> {
             Vector3D interaction = e.interaction;
             Block b = e.getTargetLocation().getBlock();
             if (e.face == BlockPlaceEvent.BlockFace.INVALID) {
-                this.debug("Failed: TypeA, p:1");
-
                 // Punish
-                this.punish(event, player, data, "TypeA", 5);
+                this.punish(event, player, data, "TypeA", 5, "p:1");
             } else if (DoubleStream.of(interaction.x, interaction.y, interaction.z)
                     .anyMatch(d -> d > 1 || d < 0)) {
-                this.debug("Failed: TypeA, i:" + interaction.toString());
-
                 // Punish
-                this.punish(event, player, data, "TypeA", 5);
+                this.punish(event, player, data, "TypeA", 5, "1:" + interaction);
             } else if (b != null && b.getType() == Material.AIR) {
-                this.debug("Failed: TypeA, p:3");
-
                 // Punish
-                this.punish(event, player, data, "TypeA", 5);
+                this.punish(event, player, data, "TypeA", 5, "p:2");
             } else {
                 reward("TypeA", data, 0.999);
             }
@@ -102,8 +96,6 @@ public class Scaffold extends Module<ScaffoldData, ScaffoldConfig> {
             }
             float angle = player.position.getDirection().angle(e.getPlaceBlockFace());
             if (angle > Math.toRadians(config.typeB_max_angle)) {
-                this.debug("Failed: TypeB, a:" + angle);
-
                 // Punish
                 this.punish(event, player, data, "TypeB", 4);
             } else {
@@ -137,8 +129,6 @@ public class Scaffold extends Module<ScaffoldData, ScaffoldConfig> {
                 return;
             }
             if (++data.typeCFails > 4) {
-                this.debug("Failed: TypeC, d:" + deltaT);
-
                 // Punish
                 this.punish(event, player, data, "TypeC", 4);
             }
@@ -165,8 +155,6 @@ public class Scaffold extends Module<ScaffoldData, ScaffoldConfig> {
             }
             if (!e.strafeNormally) {
                 if (++data.typeDFails > 4) {
-                    this.debug("Failed: TypeD");
-
                     // Punish
                     this.punish(event, player, data, "TypeD", 3);
                 }

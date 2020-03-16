@@ -21,7 +21,7 @@ public class YamlLoader extends YamlConfiguration {
         return config;
     }
 
-    public static YamlConfiguration loadConfiguration(final InputStream stream) {
+    public static YamlLoader loadConfiguration(final InputStream stream) {
         YamlLoader config = new YamlLoader();
         try {
             config.load(new InputStreamReader(stream));

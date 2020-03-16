@@ -147,10 +147,9 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionConfig
                 float discrepancy = deltaY - estimatedVelocity;
 
                 if (e.updatePos && e.velocity.lengthSquared() > 0 && Math.abs(discrepancy) > config.typeA_tolerance) {
-                    this.debug("Failed: TypeA, d:" + deltaY + ", e:" + estimatedVelocity + ", p:" + discrepancy + ", p:" + player.velocity.y);
-
                     // Punish
-                    this.punish(event, player, data, "TypeA", Math.abs(discrepancy) * 5F);
+                    this.punish(event, player, data, "TypeA", Math.abs(discrepancy) * 5F,
+                            "d:" + deltaY, "e:" + estimatedVelocity, "p:" + discrepancy, "pr:" + player.velocity.y);
                 } else {
                     reward("TypeA", data, 0.999);
                 }
@@ -184,10 +183,8 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionConfig
             double deltaY = e.velocity.y;
 
             if (deltaY > 0.6 || deltaY < -0.0784) {
-                this.debug("Failed: TypeB, d:" + deltaY);
-
                 // Punish
-                this.punish(event, player, data, "TypeB", 4);
+                this.punish(event, player, data, "TypeB", 4, "d:" + deltaY);
             } else {
                 reward("TypeB", data, 0.99);
             }
@@ -219,10 +216,8 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionConfig
 
             double discrepancy = deltaY - estimatedY;
             if (discrepancy < config.typeC_tolerance) {
-                this.debug("Failed: TypeC, d:" + deltaY);
-
                 // Punish
-                this.punish(event, player, data, "TypeC", 4);
+                this.punish(event, player, data, "TypeC", 4, "d:" + deltaY);
             } else {
                 reward("TypeC", data, 0.99);
             }

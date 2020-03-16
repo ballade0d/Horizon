@@ -13,8 +13,6 @@ public abstract class CheckConfig<T extends CheckConfig<T>> extends AbstractConf
     public int cancel_vl = 1;
     @Load(file = "check.yml", path = "enabled")
     public boolean enabled = true;
-    @Load(file = "check.yml", path = "debug")
-    public boolean debug = true;
     @Load(file = "check.yml", path = "action")
     public Map<Integer, List<String>> action = new HashMap<>();
 

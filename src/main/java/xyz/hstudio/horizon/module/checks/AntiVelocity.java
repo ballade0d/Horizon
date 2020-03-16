@@ -43,8 +43,6 @@ public class AntiVelocity extends Module<AntiVelocityData, AntiVelocityConfig> {
         if (event instanceof MoveEvent) {
             MoveEvent e = (MoveEvent) event;
             if (e.failedKnockBack && !e.collidingBlocks.contains(MatUtils.COBWEB.parse())) {
-                this.debug("Failed: TypeA");
-
                 // Punish
                 this.punish(event, player, data, "TypeA", 4);
             } else {

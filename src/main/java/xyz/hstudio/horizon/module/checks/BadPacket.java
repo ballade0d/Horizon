@@ -66,8 +66,6 @@ public class BadPacket extends Module<BadPacketData, BadPacketConfig> {
             // If player didn't send move packets in 2 sec (KeepAlive Interval)
             // but send KeepAlive packets, the player is definitely cheating.
             if (player.currentTick == data.lastTick) {
-                this.debug("Failed: TypeA");
-
                 // Punish
                 this.punish(event, player, data, "TypeA", 5);
             } else {
@@ -94,8 +92,6 @@ public class BadPacket extends Module<BadPacketData, BadPacketConfig> {
             }
             // A player can send only 19 flying packets in a row.
             if (++data.flyingCount > 20) {
-                this.debug("Failed: TypeB");
-
                 // Punish
                 this.punish(event, player, data, "TypeB", 5);
             } else if (data.flyingCount == 0) {
@@ -124,8 +120,6 @@ public class BadPacket extends Module<BadPacketData, BadPacketConfig> {
             }
             long now = System.currentTimeMillis();
             if (now - data.lastPayloadTime <= e.length) {
-                this.debug("Failed: TypeC");
-
                 // Punish
                 this.punish(event, player, data, "TypeC", 5);
             } else {
@@ -147,8 +141,6 @@ public class BadPacket extends Module<BadPacketData, BadPacketConfig> {
         if (event instanceof MoveEvent) {
             MoveEvent e = (MoveEvent) event;
             if (e.to.pitch > 90.1F || e.to.pitch < -90.1F) {
-                this.debug("Failed: TypeD");
-
                 // Punish
                 this.punish(event, player, data, "TypeD", 6);
             } else {

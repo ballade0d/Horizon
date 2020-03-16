@@ -11,6 +11,8 @@ import xyz.hstudio.horizon.compat.McAccessor;
 import xyz.hstudio.horizon.config.CheckConfig;
 import xyz.hstudio.horizon.data.Data;
 import xyz.hstudio.horizon.data.HoriPlayer;
+import xyz.hstudio.horizon.lang.Lang;
+import xyz.hstudio.horizon.thread.Async;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -26,7 +28,6 @@ public abstract class Module<K extends Data, V extends CheckConfig<V>> {
     private final V config;
 
     public Module(final ModuleType moduleType, final V config) {
-        // This throws a warn in IDE, tell me any suggestion if you have.
         this.moduleType = moduleType;
         this.config = config.load();
         Module.MODULE_MAP.put(moduleType, this);
@@ -61,7 +62,7 @@ public abstract class Module<K extends Data, V extends CheckConfig<V>> {
      * @param weight Violation level addition.
      * @author MrCraftGoo
      */
-    protected void punish(final Event event, final HoriPlayer player, final K data, final String type, final float weight) {
+    protected void punish(final Event event, final HoriPlayer player, final K data, final String type, final float weight, final String... args) {
         float oldViolation = data.violations.getOrDefault(type, 0F);
         float nowViolation = oldViolation + weight;
 
@@ -91,18 +92,28 @@ public abstract class Module<K extends Data, V extends CheckConfig<V>> {
             break;
         }
 
+        if (player.verbose) {
+            player.sendMessage(player.lang.verbose
+                    .replace("%player%", player.player.getName())
+                    .replace("%check%", this.moduleType.name())
+                    .replace("%type%", type)
+                    .replace("%vl_total%", String.valueOf(nowViolation))
+                    .replace("%vl_addition%", String.valueOf(weight))
+                    .replace("%ping%", String.valueOf(player.ping)));
+        }
+
+        if (Horizon.getInst().config.log) {
+            Async.LOG.addLast(Lang.getLang(Horizon.getInst().config.personalized_themes_default_lang).verbose
+                    .replace("%player%", player.player.getName())
+                    .replace("%check%", this.moduleType.name())
+                    .replace("%type%", type)
+                    .replace("%vl_total%", String.valueOf(nowViolation))
+                    .replace("%vl_addition%", String.valueOf(weight))
+                    .replace("%ping%", String.valueOf(player.ping)));
+        }
+
         data.violations.put(type, nowViolation);
         data.lastFailTick = player.currentTick;
-    }
-
-    /**
-     * Send a debug message to the console
-     */
-    protected void debug(final Object object) {
-        if (!this.config.debug) {
-            return;
-        }
-        McAccessor.INSTANCE.ensureMainThread(() -> Bukkit.broadcastMessage("Debug|" + this.moduleType.name() + object));
     }
 
     protected void reward(final String type, final K data, final double multiplier) {

@@ -60,8 +60,6 @@ public class GroundSpoof extends Module<GroundSpoofData, GroundSpoofConfig> {
                 }
                 e.onGround = false;
 
-                this.debug("Failed: TypeA");
-
                 // Punish
                 this.punish(event, player, data, "TypeA", 3);
             } else {

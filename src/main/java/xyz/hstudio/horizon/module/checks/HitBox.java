@@ -87,8 +87,6 @@ public class HitBox extends Module<HitBoxData, HitBoxConfig> {
             double reach = targetCube.distance(playerPos);
 
             if (reach > config.typeA_max_reach) {
-                this.debug("Failed: TypeA, r:" + reach);
-
                 // Punish
                 this.punish(event, player, data, "TypeA", (float) ((reach - config.typeA_max_reach) * 10));
             } else {

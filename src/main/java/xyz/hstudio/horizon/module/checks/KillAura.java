@@ -111,10 +111,8 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
                 return;
             }
             if (++data.typeAFails > 5) {
-                this.debug("Failed: TypeA, d:" + deltaT);
-
                 // Punish
-                this.punish(event, player, data, "TypeA", 4);
+                this.punish(event, player, data, "TypeA", 4, "d:" + deltaT);
             }
         }
     }
@@ -148,10 +146,8 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
             }
             long deltaT = player.currentTick - data.failTypeBTick;
             if (deltaT == 0) {
-                this.debug("Failed: TypeB, d:" + deltaT);
-
                 // Punish
-                this.punish(event, player, data, "TypeB", 5);
+                this.punish(event, player, data, "TypeB", 5, "d:" + deltaT);
             } else {
                 reward("TypeB", data, 0.999);
             }
@@ -190,10 +186,8 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
 
             if (gcd <= 131072) {
                 if (++data.gcdFails > 5) {
-                    this.debug("Failed: TypeC, g:" + gcd);
-
                     // Punish
-                    this.punish(event, player, data, "TypeC", 3);
+                    this.punish(event, player, data, "TypeC", 3, "g:" + gcd);
                 }
             } else if (data.gcdFails > 0) {
                 data.gcdFails--;
@@ -230,8 +224,6 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
             }
             if (!e.strafeNormally) {
                 if (++data.typeDFails > 4) {
-                    this.debug("Failed: TypeD");
-
                     // Punish
                     this.punish(event, player, data, "TypeD", 3);
                 }
@@ -275,8 +267,6 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
             Vector3D dirB = data.intersection.subtract(headPos).normalize();
 
             if (dirA.dot(dirB) < 0) {
-                this.debug("Failed: TypeE");
-
                 // Punish
                 this.punish(event, player, data, "TypeE", 5);
             } else {
@@ -325,8 +315,6 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
                 return;
             }
             if (player.currentTick - data.lastHitTickF < 2) {
-                this.debug("Failed: TypeF");
-
                 // Punish
                 this.punish(event, player, data, "TypeF", 5);
             } else {

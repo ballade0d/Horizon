@@ -12,6 +12,7 @@ import org.bukkit.potion.PotionEffect;
 import xyz.hstudio.horizon.Horizon;
 import xyz.hstudio.horizon.compat.McAccessor;
 import xyz.hstudio.horizon.data.checks.*;
+import xyz.hstudio.horizon.lang.Lang;
 import xyz.hstudio.horizon.network.ChannelHandler;
 import xyz.hstudio.horizon.util.collect.Pair;
 import xyz.hstudio.horizon.util.wrap.AABB;
@@ -24,6 +25,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class HoriPlayer {
 
+    public Lang lang = Lang.getLang("original");
+    public boolean verbose;
     public final AntiVelocityData antiVelocityData = new AntiVelocityData();
     public final BadPacketData badPacketData = new BadPacketData();
     public final GroundSpoofData groundSpoofData = new GroundSpoofData();

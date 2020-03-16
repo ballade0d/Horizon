@@ -84,10 +84,9 @@ public class Inventory extends Module<InventoryData, InventoryConfig> {
             // It's impossible to rotate if inventory is opened.
             if (config.typeA_checkRotation && e.hasDeltaRot()) {
                 // Block Inventory Rotation
-                this.debug("Failed: TypeA, t:rot");
 
                 // Punish
-                this.punish(event, player, data, "TypeA", 3);
+                this.punish(event, player, data, "TypeA", 3, "t:rot");
             }
 
             // TODO: Ignore if colliding entities
@@ -100,10 +99,9 @@ public class Inventory extends Module<InventoryData, InventoryConfig> {
                 }
                 if (!data.temporarilyBypass) {
                     // Block Inventory Position
-                    this.debug("Failed: TypeA, t:pos");
 
                     // Punish
-                    this.punish(event, player, data, "TypeA", 3);
+                    this.punish(event, player, data, "TypeA", 3, "t:pos");
                 }
             }
         } else if (event instanceof ActionEvent) {
@@ -111,13 +109,12 @@ public class Inventory extends Module<InventoryData, InventoryConfig> {
             if (!data.inventoryOpened) {
                 return;
             }
-            // Block Inventory Sprint/Sneak/Glide
             if (config.typeA_checkAction && (e.action == ActionEvent.Action.START_SNEAKING ||
                     e.action == ActionEvent.Action.START_SPRINTING || e.action == ActionEvent.Action.START_GLIDING)) {
-                this.debug("Failed: TypeA, t:action");
+                // Block Inventory Sprint/Sneak/Glide
 
                 // Punish
-                this.punish(event, player, data, "TypeA", 5);
+                this.punish(event, player, data, "TypeA", 5, "t:action");
             }
         } else if (event instanceof InteractEntityEvent) {
             if (!data.inventoryOpened) {
@@ -125,10 +122,9 @@ public class Inventory extends Module<InventoryData, InventoryConfig> {
             }
             if (config.typeA_checkHit) {
                 // Block Inventory Hit
-                this.debug("Failed: TypeA, t:hit");
 
                 // Punish
-                this.punish(event, player, data, "TypeA", 5);
+                this.punish(event, player, data, "TypeA", 5, "t:hit");
             }
         }
     }
