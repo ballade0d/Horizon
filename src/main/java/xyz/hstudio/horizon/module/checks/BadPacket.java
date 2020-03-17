@@ -5,16 +5,16 @@ import xyz.hstudio.horizon.api.events.Event;
 import xyz.hstudio.horizon.api.events.inbound.CustomPayloadEvent;
 import xyz.hstudio.horizon.api.events.inbound.KeepAliveRespondEvent;
 import xyz.hstudio.horizon.api.events.inbound.MoveEvent;
-import xyz.hstudio.horizon.config.checks.BadPacketConfig;
 import xyz.hstudio.horizon.data.HoriPlayer;
 import xyz.hstudio.horizon.data.checks.BadPacketData;
+import xyz.hstudio.horizon.file.node.BadPacketNode;
 import xyz.hstudio.horizon.module.Module;
 import xyz.hstudio.horizon.thread.Sync;
 
-public class BadPacket extends Module<BadPacketData, BadPacketConfig> {
+public class BadPacket extends Module<BadPacketData, BadPacketNode> {
 
     public BadPacket() {
-        super(ModuleType.BadPacket, new BadPacketConfig());
+        super(ModuleType.BadPacket, new BadPacketNode());
     }
 
     @Override
@@ -23,7 +23,7 @@ public class BadPacket extends Module<BadPacketData, BadPacketConfig> {
     }
 
     @Override
-    public void cancel(final Event event, final String type, final HoriPlayer player, final BadPacketData data, final BadPacketConfig config) {
+    public void cancel(final Event event, final String type, final HoriPlayer player, final BadPacketData data, final BadPacketNode config) {
         if (type.equals("TypeB") || type.equals("TypeC")) {
             event.setCancelled(true);
         } else if (type.equals("TypeD")) {
@@ -33,7 +33,7 @@ public class BadPacket extends Module<BadPacketData, BadPacketConfig> {
     }
 
     @Override
-    public void doCheck(final Event event, final HoriPlayer player, final BadPacketData data, final BadPacketConfig config) {
+    public void doCheck(final Event event, final HoriPlayer player, final BadPacketData data, final BadPacketNode config) {
         if (config.typeA_enabled) {
             typeA(event, player, data, config);
         }
@@ -56,7 +56,7 @@ public class BadPacket extends Module<BadPacketData, BadPacketConfig> {
      *
      * @author MrCraftGoo
      */
-    private void typeA(final Event event, final HoriPlayer player, final BadPacketData data, final BadPacketConfig config) {
+    private void typeA(final Event event, final HoriPlayer player, final BadPacketData data, final BadPacketNode config) {
         if (event instanceof KeepAliveRespondEvent) {
             if (player.player.isDead()) {
                 return;
@@ -83,7 +83,7 @@ public class BadPacket extends Module<BadPacketData, BadPacketConfig> {
      *
      * @author MrCraftGoo
      */
-    private void typeB(final Event event, final HoriPlayer player, final BadPacketData data, final BadPacketConfig config) {
+    private void typeB(final Event event, final HoriPlayer player, final BadPacketData data, final BadPacketNode config) {
         if (event instanceof MoveEvent) {
             MoveEvent e = (MoveEvent) event;
             if (e.moveType != MoveEvent.MoveType.FLYING || e.isTeleport) {
@@ -108,7 +108,7 @@ public class BadPacket extends Module<BadPacketData, BadPacketConfig> {
      *
      * @author MrCraftGoo
      */
-    private void typeC(final Event event, final HoriPlayer player, final BadPacketData data, final BadPacketConfig config) {
+    private void typeC(final Event event, final HoriPlayer player, final BadPacketData data, final BadPacketNode config) {
         if (event instanceof CustomPayloadEvent) {
             CustomPayloadEvent e = (CustomPayloadEvent) event;
 
@@ -137,7 +137,7 @@ public class BadPacket extends Module<BadPacketData, BadPacketConfig> {
      *
      * @author MrCraftGoo
      */
-    private void typeD(final Event event, final HoriPlayer player, final BadPacketData data, final BadPacketConfig config) {
+    private void typeD(final Event event, final HoriPlayer player, final BadPacketData data, final BadPacketNode config) {
         if (event instanceof MoveEvent) {
             MoveEvent e = (MoveEvent) event;
             if (e.to.pitch > 90.1F || e.to.pitch < -90.1F) {

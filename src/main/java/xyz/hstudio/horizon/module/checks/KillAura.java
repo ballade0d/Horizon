@@ -7,21 +7,21 @@ import xyz.hstudio.horizon.api.events.inbound.InteractEntityEvent;
 import xyz.hstudio.horizon.api.events.inbound.InteractItemEvent;
 import xyz.hstudio.horizon.api.events.inbound.MoveEvent;
 import xyz.hstudio.horizon.compat.McAccessor;
-import xyz.hstudio.horizon.config.checks.KillAuraConfig;
 import xyz.hstudio.horizon.data.HoriPlayer;
 import xyz.hstudio.horizon.data.checks.KillAuraData;
+import xyz.hstudio.horizon.file.node.KillAuraNode;
 import xyz.hstudio.horizon.module.Module;
 import xyz.hstudio.horizon.util.MathUtils;
 import xyz.hstudio.horizon.util.wrap.AABB;
 import xyz.hstudio.horizon.util.wrap.Ray;
 import xyz.hstudio.horizon.util.wrap.Vector3D;
 
-public class KillAura extends Module<KillAuraData, KillAuraConfig> {
+public class KillAura extends Module<KillAuraData, KillAuraNode> {
 
     private static final double EXPANDER = Math.pow(2, 24);
 
     public KillAura() {
-        super(ModuleType.KillAura, new KillAuraConfig());
+        super(ModuleType.KillAura, new KillAuraNode());
     }
 
     @Override
@@ -30,7 +30,7 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
     }
 
     @Override
-    public void cancel(final Event event, final String type, final HoriPlayer player, final KillAuraData data, final KillAuraConfig config) {
+    public void cancel(final Event event, final String type, final HoriPlayer player, final KillAuraData data, final KillAuraNode config) {
         // TODO: Finish this
         switch (type) {
             case "TypeE": {
@@ -57,7 +57,7 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
     }
 
     @Override
-    public void doCheck(final Event event, final HoriPlayer player, final KillAuraData data, final KillAuraConfig config) {
+    public void doCheck(final Event event, final HoriPlayer player, final KillAuraData data, final KillAuraNode config) {
         if (config.typeA_enabled) {
             typeA(event, player, data, config);
         }
@@ -89,7 +89,7 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
      *
      * @author MrCraftGoo
      */
-    private void typeA(final Event event, final HoriPlayer player, final KillAuraData data, final KillAuraConfig config) {
+    private void typeA(final Event event, final HoriPlayer player, final KillAuraData data, final KillAuraNode config) {
         if (event instanceof MoveEvent) {
             long now = System.currentTimeMillis();
             data.lagging = now - data.lastMove < 5;
@@ -126,7 +126,7 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
      *
      * @author MrCraftGoo
      */
-    private void typeB(final Event event, final HoriPlayer player, final KillAuraData data, final KillAuraConfig config) {
+    private void typeB(final Event event, final HoriPlayer player, final KillAuraData data, final KillAuraNode config) {
         if (event instanceof ActionEvent) {
             ActionEvent e = (ActionEvent) event;
             switch (e.action) {
@@ -163,7 +163,7 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
      *
      * @author MrCraftGoo
      */
-    private void typeC(final Event event, final HoriPlayer player, final KillAuraData data, final KillAuraConfig config) {
+    private void typeC(final Event event, final HoriPlayer player, final KillAuraData data, final KillAuraNode config) {
         if (event instanceof MoveEvent) {
             MoveEvent e = (MoveEvent) event;
             if (!e.updateRot) {
@@ -216,7 +216,7 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
      *
      * @author MrCraftGoo
      */
-    private void typeD(final Event event, final HoriPlayer player, final KillAuraData data, final KillAuraConfig config) {
+    private void typeD(final Event event, final HoriPlayer player, final KillAuraData data, final KillAuraNode config) {
         if (event instanceof MoveEvent) {
             MoveEvent e = (MoveEvent) event;
             if (player.currentTick - data.lastHitTickD > 5 || e.isTeleport) {
@@ -249,7 +249,7 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
      *
      * @author MrCraftGoo
      */
-    private void typeE(final Event event, final HoriPlayer player, final KillAuraData data, final KillAuraConfig config) {
+    private void typeE(final Event event, final HoriPlayer player, final KillAuraData data, final KillAuraNode config) {
         if (event instanceof InteractEntityEvent) {
             InteractEntityEvent e = (InteractEntityEvent) event;
             if (e.action != InteractEntityEvent.InteractType.INTERACT || e.intersection == null) {
@@ -285,7 +285,7 @@ public class KillAura extends Module<KillAuraData, KillAuraConfig> {
      *
      * @author MrCraftGoo
      */
-    private void typeF(final Event event, final HoriPlayer player, final KillAuraData data, final KillAuraConfig config) {
+    private void typeF(final Event event, final HoriPlayer player, final KillAuraData data, final KillAuraNode config) {
         if (event instanceof InteractEntityEvent) {
             InteractEntityEvent e = (InteractEntityEvent) event;
             if (e.action != InteractEntityEvent.InteractType.ATTACK) {

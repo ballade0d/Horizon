@@ -3,16 +3,16 @@ package xyz.hstudio.horizon.module.checks;
 import xyz.hstudio.horizon.api.ModuleType;
 import xyz.hstudio.horizon.api.events.Event;
 import xyz.hstudio.horizon.api.events.inbound.MoveEvent;
-import xyz.hstudio.horizon.config.checks.GroundSpoofConfig;
 import xyz.hstudio.horizon.data.HoriPlayer;
 import xyz.hstudio.horizon.data.checks.GroundSpoofData;
+import xyz.hstudio.horizon.file.node.GroundSpoofNode;
 import xyz.hstudio.horizon.module.Module;
 import xyz.hstudio.horizon.util.wrap.Location;
 
-public class GroundSpoof extends Module<GroundSpoofData, GroundSpoofConfig> {
+public class GroundSpoof extends Module<GroundSpoofData, GroundSpoofNode> {
 
     public GroundSpoof() {
-        super(ModuleType.GroundSpoof, new GroundSpoofConfig());
+        super(ModuleType.GroundSpoof, new GroundSpoofNode());
     }
 
     @Override
@@ -21,12 +21,12 @@ public class GroundSpoof extends Module<GroundSpoofData, GroundSpoofConfig> {
     }
 
     @Override
-    public void cancel(final Event event, final String type, final HoriPlayer player, final GroundSpoofData data, final GroundSpoofConfig config) {
+    public void cancel(final Event event, final String type, final HoriPlayer player, final GroundSpoofData data, final GroundSpoofNode config) {
         // TODO: Modify packet
     }
 
     @Override
-    public void doCheck(Event event, HoriPlayer player, GroundSpoofData data, GroundSpoofConfig config) {
+    public void doCheck(Event event, HoriPlayer player, GroundSpoofData data, GroundSpoofNode config) {
         if (config.typeA_enabled) {
             typeA(event, player, data, config);
         }
@@ -40,7 +40,7 @@ public class GroundSpoof extends Module<GroundSpoofData, GroundSpoofConfig> {
      *
      * @author MrCraftGoo
      */
-    private void typeA(final Event event, final HoriPlayer player, final GroundSpoofData data, final GroundSpoofConfig config) {
+    private void typeA(final Event event, final HoriPlayer player, final GroundSpoofData data, final GroundSpoofNode config) {
         if (event instanceof MoveEvent) {
             MoveEvent e = (MoveEvent) event;
             // Only check if player is not on ground

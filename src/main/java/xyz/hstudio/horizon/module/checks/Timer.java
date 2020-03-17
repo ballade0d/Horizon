@@ -3,18 +3,18 @@ package xyz.hstudio.horizon.module.checks;
 import xyz.hstudio.horizon.api.ModuleType;
 import xyz.hstudio.horizon.api.events.Event;
 import xyz.hstudio.horizon.api.events.inbound.MoveEvent;
-import xyz.hstudio.horizon.config.checks.TimerConfig;
 import xyz.hstudio.horizon.data.HoriPlayer;
 import xyz.hstudio.horizon.data.checks.TimerData;
+import xyz.hstudio.horizon.file.node.TimerNode;
 import xyz.hstudio.horizon.module.Module;
 import xyz.hstudio.horizon.thread.Sync;
 
-public class Timer extends Module<TimerData, TimerConfig> {
+public class Timer extends Module<TimerData, TimerNode> {
 
     private static final long MULTIPLIER = (long) 1E6;
 
     public Timer() {
-        super(ModuleType.Timer, new TimerConfig());
+        super(ModuleType.Timer, new TimerNode());
     }
 
     @Override
@@ -23,13 +23,13 @@ public class Timer extends Module<TimerData, TimerConfig> {
     }
 
     @Override
-    public void cancel(final Event event, final String type, final HoriPlayer player, final TimerData data, final TimerConfig config) {
+    public void cancel(final Event event, final String type, final HoriPlayer player, final TimerData data, final TimerNode config) {
         event.setCancelled(true);
         Sync.teleport(player, player.position);
     }
 
     @Override
-    public void doCheck(final Event event, final HoriPlayer player, final TimerData data, final TimerConfig config) {
+    public void doCheck(final Event event, final HoriPlayer player, final TimerData data, final TimerNode config) {
         if (config.typeA_enabled) {
             typeA(event, player, data, config);
         }
@@ -43,7 +43,7 @@ public class Timer extends Module<TimerData, TimerConfig> {
      *
      * @author Islandscout, MrCraftGoo
      */
-    private void typeA(final Event event, final HoriPlayer player, final TimerData data, final TimerConfig config) {
+    private void typeA(final Event event, final HoriPlayer player, final TimerData data, final TimerNode config) {
         if (event instanceof MoveEvent) {
             MoveEvent e = (MoveEvent) event;
             // Use nano second for more accuracy.

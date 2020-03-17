@@ -6,9 +6,9 @@ import xyz.hstudio.horizon.api.ModuleType;
 import xyz.hstudio.horizon.api.events.Event;
 import xyz.hstudio.horizon.api.events.inbound.MoveEvent;
 import xyz.hstudio.horizon.compat.McAccessor;
-import xyz.hstudio.horizon.config.checks.SpeedConfig;
 import xyz.hstudio.horizon.data.HoriPlayer;
 import xyz.hstudio.horizon.data.checks.SpeedData;
+import xyz.hstudio.horizon.file.node.SpeedNode;
 import xyz.hstudio.horizon.module.Module;
 import xyz.hstudio.horizon.thread.Sync;
 import xyz.hstudio.horizon.util.MathUtils;
@@ -18,10 +18,10 @@ import xyz.hstudio.horizon.util.wrap.Vector3D;
 
 import java.util.Set;
 
-public class Speed extends Module<SpeedData, SpeedConfig> {
+public class Speed extends Module<SpeedData, SpeedNode> {
 
     public Speed() {
-        super(ModuleType.Speed, new SpeedConfig());
+        super(ModuleType.Speed, new SpeedNode());
     }
 
     @Override
@@ -30,7 +30,7 @@ public class Speed extends Module<SpeedData, SpeedConfig> {
     }
 
     @Override
-    public void cancel(final Event event, final String type, final HoriPlayer player, final SpeedData data, final SpeedConfig config) {
+    public void cancel(final Event event, final String type, final HoriPlayer player, final SpeedData data, final SpeedNode config) {
         event.setCancelled(true);
         Sync.teleport(player, player.position);
         if (type.equals("TypeA") && (player.isEating || player.isPullingBow)) {
@@ -45,7 +45,7 @@ public class Speed extends Module<SpeedData, SpeedConfig> {
     }
 
     @Override
-    public void doCheck(final Event event, final HoriPlayer player, final SpeedData data, final SpeedConfig config) {
+    public void doCheck(final Event event, final HoriPlayer player, final SpeedData data, final SpeedNode config) {
         if (config.typeA_enabled) {
             typeA(event, player, data, config);
         }
@@ -62,7 +62,7 @@ public class Speed extends Module<SpeedData, SpeedConfig> {
      *
      * @author MrCraftGoo
      */
-    private void typeA(final Event event, final HoriPlayer player, final SpeedData data, final SpeedConfig config) {
+    private void typeA(final Event event, final HoriPlayer player, final SpeedData data, final SpeedNode config) {
         if (event instanceof MoveEvent) {
             MoveEvent e = (MoveEvent) event;
 
@@ -232,7 +232,7 @@ public class Speed extends Module<SpeedData, SpeedConfig> {
         }
     }
 
-    private void typeB(final Event event, final HoriPlayer player, final SpeedData data, final SpeedConfig config) {
+    private void typeB(final Event event, final HoriPlayer player, final SpeedData data, final SpeedNode config) {
         if (event instanceof MoveEvent) {
             MoveEvent e = (MoveEvent) event;
 

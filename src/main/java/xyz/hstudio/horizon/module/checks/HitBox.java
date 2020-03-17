@@ -8,19 +8,19 @@ import xyz.hstudio.horizon.api.events.Event;
 import xyz.hstudio.horizon.api.events.inbound.InteractEntityEvent;
 import xyz.hstudio.horizon.api.events.inbound.MoveEvent;
 import xyz.hstudio.horizon.compat.McAccessor;
-import xyz.hstudio.horizon.config.checks.HitBoxConfig;
 import xyz.hstudio.horizon.data.HoriPlayer;
 import xyz.hstudio.horizon.data.checks.HitBoxData;
+import xyz.hstudio.horizon.file.node.HitBoxNode;
 import xyz.hstudio.horizon.module.Module;
 import xyz.hstudio.horizon.util.collect.Pair;
 import xyz.hstudio.horizon.util.wrap.AABB;
 import xyz.hstudio.horizon.util.wrap.Location;
 import xyz.hstudio.horizon.util.wrap.Vector3D;
 
-public class HitBox extends Module<HitBoxData, HitBoxConfig> {
+public class HitBox extends Module<HitBoxData, HitBoxNode> {
 
     public HitBox() {
-        super(ModuleType.HitBox, new HitBoxConfig());
+        super(ModuleType.HitBox, new HitBoxNode());
     }
 
     @Override
@@ -29,12 +29,12 @@ public class HitBox extends Module<HitBoxData, HitBoxConfig> {
     }
 
     @Override
-    public void cancel(final Event event, final String type, final HoriPlayer player, final HitBoxData data, final HitBoxConfig config) {
+    public void cancel(final Event event, final String type, final HoriPlayer player, final HitBoxData data, final HitBoxNode config) {
         event.setCancelled(true);
     }
 
     @Override
-    public void doCheck(final Event event, final HoriPlayer player, final HitBoxData data, final HitBoxConfig config) {
+    public void doCheck(final Event event, final HoriPlayer player, final HitBoxData data, final HitBoxNode config) {
         if (config.typeA_enabled) {
             typeA(event, player, data, config);
         }
@@ -48,7 +48,7 @@ public class HitBox extends Module<HitBoxData, HitBoxConfig> {
      *
      * @author MrCraftGoo, Islandscout
      */
-    private void typeA(final Event event, final HoriPlayer player, final HitBoxData data, final HitBoxConfig config) {
+    private void typeA(final Event event, final HoriPlayer player, final HitBoxData data, final HitBoxNode config) {
         if (event instanceof MoveEvent) {
             MoveEvent e = (MoveEvent) event;
             if (!e.updatePos) {

@@ -12,7 +12,7 @@ import org.bukkit.potion.PotionEffect;
 import xyz.hstudio.horizon.Horizon;
 import xyz.hstudio.horizon.compat.McAccessor;
 import xyz.hstudio.horizon.data.checks.*;
-import xyz.hstudio.horizon.lang.Lang;
+import xyz.hstudio.horizon.file.LangFile;
 import xyz.hstudio.horizon.network.ChannelHandler;
 import xyz.hstudio.horizon.util.collect.Pair;
 import xyz.hstudio.horizon.util.wrap.AABB;
@@ -25,7 +25,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class HoriPlayer {
 
-    public Lang lang = Lang.getLang("original");
+    public String lang;
     public boolean verbose;
     public final AntiVelocityData antiVelocityData = new AntiVelocityData();
     public final BadPacketData badPacketData = new BadPacketData();
@@ -73,6 +73,8 @@ public class HoriPlayer {
     public HoriPlayer(final Player player) {
         this.player = player;
         this.pipeline = McAccessor.INSTANCE.getPipeline(player);
+
+        this.lang = Horizon.getInst().config.personalized_themes_default_lang;
 
         this.world = player.getWorld();
         this.position = new Location(player.getLocation());
@@ -180,5 +182,9 @@ public class HoriPlayer {
      */
     public void sendPacket(final Object packet) {
         McAccessor.INSTANCE.ensureMainThread(() -> this.pipeline.writeAndFlush(packet));
+    }
+
+    public LangFile getLang() {
+        return Horizon.getInst().getLang(this.lang);
     }
 }

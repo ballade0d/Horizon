@@ -6,9 +6,9 @@ import xyz.hstudio.horizon.api.ModuleType;
 import xyz.hstudio.horizon.api.events.Event;
 import xyz.hstudio.horizon.api.events.inbound.MoveEvent;
 import xyz.hstudio.horizon.compat.McAccessor;
-import xyz.hstudio.horizon.config.checks.InvalidMotionConfig;
 import xyz.hstudio.horizon.data.HoriPlayer;
 import xyz.hstudio.horizon.data.checks.InvalidMotionData;
+import xyz.hstudio.horizon.file.node.InvalidMotionNode;
 import xyz.hstudio.horizon.module.Module;
 import xyz.hstudio.horizon.thread.Sync;
 import xyz.hstudio.horizon.util.BlockUtils;
@@ -18,10 +18,10 @@ import xyz.hstudio.horizon.util.wrap.Vector3D;
 
 import java.util.Objects;
 
-public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionConfig> {
+public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> {
 
     public InvalidMotion() {
-        super(ModuleType.InvalidMotion, new InvalidMotionConfig());
+        super(ModuleType.InvalidMotion, new InvalidMotionNode());
     }
 
     @Override
@@ -30,13 +30,13 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionConfig
     }
 
     @Override
-    public void cancel(final Event event, final String type, final HoriPlayer player, final InvalidMotionData data, final InvalidMotionConfig config) {
+    public void cancel(final Event event, final String type, final HoriPlayer player, final InvalidMotionData data, final InvalidMotionNode config) {
         event.setCancelled(true);
         Sync.teleport(player, player.position);
     }
 
     @Override
-    public void doCheck(final Event event, final HoriPlayer player, final InvalidMotionData data, final InvalidMotionConfig config) {
+    public void doCheck(final Event event, final HoriPlayer player, final InvalidMotionData data, final InvalidMotionNode config) {
         data.magic = false;
         if (config.typeA_enabled) {
             typeA(event, player, data, config);
@@ -57,7 +57,7 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionConfig
      *
      * @author MrCraftGoo
      */
-    private void typeA(final Event event, final HoriPlayer player, final InvalidMotionData data, final InvalidMotionConfig config) {
+    private void typeA(final Event event, final HoriPlayer player, final InvalidMotionData data, final InvalidMotionNode config) {
         if (event instanceof MoveEvent) {
             MoveEvent e = (MoveEvent) event;
 
@@ -174,7 +174,7 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionConfig
      *
      * @author MrCraftGoo
      */
-    private void typeB(final Event event, final HoriPlayer player, final InvalidMotionData data, final InvalidMotionConfig config) {
+    private void typeB(final Event event, final HoriPlayer player, final InvalidMotionData data, final InvalidMotionNode config) {
         if (event instanceof MoveEvent) {
             MoveEvent e = (MoveEvent) event;
             if (e.stepLegitly || !e.onGround || !player.isOnGround || e.isTeleport || e.knockBack != null) {
@@ -202,7 +202,7 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionConfig
      *
      * @author MrCraftGoo
      */
-    private void typeC(final Event event, final HoriPlayer player, final InvalidMotionData data, final InvalidMotionConfig config) {
+    private void typeC(final Event event, final HoriPlayer player, final InvalidMotionData data, final InvalidMotionNode config) {
         if (event instanceof MoveEvent) {
             MoveEvent e = (MoveEvent) event;
 
@@ -225,12 +225,12 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionConfig
     }
 
     // Liquid function
-    private void typeD(final Event event, final HoriPlayer player, final InvalidMotionData data, final InvalidMotionConfig config) {
+    private void typeD(final Event event, final HoriPlayer player, final InvalidMotionData data, final InvalidMotionNode config) {
 
     }
 
     // Ladder function
-    private void typeE(final Event event, final HoriPlayer player, final InvalidMotionData data, final InvalidMotionConfig config) {
+    private void typeE(final Event event, final HoriPlayer player, final InvalidMotionData data, final InvalidMotionNode config) {
 
     }
 }

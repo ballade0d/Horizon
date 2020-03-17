@@ -5,10 +5,11 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 import xyz.hstudio.horizon.command.Commands;
-import xyz.hstudio.horizon.config.DefaultConfig;
 import xyz.hstudio.horizon.data.HoriPlayer;
+import xyz.hstudio.horizon.file.AbstractFile;
+import xyz.hstudio.horizon.file.ConfigFile;
+import xyz.hstudio.horizon.file.LangFile;
 import xyz.hstudio.horizon.kirin.Kirin;
-import xyz.hstudio.horizon.lang.Lang;
 import xyz.hstudio.horizon.listener.Listeners;
 import xyz.hstudio.horizon.module.Module;
 import xyz.hstudio.horizon.module.checks.*;
@@ -32,9 +33,9 @@ public class Horizon extends JavaPlugin {
     @Getter
     private static Horizon inst;
 
-    public final Map<String, YamlLoader> configMap = new ConcurrentHashMap<>();
-    public final Map<String, Lang> langMap = new ConcurrentHashMap<>();
-    public DefaultConfig config;
+    public final Map<String, LangFile> langMap = new ConcurrentHashMap<>();
+    public YamlLoader checkLoader;
+    public ConfigFile config;
     public boolean usePapi;
 
     private BukkitTask syncTask;
@@ -63,18 +64,16 @@ public class Horizon extends JavaPlugin {
         if (!checkFile.exists()) {
             saveResource("check.yml", true);
         }
-        YamlLoader checkYaml = YamlLoader.loadConfiguration(checkFile);
-        this.configMap.put("check.yml", checkYaml);
+        this.checkLoader = YamlLoader.loadConfiguration(checkFile);
 
         File configFile = new File(folder, "config.yml");
         if (!checkFile.exists()) {
             saveResource("config.yml", true);
         }
         YamlLoader configYaml = YamlLoader.loadConfiguration(configFile);
-        this.configMap.put("config.yml", configYaml);
-        this.config = new DefaultConfig().load();
+        this.config = AbstractFile.load(null, new ConfigFile(), configYaml);
 
-        this.langMap.put("original", new Lang(YamlLoader.loadConfiguration(this.getResource("language.yml"))));
+        //this.langMap.put("original", new LangFile(YamlLoader.loadConfiguration(this.getResource("lang.yml"))));
         // TODO: Load languages from cloud
 
         this.usePapi = Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI");
@@ -117,5 +116,11 @@ public class Horizon extends JavaPlugin {
 
         this.syncTask.cancel();
         this.asyncTask.running = false;
+    }
+
+    public LangFile getLang(final String name) {
+        return config.personalized_themes_enabled ?
+                langMap.getOrDefault(name, langMap.get("original")) :
+                langMap.get("original");
     }
 }

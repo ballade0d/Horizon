@@ -4,16 +4,16 @@ import xyz.hstudio.horizon.api.ModuleType;
 import xyz.hstudio.horizon.api.events.Event;
 import xyz.hstudio.horizon.api.events.inbound.*;
 import xyz.hstudio.horizon.api.events.outbound.CloseWindowEvent;
-import xyz.hstudio.horizon.config.checks.InventoryConfig;
 import xyz.hstudio.horizon.data.HoriPlayer;
 import xyz.hstudio.horizon.data.checks.InventoryData;
+import xyz.hstudio.horizon.file.node.InventoryNode;
 import xyz.hstudio.horizon.module.Module;
 import xyz.hstudio.horizon.thread.Sync;
 
-public class Inventory extends Module<InventoryData, InventoryConfig> {
+public class Inventory extends Module<InventoryData, InventoryNode> {
 
     public Inventory() {
-        super(ModuleType.Inventory, new InventoryConfig());
+        super(ModuleType.Inventory, new InventoryNode());
     }
 
     @Override
@@ -22,7 +22,7 @@ public class Inventory extends Module<InventoryData, InventoryConfig> {
     }
 
     @Override
-    public void cancel(final Event event, final String type, final HoriPlayer player, final InventoryData data, final InventoryConfig config) {
+    public void cancel(final Event event, final String type, final HoriPlayer player, final InventoryData data, final InventoryNode config) {
         if (event instanceof MoveEvent) {
             event.setCancelled(true);
             Sync.teleport(player, data.legitLocation);
@@ -32,7 +32,7 @@ public class Inventory extends Module<InventoryData, InventoryConfig> {
     }
 
     @Override
-    public void doCheck(final Event event, final HoriPlayer player, final InventoryData data, final InventoryConfig config) {
+    public void doCheck(final Event event, final HoriPlayer player, final InventoryData data, final InventoryNode config) {
         if (config.typeA_enabled) {
             typeA(event, player, data, config);
         }
@@ -46,7 +46,7 @@ public class Inventory extends Module<InventoryData, InventoryConfig> {
      *
      * @author MrCraftGoo
      */
-    private void typeA(final Event event, final HoriPlayer player, final InventoryData data, final InventoryConfig config) {
+    private void typeA(final Event event, final HoriPlayer player, final InventoryData data, final InventoryNode config) {
         if (event instanceof ClientCommandEvent) {
             ClientCommandEvent e = (ClientCommandEvent) event;
             // In 1.8.8 or lower, client will send this packet when opening player inventory.

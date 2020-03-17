@@ -1,4 +1,4 @@
-package xyz.hstudio.horizon.lang.annotation;
+package xyz.hstudio.horizon.file;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

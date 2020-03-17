@@ -6,18 +6,18 @@ import xyz.hstudio.horizon.api.ModuleType;
 import xyz.hstudio.horizon.api.events.Event;
 import xyz.hstudio.horizon.api.events.inbound.BlockPlaceEvent;
 import xyz.hstudio.horizon.api.events.inbound.MoveEvent;
-import xyz.hstudio.horizon.config.checks.ScaffoldConfig;
 import xyz.hstudio.horizon.data.HoriPlayer;
 import xyz.hstudio.horizon.data.checks.ScaffoldData;
+import xyz.hstudio.horizon.file.node.ScaffoldNode;
 import xyz.hstudio.horizon.module.Module;
 import xyz.hstudio.horizon.util.wrap.Vector3D;
 
 import java.util.stream.DoubleStream;
 
-public class Scaffold extends Module<ScaffoldData, ScaffoldConfig> {
+public class Scaffold extends Module<ScaffoldData, ScaffoldNode> {
 
     public Scaffold() {
-        super(ModuleType.Scaffold, new ScaffoldConfig());
+        super(ModuleType.Scaffold, new ScaffoldNode());
     }
 
     @Override
@@ -26,12 +26,12 @@ public class Scaffold extends Module<ScaffoldData, ScaffoldConfig> {
     }
 
     @Override
-    public void cancel(final Event event, final String type, final HoriPlayer player, final ScaffoldData data, final ScaffoldConfig config) {
+    public void cancel(final Event event, final String type, final HoriPlayer player, final ScaffoldData data, final ScaffoldNode config) {
         // TODO: Finish this
     }
 
     @Override
-    public void doCheck(final Event event, final HoriPlayer player, final ScaffoldData data, final ScaffoldConfig config) {
+    public void doCheck(final Event event, final HoriPlayer player, final ScaffoldData data, final ScaffoldNode config) {
         if (config.typeA_enabled) {
             typeA(event, player, data, config);
         }
@@ -55,7 +55,7 @@ public class Scaffold extends Module<ScaffoldData, ScaffoldConfig> {
      *
      * @author MrCraftGoo
      */
-    private void typeA(final Event event, final HoriPlayer player, final ScaffoldData data, final ScaffoldConfig config) {
+    private void typeA(final Event event, final HoriPlayer player, final ScaffoldData data, final ScaffoldNode config) {
         if (event instanceof BlockPlaceEvent) {
             BlockPlaceEvent e = (BlockPlaceEvent) event;
             if (e.placeType != BlockPlaceEvent.PlaceType.PLACE_BLOCK) {
@@ -88,7 +88,7 @@ public class Scaffold extends Module<ScaffoldData, ScaffoldConfig> {
      *
      * @author MrCraftGoo
      */
-    private void typeB(final Event event, final HoriPlayer player, final ScaffoldData data, final ScaffoldConfig config) {
+    private void typeB(final Event event, final HoriPlayer player, final ScaffoldData data, final ScaffoldNode config) {
         if (event instanceof BlockPlaceEvent) {
             BlockPlaceEvent e = (BlockPlaceEvent) event;
             if (e.placeType != BlockPlaceEvent.PlaceType.PLACE_BLOCK) {
@@ -112,7 +112,7 @@ public class Scaffold extends Module<ScaffoldData, ScaffoldConfig> {
      *
      * @author MrCraftGoo
      */
-    private void typeC(final Event event, final HoriPlayer player, final ScaffoldData data, final ScaffoldConfig config) {
+    private void typeC(final Event event, final HoriPlayer player, final ScaffoldData data, final ScaffoldNode config) {
         if (event instanceof BlockPlaceEvent) {
             BlockPlaceEvent e = (BlockPlaceEvent) event;
             if (e.placeType != BlockPlaceEvent.PlaceType.PLACE_BLOCK) {
@@ -147,7 +147,7 @@ public class Scaffold extends Module<ScaffoldData, ScaffoldConfig> {
      *
      * @author MrCraftGoo
      */
-    private void typeD(final Event event, final HoriPlayer player, final ScaffoldData data, final ScaffoldConfig config) {
+    private void typeD(final Event event, final HoriPlayer player, final ScaffoldData data, final ScaffoldNode config) {
         if (event instanceof MoveEvent) {
             MoveEvent e = (MoveEvent) event;
             if (player.currentTick - data.lastPlaceTick > 6 || e.isTeleport) {

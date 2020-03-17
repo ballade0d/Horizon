@@ -8,20 +8,20 @@ import xyz.hstudio.horizon.api.ModuleType;
 import xyz.hstudio.horizon.api.PlayerViolateEvent;
 import xyz.hstudio.horizon.api.events.Event;
 import xyz.hstudio.horizon.compat.McAccessor;
-import xyz.hstudio.horizon.config.CheckConfig;
 import xyz.hstudio.horizon.data.Data;
 import xyz.hstudio.horizon.data.HoriPlayer;
-import xyz.hstudio.horizon.lang.Lang;
+import xyz.hstudio.horizon.file.AbstractFile;
+import xyz.hstudio.horizon.file.CheckFile;
 import xyz.hstudio.horizon.thread.Async;
 
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public abstract class Module<K extends Data, V extends CheckConfig<V>> {
+public abstract class Module<K extends Data, V extends CheckFile> {
 
     // Use LinkedHashMap to keep the check order.
-    public static final Map<ModuleType, Module<? extends Data, ? extends CheckConfig<?>>> MODULE_MAP = new LinkedHashMap<>(16, 1);
+    public static final Map<ModuleType, Module<? extends Data, ? extends CheckFile>> MODULE_MAP = new LinkedHashMap<>(16, 1);
 
     private final ModuleType moduleType;
     @Getter
@@ -29,7 +29,7 @@ public abstract class Module<K extends Data, V extends CheckConfig<V>> {
 
     public Module(final ModuleType moduleType, final V config) {
         this.moduleType = moduleType;
-        this.config = config.load();
+        this.config = AbstractFile.load(moduleType.name().toLowerCase(), config, Horizon.getInst().checkLoader);
         Module.MODULE_MAP.put(moduleType, this);
     }
 
@@ -93,7 +93,7 @@ public abstract class Module<K extends Data, V extends CheckConfig<V>> {
         }
 
         if (player.verbose) {
-            player.sendMessage(player.lang.verbose
+            player.sendMessage(Horizon.getInst().config.prefix + player.getLang().verbose
                     .replace("%player%", player.player.getName())
                     .replace("%check%", this.moduleType.name())
                     .replace("%type%", type)
@@ -103,7 +103,7 @@ public abstract class Module<K extends Data, V extends CheckConfig<V>> {
         }
 
         if (Horizon.getInst().config.log) {
-            Async.LOG.addLast(Lang.getLang(Horizon.getInst().config.personalized_themes_default_lang).verbose
+            Async.LOG.addLast(Horizon.getInst().getLang(Horizon.getInst().config.personalized_themes_default_lang).verbose
                     .replace("%player%", player.player.getName())
                     .replace("%check%", this.moduleType.name())
                     .replace("%type%", type)
