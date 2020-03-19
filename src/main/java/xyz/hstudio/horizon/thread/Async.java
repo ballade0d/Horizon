@@ -1,14 +1,15 @@
 package xyz.hstudio.horizon.thread;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import sun.security.action.GetPropertyAction;
 import xyz.hstudio.horizon.Horizon;
 import xyz.hstudio.horizon.data.HoriPlayer;
 import xyz.hstudio.horizon.util.DateUtils;
 
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.security.AccessController;
 import java.util.Deque;
 import java.util.concurrent.*;
 
@@ -29,7 +30,8 @@ public class Async extends Thread {
         THREAD_POOL.execute(command);
     }
 
-    private BufferedWriter logWriter;
+    private FileWriter logWriter;
+    private String lineSeparator;
 
     public Async() {
         super("Horizon Processing Thread");
@@ -45,10 +47,12 @@ public class Async extends Thread {
             if (!log.exists()) {
                 log.createNewFile();
             }
-            this.logWriter = new BufferedWriter(new FileWriter(log, true));
+            this.logWriter = new FileWriter(log, true);
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        lineSeparator = AccessController.doPrivileged(new GetPropertyAction("line.separator"));
 
         this.start();
     }
@@ -70,7 +74,7 @@ public class Async extends Thread {
                 String time = "[" + DateUtils.now(true) + "] ";
                 for (String message : Async.LOG) {
                     this.logWriter.write(time + message);
-                    this.logWriter.newLine();
+                    this.logWriter.write(lineSeparator);
                 }
                 Async.LOG.clear();
 

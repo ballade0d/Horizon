@@ -5,7 +5,6 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import xyz.hstudio.horizon.compat.McAccessor;
-import xyz.hstudio.horizon.util.enums.MatUtils;
 import xyz.hstudio.horizon.util.wrap.AABB;
 import xyz.hstudio.horizon.util.wrap.Location;
 import xyz.hstudio.horizon.util.wrap.Vector3D;
@@ -27,13 +26,22 @@ public class BlockUtils {
         return null;
     }
 
+    public static boolean isSolid(final Block block) {
+        return McAccessor.INSTANCE.isSolid(block);
+    }
+
+    /*
     public static boolean isSolid(final Material material) {
         boolean isSolid = material.isSolid();
         if (material == Material.SNOW ||
                 material == MatUtils.LADDER.parse() ||
                 material == MatUtils.VINE.parse() ||
                 material == MatUtils.REPEATER.parse() ||
+                material == MatUtils.DIODE_BLOCK_ON.parse() ||
+                material == MatUtils.DIODE_BLOCK_OFF.parse() ||
                 material == MatUtils.COMPARATOR.parse() ||
+                material == MatUtils.REDSTONE_COMPARATOR_ON.parse() ||
+                material == MatUtils.REDSTONE_COMPARATOR_OFF.parse() ||
                 material == MatUtils.LILY_PAD.parse() ||
                 material == MatUtils.COCOA_BEANS.parse() ||
                 material == MatUtils.SEA_PICKLE.parse() ||
@@ -43,7 +51,7 @@ public class BlockUtils {
                 material == MatUtils.CHORUS_PLANT.parse() ||
                 material == MatUtils.SCAFFOLDING.parse() ||
                 material == MatUtils.BAMBOO.parse() ||
-                material.name().contains("DIODE") ||
+                // org.bukkit.Material#isSolid is fake and shit
                 material.name().contains("SKULL") ||
                 material.name().contains("HEAD") ||
                 material.name().contains("POT") ||
@@ -52,9 +60,10 @@ public class BlockUtils {
         }
         return isSolid;
     }
+     */
 
     public static List<Block> getBlocksInLocation(final Location loc) {
-        List<Block> blocks = new ArrayList<>();
+        List<Block> blocks = new ArrayList<>(8);
         blocks.add(loc.add(0.3, 0, 0).getBlock());
         blocks.add(loc.add(0, 0, 0.3).getBlock());
         blocks.add(loc.add(-0.3, 0, 0).getBlock());

@@ -5,6 +5,7 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import xyz.hstudio.horizon.api.events.Event;
 import xyz.hstudio.horizon.data.HoriPlayer;
+import xyz.hstudio.horizon.util.enums.MatUtils;
 
 public class InteractItemEvent extends Event {
 
@@ -25,8 +26,7 @@ public class InteractItemEvent extends Event {
         Material mat = this.itemStack.getType();
         if (this.interactType == InteractType.START_USE_ITEM) {
             // Player can still eat golden apple even if they're full.
-            // In 1.13+ there's ENCHANTED_GOLDEN_APPLE so I use String#contains.
-            if (mat.isEdible() && (player.player.getFoodLevel() < 20 || mat.name().contains("GOLDEN_APPLE"))) {
+            if (mat.isEdible() && (player.player.getFoodLevel() < 20 || mat == Material.GOLDEN_APPLE || mat == MatUtils.ENCHANTED_GOLDEN_APPLE.parse())) {
                 player.isEating = true;
             }
             if (mat == Material.BOW && (player.player.getInventory().contains(Material.ARROW) || player.player.getGameMode() == GameMode.CREATIVE)) {

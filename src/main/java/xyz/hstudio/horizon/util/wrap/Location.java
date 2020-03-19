@@ -16,7 +16,7 @@ import java.util.Objects;
  * A wrapped Location class. Remember to use this instead of using bukkit's.
  * This includes optimized math utils and async block-getter method.
  */
-public class Location {
+public class Location implements Cloneable {
 
     public final World world;
     public final double x;
@@ -68,7 +68,7 @@ public class Location {
         AABB topFeet = underFeet.add(0, feetDepth + 0.00001, 0, 0, 0, 0);
         List<Block> aboveBlocks = !ignoreOnGround ? null : BlockUtils.getBlocksInLocation(this);
         for (Block block : blocks) {
-            if (block.isLiquid() || !BlockUtils.isSolid(block.getType())) {
+            if (block.isLiquid() || !BlockUtils.isSolid(block)) {
                 continue;
             }
             for (AABB bBox : McAccessor.INSTANCE.getBoxes(block)) {
@@ -77,7 +77,7 @@ public class Location {
                 }
                 if (ignoreOnGround) {
                     for (Block above : aboveBlocks) {
-                        if (above.isLiquid() || !BlockUtils.isSolid(above.getType())) {
+                        if (above.isLiquid() || !BlockUtils.isSolid(above)) {
                             continue;
                         }
                         for (AABB aboveBox : McAccessor.INSTANCE.getBoxes(above)) {
@@ -188,5 +188,14 @@ public class Location {
             return false;
         }
         return Float.floatToIntBits(this.yaw) == Float.floatToIntBits(other.yaw);
+    }
+
+    @Override
+    public Location clone() {
+        try {
+            return (Location) super.clone();
+        } catch (CloneNotSupportedException var2) {
+            throw new Error(var2);
+        }
     }
 }

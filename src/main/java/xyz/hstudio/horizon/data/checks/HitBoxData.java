@@ -17,21 +17,22 @@ public class HitBoxData extends Data {
         long time = System.currentTimeMillis();
         for (int i = history.size() - 1; i >= 0; i--) {
             long elapsedTime = time - history.get(i).value;
-            if (elapsedTime >= ping) {
-                if (i == history.size() - 1) {
-                    return history.get(i).key;
-                }
-                if (lerp) {
-                    double nextMoveWeight = (elapsedTime - ping) / (double) (elapsedTime - (time - history.get(i + 1).value));
-                    Location before = history.get(i).key;
-                    Location after = history.get(i + 1).key;
-                    Vector3D interpolate = after.toVector().subtract(before.toVector());
-                    interpolate.multiply(nextMoveWeight);
-                    before.add(interpolate);
-                    return before;
-                } else {
-                    return history.get(i).key;
-                }
+            if (elapsedTime < ping) {
+                continue;
+            }
+            if (i == history.size() - 1) {
+                return history.get(i).key;
+            }
+            if (lerp) {
+                double nextMoveWeight = (elapsedTime - ping) / (double) (elapsedTime - (time - history.get(i + 1).value));
+                Location before = history.get(i).key;
+                Location after = history.get(i + 1).key;
+                Vector3D interpolate = after.toVector().subtract(before.toVector());
+                interpolate.multiply(nextMoveWeight);
+                before.add(interpolate);
+                return before;
+            } else {
+                return history.get(i).key;
             }
         }
         return history.get(0).key;
@@ -44,14 +45,15 @@ public class HitBoxData extends Data {
         long currentTime = System.currentTimeMillis();
         for (int i = history.size() - 1; i >= 0; i--) {
             int elapsedTime = (int) (currentTime - history.get(i).value);
-            if (elapsedTime >= ping) {
-                if (i == history.size() - 1) {
-                    return new Vector3D(0, 0, 0);
-                }
-                Location before = history.get(i).key;
-                Location after = history.get(i + 1).key;
-                return after.toVector().subtract(before.toVector());
+            if (elapsedTime < ping) {
+                continue;
             }
+            if (i == history.size() - 1) {
+                return new Vector3D(0, 0, 0);
+            }
+            Location before = history.get(i).key;
+            Location after = history.get(i + 1).key;
+            return after.toVector().subtract(before.toVector());
         }
         return new Vector3D(0, 0, 0);
     }

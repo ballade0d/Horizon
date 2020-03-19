@@ -4,7 +4,6 @@ import lombok.Getter;
 import org.bukkit.Material;
 import xyz.hstudio.horizon.api.events.Event;
 import xyz.hstudio.horizon.data.HoriPlayer;
-import xyz.hstudio.horizon.util.wrap.ClientBlock;
 import xyz.hstudio.horizon.util.wrap.Location;
 import xyz.hstudio.horizon.util.wrap.Vector3D;
 
@@ -28,8 +27,7 @@ public class BlockPlaceEvent extends Event {
     @Override
     public void post() {
         if (this.placeType == PlaceType.PLACE_BLOCK) {
-            ClientBlock clientBlock = new ClientBlock(player.currentTick, this.material);
-            player.addClientBlock(this.placed, clientBlock);
+            player.addClientBlock(this.placed, player.currentTick);
         }
     }
 

@@ -71,4 +71,9 @@ public interface IMcAccessor {
      * Stop a player from using item.
      */
     void releaseItem(final Player player);
+
+    /**
+     * Check if a block is solid
+     */
+    boolean isSolid(final Block block);
 }

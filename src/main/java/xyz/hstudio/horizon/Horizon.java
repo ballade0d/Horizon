@@ -67,13 +67,13 @@ public class Horizon extends JavaPlugin {
         this.checkLoader = YamlLoader.loadConfiguration(checkFile);
 
         File configFile = new File(folder, "config.yml");
-        if (!checkFile.exists()) {
+        if (!configFile.exists()) {
             saveResource("config.yml", true);
         }
         YamlLoader configYaml = YamlLoader.loadConfiguration(configFile);
         this.config = AbstractFile.load(null, new ConfigFile(), configYaml);
 
-        //this.langMap.put("original", new LangFile(YamlLoader.loadConfiguration(this.getResource("lang.yml"))));
+        this.langMap.put("original", AbstractFile.load(null, new LangFile(), YamlLoader.loadConfiguration(this.getResource("lang.yml"))));
         // TODO: Load languages from cloud
 
         this.usePapi = Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI");
@@ -114,7 +114,9 @@ public class Horizon extends JavaPlugin {
 
         Module.MODULE_MAP.clear();
 
-        this.syncTask.cancel();
+        if (this.syncTask != null) {
+            this.syncTask.cancel();
+        }
         this.asyncTask.running = false;
     }
 

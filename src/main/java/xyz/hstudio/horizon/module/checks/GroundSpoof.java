@@ -55,7 +55,7 @@ public class GroundSpoof extends Module<GroundSpoofData, GroundSpoofNode> {
                 if (checkLoc.isOnGround(player, false, 0.025)) {
                     return;
                 }
-                if (e.clientBlock != null) {
+                if (e.clientBlock != -1) {
                     return;
                 }
                 e.onGround = false;

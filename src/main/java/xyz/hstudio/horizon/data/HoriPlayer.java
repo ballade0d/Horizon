@@ -16,7 +16,6 @@ import xyz.hstudio.horizon.file.LangFile;
 import xyz.hstudio.horizon.network.ChannelHandler;
 import xyz.hstudio.horizon.util.collect.Pair;
 import xyz.hstudio.horizon.util.wrap.AABB;
-import xyz.hstudio.horizon.util.wrap.ClientBlock;
 import xyz.hstudio.horizon.util.wrap.Location;
 import xyz.hstudio.horizon.util.wrap.Vector3D;
 
@@ -47,7 +46,7 @@ public class HoriPlayer {
     public double prevPrevDeltaY;
     public Vector3D velocity = new Vector3D(0, 0, 0);
     public List<Pair<Vector3D, Long>> velocities = new LinkedList<>();
-    public Map<Location, ClientBlock> clientBlocks = new ConcurrentHashMap<>();
+    public Map<Location, Long> clientBlocks = new ConcurrentHashMap<>();
     public List<AABB> piston = new ArrayList<>();
     public Set<BlockFace> touchingFaces = EnumSet.noneOf(BlockFace.class);
     public boolean isSneaking;
@@ -85,11 +84,11 @@ public class HoriPlayer {
         Horizon.PLAYERS.put(player.getUniqueId(), this);
     }
 
-    public void addClientBlock(final Location location, final ClientBlock clientBlock) {
+    public void addClientBlock(final Location location, final long initTick) {
         if (clientBlocks.size() >= 12) {
             return;
         }
-        clientBlocks.put(location, clientBlock);
+        clientBlocks.put(location, initTick);
     }
 
     /**

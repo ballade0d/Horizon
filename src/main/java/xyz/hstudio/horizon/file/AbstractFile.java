@@ -22,8 +22,12 @@ public abstract class AbstractFile {
 
             Object value = instance.getValue(path, loader, field.getType());
 
+            if (value == null) {
+                continue;
+            }
+
             // Double.class.isAssignableFrom(double.class) is false :/
-            if (!Primitives.unwrap(value.getClass()).isAssignableFrom(field.getType())) {
+            if (!field.getType().isAssignableFrom(Primitives.unwrap(value.getClass()))) {
                 throw new IllegalStateException("Failed to load value: " + path);
             }
 

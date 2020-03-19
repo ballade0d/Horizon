@@ -12,7 +12,6 @@ import xyz.hstudio.horizon.util.MathUtils;
 import xyz.hstudio.horizon.util.collect.Pair;
 import xyz.hstudio.horizon.util.enums.MatUtils;
 import xyz.hstudio.horizon.util.wrap.AABB;
-import xyz.hstudio.horizon.util.wrap.ClientBlock;
 import xyz.hstudio.horizon.util.wrap.Location;
 import xyz.hstudio.horizon.util.wrap.Vector3D;
 
@@ -40,7 +39,7 @@ public class MoveEvent extends Event {
     public final float newFriction;
     public final List<AABB> piston;
     public final Set<Material> collidingBlocks;
-    public final ClientBlock clientBlock;
+    public final long clientBlock;
     public final Set<BlockFace> touchingFaces;
     public final boolean stepLegitly;
     public final Vector3D knockBack;
@@ -168,7 +167,7 @@ public class MoveEvent extends Event {
      *
      * @author Islandscout
      */
-    private ClientBlock getClientBlock() {
+    private long getClientBlock() {
         AABB feet = new AABB(to.toVector().add(new Vector3D(-0.3, -0.02, -0.3)), to.toVector().add(new Vector3D(0.3, 0, 0.3)));
         AABB aboveFeet = feet.add(0, 0.20001, 0);
         AABB cube = new AABB(new Vector3D(0, 0, 0), new Vector3D(1, 1, 1));
@@ -176,13 +175,17 @@ public class MoveEvent extends Event {
             if (!to.world.equals(loc.world)) {
                 continue;
             }
-            ClientBlock cBlock = player.clientBlocks.get(loc);
+            long cBlock = player.clientBlocks.get(loc);
+            Block block = loc.getBlock();
+            if (block == null) {
+                continue;
+            }
             AABB newAABB = cube.translateTo(loc.toVector());
-            if (BlockUtils.isSolid(cBlock.material) && feet.isColliding(newAABB) && !aboveFeet.isColliding(newAABB)) {
+            if (BlockUtils.isSolid(block) && feet.isColliding(newAABB) && !aboveFeet.isColliding(newAABB)) {
                 return cBlock;
             }
         }
-        return null;
+        return -1;
     }
 
     /**
@@ -340,12 +343,8 @@ public class MoveEvent extends Event {
     @Override
     public boolean pre() {
         player.currentTick++;
-        for (Location loc : player.clientBlocks.keySet()) {
-            ClientBlock clientBlock = player.clientBlocks.get(loc);
-            if (player.currentTick - clientBlock.initTick > 3) {
-                player.clientBlocks.remove(loc);
-            }
-        }
+
+        player.clientBlocks.entrySet().removeIf(next -> player.currentTick - next.getValue() > 3);
 
         if (player.isTeleporting) {
             Location tpLoc = player.teleportPos;

@@ -144,4 +144,15 @@ public class McAccessor_v1_13_R2 implements IMcAccessor {
     public void releaseItem(final Player player) {
         ((CraftPlayer) player).getHandle().clearActiveItem();
     }
+
+    @Override
+    public boolean isSolid(final org.bukkit.block.Block block) {
+        WorldServer world = ((CraftWorld) block.getWorld()).getHandle();
+        Chunk chunk = world.getChunkIfLoaded(block.getX() >> 4, block.getZ() >> 4);
+        if (chunk == null) {
+            return block.getType().isSolid();
+        }
+        IBlockData data = chunk.getBlockData(block.getX(), block.getY(), block.getZ());
+        return data.getBlock().n(data).isSolid();
+    }
 }
