@@ -1,1 +1,1 @@
-verbose: 'Player %player% failed check %check% (%type%), VL: %vl_total% (+%vl_addition%), Ping: %ping%'
+verbose: 'Player %player% failed check %check% (%type%), VL: %vl_total% (+%vl_addition%), Ping: %ping%, %args%'

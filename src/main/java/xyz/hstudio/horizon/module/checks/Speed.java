@@ -101,7 +101,7 @@ public class Speed extends Module<SpeedData, SpeedNode> {
                     .getMaterials(e.to.world)
                     .stream()
                     .anyMatch(MatUtils::isLiquid);
-            boolean usingItem = player.isEating || player.isPullingBow;
+            boolean usingItem = player.isEating || player.isPullingBow || player.isBlocking;
 
             double estimatedSpeed;
             double discrepancy;

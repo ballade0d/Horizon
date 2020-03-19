@@ -6,7 +6,7 @@
 
     <groupId>xyz.hstudio</groupId>
     <artifactId>Horizon</artifactId>
-    <version>BETA2</version>
+    <version>BETA3</version>
 
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>

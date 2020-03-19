@@ -14,6 +14,7 @@ import xyz.hstudio.horizon.file.AbstractFile;
 import xyz.hstudio.horizon.file.CheckFile;
 import xyz.hstudio.horizon.thread.Async;
 
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -99,7 +100,8 @@ public abstract class Module<K extends Data, V extends CheckFile> {
                     .replace("%type%", type)
                     .replace("%vl_total%", String.valueOf(nowViolation))
                     .replace("%vl_addition%", String.valueOf(weight))
-                    .replace("%ping%", String.valueOf(player.ping)));
+                    .replace("%ping%", String.valueOf(player.ping))
+                    .replace("%args%", Arrays.toString(args)));
         }
 
         if (Horizon.getInst().config.log) {
@@ -109,7 +111,8 @@ public abstract class Module<K extends Data, V extends CheckFile> {
                     .replace("%type%", type)
                     .replace("%vl_total%", String.valueOf(nowViolation))
                     .replace("%vl_addition%", String.valueOf(weight))
-                    .replace("%ping%", String.valueOf(player.ping)));
+                    .replace("%ping%", String.valueOf(player.ping))
+                    .replace("%args%", Arrays.toString(args)));
         }
 
         data.violations.put(type, nowViolation);

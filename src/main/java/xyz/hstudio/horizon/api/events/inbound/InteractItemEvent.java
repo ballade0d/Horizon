@@ -32,9 +32,13 @@ public class InteractItemEvent extends Event {
             if (mat == Material.BOW && (player.player.getInventory().contains(Material.ARROW) || player.player.getGameMode() == GameMode.CREATIVE)) {
                 player.isPullingBow = true;
             }
+            if (MatUtils.BLOCKABLE.contains(mat)) {
+                player.isBlocking = true;
+            }
         } else if (this.interactType == InteractType.RELEASE_USE_ITEM) {
             player.isEating = false;
             player.isPullingBow = false;
+            player.isBlocking = false;
         }
     }
 

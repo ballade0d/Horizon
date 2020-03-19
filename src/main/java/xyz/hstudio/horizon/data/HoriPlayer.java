@@ -53,6 +53,7 @@ public class HoriPlayer {
     public boolean isSprinting;
     public boolean isEating;
     public boolean isPullingBow;
+    public boolean isBlocking;
     public boolean isOnGround;
     public boolean onGroundReally;
     public boolean isGliding;
