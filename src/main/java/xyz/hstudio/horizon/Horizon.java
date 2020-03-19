@@ -16,6 +16,7 @@ import xyz.hstudio.horizon.module.checks.*;
 import xyz.hstudio.horizon.network.ChannelHandler;
 import xyz.hstudio.horizon.thread.Async;
 import xyz.hstudio.horizon.thread.Sync;
+import xyz.hstudio.horizon.util.BlockUtils;
 import xyz.hstudio.horizon.util.enums.Version;
 import xyz.hstudio.horizon.util.wrap.YamlLoader;
 
@@ -93,6 +94,8 @@ public class Horizon extends JavaPlugin {
 
         new Listeners();
         new Commands();
+        // Load static code block
+        new BlockUtils();
 
         // Enable checks
         new AntiVelocity();

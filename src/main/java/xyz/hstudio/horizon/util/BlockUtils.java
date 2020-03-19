@@ -5,16 +5,58 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import xyz.hstudio.horizon.compat.McAccessor;
+import xyz.hstudio.horizon.util.enums.MatUtils;
 import xyz.hstudio.horizon.util.wrap.AABB;
 import xyz.hstudio.horizon.util.wrap.Location;
 import xyz.hstudio.horizon.util.wrap.Vector3D;
 
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class BlockUtils {
+
+    private static final Set<Material> SOLID = new HashSet<>();
+
+    static {
+        SOLID.add(Material.SNOW);
+        SOLID.add(Material.LADDER);
+        SOLID.add(Material.VINE);
+        SOLID.add(MatUtils.LILY_PAD.parse());
+        SOLID.add(MatUtils.COCOA_BEANS.parse());
+        SOLID.add(MatUtils.END_ROD.parse());
+        SOLID.add(MatUtils.CHORUS_FLOWER.parse());
+        SOLID.add(MatUtils.CHORUS_PLANT.parse());
+        SOLID.add(MatUtils.SEA_PICKLE.parse());
+        SOLID.add(MatUtils.FARMLAND.parse());
+        SOLID.add(MatUtils.SCAFFOLDING.parse());
+        SOLID.add(MatUtils.BAMBOO.parse());
+
+        SOLID.add(MatUtils.REPEATER.parse());
+
+        SOLID.add(Material.FLOWER_POT);
+
+        for (Material material : Material.values()) {
+            if (material.name().startsWith("LEGACY_")) {
+                continue;
+            }
+            if (material.name().contains("COMPARATOR") || material.name().contains("DIODE")) {
+                SOLID.add(material);
+            }
+            // For 1.13+ potted flower material
+            if (material.name().contains("POTTED")) {
+                SOLID.add(material);
+            }
+            // For 1.13+ skull
+            if (material.isBlock() && (material.name().contains("SKULL") || material.name().contains("HEAD"))) {
+                SOLID.add(material);
+            }
+            // For 1.13+ carpet
+            if (material.name().contains("CARPET")) {
+                SOLID.add(material);
+            }
+        }
+
+        SOLID.remove(null);
+    }
 
     /**
      * Remember to use this method when getting block async.
@@ -27,40 +69,8 @@ public class BlockUtils {
     }
 
     public static boolean isSolid(final Block block) {
-        return McAccessor.INSTANCE.isSolid(block);
+        return McAccessor.INSTANCE.isSolid(block) || SOLID.contains(block.getType());
     }
-
-    /*
-    public static boolean isSolid(final Material material) {
-        boolean isSolid = material.isSolid();
-        if (material == Material.SNOW ||
-                material == MatUtils.LADDER.parse() ||
-                material == MatUtils.VINE.parse() ||
-                material == MatUtils.REPEATER.parse() ||
-                material == MatUtils.DIODE_BLOCK_ON.parse() ||
-                material == MatUtils.DIODE_BLOCK_OFF.parse() ||
-                material == MatUtils.COMPARATOR.parse() ||
-                material == MatUtils.REDSTONE_COMPARATOR_ON.parse() ||
-                material == MatUtils.REDSTONE_COMPARATOR_OFF.parse() ||
-                material == MatUtils.LILY_PAD.parse() ||
-                material == MatUtils.COCOA_BEANS.parse() ||
-                material == MatUtils.SEA_PICKLE.parse() ||
-                material == MatUtils.FARMLAND.parse() ||
-                material == MatUtils.END_ROD.parse() ||
-                material == MatUtils.CHORUS_FLOWER.parse() ||
-                material == MatUtils.CHORUS_PLANT.parse() ||
-                material == MatUtils.SCAFFOLDING.parse() ||
-                material == MatUtils.BAMBOO.parse() ||
-                // org.bukkit.Material#isSolid is fake and shit
-                material.name().contains("SKULL") ||
-                material.name().contains("HEAD") ||
-                material.name().contains("POT") ||
-                material.name().contains("CARPET")) {
-            isSolid = true;
-        }
-        return isSolid;
-    }
-     */
 
     public static List<Block> getBlocksInLocation(final Location loc) {
         List<Block> blocks = new ArrayList<>(8);

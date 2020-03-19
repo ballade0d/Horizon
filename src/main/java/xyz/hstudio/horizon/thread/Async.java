@@ -77,6 +77,7 @@ public class Async extends Thread {
                     this.logWriter.write(lineSeparator);
                 }
                 Async.LOG.clear();
+                this.logWriter.flush();
 
                 currentTick++;
 
