@@ -88,6 +88,17 @@ public class Horizon extends JavaPlugin {
             }
         }
 
+        File checkFolder = new File(folder, "checks");
+        if (!checkFolder.exists()) {
+            checkFolder.mkdirs();
+        }
+        File[] checks = checkFolder.listFiles();
+        if (checks != null) {
+            for (File check : checks) {
+                // TODO
+            }
+        }
+
         // Run every 50ms (1 tick)
         this.asyncTask = new Async();
         this.syncTask = Bukkit.getScheduler().runTaskTimer(this, new Sync(), 1L, 1L);

@@ -69,12 +69,16 @@ public class Timer extends Module<TimerData, TimerNode> {
             // Player is 1 tick faster.
             // Also allowed network jitter.
             if (diff < -config.typeA_allow_ms) {
-                // Punish
-                this.punish(event, player, data, "TypeA", (float) (-diff / 50F * 2F),
-                        "d:" + diff, "s:" + (-diff / 50));
+                if (++data.fails > 4) {
+                    // Punish
+                    this.punish(event, player, data, "TypeA", (float) (-diff / 50F * 2F),
+                            "d:" + diff, "s:" + (-diff / 50));
 
-                // Reset drift to -45 to stop spam-flagging.
-                drift = -45 * MULTIPLIER;
+                    // Reset drift to -45 to stop spam-flagging.
+                    drift = -45 * MULTIPLIER;
+                }
+            } else if (data.fails > 0) {
+                data.fails--;
             } else {
                 reward("TypeA", data, 0.995);
             }

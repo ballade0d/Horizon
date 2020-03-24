@@ -1,5 +1,6 @@
 package xyz.hstudio.horizon.module.checks;
 
+import org.bukkit.entity.LivingEntity;
 import xyz.hstudio.horizon.api.ModuleType;
 import xyz.hstudio.horizon.api.events.Event;
 import xyz.hstudio.horizon.api.events.inbound.ActionEvent;
@@ -253,6 +254,9 @@ public class KillAura extends Module<KillAuraData, KillAuraNode> {
         if (event instanceof InteractEntityEvent) {
             InteractEntityEvent e = (InteractEntityEvent) event;
             if (e.action != InteractEntityEvent.InteractType.INTERACT || e.intersection == null) {
+                return;
+            }
+            if (!(e.entity instanceof LivingEntity)) {
                 return;
             }
             data.intersection = e.intersection.clone().add(e.entity.getLocation().toVector());

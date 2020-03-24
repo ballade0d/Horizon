@@ -65,6 +65,7 @@ public class HoriPlayer {
     public boolean isTeleporting;
     public Location teleportPos;
     public int vehicle = -1;
+    public long leaveVehicleTick = -1;
     public long ping;
     public long lastRequestSent;
     public float moveFactor = 0.1F;

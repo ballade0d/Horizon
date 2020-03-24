@@ -15,5 +15,8 @@ public class VehicleEvent extends Event {
     @Override
     public void post() {
         player.vehicle = vehicle;
+        if (vehicle == -1) {
+            player.leaveVehicleTick = player.currentTick;
+        }
     }
 }

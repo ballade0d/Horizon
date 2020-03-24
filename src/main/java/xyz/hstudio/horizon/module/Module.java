@@ -93,7 +93,7 @@ public abstract class Module<K extends Data, V extends CheckFile> {
             break;
         }
 
-        if (player.verbose) {
+        if (true) {
             player.sendMessage(Horizon.getInst().config.prefix + player.getLang().verbose
                     .replace("%player%", player.player.getName())
                     .replace("%check%", this.moduleType.name())
@@ -130,14 +130,4 @@ public abstract class Module<K extends Data, V extends CheckFile> {
     public abstract void cancel(final Event event, final String type, final HoriPlayer player, final K data, final V config);
 
     public abstract void doCheck(final Event event, final HoriPlayer player, final K data, final V config);
-
-    /**
-     * This will run every tick (async) to execute some checks.
-     *
-     * @param currentTick Current ticks
-     * @param config      The check config
-     * @author MrCraftGoo
-     */
-    public void runAsync(final long currentTick, final V config) {
-    }
 }

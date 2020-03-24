@@ -25,7 +25,7 @@ public class AttributeEvent extends Event {
             if (!snapshot.key.equals("generic.movementSpeed")) {
                 continue;
             }
-            if (snapshot.modifiers.size() == 0) {
+            if (snapshot.modifiers.size() == 0 && !player.isSprinting) {
                 player.moveFactor = (float) snapshot.baseValue;
                 break;
             }

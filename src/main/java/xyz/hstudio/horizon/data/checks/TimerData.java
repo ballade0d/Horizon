@@ -6,4 +6,5 @@ public class TimerData extends Data {
 
     public long prevMoveTime = System.nanoTime();
     public long drift = 0;
+    public int fails;
 }

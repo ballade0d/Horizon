@@ -15,16 +15,17 @@ public class HitBoxData extends Data {
 
     public Location getHistoryLocation(final long ping, final boolean lerp) {
         long time = System.currentTimeMillis();
+        long rewindTime = ping + 175;
         for (int i = history.size() - 1; i >= 0; i--) {
             long elapsedTime = time - history.get(i).value;
-            if (elapsedTime < ping) {
+            if (elapsedTime < rewindTime) {
                 continue;
             }
             if (i == history.size() - 1) {
                 return history.get(i).key;
             }
             if (lerp) {
-                double nextMoveWeight = (elapsedTime - ping) / (double) (elapsedTime - (time - history.get(i + 1).value));
+                double nextMoveWeight = (elapsedTime - rewindTime) / (double) (elapsedTime - (time - history.get(i + 1).value));
                 Location before = history.get(i).key;
                 Location after = history.get(i + 1).key;
                 Vector3D interpolate = after.toVector().subtract(before.toVector());
@@ -43,9 +44,10 @@ public class HitBoxData extends Data {
             return new Vector3D(0, 0, 0);
         }
         long currentTime = System.currentTimeMillis();
+        long rewindTime = ping + 175;
         for (int i = history.size() - 1; i >= 0; i--) {
             int elapsedTime = (int) (currentTime - history.get(i).value);
-            if (elapsedTime < ping) {
+            if (elapsedTime < rewindTime) {
                 continue;
             }
             if (i == history.size() - 1) {

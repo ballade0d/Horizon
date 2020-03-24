@@ -72,10 +72,11 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
             // TODO: Handle Vehicle
 
             if (!e.onGround && !e.jumpLegitly && !e.stepLegitly && e.knockBack == null && e.piston.size() == 0 &&
-                    player.getVehicle() == null && !player.isFlying() && !player.player.isDead() && !e.isOnSlime && !e.isOnBed &&
-                    !e.isInLiquid && !player.isInLiquid && !e.collidingBlocks.contains(Material.LADDER) &&
-                    !e.collidingBlocks.contains(Material.VINE) && !e.collidingBlocks.contains(MatUtils.SCAFFOLDING.parse()) &&
-                    !e.collidingBlocks.contains(MatUtils.KELP.parse()) && !e.collidingBlocks.contains(MatUtils.KELP_PLANT.parse())) {
+                    player.currentTick - player.leaveVehicleTick > 1 && player.getVehicle() == null && !player.isFlying() &&
+                    !player.player.isDead() && !e.isOnSlime && !e.isOnBed && !e.isInLiquid && !player.isInLiquid &&
+                    !e.collidingBlocks.contains(Material.LADDER) && !e.collidingBlocks.contains(Material.VINE) &&
+                    !e.collidingBlocks.contains(MatUtils.SCAFFOLDING.parse()) && !e.collidingBlocks.contains(MatUtils.KELP.parse()) &&
+                    !e.collidingBlocks.contains(MatUtils.KELP_PLANT.parse())) {
 
                 int levitation = player.getPotionEffectAmplifier("LEVITATION");
                 // Supports SLOW_FALLING potion effect

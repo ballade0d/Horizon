@@ -16,6 +16,7 @@ import xyz.hstudio.horizon.util.enums.MatUtils;
 import xyz.hstudio.horizon.util.wrap.AABB;
 import xyz.hstudio.horizon.util.wrap.Vector3D;
 
+import java.util.Arrays;
 import java.util.Set;
 
 public class Speed extends Module<SpeedData, SpeedNode> {
@@ -90,11 +91,11 @@ public class Speed extends Module<SpeedData, SpeedNode> {
                 data.prevSpeed = speed;
                 return;
             }
-            if (e.isTeleport) {
+            if (e.isTeleport || player.isFlying() || player.getVehicle() != null ||
+                    player.currentTick - player.leaveVehicleTick <= 1 || player.isGliding) {
                 return;
             }
 
-            boolean flying = player.isFlying();
             boolean swimming = AABB.waterCollisionBox
                     .shrink(0.001, 0.001, 0.001)
                     .add(e.from.toVector())
@@ -106,7 +107,7 @@ public class Speed extends Module<SpeedData, SpeedNode> {
             double estimatedSpeed;
             double discrepancy;
 
-            if (swimming && !flying) {
+            if (swimming) {
                 // Water function
                 Vector3D move = e.velocity.clone().setY(0);
                 Vector3D waterForce = e.waterFlowForce.clone().setY(0).normalize().multiply(0.014);
@@ -153,21 +154,26 @@ public class Speed extends Module<SpeedData, SpeedNode> {
             }
             discrepancy = speed - estimatedSpeed;
             if (e.updatePos) {
-                if (discrepancy < 0 || speed > 0) {
+                if (discrepancy < 0 || speed > data.negativeDiscrepanciesCumulative) {
                     data.discrepancies = Math.max(data.discrepancies + discrepancy, 0);
                 }
                 double totalDiscrepancy = data.discrepancies;
                 if (discrepancy > 0 && totalDiscrepancy > config.typeA_tolerance) {
-                    // Punish
-                    this.punish(event, player, data, "TypeA", (float) (totalDiscrepancy * 10),
-                            "s:" + speed, "e:" + estimatedSpeed, "p:" + prevSpeed, "d:" + discrepancy);
+                    if (!(!e.onGround && Math.abs(player.velocity.y - 0.33319999) < 0.001 &&
+                            player.touchingFaces.size() > 0 && e.touchingFaces.size() == 0)) {
+                        // Punish
+                        this.punish(event, player, data, "TypeA", (float) (totalDiscrepancy * 10),
+                                "s:" + speed, "e:" + estimatedSpeed, "p:" + prevSpeed, "d:" + discrepancy);
+                    }
                     data.discrepancies = 0;
                 } else {
                     reward("TypeA", data, 0.99);
                 }
                 data.negativeDiscrepancies = 0;
+                data.negativeDiscrepanciesCumulative = 0;
             } else {
                 data.negativeDiscrepancies = discrepancy;
+                data.negativeDiscrepanciesCumulative = data.negativeDiscrepanciesCumulative + speed;
             }
             data.prevSpeed = speed;
         }
@@ -203,12 +209,10 @@ public class Speed extends Module<SpeedData, SpeedNode> {
             initForce *= 0.2;
         }
         boolean sprinting = player.isSprinting && !player.isSneaking && player.getPotionEffectAmplifier("BLINDNESS") <= 0;
-        boolean flying = player.isFlying();
 
         float multiplier;
         if (player.isOnGround) {
             multiplier = player.moveFactor * 0.16277136F / (newFriction * newFriction * newFriction);
-            // float groundMultiplier = 5 * player.player.getWalkSpeed() * (1 + player.getPotionEffectAmplifier("SPEED") * 0.2F);
             float groundMultiplier = 5 * player.player.getWalkSpeed();
             multiplier *= groundMultiplier;
 
@@ -220,7 +224,7 @@ public class Speed extends Module<SpeedData, SpeedNode> {
             return (float) Math.sqrt(2 * componentForce * componentForce);
         } else {
             float flyMultiplier = 10 * player.player.getFlySpeed();
-            multiplier = (flying ? 0.05F : 0.02F) * flyMultiplier;
+            multiplier = 0.02F * flyMultiplier;
 
             float diagonal = (float) Math.sqrt(2 * initForce * initForce);
             if (diagonal < 1) {
@@ -228,8 +232,37 @@ public class Speed extends Module<SpeedData, SpeedNode> {
             }
             float componentForce = initForce * multiplier / diagonal;
             float finalForce = (float) Math.sqrt(2 * componentForce * componentForce);
-            return finalForce * (sprinting ? (flying ? 2 : 1.3F) : 1);
+            return finalForce * (sprinting ? 1.3F : 1);
         }
+    }
+
+    private float computeMaxInputForceOld(final HoriPlayer player, final float newFriction, final boolean usingItem) {
+        float initForce = 0.98F;
+        if (player.isSneaking) {
+            initForce *= 0.3;
+        }
+        if (usingItem) {
+            initForce *= 0.2;
+        }
+        boolean sprinting = player.isSprinting && !player.isSneaking && player.getPotionEffectAmplifier("BLINDNESS") <= 0;
+
+        float multiplier;
+        if (player.isOnGround) {
+            multiplier = 0.1F * 0.16277136F / (newFriction * newFriction * newFriction);
+            float groundMultiplier = 5 * player.player.getWalkSpeed() * 1;
+            multiplier *= groundMultiplier;
+        } else {
+            float flyMultiplier = 10 * player.player.getFlySpeed();
+            multiplier = 0.02F * flyMultiplier;
+        }
+
+        float diagonal = (float) Math.sqrt(2 * initForce * initForce);
+        if (diagonal < 1.0F) {
+            diagonal = 1.0F;
+        }
+        float componentForce = initForce * multiplier / diagonal;
+        float finalForce = (float) Math.sqrt(2 * componentForce * componentForce);
+        return (float) (finalForce * (sprinting ? 1.3 : 1));
     }
 
     private void typeB(final Event event, final HoriPlayer player, final SpeedData data, final SpeedNode config) {
@@ -247,7 +280,8 @@ public class Speed extends Module<SpeedData, SpeedNode> {
             if (e.isInLiquid || e.isTeleport || e.knockBack != null || e.collidingBlocks.contains(Material.LADDER) ||
                     e.collidingBlocks.contains(Material.VINE) || (collisionHorizontal && !data.collisionHorizontal) ||
                     player.isFlying() || player.currentTick - data.lastSprintTick < 2 || player.getVehicle() != null ||
-                    e.velocity.clone().setY(0).lengthSquared() < 0.04 || e.piston.size() > 0) {
+                    player.currentTick - player.leaveVehicleTick < 1 || e.velocity.clone().setY(0).lengthSquared() < 0.04 ||
+                    e.piston.size() > 0) {
                 return;
             }
 
