@@ -160,4 +160,11 @@ public class McAccessor_v1_8_R3 implements IMcAccessor {
         IBlockData data = chunk.getBlockData(bPos);
         return data.getBlock().getMaterial().isSolid();
     }
+
+    @Override
+    public boolean isCollidingEntities(final org.bukkit.World world, final Player player, final AABB aabb) {
+        World w = ((CraftWorld) world).getHandle();
+        return w.getEntities(((CraftPlayer) player).getHandle(), new AxisAlignedBB(aabb.minX, aabb.minY, aabb.minZ, aabb.maxX, aabb.maxY, aabb.maxZ))
+                .size() > 0;
+    }
 }

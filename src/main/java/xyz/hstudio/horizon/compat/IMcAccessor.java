@@ -76,4 +76,9 @@ public interface IMcAccessor {
      * Check if a block is solid
      */
     boolean isSolid(final Block block);
+
+    /**
+     * Check if player is colliding entities
+     */
+    boolean isCollidingEntities(final World world, final Player player, final AABB aabb);
 }

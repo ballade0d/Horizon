@@ -11,6 +11,7 @@ public enum MatUtils {
     CHORUS_FLOWER(),
     CHORUS_PLANT(),
     BAMBOO(),
+    BUBBLE_COLUMN(),
     END_ROD(),
     FARMLAND("SOIL"),
     ENCHANTED_GOLDEN_APPLE("GOLDEN_APPLE"),

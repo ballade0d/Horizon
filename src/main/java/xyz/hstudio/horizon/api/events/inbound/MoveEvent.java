@@ -31,6 +31,7 @@ public class MoveEvent extends Event {
     public final MoveType moveType;
     public final boolean hitSlowdown;
     public final boolean onGroundReally;
+    public final boolean isCollidingEntities;
     public final boolean isOnSlime;
     public final boolean isOnBed;
     public final Vector3D waterFlowForce;
@@ -64,6 +65,8 @@ public class MoveEvent extends Event {
         this.hitSlowdown = player.currentTick == player.hitSlowdownTick;
 
         this.onGroundReally = this.to.isOnGround(player, false, 0.001);
+
+        this.isCollidingEntities = McAccessor.INSTANCE.isCollidingEntities(to.world, player.player, cube);
 
         this.isOnSlime = this.checkSlime();
         this.isOnBed = this.checkBed();
@@ -289,7 +292,8 @@ public class MoveEvent extends Event {
                 player.touchingFaces.contains(BlockFace.UP) || this.touchingFaces.contains(BlockFace.UP) ||
                 this.touchingFaces.contains(BlockFace.NORTH) || this.touchingFaces.contains(BlockFace.SOUTH) ||
                 this.touchingFaces.contains(BlockFace.WEST) || this.touchingFaces.contains(BlockFace.EAST) ||
-                this.collidingBlocks.contains(Material.LADDER) || this.collidingBlocks.contains(Material.VINE)) {
+                this.collidingBlocks.contains(Material.LADDER) || this.collidingBlocks.contains(Material.VINE) ||
+                this.isCollidingEntities) {
             return true;
         }
         Block footBlock = player.position.add(0, -1, 0).getBlock();

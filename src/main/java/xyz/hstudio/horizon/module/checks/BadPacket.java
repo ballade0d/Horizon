@@ -58,7 +58,7 @@ public class BadPacket extends Module<BadPacketData, BadPacketNode> {
      */
     private void typeA(final Event event, final HoriPlayer player, final BadPacketData data, final BadPacketNode config) {
         if (event instanceof KeepAliveRespondEvent) {
-            if (player.player.isDead()) {
+            if (player.player.isDead() || player.currentTick < 10) {
                 return;
             }
             // A player should send 20 move packets(1.8.8 or lower)

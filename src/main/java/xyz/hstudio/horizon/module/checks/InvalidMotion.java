@@ -76,7 +76,8 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
                     !player.player.isDead() && !e.isOnSlime && !e.isOnBed && !e.isInLiquid && !player.isInLiquid &&
                     !e.collidingBlocks.contains(Material.LADDER) && !e.collidingBlocks.contains(Material.VINE) &&
                     !e.collidingBlocks.contains(MatUtils.SCAFFOLDING.parse()) && !e.collidingBlocks.contains(MatUtils.KELP.parse()) &&
-                    !e.collidingBlocks.contains(MatUtils.KELP_PLANT.parse())) {
+                    !e.collidingBlocks.contains(MatUtils.KELP_PLANT.parse()) && !e.collidingBlocks.contains(MatUtils.BUBBLE_COLUMN.parse()) &&
+                    e.collidingBlocks.stream().noneMatch(BlockUtils.SHULKER_BOX::contains)) {
 
                 int levitation = player.getPotionEffectAmplifier("LEVITATION");
                 // Supports SLOW_FALLING potion effect

@@ -1,5 +1,6 @@
 package xyz.hstudio.horizon.module.checks;
 
+import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import xyz.hstudio.horizon.api.ModuleType;
@@ -59,6 +60,9 @@ public class Scaffold extends Module<ScaffoldData, ScaffoldNode> {
         if (event instanceof BlockPlaceEvent) {
             BlockPlaceEvent e = (BlockPlaceEvent) event;
             if (e.placeType != BlockPlaceEvent.PlaceType.PLACE_BLOCK) {
+                return;
+            }
+            if (player.player.getGameMode() == GameMode.CREATIVE) {
                 return;
             }
 

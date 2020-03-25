@@ -236,35 +236,6 @@ public class Speed extends Module<SpeedData, SpeedNode> {
         }
     }
 
-    private float computeMaxInputForceOld(final HoriPlayer player, final float newFriction, final boolean usingItem) {
-        float initForce = 0.98F;
-        if (player.isSneaking) {
-            initForce *= 0.3;
-        }
-        if (usingItem) {
-            initForce *= 0.2;
-        }
-        boolean sprinting = player.isSprinting && !player.isSneaking && player.getPotionEffectAmplifier("BLINDNESS") <= 0;
-
-        float multiplier;
-        if (player.isOnGround) {
-            multiplier = 0.1F * 0.16277136F / (newFriction * newFriction * newFriction);
-            float groundMultiplier = 5 * player.player.getWalkSpeed() * 1;
-            multiplier *= groundMultiplier;
-        } else {
-            float flyMultiplier = 10 * player.player.getFlySpeed();
-            multiplier = 0.02F * flyMultiplier;
-        }
-
-        float diagonal = (float) Math.sqrt(2 * initForce * initForce);
-        if (diagonal < 1.0F) {
-            diagonal = 1.0F;
-        }
-        float componentForce = initForce * multiplier / diagonal;
-        float finalForce = (float) Math.sqrt(2 * componentForce * componentForce);
-        return (float) (finalForce * (sprinting ? 1.3 : 1));
-    }
-
     private void typeB(final Event event, final HoriPlayer player, final SpeedData data, final SpeedNode config) {
         if (event instanceof MoveEvent) {
             MoveEvent e = (MoveEvent) event;
@@ -281,7 +252,7 @@ public class Speed extends Module<SpeedData, SpeedNode> {
                     e.collidingBlocks.contains(Material.VINE) || (collisionHorizontal && !data.collisionHorizontal) ||
                     player.isFlying() || player.currentTick - data.lastSprintTick < 2 || player.getVehicle() != null ||
                     player.currentTick - player.leaveVehicleTick < 1 || e.velocity.clone().setY(0).lengthSquared() < 0.04 ||
-                    e.piston.size() > 0) {
+                    e.piston.size() > 0 || e.isCollidingEntities) {
                 return;
             }
 

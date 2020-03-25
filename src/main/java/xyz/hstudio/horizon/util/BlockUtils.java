@@ -15,6 +15,7 @@ import java.util.*;
 public class BlockUtils {
 
     private static final Set<Material> SOLID = new HashSet<>();
+    public static final Set<Material> SHULKER_BOX = new HashSet<>();
 
     static {
         SOLID.add(Material.SNOW);
@@ -52,6 +53,10 @@ public class BlockUtils {
             // For 1.13+ carpet
             if (material.name().contains("CARPET")) {
                 SOLID.add(material);
+            }
+            // For 1.12+ shulker box
+            if (material.name().contains("SHULKER_BOX")) {
+                SHULKER_BOX.add(material);
             }
         }
 

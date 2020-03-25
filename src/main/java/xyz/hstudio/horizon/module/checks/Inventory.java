@@ -4,6 +4,7 @@ import xyz.hstudio.horizon.api.ModuleType;
 import xyz.hstudio.horizon.api.events.Event;
 import xyz.hstudio.horizon.api.events.inbound.*;
 import xyz.hstudio.horizon.api.events.outbound.CloseWindowEvent;
+import xyz.hstudio.horizon.compat.McAccessor;
 import xyz.hstudio.horizon.data.HoriPlayer;
 import xyz.hstudio.horizon.data.checks.InventoryData;
 import xyz.hstudio.horizon.file.node.InventoryNode;
@@ -29,6 +30,7 @@ public class Inventory extends Module<InventoryData, InventoryNode> {
         } else if (event instanceof InteractEntityEvent) {
             event.setCancelled(true);
         }
+        McAccessor.INSTANCE.ensureMainThread(() -> player.player.closeInventory());
     }
 
     @Override
