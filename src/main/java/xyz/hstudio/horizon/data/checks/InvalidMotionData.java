@@ -9,4 +9,5 @@ public class InvalidMotionData extends Data {
     public boolean prevGliding;
     // Magic
     public boolean magic;
+    public long attemptGlideTick;
 }

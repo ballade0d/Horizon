@@ -4,6 +4,7 @@ import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
 import xyz.hstudio.horizon.api.ModuleType;
 import xyz.hstudio.horizon.api.events.Event;
+import xyz.hstudio.horizon.api.events.inbound.ActionEvent;
 import xyz.hstudio.horizon.api.events.inbound.MoveEvent;
 import xyz.hstudio.horizon.compat.McAccessor;
 import xyz.hstudio.horizon.data.HoriPlayer;
@@ -106,6 +107,10 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
                     } else {
                         estimatedVelocity = deltaY;
                     }
+                } else if (data.prevGliding) {
+                    estimatedVelocity = 0;
+                } else if (player.currentTick - data.attemptGlideTick < 2) {
+                    estimatedVelocity = deltaY;
                 } else if (levitation > 0) {
                     estimatedVelocity = prevEstimatedVelocity + (0.05F * levitation - prevEstimatedVelocity) * 0.2F;
                 } else if (e.collidingBlocks.contains(MatUtils.COBWEB.parse())) {
@@ -166,6 +171,11 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
                 }
             }
             data.prevGliding = player.isGliding;
+        } else if (event instanceof ActionEvent) {
+            ActionEvent e = (ActionEvent) event;
+            if (e.action == ActionEvent.Action.START_GLIDING) {
+                data.attemptGlideTick = player.currentTick;
+            }
         }
     }
 

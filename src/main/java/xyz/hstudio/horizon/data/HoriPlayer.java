@@ -59,7 +59,7 @@ public class HoriPlayer {
     public boolean isGliding;
     public boolean isInLiquid;
     public long lastTeleportAcceptTick = -1;
-    public long toggleFlyTime;
+    public long toggleFlyTick;
     public long hitSlowdownTick = -1;
     public long teleportTime = -1;
     public boolean isTeleporting;
@@ -107,7 +107,7 @@ public class HoriPlayer {
      * Check if player is flying
      */
     public boolean isFlying() {
-        return System.currentTimeMillis() - this.toggleFlyTime <= 100L || this.player.isFlying();
+        return this.currentTick - this.toggleFlyTick <= 5L || this.player.isFlying();
     }
 
     /**

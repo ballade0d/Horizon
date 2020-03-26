@@ -16,7 +16,6 @@ import xyz.hstudio.horizon.util.enums.MatUtils;
 import xyz.hstudio.horizon.util.wrap.AABB;
 import xyz.hstudio.horizon.util.wrap.Vector3D;
 
-import java.util.Arrays;
 import java.util.Set;
 
 public class Speed extends Module<SpeedData, SpeedNode> {
@@ -86,12 +85,13 @@ public class Speed extends Module<SpeedData, SpeedNode> {
                 data.noMoves++;
             }
 
-            if (e.knockBack != null || e.piston.size() > 0 || e.touchingFaces.contains(BlockFace.UP) ||
-                    player.touchingFaces.contains(BlockFace.UP) || player.invalidMotionData.magic) {
+            if (e.knockBack != null || e.piston.size() > 0 || player.isFlying() || e.touchingFaces.contains(BlockFace.UP) ||
+                    player.touchingFaces.contains(BlockFace.UP) || player.invalidMotionData.magic ||
+                    player.invalidMotionData.prevGliding) {
                 data.prevSpeed = speed;
                 return;
             }
-            if (e.isTeleport || player.isFlying() || player.getVehicle() != null ||
+            if (e.isTeleport || player.getVehicle() != null ||
                     player.currentTick - player.leaveVehicleTick <= 1 || player.isGliding) {
                 return;
             }

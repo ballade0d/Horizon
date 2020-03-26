@@ -15,7 +15,10 @@ public class AbilitiesEvent extends Event {
     @Override
     public void post() {
         if (player.player.getAllowFlight() && this.flying) {
-            player.toggleFlyTime = System.currentTimeMillis();
+            player.toggleFlyTick = player.currentTick;
+        }
+        if (player.player.isFlying() && !this.flying) {
+            player.toggleFlyTick = player.currentTick;
         }
     }
 }
