@@ -128,6 +128,12 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
                 if (hitHead && !hasHitHead) {
                     deltaY = estimatedVelocity = 0;
                 }
+                if (Math.abs(deltaY - 0.2) < 0.001 && estimatedVelocity == -0.0784F && !e.onGround) {
+                    deltaY = estimatedVelocity = 0;
+                }
+                if (Math.abs(deltaY + 0.0784) < 0.001 && Math.abs(player.velocity.y - 0.2) < 0.001 && !e.onGround) {
+                    estimatedVelocity = deltaY;
+                }
                 if (player.velocity.y == 0F && (estimatedVelocity == -0.0784F || estimatedVelocity == 0F) && player.isOnGround && deltaY >= 0 && deltaY < 0.419F) {
                     estimatedVelocity = deltaY;
                     data.magic = true;
@@ -156,8 +162,12 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
 
                 if (e.updatePos && e.velocity.lengthSquared() > 0 && Math.abs(discrepancy) > config.typeA_tolerance) {
                     // Punish
-                    this.punish(event, player, data, "TypeA", Math.abs(discrepancy) * 5F,
-                            "d:" + deltaY, "e:" + estimatedVelocity, "p:" + discrepancy, "pr:" + player.velocity.y);
+                    if (config.typeA_wall_jump && e.clientBlock != -1) {
+                        this.cancel(e, "TypeA", player, data, config);
+                    } else {
+                        this.punish(event, player, data, "TypeA", Math.abs(discrepancy) * 5F,
+                                "d:" + deltaY, "e:" + estimatedVelocity, "p:" + discrepancy, "pr:" + player.velocity.y);
+                    }
                 } else {
                     reward("TypeA", data, 0.999);
                 }

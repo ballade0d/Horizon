@@ -12,6 +12,8 @@ public class InvalidMotionNode extends CheckFile {
     public boolean typeA_enabled = true;
     @Load(path = "typeA.tolerance")
     public double typeA_tolerance = 0.001;
+    @Load(path = "typeA.wall_jump")
+    public boolean typeA_wall_jump = true;
     // TypeB
     @Load(path = "typeB.enabled")
     public boolean typeB_enabled = true;

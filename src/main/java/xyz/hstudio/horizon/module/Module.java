@@ -47,6 +47,10 @@ public abstract class Module<K extends Data, V extends CheckFile> {
             if (!modules.config.enabled) {
                 continue;
             }
+            if (!modules.config.enable_worlds.contains("*") &&
+                    !modules.config.enable_worlds.contains(player.position.world.getName())) {
+                continue;
+            }
             if (event.isCancelled()) {
                 return;
             }
@@ -73,7 +77,7 @@ public abstract class Module<K extends Data, V extends CheckFile> {
             return;
         }
 
-        if (nowViolation > config.cancel_vl) {
+        if (nowViolation > config.cancel_vl && config.cancel_vl != -1) {
             this.cancel(event, type, player, data, config);
         }
 
@@ -93,7 +97,7 @@ public abstract class Module<K extends Data, V extends CheckFile> {
             break;
         }
 
-        if (true) {
+        if (player.verbose) {
             player.sendMessage(Horizon.getInst().config.prefix + player.getLang().verbose
                     .replace("%player%", player.player.getName())
                     .replace("%check%", this.moduleType.name())

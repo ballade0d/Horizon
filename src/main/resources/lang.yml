@@ -1,1 +1,10 @@
+cmd_only_player: 'This command can only be executed by a player.'
+cmd_no_permission: 'You don''t have the permission to execute this command.'
+
+cmd_verbose_enabled: 'Verbose is enabled now.'
+cmd_verbose_disabled: 'Verbose is disabled now.'
 verbose: 'Player %player% failed check %check% (%type%), VL: %vl_total% (+%vl_addition%), Ping: %ping%, %args%'
+
+cmd_analysis_enabled: 'Analysis is enabled now.'
+cmd_analysis_disabled: 'Analysis is disabled now.'
+analysis: 'Y Speed: %y_speed%, XZ Speed: %xz_speed%, tick: %tick%, cGround: %c_ground%, sGround: %s_ground%'

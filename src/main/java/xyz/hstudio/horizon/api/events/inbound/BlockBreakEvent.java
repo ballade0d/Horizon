@@ -1,5 +1,6 @@
 package xyz.hstudio.horizon.api.events.inbound;
 
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.inventory.ItemStack;
@@ -25,7 +26,7 @@ public class BlockBreakEvent extends Event {
     @Override
     public void post() {
         if (this.digType == DigType.COMPLETE) {
-            player.addClientBlock(new Location(this.block.getLocation()), player.currentTick);
+            player.addClientBlock(new Location(this.block.getLocation()), player.currentTick, Material.AIR);
         }
     }
 

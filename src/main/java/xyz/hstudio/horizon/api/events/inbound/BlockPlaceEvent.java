@@ -27,7 +27,7 @@ public class BlockPlaceEvent extends Event {
     @Override
     public void post() {
         if (this.placeType == PlaceType.PLACE_BLOCK) {
-            player.addClientBlock(this.placed, player.currentTick);
+            player.addClientBlock(this.placed, player.currentTick, this.material);
         }
     }
 

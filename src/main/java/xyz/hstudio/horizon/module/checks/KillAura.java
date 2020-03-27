@@ -262,7 +262,8 @@ public class KillAura extends Module<KillAuraData, KillAuraNode> {
             data.intersection = e.intersection.clone().add(e.entity.getLocation().toVector());
         } else if (event instanceof MoveEvent) {
             MoveEvent e = (MoveEvent) event;
-            if (data.intersection == null) {
+            if (data.intersection == null || player.getVehicle() != null || e.isTeleport) {
+                data.intersection = null;
                 return;
             }
 

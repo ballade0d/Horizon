@@ -1,6 +1,8 @@
 antivelocity:
   enabled: true
   cancel_vl: 1
+  enable_worlds:
+    - '*'
   typeA:
     enabled: true
   action:
@@ -12,6 +14,8 @@ antivelocity:
 badpacket:
   enabled: true
   cancel_vl: 0
+  enable_worlds:
+    - '*'
   typeA:
     enabled: true
   typeB:
@@ -29,6 +33,8 @@ badpacket:
 groundspoof:
   enabled: true
   cancel_vl: 0
+  enable_worlds:
+    - '*'
   typeA:
     enabled: true
   action:
@@ -40,6 +46,8 @@ groundspoof:
 hitbox:
   enabled: true
   cancel_vl: 1
+  enable_worlds:
+    - '*'
   typeA:
     enabled: true
     max_reach: 3.1
@@ -52,9 +60,14 @@ hitbox:
 invalidmotion:
   enabled: true
   cancel_vl: 1
+  enable_worlds:
+    - '*'
   typeA:
     enabled: true
     tolerance: 0.001
+    # Should Horizon only set back but not add any violation levels
+    # if player tries to wall-jump?
+    wall_jump: true
   typeB:
     enabled: true
   typeC:
@@ -69,6 +82,8 @@ invalidmotion:
 inventory:
   enabled: true
   cancel_vl: 0
+  enable_worlds:
+    - '*'
   typeA:
     enabled: true
     checkRotation: true
@@ -84,6 +99,8 @@ inventory:
 killaura:
   enabled: true
   cancel_vl: 0
+  enable_worlds:
+    - '*'
   typeA:
     enabled: true
   typeB:
@@ -113,6 +130,8 @@ killaura:
 noswing:
   enabled: true
   cancel_vl: 0
+  enable_worlds:
+    - '*'
   typeA:
     enabled: true
   action:
@@ -124,6 +143,8 @@ noswing:
 scaffold:
   enabled: true
   cancel_vl: 0
+  enable_worlds:
+    - '*'
   typeA:
     enabled: true
   typeB:
@@ -142,6 +163,8 @@ scaffold:
 speed:
   enabled: true
   cancel_vl: 1
+  enable_worlds:
+    - '*'
   typeA:
     enabled: true
     tolerance: 0.08
@@ -160,6 +183,8 @@ speed:
 timer:
   enabled: true
   cancel_vl: 1
+  enable_worlds:
+    - '*'
   typeA:
     enabled: true
     allow_ms: 50

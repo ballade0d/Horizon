@@ -26,6 +26,7 @@ public class HoriPlayer {
 
     public String lang;
     public boolean verbose;
+    public boolean analysis;
     public final AntiVelocityData antiVelocityData = new AntiVelocityData();
     public final BadPacketData badPacketData = new BadPacketData();
     public final GroundSpoofData groundSpoofData = new GroundSpoofData();
@@ -46,7 +47,7 @@ public class HoriPlayer {
     public double prevPrevDeltaY;
     public Vector3D velocity = new Vector3D(0, 0, 0);
     public List<Pair<Vector3D, Long>> velocities = new LinkedList<>();
-    public Map<Location, Long> clientBlocks = new ConcurrentHashMap<>();
+    public Map<Location, Map.Entry<Long, Material>> clientBlocks = new ConcurrentHashMap<>();
     public List<AABB> piston = new ArrayList<>();
     public Set<BlockFace> touchingFaces = EnumSet.noneOf(BlockFace.class);
     public boolean isSneaking;
@@ -86,11 +87,11 @@ public class HoriPlayer {
         Horizon.PLAYERS.put(player.getUniqueId(), this);
     }
 
-    public void addClientBlock(final Location location, final long initTick) {
+    public void addClientBlock(final Location location, final long initTick, final Material type) {
         if (clientBlocks.size() >= 12) {
             return;
         }
-        clientBlocks.put(location, initTick);
+        clientBlocks.put(location, new AbstractMap.SimpleImmutableEntry<>(initTick, type));
     }
 
     /**

@@ -60,7 +60,7 @@ public class BlockUtils {
             }
         }
 
-        SOLID.remove(null);
+        SOLID.removeIf(Objects::isNull);
     }
 
     /**
@@ -75,6 +75,10 @@ public class BlockUtils {
 
     public static boolean isSolid(final Block block) {
         return McAccessor.INSTANCE.isSolid(block) || SOLID.contains(block.getType());
+    }
+
+    public static boolean isSolid(final Material type) {
+        return type.isSolid() || SOLID.contains(type);
     }
 
     public static List<Block> getBlocksInLocation(final Location loc) {

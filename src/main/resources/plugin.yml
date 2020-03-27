@@ -4,3 +4,8 @@ version: '${project.version}'
 api-version: '1.13'
 softdepend:
   - PlaceholderAPI
+permissions:
+  horizon.cmd.verbose:
+    default: op
+  horizon.cmd.analysis:
+    default: op

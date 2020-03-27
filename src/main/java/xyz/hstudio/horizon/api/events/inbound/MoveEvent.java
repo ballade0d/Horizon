@@ -1,11 +1,14 @@
 package xyz.hstudio.horizon.api.events.inbound;
 
+import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import xyz.hstudio.horizon.Horizon;
 import xyz.hstudio.horizon.api.events.Event;
 import xyz.hstudio.horizon.compat.McAccessor;
 import xyz.hstudio.horizon.data.HoriPlayer;
+import xyz.hstudio.horizon.file.LangFile;
 import xyz.hstudio.horizon.thread.Sync;
 import xyz.hstudio.horizon.util.BlockUtils;
 import xyz.hstudio.horizon.util.MathUtils;
@@ -16,6 +19,7 @@ import xyz.hstudio.horizon.util.wrap.Location;
 import xyz.hstudio.horizon.util.wrap.Vector3D;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class MoveEvent extends Event {
@@ -178,14 +182,10 @@ public class MoveEvent extends Event {
             if (!to.world.equals(loc.world)) {
                 continue;
             }
-            long cBlock = player.clientBlocks.get(loc);
-            Block block = loc.getBlock();
-            if (block == null) {
-                continue;
-            }
+            Map.Entry<Long, Material> cBlock = player.clientBlocks.get(loc);
             AABB newAABB = cube.translateTo(loc.toVector());
-            if (BlockUtils.isSolid(block) && feet.isColliding(newAABB) && !aboveFeet.isColliding(newAABB)) {
-                return cBlock;
+            if (BlockUtils.isSolid(cBlock.getValue()) && feet.isColliding(newAABB) && !aboveFeet.isColliding(newAABB)) {
+                return cBlock.getKey();
             }
         }
         return -1;
@@ -348,7 +348,20 @@ public class MoveEvent extends Event {
     public boolean pre() {
         player.currentTick++;
 
-        player.clientBlocks.entrySet().removeIf(next -> player.currentTick - next.getValue() > 3);
+        if (player.analysis && this.updatePos) {
+            LangFile lang = Horizon.getInst().getLang(player.lang);
+            String analysis = Horizon.getInst().config.prefix + lang.analysis
+                    .replace("%y_speed%", String.valueOf(this.velocity.y))
+                    .replace("%xz_speed%", String.valueOf(MathUtils.distance2d(this.velocity.x, this.velocity.z)))
+                    .replace("%tick%", String.valueOf(player.currentTick))
+                    .replace("%c_ground%", String.valueOf(this.onGround))
+                    .replace("%s_ground%", String.valueOf(this.onGroundReally));
+            player.sendMessage(Horizon.getInst().usePapi ?
+                    PlaceholderAPI.setPlaceholders(player.player, analysis) :
+                    analysis);
+        }
+
+        player.clientBlocks.entrySet().removeIf(next -> player.currentTick - next.getValue().getKey() > 3);
 
         if (player.isTeleporting) {
             Location tpLoc = player.teleportPos;

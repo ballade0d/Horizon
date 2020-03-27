@@ -15,6 +15,8 @@ public class CheckFile extends AbstractFile {
     public int cancel_vl = 1;
     @Load(path = "enabled")
     public boolean enabled = true;
+    @Load(path = "enable_worlds")
+    public List<String> enable_worlds = Collections.singletonList("*");
     @Load(path = "action")
     public Map<Integer, List<String>> action = new HashMap<>();
 

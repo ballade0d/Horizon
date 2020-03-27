@@ -120,6 +120,8 @@ public class Horizon extends JavaPlugin {
         new Scaffold();
         new Speed();
         new Timer();
+
+        Bukkit.getOnlinePlayers().forEach(HoriPlayer::new);
     }
 
     @Override
