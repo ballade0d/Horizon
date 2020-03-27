@@ -10,4 +10,12 @@ public class OpenWindowEvent extends Event {
     public OpenWindowEvent(final HoriPlayer player) {
         super(player);
     }
+
+    @Override
+    public boolean pre() {
+        player.isEating = false;
+        player.isPullingBow = false;
+        player.isBlocking = false;
+        return true;
+    }
 }

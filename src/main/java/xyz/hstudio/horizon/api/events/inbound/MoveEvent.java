@@ -328,11 +328,11 @@ public class MoveEvent extends Event {
         double angle = (vectorDir ? 1 : -1) * MathUtils.angle(accelDir, yaw);
 
         // double multiple = angle / (Math.PI / 4);
-
         // return Math.abs(multiple - Math.round(multiple)) <= STRAFE_THRESHOLD;
 
         double modulo = (angle % (Math.PI / 4)) * (4 / Math.PI);
         double error = Math.abs(modulo - Math.round(modulo)) * (Math.PI / 4);
+
         return error <= STRAFE_THRESHOLD;
     }
 

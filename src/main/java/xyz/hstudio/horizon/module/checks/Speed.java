@@ -33,7 +33,7 @@ public class Speed extends Module<SpeedData, SpeedNode> {
     public void cancel(final Event event, final String type, final HoriPlayer player, final SpeedData data, final SpeedNode config) {
         event.setCancelled(true);
         Sync.teleport(player, player.position);
-        if (type.equals("TypeA") && (player.isEating || player.isPullingBow)) {
+        if (type.equals("TypeA") && (player.isEating || player.isPullingBow || player.isBlocking)) {
             if (config.typeA_cancel_type == 1) {
                 int slot = player.heldSlot + 1 > 8 ? 0 : player.heldSlot + 1;
                 player.player.getInventory().setHeldItemSlot(slot);
@@ -51,6 +51,9 @@ public class Speed extends Module<SpeedData, SpeedNode> {
         }
         if (config.typeB_enabled) {
             typeB(event, player, data, config);
+        }
+        if (config.typeC_enabled) {
+            typeC(event, player, data, config);
         }
     }
 
@@ -287,6 +290,21 @@ public class Speed extends Module<SpeedData, SpeedNode> {
             }
 
             data.collisionHorizontal = collisionHorizontal;
+        }
+    }
+
+    private void typeC(final Event event, final HoriPlayer player, final SpeedData data, final SpeedNode config) {
+        if (event instanceof MoveEvent) {
+            MoveEvent e = (MoveEvent) event;
+            if (e.strafeNormally) {
+                data.typeCFails = data.typeCFails > 0 ? data.typeCFails - 1 : 0;
+                reward("TypeB", data, 0.995);
+                return;
+            }
+            if (++data.typeCFails > config.typeC_threshold) {
+                // Punish
+                this.punish(event, player, data, "TypeC", 2);
+            }
         }
     }
 }

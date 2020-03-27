@@ -134,7 +134,7 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
                 if (Math.abs(deltaY + 0.0784) < 0.001 && Math.abs(player.velocity.y - 0.2) < 0.001 && !e.onGround) {
                     estimatedVelocity = deltaY;
                 }
-                if (player.velocity.y == 0F && (estimatedVelocity == -0.0784F || estimatedVelocity == 0F) && player.isOnGround && deltaY >= 0 && deltaY < 0.419F) {
+                if ((estimatedVelocity == -0.0784F || estimatedVelocity == 0F) && player.isOnGround && deltaY >= 0 && deltaY < 0.419F) {
                     estimatedVelocity = deltaY;
                     data.magic = true;
                 }

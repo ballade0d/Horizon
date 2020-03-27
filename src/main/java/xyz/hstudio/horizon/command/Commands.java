@@ -14,9 +14,11 @@ import xyz.hstudio.horizon.util.collect.Pair;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
-public class Commands implements CommandExecutor {
+public class Commands implements TabCompleter, CommandExecutor {
 
     // CommandSender, String[], String, Lang
     private final List<Pair<Cmd, Integer>> commands = new ArrayList<>();
@@ -34,7 +36,10 @@ public class Commands implements CommandExecutor {
             SimpleCommandMap commandMap = (SimpleCommandMap) method.invoke(Bukkit.getServer());
             commandMap.register("horizon", command);
 
-            Bukkit.getPluginCommand("horizon").setExecutor(this);
+            command = Bukkit.getPluginCommand("horizon");
+
+            command.setTabCompleter(this);
+            command.setExecutor(this);
         } catch (Exception e) {
             throw new IllegalStateException("Failed to register commands!");
         }
@@ -98,5 +103,13 @@ public class Commands implements CommandExecutor {
         boolean analysis = !player.analysis;
         sender.sendMessage(prefix + (analysis ? lang.cmd_analysis_enabled : lang.cmd_analysis_disabled));
         player.analysis = analysis;
+    }
+
+    @Override
+    public List<String> onTabComplete(final CommandSender sender, final Command command, final String alias, final String[] args) {
+        if (args.length == 0) {
+            return this.commands.stream().map(pair -> pair.key.name()).sorted().collect(Collectors.toList());
+        }
+        return Collections.emptyList();
     }
 }

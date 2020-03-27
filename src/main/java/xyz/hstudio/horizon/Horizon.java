@@ -122,6 +122,8 @@ public class Horizon extends JavaPlugin {
         new Timer();
 
         Bukkit.getOnlinePlayers().forEach(HoriPlayer::new);
+
+        Async.LOG.addLast("Horizon is fully startup.");
     }
 
     @Override

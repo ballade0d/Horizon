@@ -6,12 +6,13 @@ import xyz.hstudio.horizon.Horizon;
 import xyz.hstudio.horizon.data.HoriPlayer;
 import xyz.hstudio.horizon.util.DateUtils;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.security.AccessController;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Deque;
 import java.util.concurrent.*;
+import java.util.zip.GZIPOutputStream;
 
 public class Async extends Thread {
 
@@ -42,11 +43,39 @@ public class Async extends Thread {
             if (!logs.exists()) {
                 logs.mkdirs();
             }
-            String date = DateUtils.now(false);
-            File log = new File(logs, date + ".log");
-            if (!log.exists()) {
-                log.createNewFile();
+            File[] files = logs.listFiles();
+            if (files == null) {
+                throw new IllegalStateException("Failed to enable log system.");
             }
+
+            String date = DateTimeFormatter.ofPattern("yyyy-MM-dd").format(LocalDateTime.now());
+
+            int count = 0;
+            for (File file : files) {
+                if (!file.getName().startsWith(date)) {
+                    continue;
+                }
+                count++;
+            }
+
+            File oldLog = new File(logs, date + "-" + count + ".log");
+            if (oldLog.exists()) {
+                FileInputStream input = new FileInputStream(oldLog);
+                GZIPOutputStream output = new GZIPOutputStream(new FileOutputStream(new File(logs, date + "-" + count + ".log.gz")));
+                byte[] buf = new byte[1024];
+                int len;
+                while ((len = input.read(buf)) > 0) {
+                    output.write(buf, 0, len);
+                }
+                output.finish();
+                output.close();
+                input.close();
+                oldLog.delete();
+            }
+
+            File log = new File(logs, date + "-" + (count + 1) + ".log");
+            log.createNewFile();
+
             this.logWriter = new FileWriter(log, true);
         } catch (IOException e) {
             e.printStackTrace();
@@ -71,7 +100,7 @@ public class Async extends Thread {
                     Horizon.PLAYERS.values().forEach(HoriPlayer::sendRequest);
                 }
 
-                String time = "[" + DateUtils.now(true) + "] ";
+                String time = "[" + DateUtils.now() + "] ";
                 for (String message : Async.LOG) {
                     this.logWriter.write(time + message);
                     this.logWriter.write(lineSeparator);

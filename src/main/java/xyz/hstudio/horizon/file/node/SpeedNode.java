@@ -17,6 +17,11 @@ public class SpeedNode extends CheckFile {
     // TypeB
     @Load(path = "typeB.enabled")
     public boolean typeB_enabled = true;
+    // TypeC
+    @Load(path = "typeC.enabled")
+    public boolean typeC_enabled = true;
+    @Load(path = "typeC.threshold")
+    public int typeC_threshold = 3;
 
     public SpeedNode load(final String pathPrefix, final YamlLoader loader) {
         return AbstractFile.load(pathPrefix, this, loader);
