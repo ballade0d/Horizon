@@ -316,9 +316,6 @@ public class PacketConverter_v1_12_R1 implements IPacketConverter {
         try {
             packet.b(serializer);
             int id = serializer.g();
-            if (id != player.player.getEntityId()) {
-                return null;
-            }
             List<DataWatcher.Item<?>> metaData = DataWatcher.b(serializer);
             if (metaData == null) {
                 return null;
@@ -329,7 +326,7 @@ public class PacketConverter_v1_12_R1 implements IPacketConverter {
                 Object object = watchableObject.b();
                 objects.add(new MetaEvent.WatchableObject(index, object));
             }
-            return new MetaEvent(player, objects);
+            return new MetaEvent(player, id, objects, packet);
         } catch (Exception e) {
             return null;
         }

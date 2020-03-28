@@ -16,36 +16,36 @@ public class ChannelHandler extends ChannelDuplexHandler {
     private static final String HANDLER_NAME = "horizon_packet_handler";
     private final HoriPlayer player;
 
-    private static boolean runInbound(final HoriPlayer player, final Object packet) {
+    private static Object runInbound(final HoriPlayer player, Object packet) {
         Event event = PacketConverter.INSTANCE.convertIn(player, packet);
         if (event == null) {
-            return true;
+            return packet;
         }
         if (!event.pre()) {
-            return false;
+            return null;
         }
         Module.doCheck(event, player);
         if (event.isCancelled()) {
-            return false;
+            return null;
         }
         event.post();
-        return true;
+        return event.rawPacket == null ? packet : event.rawPacket;
     }
 
-    private static boolean runOutbound(final HoriPlayer player, final Object packet) {
+    private static Object runOutbound(final HoriPlayer player, Object packet) {
         Event event = PacketConverter.INSTANCE.convertOut(player, packet);
         if (event == null) {
-            return true;
+            return packet;
         }
         if (!event.pre()) {
-            return false;
+            return null;
         }
         Module.doCheck(event, player);
         if (event.isCancelled()) {
-            return false;
+            return null;
         }
         event.post();
-        return true;
+        return event.rawPacket == null ? packet : event.rawPacket;
     }
 
     public static void register(final HoriPlayer player, final ChannelPipeline pipeline) {
@@ -67,7 +67,8 @@ public class ChannelHandler extends ChannelDuplexHandler {
     public void channelRead(final ChannelHandlerContext ctx, Object packet) throws Exception {
         boolean pass = true;
         try {
-            pass = ChannelHandler.runInbound(player, packet);
+            packet = ChannelHandler.runInbound(player, packet);
+            pass = packet != null;
         } catch (Throwable throwable) {
             throwable.printStackTrace();
         } finally {
@@ -81,7 +82,8 @@ public class ChannelHandler extends ChannelDuplexHandler {
     public void write(final ChannelHandlerContext ctx, Object packet, final ChannelPromise promise) throws Exception {
         boolean pass = true;
         try {
-            pass = ChannelHandler.runOutbound(player, packet);
+            packet = ChannelHandler.runOutbound(player, packet);
+            pass = packet != null;
         } catch (Throwable throwable) {
             throwable.printStackTrace();
         } finally {

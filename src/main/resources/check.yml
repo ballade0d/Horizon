@@ -57,6 +57,16 @@ hitbox:
     15:
       - 'horizon notify %player% is kicked for using HitBox'
       - 'horizon kick %player% Did not hit hitbox.'
+healthtag:
+  enabled: true
+  # Unused in this check
+  cancel_vl: 0
+  enable_worlds:
+    - '*'
+  typeA:
+    enabled: true
+  # Unused in this check
+  action: {}
 invalidmotion:
   enabled: true
   cancel_vl: 1

@@ -38,6 +38,7 @@ public class Horizon extends JavaPlugin {
     public YamlLoader checkLoader;
     public ConfigFile config;
     public boolean usePapi;
+    public boolean useViaVer;
 
     private BukkitTask syncTask;
     private Async asyncTask;
@@ -78,6 +79,7 @@ public class Horizon extends JavaPlugin {
         // TODO: Load languages from cloud
 
         this.usePapi = Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI");
+        this.usePapi = Bukkit.getPluginManager().isPluginEnabled("ViaVersion");
 
         if (this.config.kirin_enabled) {
             try {
@@ -112,6 +114,7 @@ public class Horizon extends JavaPlugin {
         new AntiVelocity();
         new BadPacket();
         new GroundSpoof();
+        new HealthTag();
         new HitBox();
         new InvalidMotion();
         new Inventory();

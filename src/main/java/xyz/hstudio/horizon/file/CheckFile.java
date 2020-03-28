@@ -27,6 +27,9 @@ public class CheckFile extends AbstractFile {
         }
 
         Map<Integer, List<String>> map = new HashMap<>();
+        if (loader.get(path) == null) {
+            return map;
+        }
         for (String s : loader.getConfigurationSection(path).getKeys(false)) {
             if (!StringUtils.isNumeric(s)) {
                 continue;

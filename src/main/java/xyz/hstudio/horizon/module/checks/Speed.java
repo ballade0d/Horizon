@@ -4,6 +4,8 @@ import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
 import xyz.hstudio.horizon.api.ModuleType;
 import xyz.hstudio.horizon.api.events.Event;
+import xyz.hstudio.horizon.api.events.inbound.ActionEvent;
+import xyz.hstudio.horizon.api.events.inbound.InteractItemEvent;
 import xyz.hstudio.horizon.api.events.inbound.MoveEvent;
 import xyz.hstudio.horizon.compat.McAccessor;
 import xyz.hstudio.horizon.data.HoriPlayer;
@@ -66,7 +68,33 @@ public class Speed extends Module<SpeedData, SpeedNode> {
      * @author MrCraftGoo
      */
     private void typeA(final Event event, final HoriPlayer player, final SpeedData data, final SpeedNode config) {
-        if (event instanceof MoveEvent) {
+        if (event instanceof InteractItemEvent) {
+            if (player.protocol != 47) {
+                return;
+            }
+            InteractItemEvent e = (InteractItemEvent) event;
+            if (e.interactType != InteractItemEvent.InteractType.START_USE_ITEM &&
+                    e.interactType != InteractItemEvent.InteractType.RELEASE_USE_ITEM) {
+                return;
+            }
+            if (player.currentTick == data.lastUseTick) {
+                this.punish(event, player, data, "TypeA", 3, "t:p1");
+            }
+            data.lastUseTick = player.currentTick;
+        } else if (event instanceof ActionEvent) {
+            if (player.protocol != 47) {
+                return;
+            }
+            ActionEvent e = (ActionEvent) event;
+            if (e.action != ActionEvent.Action.START_SNEAKING &&
+                    e.action != ActionEvent.Action.STOP_SNEAKING) {
+                return;
+            }
+            if (player.currentTick == data.lastToggleTick) {
+                this.punish(event, player, data, "TypeA", 3, "t:p2");
+            }
+            data.lastToggleTick = player.currentTick;
+        } else if (event instanceof MoveEvent) {
             MoveEvent e = (MoveEvent) event;
 
             double prevSpeed;

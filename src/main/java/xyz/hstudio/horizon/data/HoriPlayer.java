@@ -9,12 +9,14 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
+import us.myles.ViaVersion.api.Via;
 import xyz.hstudio.horizon.Horizon;
 import xyz.hstudio.horizon.compat.McAccessor;
 import xyz.hstudio.horizon.data.checks.*;
 import xyz.hstudio.horizon.file.LangFile;
 import xyz.hstudio.horizon.network.ChannelHandler;
 import xyz.hstudio.horizon.util.collect.Pair;
+import xyz.hstudio.horizon.util.enums.Version;
 import xyz.hstudio.horizon.util.wrap.AABB;
 import xyz.hstudio.horizon.util.wrap.Location;
 import xyz.hstudio.horizon.util.wrap.Vector3D;
@@ -38,6 +40,7 @@ public class HoriPlayer {
     public final ScaffoldData scaffoldData = new ScaffoldData();
     public final SpeedData speedData = new SpeedData();
     public final TimerData timerData = new TimerData();
+    public final int protocol;
     public Player player;
     public long currentTick;
     public World world;
@@ -73,6 +76,9 @@ public class HoriPlayer {
     public ChannelPipeline pipeline;
 
     public HoriPlayer(final Player player) {
+        this.protocol = Horizon.getInst().useViaVer ?
+                Via.getAPI().getPlayerVersion(player.getUniqueId()) :
+                Version.VERSION == Version.v1_8_R3 ? 47 : -1;
         this.player = player;
         this.pipeline = McAccessor.INSTANCE.getPipeline(player);
 

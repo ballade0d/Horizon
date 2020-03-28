@@ -9,15 +9,20 @@ import java.util.List;
 
 public class MetaEvent extends Event {
 
+    public final int entityId;
     public final List<WatchableObject> objects;
 
-    public MetaEvent(final HoriPlayer player, final List<WatchableObject> objects) {
-        super(player);
+    public MetaEvent(final HoriPlayer player, final int entityId, final List<WatchableObject> objects, final Object rawPacket) {
+        super(player, rawPacket);
+        this.entityId = entityId;
         this.objects = objects;
     }
 
     @Override
     public void post() {
+        if (this.entityId != player.player.getEntityId()) {
+            return;
+        }
         if (Version.VERSION == Version.v1_8_R3) {
             for (WatchableObject object : this.objects) {
                 if (object.index != 0) {
