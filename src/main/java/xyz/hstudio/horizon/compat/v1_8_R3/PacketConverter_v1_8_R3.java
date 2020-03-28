@@ -104,7 +104,7 @@ public class PacketConverter_v1_8_R3 implements IPacketConverter {
             // Bad Move, will be blocked by the server.
             return null;
         }
-        return new MoveEvent(player, to, onGround, updatePos, updateRot, moveType);
+        return new MoveEvent(player, to, onGround, updatePos, updateRot, moveType, packet);
     }
 
     private Event convertBlockBreakEvent(final HoriPlayer player, final PacketPlayInBlockDig packet) {

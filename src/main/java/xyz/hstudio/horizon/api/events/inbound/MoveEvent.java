@@ -54,8 +54,8 @@ public class MoveEvent extends Event {
     public boolean onGround;
     public boolean isTeleport;
 
-    public MoveEvent(final HoriPlayer player, final Location to, final boolean onGround, final boolean updatePos, final boolean updateRot, final MoveType moveType) {
-        super(player);
+    public MoveEvent(final HoriPlayer player, final Location to, final boolean onGround, final boolean updatePos, final boolean updateRot, final MoveType moveType, final Object rawPacket) {
+        super(player, rawPacket);
         this.from = player.position;
         this.to = to;
         this.onGround = onGround;

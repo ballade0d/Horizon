@@ -8,3 +8,5 @@ verbose: 'Player %player% failed check %check% (%type%), VL: %vl_total% (+%vl_ad
 cmd_analysis_enabled: 'Analysis is enabled now.'
 cmd_analysis_disabled: 'Analysis is disabled now.'
 analysis: 'Y Speed: %y_speed%, XZ Speed: %xz_speed%, tick: %tick%, cGround: %c_ground%, sGround: %s_ground%'
+
+cmd_unknown: 'Unknown command!'

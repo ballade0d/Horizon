@@ -1,5 +1,6 @@
 package xyz.hstudio.horizon.compat.v1_13_R2;
 
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelPipeline;
 import net.minecraft.server.v1_13_R2.*;
 import org.bukkit.Bukkit;
@@ -8,6 +9,7 @@ import org.bukkit.craftbukkit.v1_13_R2.CraftWorld;
 import org.bukkit.craftbukkit.v1_13_R2.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_13_R2.entity.CraftPlayer;
 import org.bukkit.entity.Player;
+import xyz.hstudio.horizon.api.events.inbound.MoveEvent;
 import xyz.hstudio.horizon.compat.IMcAccessor;
 import xyz.hstudio.horizon.util.RandomUtils;
 import xyz.hstudio.horizon.util.wrap.AABB;
@@ -166,5 +168,31 @@ public class McAccessor_v1_13_R2 implements IMcAccessor {
         World w = ((CraftWorld) world).getHandle();
         return w.getEntities(((CraftPlayer) player).getHandle(), new AxisAlignedBB(aabb.minX, aabb.minY, aabb.minZ, aabb.maxX, aabb.maxY, aabb.maxZ))
                 .size() > 0;
+    }
+
+    @Override
+    public void setOnGround(final MoveEvent e, final boolean onGround) {
+        try {
+            int value = onGround ? 1 : 0;
+            PacketDataSerializer serializer = new PacketDataSerializer(Unpooled.buffer(256));
+            Packet<?> packet = (Packet<?>) e.rawPacket;
+            packet.b(serializer);
+            switch (e.moveType) {
+                case FLYING:
+                    serializer.setByte(0, value);
+                    break;
+                case POSITION:
+                    serializer.setByte(24, value);
+                    break;
+                case LOOK:
+                    serializer.setByte(8, value);
+                    break;
+                case POSITION_LOOK:
+                    serializer.setByte(32, value);
+                    break;
+            }
+            packet.a(serializer);
+        } catch (Exception ignore) {
+        }
     }
 }

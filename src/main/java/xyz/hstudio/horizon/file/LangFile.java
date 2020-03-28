@@ -23,6 +23,9 @@ public class LangFile extends AbstractFile {
     @Load(path = "analysis")
     public String analysis = "Y Speed: %y_speed%, XZ Speed: %xz_speed%, tick: %tick%, cGround: %c_ground%, sGround: %s_ground%";
 
+    @Load(path = "cmd_unknown")
+    public String cmd_unknown = "Unknown command!";
+
     @Override
     public Object getValue(final String path, final YamlLoader loader, final Class<?> type) {
         return loader.get(path);

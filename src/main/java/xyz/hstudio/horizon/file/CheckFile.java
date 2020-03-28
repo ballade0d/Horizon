@@ -31,7 +31,7 @@ public class CheckFile extends AbstractFile {
             if (!StringUtils.isNumeric(s)) {
                 continue;
             }
-            List<String> list = loader.isList(path + s) ?
+            List<String> list = loader.isList(path + "." + s) ?
                     loader.getStringList(path + "." + s) :
                     Collections.singletonList(loader.getString(path + "." + s));
             map.put(Integer.parseInt(s), list);

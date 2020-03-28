@@ -3,6 +3,7 @@ package xyz.hstudio.horizon.module.checks;
 import xyz.hstudio.horizon.api.ModuleType;
 import xyz.hstudio.horizon.api.events.Event;
 import xyz.hstudio.horizon.api.events.inbound.MoveEvent;
+import xyz.hstudio.horizon.compat.McAccessor;
 import xyz.hstudio.horizon.data.HoriPlayer;
 import xyz.hstudio.horizon.data.checks.GroundSpoofData;
 import xyz.hstudio.horizon.file.node.GroundSpoofNode;
@@ -22,7 +23,7 @@ public class GroundSpoof extends Module<GroundSpoofData, GroundSpoofNode> {
 
     @Override
     public void cancel(final Event event, final String type, final HoriPlayer player, final GroundSpoofData data, final GroundSpoofNode config) {
-        // TODO: Modify packet
+        McAccessor.INSTANCE.setOnGround((MoveEvent) event, false);
     }
 
     @Override

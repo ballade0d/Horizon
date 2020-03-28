@@ -60,7 +60,10 @@ public class Inventory extends Module<InventoryData, InventoryNode> {
             }
         } else if (event instanceof WindowClickEvent) {
             // Client clicked window, so there should be a window opened.
-            data.inventoryOpened = data.temporarilyBypass = true;
+            if (!data.inventoryOpened) {
+                data.temporarilyBypass = true;
+            }
+            data.inventoryOpened = true;
             data.inventoryOpenTick = player.currentTick;
             data.legitLocation = player.position;
         } else if (event instanceof WindowCloseEvent) {

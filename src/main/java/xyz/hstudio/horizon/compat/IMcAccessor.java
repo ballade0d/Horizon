@@ -5,6 +5,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import xyz.hstudio.horizon.api.events.inbound.MoveEvent;
 import xyz.hstudio.horizon.util.wrap.AABB;
 import xyz.hstudio.horizon.util.wrap.Vector3D;
 
@@ -81,4 +82,9 @@ public interface IMcAccessor {
      * Check if player is colliding entities
      */
     boolean isCollidingEntities(final World world, final Player player, final AABB aabb);
+
+    /**
+     * Set onGround statue of a move packet.
+     */
+    void setOnGround(final MoveEvent e, final boolean onGround);
 }

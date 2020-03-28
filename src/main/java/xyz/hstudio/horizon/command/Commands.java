@@ -82,10 +82,12 @@ public class Commands implements TabCompleter, CommandExecutor {
             }
             try {
                 this.getClass().getMethods()[pair.value].invoke(this, sender, subArgs, prefix, lang);
+                return true;
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
+        sender.sendMessage(prefix + lang.cmd_unknown);
         return true;
     }
 
