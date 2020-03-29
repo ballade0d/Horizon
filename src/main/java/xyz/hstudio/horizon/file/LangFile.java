@@ -23,6 +23,14 @@ public class LangFile extends AbstractFile {
     @Load(path = "analysis")
     public String analysis = "Y Speed: %y_speed%, XZ Speed: %xz_speed%, tick: %tick%, cGround: %c_ground%, sGround: %s_ground%";
 
+    @Load(path = "cmd_notify_sent")
+    public String cmd_notify_sent = "Notification is sent.";
+
+    @Load(path = "cmd_kick_player_not_found")
+    public String cmd_kick_player_not_found = "The player is not online.";
+    @Load(path = "cmd_kick_wrong_usage")
+    public String cmd_kick_wrong_usage = "Usage: /horizon kick <player> <reason>";
+
     @Load(path = "cmd_unknown")
     public String cmd_unknown = "Unknown command!";
 

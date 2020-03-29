@@ -7,6 +7,7 @@ import java.util.Set;
 
 public enum MatUtils {
 
+    SWEET_BERRY_BUSH(),
     COCOA_BEANS("COCOA"),
     CHORUS_FLOWER(),
     CHORUS_PLANT(),

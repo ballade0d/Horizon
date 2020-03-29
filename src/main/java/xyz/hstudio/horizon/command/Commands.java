@@ -107,6 +107,39 @@ public class Commands implements TabCompleter, CommandExecutor {
         player.analysis = analysis;
     }
 
+    @Cmd(name = "notify", perm = "horizon.cmd.notify")
+    public void notify(final CommandSender sender, final String[] args, final String prefix, final LangFile lang) {
+        StringBuilder builder = new StringBuilder();
+        for (String s : args) {
+            builder.append(s).append(" ");
+        }
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            if (!player.hasPermission("horizon.notify")) {
+                continue;
+            }
+            player.sendMessage(prefix + builder.toString().trim());
+        }
+        sender.sendMessage(prefix + lang.cmd_notify_sent);
+    }
+
+    @Cmd(name = "kick", perm = "horizon.cmd.kick")
+    public void kick(final CommandSender sender, final String[] args, final String prefix, final LangFile lang) {
+        if (args.length <= 1) {
+            sender.sendMessage(prefix + lang.cmd_kick_wrong_usage);
+            return;
+        }
+        Player player = Bukkit.getPlayer(args[0]);
+        if (player == null || !player.isOnline()) {
+            sender.sendMessage(prefix + lang.cmd_kick_player_not_found);
+            return;
+        }
+        StringBuilder builder = new StringBuilder();
+        for (int i = 1; i < args.length; i++) {
+            builder.append(args[i]).append(" ");
+        }
+        player.kickPlayer(builder.toString().trim().replace("%break%", "\n"));
+    }
+
     @Override
     public List<String> onTabComplete(final CommandSender sender, final Command command, final String alias, final String[] args) {
         if (args.length == 0) {

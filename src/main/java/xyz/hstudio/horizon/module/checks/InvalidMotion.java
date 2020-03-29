@@ -78,6 +78,7 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
                     !e.collidingBlocks.contains(Material.LADDER) && !e.collidingBlocks.contains(Material.VINE) &&
                     !e.collidingBlocks.contains(MatUtils.SCAFFOLDING.parse()) && !e.collidingBlocks.contains(MatUtils.KELP.parse()) &&
                     !e.collidingBlocks.contains(MatUtils.KELP_PLANT.parse()) && !e.collidingBlocks.contains(MatUtils.BUBBLE_COLUMN.parse()) &&
+                    !e.collidingBlocks.contains(MatUtils.SWEET_BERRY_BUSH.parse()) &&
                     e.collidingBlocks.stream().noneMatch(BlockUtils.SHULKER_BOX::contains)) {
 
                 int levitation = player.getPotionEffectAmplifier("LEVITATION");
@@ -134,7 +135,7 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
                 if (Math.abs(deltaY + 0.0784) < 0.001 && Math.abs(player.velocity.y - 0.2) < 0.001 && !e.onGround) {
                     estimatedVelocity = deltaY;
                 }
-                if ((estimatedVelocity == -0.0784F || estimatedVelocity == 0F) && player.isOnGround && deltaY == 0 && deltaY < 0.419F) {
+                if ((estimatedVelocity == -0.0784F || estimatedVelocity == 0F) && player.isOnGround && deltaY == 0) {
                     estimatedVelocity = deltaY;
                     data.magic = true;
                 }

@@ -195,4 +195,9 @@ public class HoriPlayer {
     public LangFile getLang() {
         return Horizon.getInst().getLang(this.lang);
     }
+
+    @Override
+    public int hashCode() {
+        return this.player.getUniqueId().hashCode();
+    }
 }

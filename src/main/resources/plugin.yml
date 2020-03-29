@@ -2,6 +2,13 @@ name: Horizon
 main: xyz.hstudio.horizon.Horizon
 version: '${project.version}'
 api-version: '1.13'
+authors:
+  - MrCraftGoo
+  - Anthony M.
+  - Cipher
+  - ExclusiveFurryYT
+  - Juli_0 | Julian
+  - FrozenAnarchy
 softdepend:
   - PlaceholderAPI
   - ViaVersion
@@ -9,4 +16,10 @@ permissions:
   horizon.cmd.verbose:
     default: op
   horizon.cmd.analysis:
+    default: op
+  horizon.cmd.notify:
+    default: op
+  horizon.verbose:
+    default: op
+  horizon.notify:
     default: op

@@ -6,6 +6,8 @@ import org.bukkit.Bukkit;
 import xyz.hstudio.horizon.Horizon;
 import xyz.hstudio.horizon.api.ModuleType;
 import xyz.hstudio.horizon.api.PlayerViolateEvent;
+import xyz.hstudio.horizon.api.custom.CustomCheck;
+import xyz.hstudio.horizon.api.custom.CustomConfig;
 import xyz.hstudio.horizon.api.events.Event;
 import xyz.hstudio.horizon.compat.McAccessor;
 import xyz.hstudio.horizon.data.Data;
@@ -14,15 +16,13 @@ import xyz.hstudio.horizon.file.AbstractFile;
 import xyz.hstudio.horizon.file.CheckFile;
 import xyz.hstudio.horizon.thread.Async;
 
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public abstract class Module<K extends Data, V extends CheckFile> {
 
     // Use LinkedHashMap to keep the check order.
     public static final Map<ModuleType, Module<? extends Data, ? extends CheckFile>> MODULE_MAP = new LinkedHashMap<>(16, 1);
+    public static final List<CustomCheck<? extends CustomConfig>> CUSTOM_CHECKS = new LinkedList<>();
 
     private final ModuleType moduleType;
     @Getter
@@ -97,7 +97,7 @@ public abstract class Module<K extends Data, V extends CheckFile> {
             break;
         }
 
-        if (player.verbose) {
+        if (player.verbose || player.player.hasPermission("horizon.verbose")) {
             player.sendMessage(Horizon.getInst().config.prefix + player.getLang().verbose
                     .replace("%player%", player.player.getName())
                     .replace("%check%", this.moduleType.name())
