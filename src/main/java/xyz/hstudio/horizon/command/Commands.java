@@ -142,7 +142,7 @@ public class Commands implements TabCompleter, CommandExecutor {
 
     @Override
     public List<String> onTabComplete(final CommandSender sender, final Command command, final String alias, final String[] args) {
-        if (args.length == 0) {
+        if (args.length == 1) {
             return this.commands.stream().map(pair -> pair.key.name()).sorted().collect(Collectors.toList());
         }
         return Collections.emptyList();
