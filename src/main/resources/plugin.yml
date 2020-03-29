@@ -19,7 +19,9 @@ permissions:
     default: op
   horizon.cmd.notify:
     default: op
-  horizon.verbose:
+  horizon.cmd.kick:
     default: op
   horizon.notify:
     default: op
+  horizon.verbose:
+    default: false
