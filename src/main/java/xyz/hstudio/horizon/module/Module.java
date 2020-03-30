@@ -94,6 +94,7 @@ public abstract class Module<K extends Data, V extends CheckFile> {
                     Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd);
                 }
             });
+            Async.LOG.addLast("Executed action \"" + Arrays.toString(entry.getValue().toArray()) + "\". Check:" + moduleType.name() + " VL:" + nowViolation);
             break;
         }
 

@@ -69,7 +69,6 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
                 return;
             }
 
-            // TODO: Fix Cobweb, Slime handler
             // TODO: Handle Vehicle
 
             if (!e.onGround && !e.jumpLegitly && !e.stepLegitly && e.knockBack == null && e.piston.size() == 0 &&
@@ -127,9 +126,6 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
                 boolean hitHead = e.touchingFaces.contains(BlockFace.UP);
                 boolean hasHitHead = player.touchingFaces.contains(BlockFace.UP);
                 if (hitHead && !hasHitHead) {
-                    deltaY = estimatedVelocity = 0;
-                }
-                if (Math.abs(deltaY - 0.2) < 0.001 && estimatedVelocity == -0.0784F && !e.onGround) {
                     deltaY = estimatedVelocity = 0;
                 }
                 if (Math.abs(deltaY + 0.0784) < 0.001 && Math.abs(player.velocity.y - 0.2) < 0.001 && !e.onGround) {

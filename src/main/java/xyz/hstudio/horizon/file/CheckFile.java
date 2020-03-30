@@ -3,10 +3,7 @@ package xyz.hstudio.horizon.file;
 import org.apache.commons.lang.StringUtils;
 import xyz.hstudio.horizon.util.wrap.YamlLoader;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class CheckFile extends AbstractFile {
 
@@ -34,9 +31,10 @@ public class CheckFile extends AbstractFile {
             if (!StringUtils.isNumeric(s)) {
                 continue;
             }
-            List<String> list = loader.isList(path + "." + s) ?
+            List<String> list = new ArrayList<>(loader.isList(path + "." + s) ?
                     loader.getStringList(path + "." + s) :
-                    Collections.singletonList(loader.getString(path + "." + s));
+                    Collections.singletonList(loader.getString(path + "." + s)));
+            Collections.reverse(list);
             map.put(Integer.parseInt(s), list);
         }
         return map;

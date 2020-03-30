@@ -117,6 +117,8 @@ public class Horizon extends JavaPlugin {
             }
         }
 
+        new MetricsLite(this, 4236);
+
         // Run every 50ms (1 tick)
         this.asyncTask = new Async();
         this.syncTask = Bukkit.getScheduler().runTaskTimer(this, new Sync(), 1L, 1L);

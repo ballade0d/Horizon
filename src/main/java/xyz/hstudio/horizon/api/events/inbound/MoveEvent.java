@@ -273,9 +273,13 @@ public class MoveEvent extends Event {
     private boolean checkJump() {
         float initJumpVelocity = 0.42F + player.getPotionEffectAmplifier("JUMP") * 0.1F;
         float deltaY = (float) this.velocity.y;
-        boolean hitCeiling = touchingFaces.contains(BlockFace.UP);
+
+        AABB collisionBox = new AABB(from.x - 0.299999, to.y + 0.000001, from.z - 0.299999, from.x + 0.299999, to.y + 1.799999, from.z + 0.299999);
+        boolean hitCeiling = BlockUtils.checkTouchingBlock(collisionBox, to.world, 0.0001).contains(BlockFace.UP);
+
         boolean kbSimilarToJump = this.knockBack != null && (Math.abs(knockBack.y - initJumpVelocity) < 0.001 || hitCeiling);
-        return !kbSimilarToJump && player.isOnGround && !onGround && (deltaY == initJumpVelocity || hitCeiling);
+        boolean leftGround = (player.isOnGround && !this.onGround);
+        return !kbSimilarToJump && ((initJumpVelocity == 0 && player.isOnGround) || leftGround) && (deltaY == initJumpVelocity || hitCeiling);
     }
 
     /**
