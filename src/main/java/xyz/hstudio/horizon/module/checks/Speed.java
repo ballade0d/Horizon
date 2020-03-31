@@ -122,7 +122,7 @@ public class Speed extends Module<SpeedData, SpeedNode> {
                 data.prevSpeed = speed;
                 return;
             }
-            if (e.isTeleport || player.getVehicle() != null ||
+            if (player.teleports.size() > 0 || e.isTeleport || player.getVehicle() != null ||
                     player.currentTick - player.leaveVehicleTick <= 1 || player.isGliding) {
                 return;
             }
@@ -279,7 +279,7 @@ public class Speed extends Module<SpeedData, SpeedNode> {
             }
 
             // TODO: Ignore if colliding entities
-            if (e.isInLiquid || e.isTeleport || e.knockBack != null || e.collidingBlocks.contains(Material.LADDER) ||
+            if (e.isInLiquid || player.currentTick - player.lastTeleportAcceptTick < 3 || e.knockBack != null || e.collidingBlocks.contains(Material.LADDER) ||
                     e.collidingBlocks.contains(Material.VINE) || (collisionHorizontal && !data.collisionHorizontal) ||
                     player.isFlying() || player.currentTick - data.lastSprintTick < 2 || player.getVehicle() != null ||
                     player.currentTick - player.leaveVehicleTick < 1 || e.velocity.clone().setY(0).lengthSquared() < 0.04 ||

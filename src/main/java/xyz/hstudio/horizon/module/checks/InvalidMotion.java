@@ -64,14 +64,9 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
 
             float deltaY = (float) e.velocity.y;
 
-            if (player.currentTick - player.lastTeleportAcceptTick < 3) {
-                data.estimatedVelocity = deltaY;
-                return;
-            }
-
             // TODO: Handle Vehicle
 
-            if (!e.onGround && !e.jumpLegitly && !e.stepLegitly && e.knockBack == null && e.piston.size() == 0 &&
+            if (!e.onGround && !e.isTeleport && player.teleports.size() == 0 && !e.jumpLegitly && !e.stepLegitly && e.knockBack == null && e.piston.size() == 0 &&
                     player.currentTick - player.leaveVehicleTick > 1 && player.getVehicle() == null && !player.isFlying() &&
                     !player.player.isDead() && !e.isOnSlime && !e.isOnBed && !e.isInLiquid && !player.isInLiquid &&
                     !e.collidingBlocks.contains(Material.LADDER) && !e.collidingBlocks.contains(Material.VINE) &&
@@ -120,6 +115,9 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
                 }
                 if (Math.abs(estimatedVelocity) < 0.005 && estimatedVelocity != 0) {
                     estimatedVelocity = deltaY;
+                }
+                if (player.currentTick - player.lastTeleportAcceptTick < 2) {
+                    estimatedVelocity = 0;
                 }
 
                 // Fix the false positives when there're blocks above
@@ -226,7 +224,7 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
         if (event instanceof MoveEvent) {
             MoveEvent e = (MoveEvent) event;
 
-            if (e.isTeleport || !e.onGround || e.knockBack != null || e.touchingFaces.contains(BlockFace.UP) || player.touchingFaces.contains(BlockFace.UP) ||
+            if (player.currentTick - player.lastTeleportAcceptTick < 2 || player.teleports.size() > 0 || !e.onGround || e.knockBack != null || e.touchingFaces.contains(BlockFace.UP) || player.touchingFaces.contains(BlockFace.UP) ||
                     e.collidingBlocks.contains(MatUtils.LADDER.parse()) || e.collidingBlocks.contains(MatUtils.VINE.parse()) ||
                     player.isFlying() || player.player.isSleeping() || player.position.isOnGround(player, false, 0.001)) {
                 return;
@@ -237,7 +235,7 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
             double discrepancy = deltaY - estimatedY;
             if (discrepancy < config.typeC_tolerance) {
                 // Punish
-                this.punish(event, player, data, "TypeC", 4, "d:" + deltaY);
+                this.punish(event, player, data, "TypeC", 4, "d:" + deltaY, "e:" + estimatedY);
             } else {
                 reward("TypeC", data, 0.99);
             }

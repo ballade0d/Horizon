@@ -86,7 +86,7 @@ public class BadPacket extends Module<BadPacketData, BadPacketNode> {
     private void typeB(final Event event, final HoriPlayer player, final BadPacketData data, final BadPacketNode config) {
         if (event instanceof MoveEvent) {
             MoveEvent e = (MoveEvent) event;
-            if (e.moveType != MoveEvent.MoveType.FLYING || e.isTeleport) {
+            if (e.moveType != MoveEvent.MoveType.FLYING || e.isTeleport || System.currentTimeMillis() - player.lastTeleportAcceptTick < 1000L) {
                 data.flyingCount = 0;
                 return;
             }

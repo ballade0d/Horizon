@@ -42,6 +42,9 @@ public class AntiVelocity extends Module<AntiVelocityData, AntiVelocityNode> {
     private void typeA(final Event event, final HoriPlayer player, final AntiVelocityData data, final AntiVelocityNode config) {
         if (event instanceof MoveEvent) {
             MoveEvent e = (MoveEvent) event;
+            if (player.teleports.size() > 0) {
+                return;
+            }
             if (e.failedKnockBack && !e.collidingBlocks.contains(MatUtils.COBWEB.parse()) && !e.isTeleport) {
                 // Punish
                 this.punish(event, player, data, "TypeA", 4);

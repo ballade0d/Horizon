@@ -21,7 +21,6 @@ public class Listeners implements Listener {
 
     @EventHandler
     public void onJoin(final PlayerJoinEvent event) {
-        // Use callSyncMethod to fix an error if late-bind is enabled.
         Bukkit.getScheduler().callSyncMethod(Horizon.getInst(), () -> new HoriPlayer(event.getPlayer()));
     }
 
@@ -37,10 +36,8 @@ public class Listeners implements Listener {
         if (player == null) {
             return;
         }
-        player.isTeleporting = true;
+        player.teleports.put(new Location(e.getTo()), System.currentTimeMillis());
         player.world = e.getTo().getWorld();
-        player.teleportPos = new Location(e.getTo());
-        player.teleportTime = System.currentTimeMillis();
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -50,10 +47,8 @@ public class Listeners implements Listener {
         if (player == null) {
             return;
         }
-        player.isTeleporting = true;
+        player.teleports.put(new Location(e.getRespawnLocation()), System.currentTimeMillis());
         player.world = e.getRespawnLocation().getWorld();
-        player.teleportPos = new Location(e.getRespawnLocation());
-        player.teleportTime = System.currentTimeMillis();
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -63,10 +58,8 @@ public class Listeners implements Listener {
         if (player == null) {
             return;
         }
-        player.isTeleporting = true;
+        player.teleports.put(new Location(p.getLocation()), System.currentTimeMillis());
         player.world = p.getWorld();
-        player.teleportPos = new Location(e.getPlayer().getLocation());
-        player.teleportTime = System.currentTimeMillis();
     }
 
     @EventHandler

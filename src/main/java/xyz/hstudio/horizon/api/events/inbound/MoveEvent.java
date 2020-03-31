@@ -209,7 +209,7 @@ public class MoveEvent extends Event {
     }
 
     private Vector3D checkKnockBack() {
-        List<Pair<Vector3D, Long>> velocities = player.velocities;
+        final List<Pair<Vector3D, Long>> velocities = player.velocities;
         if (velocities.size() <= 0) {
             return null;
         }
@@ -367,20 +367,20 @@ public class MoveEvent extends Event {
 
         player.clientBlocks.entrySet().removeIf(next -> player.currentTick - next.getValue().getKey() > 3);
 
-        if (player.isTeleporting) {
-            Location tpLoc = player.teleportPos;
-            long now = System.currentTimeMillis();
-            if (tpLoc.world.equals(this.to.world) && this.to.distanceSquared(tpLoc) < 0.001) {
-                if (now - player.teleportTime > player.ping - 50) {
-                    player.isTeleporting = false;
-                    player.position = tpLoc;
+        long now = System.currentTimeMillis();
+        for (Map.Entry<Location, Long> entry : player.teleports.entrySet()) {
+            if (entry.getKey().world.equals(this.to.world) && this.to.distanceSquared(entry.getKey()) < 0.001) {
+                if (now - entry.getValue() > player.ping - 50) {
+                    player.position = entry.getKey();
                     player.lastTeleportAcceptTick = player.currentTick;
+                    player.lastTeleportTime = now;
                     this.isTeleport = true;
+                    player.teleports.remove(entry.getKey());
                 } else {
                     return false;
                 }
-            } else if (!player.player.isSleeping() && player.currentTick - player.teleportTime > player.ping + 250) {
-                Sync.teleport(player, tpLoc);
+            } else if (!player.player.isSleeping() && now - entry.getValue() > player.ping + 250) {
+                Sync.teleport(player, entry.getKey());
                 return false;
             }
         }

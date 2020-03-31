@@ -23,6 +23,7 @@ import xyz.hstudio.horizon.util.wrap.Vector3D;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
 public class HoriPlayer {
 
@@ -49,8 +50,9 @@ public class HoriPlayer {
     public float friction;
     public double prevPrevDeltaY;
     public Vector3D velocity = new Vector3D(0, 0, 0);
-    public List<Pair<Vector3D, Long>> velocities = new LinkedList<>();
-    public Map<Location, Map.Entry<Long, Material>> clientBlocks = new ConcurrentHashMap<>();
+    public final List<Pair<Vector3D, Long>> velocities = new LinkedList<>();
+    public final Map<Location, Long> teleports = new ConcurrentHashMap<>();
+    public final Map<Location, Map.Entry<Long, Material>> clientBlocks = new ConcurrentHashMap<>();
     public List<AABB> piston = new ArrayList<>();
     public Set<BlockFace> touchingFaces = EnumSet.noneOf(BlockFace.class);
     public boolean isSneaking;
@@ -65,11 +67,9 @@ public class HoriPlayer {
     public long lastTeleportAcceptTick = -1;
     public long toggleFlyTick;
     public long hitSlowdownTick = -1;
-    public long teleportTime = -1;
-    public boolean isTeleporting;
-    public Location teleportPos;
     public int vehicle = -1;
     public long leaveVehicleTick = -1;
+    public long lastTeleportTime;
     public long ping;
     public long lastRequestSent;
     public float moveFactor = 0.1F;

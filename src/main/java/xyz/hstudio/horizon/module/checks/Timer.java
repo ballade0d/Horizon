@@ -53,7 +53,7 @@ public class Timer extends Module<TimerData, TimerNode> {
 
             // Skip if player is teleporting.
             // Ignore the first 2 second joining the server.
-            if (e.isTeleport || System.currentTimeMillis() - player.teleportTime < 1000L || player.currentTick < 40) {
+            if (e.isTeleport || System.currentTimeMillis() - player.lastTeleportTime < 1000L || player.currentTick < 40) {
                 return;
             }
 
