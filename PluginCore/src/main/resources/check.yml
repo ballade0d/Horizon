@@ -1,0 +1,211 @@
+antivelocity:
+  enabled: true
+  cancel_vl: 1
+  enable_worlds:
+    - '*'
+  typeA:
+    enabled: true
+  action:
+    5:
+      - 'horizon notify %player% might be using AntiVelocity'
+    8:
+      - 'horizon notify %player% is kicked for using AntiVelocity'
+      - 'horizon kick %player% Did not take knock back.'
+badpacket:
+  enabled: true
+  cancel_vl: 0
+  enable_worlds:
+    - '*'
+  typeA:
+    enabled: true
+  typeB:
+    enabled: true
+  typeC:
+    enabled: true
+  typeD:
+    enabled: true
+  action:
+    2:
+      - 'horizon notify %player% might be sending bad packets'
+    4:
+      - 'horizon notify %player% is kicked for sending bad packets'
+      - 'horizon kick %player% Invalid packets.'
+groundspoof:
+  enabled: true
+  cancel_vl: 0
+  enable_worlds:
+    - '*'
+  typeA:
+    enabled: true
+  action:
+    16:
+      - 'horizon notify %player% might be spoofing on ground'
+    25:
+      - 'horizon notify %player% is kicked for spoofing on ground'
+      - 'horizon kick %player% Spoof on ground.'
+hitbox:
+  enabled: true
+  cancel_vl: 1
+  enable_worlds:
+    - '*'
+  typeA:
+    enabled: true
+    max_reach: 3.1
+  action:
+    8:
+      - 'horizon notify %player% might be using HitBox'
+    15:
+      - 'horizon notify %player% is kicked for using HitBox'
+      - 'horizon kick %player% Did not hit hitbox.'
+healthtag:
+  enabled: true
+  # Unused in this check
+  cancel_vl: 0
+  enable_worlds:
+    - '*'
+  typeA:
+    enabled: true
+  # Unused in this check
+  action: {}
+invalidmotion:
+  enabled: true
+  cancel_vl: 1
+  enable_worlds:
+    - '*'
+  typeA:
+    enabled: true
+    tolerance: 0.001
+    # Should Horizon only set back but not add any violation levels
+    # if player tries to wall-jump?
+    wall_jump: true
+  typeB:
+    enabled: true
+  typeC:
+    enabled: true
+    tolerance: -0.02
+  action:
+    20:
+      - 'horizon notify %player% might be moving unexpectedly'
+    40:
+      - 'horizon notify %player% is kicked for moving unexpectedly'
+      - 'horizon kick %player% Moving unexpectedly.'
+inventory:
+  enabled: true
+  cancel_vl: 0
+  enable_worlds:
+    - '*'
+  typeA:
+    enabled: true
+    checkRotation: true
+    checkPosition: true
+    checkAction: true
+    checkHit: true
+  action:
+    8:
+      - 'horizon notify %player% might be using inventory related cheats'
+    16:
+      - 'horizon notify %player% is kicked for using inventory related hacks'
+      - 'horizon kick %player% Impossible inventory action'
+killaura:
+  enabled: true
+  cancel_vl: 0
+  enable_worlds:
+    - '*'
+  typeA:
+    enabled: true
+  typeB:
+    enabled: true
+  typeC:
+    enabled: true
+  typeD:
+    enabled: true
+  typeE:
+    enabled: true
+    # How will Horizon cancel player's action?
+    # 1: Swap item slot
+    # (Default) 2: Release item
+    cancel_type: 2
+  typeF:
+    enabled: true
+    # How will Horizon cancel player's action?
+    # 1: Swap item slot
+    # (Default) 2: Release item
+    cancel_type: 2
+  action:
+    10:
+      - 'horizon notify %player% might be using KillAura'
+    20:
+      - 'horizon notify %player% is kicked for using KillAura'
+      - 'horizon kick %player% Unfair advantages.'
+noswing:
+  enabled: true
+  cancel_vl: 0
+  enable_worlds:
+    - '*'
+  typeA:
+    enabled: true
+  action:
+    3:
+      - 'horizon notify %player% might be using NoSwing'
+    10:
+      - 'horizon notify %player% is kicked for using NoSwing'
+      - 'horizon kick %player% Did not swing arm.'
+scaffold:
+  enabled: true
+  cancel_vl: 0
+  enable_worlds:
+    - '*'
+  typeA:
+    enabled: true
+  typeB:
+    enabled: true
+    max_angle: 90.0
+  typeC:
+    enabled: true
+  typeD:
+    enabled: true
+  action:
+    12:
+      - 'horizon notify %player% might be using Scaffold'
+    22:
+      - 'horizon notify %player% is kicked for using Scaffold'
+      - 'horizon kick %player% Unfair advantages.'
+speed:
+  enabled: true
+  cancel_vl: 1
+  enable_worlds:
+    - '*'
+  typeA:
+    enabled: true
+    tolerance: 0.08
+    # How will Horizon cancel player's action if player is detected for NoSlow?
+    # 1: Swap item slot
+    # (Default) 2: Release item
+    cancel_type: 2
+    # Should Horizon only checks for NoSlow hacks?
+    only_noslow: false
+  typeB:
+    enabled: true
+  typeC:
+    enabled: true
+    threshold: 3
+  action:
+    15:
+      - 'horizon notify %player% might be moving faster than legit'
+    30:
+      - 'horizon notify %player% is kicked for moving too fast'
+      - 'horizon kick %player% Moving too fast.'
+timer:
+  enabled: true
+  cancel_vl: 1
+  enable_worlds:
+    - '*'
+  typeA:
+    enabled: true
+    allow_ms: 50
+  action:
+    25:
+      - 'horizon notify %player% might be sending too many move packets'
+    40:
+      - 'horizon notify %player% is kicked for sending too many move packets'
+      - 'horizon kick %player% Too many packets.'

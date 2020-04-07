@@ -1,0 +1,27 @@
+prefix: '§9Horizon §1» §r§3'
+
+log: true
+
+command_alias: [hz, hori]
+
+# Personalized Themes Module
+# It will pickup themes individually for each player according to their client language.
+personalized_themes:
+  enabled: true
+  # Which language file should be used in the console?
+  # If a player uses an untranslated language,
+  # the plugin will use the default lang too.
+  default_lang: 'en_US'
+
+discord_integration:
+  enabled: false
+  token: ''
+  channel_name: ''
+
+kirin:
+  enabled: false
+  licence: ''
+
+# Should Horizon replace Velocity packet with Explosion packet?
+# This can make some (or a lot of) anti velocity hacks unavailable.
+use_explosion_packet: true
