@@ -200,6 +200,6 @@ public class McAccessor_v1_15_R1 implements IMcAccessor {
 
     @Override
     public Object createExplosionPacket(final double x, final double y, final double z) {
-        return new PacketPlayOutExplosion(x, y, z, 0, new ArrayList<>(), new Vec3D(x, y, z));
+        return new PacketPlayOutExplosion(x, y, z, 0, new ArrayList<>(), new Vec3D(0, 0, 0));
     }
 }

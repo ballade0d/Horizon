@@ -18,7 +18,6 @@ import xyz.hstudio.horizon.util.enums.MatUtils;
 import xyz.hstudio.horizon.util.wrap.AABB;
 import xyz.hstudio.horizon.util.wrap.Vector3D;
 
-import java.util.Objects;
 import java.util.Set;
 
 public class Speed extends Module<SpeedData, SpeedNode> {

@@ -33,11 +33,6 @@
             <artifactId>commons-lang3</artifactId>
             <version>3.9</version>
         </dependency>
-        <dependency>
-            <groupId>io.netty</groupId>
-            <artifactId>netty-all</artifactId>
-            <version>4.1.44.Final</version>
-        </dependency>
     </dependencies>
 
     <build>
@@ -127,7 +122,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>xyz.hstudio.kirinserver.Kirin</mainClass>
+                            <mainClass>xyz.hstudio.kirinserver.KirinServer</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

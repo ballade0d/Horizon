@@ -1,16 +1,13 @@
-package xyz.hstudio.horizon.kirin.encrypt;
+package xyz.hstudio.horizon.kirin;
 
 import javax.crypto.Cipher;
 import java.io.ByteArrayOutputStream;
-import java.security.KeyFactory;
-import java.security.interfaces.RSAPublicKey;
-import java.security.spec.X509EncodedKeySpec;
+import java.security.PublicKey;
 
 public class RSA {
 
-    public static byte[] encrypt(final byte[] raw, final byte[] key) throws Exception {
-        RSAPublicKey publicKey = (RSAPublicKey) KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(key));
-        Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
+    public static byte[] encrypt(final byte[] raw, final PublicKey publicKey) throws Exception {
+        Cipher cipher = Cipher.getInstance("RSA");
         cipher.init(Cipher.ENCRYPT_MODE, publicKey);
         int inputLen = raw.length;
         ByteArrayOutputStream out = new ByteArrayOutputStream();
