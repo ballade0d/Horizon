@@ -1,5 +1,6 @@
 package xyz.hstudio.horizon.kirin;
 
+import xyz.hstudio.horizon.Horizon;
 import xyz.hstudio.horizon.util.SystemClassLoader;
 
 import java.io.ByteArrayOutputStream;
@@ -26,36 +27,34 @@ public class Kirin {
 
         this.licence = licence;
 
-        new Thread(() -> {
-            try {
-                Socket socket = new Socket("127.0.0.1", 5000);
-                byte[] licenceByte = RSA.encrypt(this.licence.getBytes(StandardCharsets.UTF_8), this.publicKey);
-                socket.getOutputStream().write(licenceByte);
-                socket.shutdownOutput();
+        try {
+            Socket socket = new Socket("mc3.mccsm.cn", 28589);
+            byte[] licenceByte = RSA.encrypt(this.licence.getBytes(StandardCharsets.UTF_8), this.publicKey);
+            socket.getOutputStream().write(licenceByte);
+            socket.shutdownOutput();
 
-                InputStream inputStream = socket.getInputStream();
+            InputStream inputStream = socket.getInputStream();
 
-                ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-                int nRead;
-                byte[] cacheData = new byte[16384];
-                while ((nRead = inputStream.read(cacheData, 0, cacheData.length)) != -1) {
-                    buffer.write(cacheData, 0, nRead);
-                }
-
-                byte[] code = buffer.toByteArray();
-
-                try {
-                    Constructor<?> ctr = SystemClassLoader.define(code).getDeclaredConstructor();
-                    ctr.setAccessible(true);
-                    ctr.newInstance();
-                    ctr.setAccessible(false);
-                } catch (Throwable throwable) {
-                    throwable.printStackTrace();
-                    throw new IllegalStateException(new String(code));
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
+            ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+            int nRead;
+            byte[] cacheData = new byte[16384];
+            while ((nRead = inputStream.read(cacheData, 0, cacheData.length)) != -1) {
+                buffer.write(cacheData, 0, nRead);
             }
-        }).start();
+
+            byte[] code = buffer.toByteArray();
+
+            try {
+                Constructor<?> ctr = SystemClassLoader.define(code).getDeclaredConstructor(Horizon.class);
+                ctr.setAccessible(true);
+                ctr.newInstance(Horizon.getInst());
+                ctr.setAccessible(false);
+            } catch (Throwable throwable) {
+                throwable.printStackTrace();
+                throw new IllegalStateException(new String(code));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

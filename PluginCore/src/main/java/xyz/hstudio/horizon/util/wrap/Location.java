@@ -71,7 +71,7 @@ public class Location implements Cloneable {
             if (block.isLiquid() || !BlockUtils.isSolid(block)) {
                 continue;
             }
-            for (AABB bBox : McAccessor.INSTANCE.getBoxes(block)) {
+            for (AABB bBox : McAccessor.INSTANCE.getBoxes(player, block)) {
                 if (!bBox.isColliding(underFeet)) {
                     continue;
                 }
@@ -80,7 +80,7 @@ public class Location implements Cloneable {
                         if (above.isLiquid() || !BlockUtils.isSolid(above)) {
                             continue;
                         }
-                        for (AABB aboveBox : McAccessor.INSTANCE.getBoxes(above)) {
+                        for (AABB aboveBox : McAccessor.INSTANCE.getBoxes(player, above)) {
                             if (aboveBox.isColliding(topFeet)) {
                                 return false;
                             }

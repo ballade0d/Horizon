@@ -15,7 +15,6 @@ import xyz.hstudio.horizon.module.Module;
 import xyz.hstudio.horizon.thread.Sync;
 import xyz.hstudio.horizon.util.MathUtils;
 import xyz.hstudio.horizon.util.enums.MatUtils;
-import xyz.hstudio.horizon.util.wrap.AABB;
 import xyz.hstudio.horizon.util.wrap.Vector3D;
 
 import java.util.Set;
@@ -128,12 +127,15 @@ public class Speed extends Module<SpeedData, SpeedNode> {
                 return;
             }
 
+            /*
             boolean swimming = AABB.waterCollisionBox
-                    .shrink(0.001, 0.001, 0.001)
+                    .shrink(0.01, 0.01, 0.01)
                     .add(e.from.toVector())
                     .getMaterials(e.to.world)
                     .stream()
                     .anyMatch(MatUtils::isLiquid);
+             */
+            boolean swimming = player.isInLiquid;
             boolean usingItem = player.isEating || player.isPullingBow || player.isBlocking;
 
             double estimatedSpeed;
@@ -196,7 +198,7 @@ public class Speed extends Module<SpeedData, SpeedNode> {
                         if (!config.typeA_only_noslow || usingItem) {
                             // Punish
                             this.punish(event, player, data, "TypeA", (float) (totalDiscrepancy * 10),
-                                    "s:" + speed, "e:" + estimatedSpeed, "p:" + prevSpeed, "d:" + discrepancy);
+                                    "s:" + speed, "e:" + estimatedSpeed, "p:" + prevSpeed, "d:" + discrepancy, "s:" + swimming);
                         }
                     }
                     data.discrepancies = 0;

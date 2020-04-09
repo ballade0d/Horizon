@@ -22,6 +22,5 @@ kirin:
   enabled: false
   licence: ''
 
-# Should Horizon replace Velocity packet with Explosion packet?
-# This can make some (or a lot of) anti velocity hacks unavailable.
-use_explosion_packet: true
+# Should Horizon fix ghost-block?
+ghost_block_fix: true

@@ -90,7 +90,7 @@ public class KirinServer {
 
         new Thread(() -> {
             try {
-                ServerSocket server = new ServerSocket(5000);
+                ServerSocket server = new ServerSocket(28589);
                 while (true) {
                     Socket socket = server.accept();
                     new ClientHandler(socket).start();

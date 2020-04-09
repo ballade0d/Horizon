@@ -13,9 +13,9 @@ import java.util.Set;
 
 public class AABB {
 
-    public static final AABB collisionBox = new AABB(new Vector3D(-0.3, 0, -0.3), new Vector3D(0.3, 1.8, 0.3));
-    public static final AABB waterCollisionBox = new AABB(new Vector3D(-0.299, 0.401, -0.299), new Vector3D(0.299, 1.399, 0.299));
-    public static final AABB swimmingBox = new AABB(new Vector3D(-0.3, 0, -0.3), new Vector3D(0.3, 0.6, 0.3));
+    public static final AABB NORMAL_BOX = new AABB(new Vector3D(-0.3, 0, -0.3), new Vector3D(0.3, 1.8, 0.3));
+    public static final AABB WATER_BOX = new AABB(new Vector3D(-0.299, 0.401, -0.299), new Vector3D(0.299, 1.399, 0.299));
+    public static final AABB SWIM_BOX = new AABB(new Vector3D(-0.3, 0, -0.3), new Vector3D(0.3, 0.6, 0.3));
 
     public final double minX, minY, minZ;
     public final double maxX, maxY, maxZ;

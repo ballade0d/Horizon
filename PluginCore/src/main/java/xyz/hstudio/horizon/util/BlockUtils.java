@@ -5,6 +5,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import xyz.hstudio.horizon.compat.McAccessor;
+import xyz.hstudio.horizon.data.HoriPlayer;
 import xyz.hstudio.horizon.util.enums.MatUtils;
 import xyz.hstudio.horizon.util.wrap.AABB;
 import xyz.hstudio.horizon.util.wrap.Location;
@@ -107,7 +108,8 @@ public class BlockUtils {
      *
      * @author Islandscout, MrCraftGoo
      */
-    public static Set<BlockFace> checkTouchingBlock(final AABB box, final World world, final double borderSize) {
+    public static Set<BlockFace> checkTouchingBlock(final HoriPlayer player, final AABB box,
+                                                    final World world, final double borderSize) {
         Vector3D min = new Vector3D(box.minX - borderSize, box.minY - borderSize, box.minZ - borderSize);
         Vector3D max = new Vector3D(box.maxX + borderSize, box.maxY + borderSize, box.maxZ + borderSize);
         Set<BlockFace> directions = EnumSet.noneOf(BlockFace.class);
@@ -118,7 +120,7 @@ public class BlockUtils {
                     if (b == null) {
                         continue;
                     }
-                    for (AABB blockBox : McAccessor.INSTANCE.getBoxes(b)) {
+                    for (AABB blockBox : McAccessor.INSTANCE.getBoxes(player, b)) {
                         if (blockBox.minX > box.maxX && blockBox.minX < max.x) {
                             directions.add(BlockFace.EAST);
                         }

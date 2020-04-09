@@ -1,6 +1,7 @@
 package xyz.hstudio.horizon.listener;
 
 import org.bukkit.Bukkit;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -8,6 +9,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.player.*;
 import xyz.hstudio.horizon.Horizon;
+import xyz.hstudio.horizon.compat.McAccessor;
 import xyz.hstudio.horizon.data.HoriPlayer;
 import xyz.hstudio.horizon.util.wrap.AABB;
 import xyz.hstudio.horizon.util.wrap.Location;
@@ -38,6 +40,15 @@ public class Listeners implements Listener {
         }
         player.teleports.put(new Location(e.getTo()), System.currentTimeMillis());
         player.world = e.getTo().getWorld();
+
+        if (e.getCause() == PlayerTeleportEvent.TeleportCause.UNKNOWN &&
+                Horizon.getInst().config.ghost_block_fix) {
+            Location fromLoc = new Location(e.getFrom());
+            Vector3D fromVec = new Vector3D(fromLoc.x, fromLoc.y, fromLoc.z);
+            for (Block b : McAccessor.INSTANCE.getCube(p).translateTo(fromVec).getBlocks(fromLoc.world)) {
+                McAccessor.INSTANCE.updateBlock(player, new Location(b.getLocation()));
+            }
+        }
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

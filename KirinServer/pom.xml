@@ -33,6 +33,11 @@
             <artifactId>commons-lang3</artifactId>
             <version>3.9</version>
         </dependency>
+        <dependency>
+            <groupId>xyz.hstudio</groupId>
+            <artifactId>PluginCore</artifactId>
+            <version>BETA5</version>
+        </dependency>
     </dependencies>
 
     <build>

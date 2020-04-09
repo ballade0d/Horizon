@@ -28,15 +28,15 @@ public class Commands implements TabCompleter, CommandExecutor {
             Constructor<PluginCommand> constructor = PluginCommand.class.getDeclaredConstructor(String.class, Plugin.class);
             boolean accessible = constructor.isAccessible();
             constructor.setAccessible(true);
-            PluginCommand command = constructor.newInstance("xyz/hstudio/horizon", Horizon.getInst());
+            PluginCommand command = constructor.newInstance("horizon", Horizon.getInst());
             command.setAliases(Horizon.getInst().config.command_alias);
             constructor.setAccessible(accessible);
 
             Method method = Bukkit.getServer().getClass().getDeclaredMethod("getCommandMap");
             SimpleCommandMap commandMap = (SimpleCommandMap) method.invoke(Bukkit.getServer());
-            commandMap.register("xyz/hstudio/horizon", command);
+            commandMap.register("horizon", command);
 
-            command = Bukkit.getPluginCommand("xyz/hstudio/horizon");
+            command = Bukkit.getPluginCommand("horizon");
 
             command.setTabCompleter(this);
             command.setExecutor(this);

@@ -27,6 +27,9 @@ public class ConfigFile extends AbstractFile {
     @Load(path = "kirin.licence")
     public String kirin_licence = "";
 
+    @Load(path = "ghost_block_fix")
+    public boolean ghost_block_fix = true;
+
     @Override
     public Object getValue(final String path, final YamlLoader loader, final Class<?> type) {
         Object value = loader.get(path);

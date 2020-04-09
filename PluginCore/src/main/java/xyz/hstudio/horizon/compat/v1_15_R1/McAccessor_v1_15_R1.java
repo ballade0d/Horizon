@@ -11,8 +11,10 @@ import org.bukkit.craftbukkit.v1_15_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import xyz.hstudio.horizon.api.events.inbound.MoveEvent;
 import xyz.hstudio.horizon.compat.IMcAccessor;
+import xyz.hstudio.horizon.data.HoriPlayer;
 import xyz.hstudio.horizon.util.RandomUtils;
 import xyz.hstudio.horizon.util.wrap.AABB;
+import xyz.hstudio.horizon.util.wrap.Location;
 import xyz.hstudio.horizon.util.wrap.Vector3D;
 
 import java.util.ArrayList;
@@ -75,7 +77,7 @@ public class McAccessor_v1_15_R1 implements IMcAccessor {
     }
 
     @Override
-    public AABB[] getBoxes(final org.bukkit.block.Block block) {
+    public AABB[] getBoxes(final HoriPlayer player, final org.bukkit.block.Block block) {
         WorldServer world = ((CraftWorld) block.getWorld()).getHandle();
         Chunk chunk = world.getChunkIfLoaded(block.getX() >> 4, block.getZ() >> 4);
         if (chunk == null) {
@@ -89,11 +91,30 @@ public class McAccessor_v1_15_R1 implements IMcAccessor {
             AABB[] aabbarr = new AABB[1];
             aabbarr[0] = new AABB(block.getX(), block.getY(), block.getZ(), block.getX() + 1, block.getY() + 0.0625, block.getZ() + 1);
             return aabbarr;
-        }
-        if (b instanceof BlockSnow && data.get(BlockSnow.LAYERS) == 1) {
+        } else if (b instanceof BlockSnow && data.get(BlockSnow.LAYERS) == 1) {
             AABB[] aabbarr = new AABB[1];
             aabbarr[0] = new AABB(block.getX(), block.getY(), block.getZ(), block.getX() + 1, block.getY(), block.getZ() + 1);
             return aabbarr;
+        } else if (b instanceof BlockSoil) {
+            if (player.protocol == 47) {
+                AABB[] aabbarr = new AABB[1];
+                aabbarr[0] = new AABB(block.getX(), block.getY(), block.getZ(), block.getX() + 1, block.getY() + 1, block.getZ() + 1);
+                return aabbarr;
+            } else {
+                AABB[] aabbarr = new AABB[1];
+                aabbarr[0] = new AABB(block.getX(), block.getY(), block.getZ(), block.getX() + 1, block.getY() + 0.9375, block.getZ() + 1);
+                return aabbarr;
+            }
+        } else if (b instanceof BlockWaterLily) {
+            if (player.protocol == 47) {
+                AABB[] aabbarr = new AABB[1];
+                aabbarr[0] = new AABB(block.getX(), block.getY(), block.getZ(), block.getX() + 1, block.getY() + 0.015625, block.getZ() + 1);
+                return aabbarr;
+            } else {
+                AABB[] aabbarr = new AABB[1];
+                aabbarr[0] = new AABB(block.getX() + 0.0625, block.getY(), block.getZ() + 0.0625, block.getX() + 0.9375, block.getY() + 0.09375, block.getZ() + 0.9375);
+                return aabbarr;
+            }
         }
 
         VoxelShape voxelShape = data.getCollisionShape(world, bPos);
@@ -107,11 +128,6 @@ public class McAccessor_v1_15_R1 implements IMcAccessor {
         }
 
         return boxes;
-    }
-
-    @Override
-    public double getMoveFactor(final Player player) {
-        return ((CraftPlayer) player).getHandle().getAttributeInstance(GenericAttributes.MOVEMENT_SPEED).getValue();
     }
 
     @Override
@@ -201,5 +217,13 @@ public class McAccessor_v1_15_R1 implements IMcAccessor {
     @Override
     public Object createExplosionPacket(final double x, final double y, final double z) {
         return new PacketPlayOutExplosion(x, y, z, 0, new ArrayList<>(), new Vec3D(0, 0, 0));
+    }
+
+    @Override
+    public void updateBlock(final HoriPlayer player, final Location loc) {
+        World world = ((CraftWorld) loc.world).getHandle();
+        BlockPosition bPos = new BlockPosition(loc.x, loc.y, loc.z);
+        PacketPlayOutBlockChange packet = new PacketPlayOutBlockChange(world, bPos);
+        player.sendPacket(packet);
     }
 }

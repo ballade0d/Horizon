@@ -75,14 +75,17 @@ public class MoveEvent extends Event {
         this.isOnSlime = this.checkSlime();
         this.isOnBed = this.checkBed();
 
-        this.waterFlowForce = this.computeWaterFlowForce();
-
+        Pair<Vector3D, Boolean> pair = this.computeWaterFlowForce();
+        this.waterFlowForce = pair.key;
+        this.isInLiquid = pair.value;
+ /*
         this.isInLiquid = AABB.collisionBox
                 .shrink(0.001, 0.001, 0.001)
                 .add(this.from.toVector())
                 .getMaterials(to.world)
                 .stream()
                 .anyMatch(MatUtils::isLiquid);
+  */
 
         this.oldFriction = player.friction;
         this.newFriction = this.computeFriction();
@@ -93,7 +96,7 @@ public class MoveEvent extends Event {
         this.collidingBlocks = this.cube.add(-0.0001, 0.0001, -0.0001, 0.0001, 0, 0.0001).getMaterials(to.world);
 
         this.clientBlock = this.getClientBlock();
-        this.touchingFaces = BlockUtils.checkTouchingBlock(new AABB(to.x - 0.299999, to.y + 0.000001, to.z - 0.299999, to.x + 0.299999, to.y + 1.799999, to.z + 0.299999), to.world, 0.0001);
+        this.touchingFaces = BlockUtils.checkTouchingBlock(player, new AABB(to.x - 0.299999, to.y + 0.000001, to.z - 0.299999, to.x + 0.299999, to.y + 1.799999, to.z + 0.299999), to.world, 0.0001);
         this.stepLegitly = this.checkStep();
         this.knockBack = this.checkKnockBack();
         this.jumpLegitly = this.checkJump();
@@ -143,19 +146,21 @@ public class MoveEvent extends Event {
                 player.velocity.y <= 0 && deltaY > 0 && deltaY <= bedExpect;
     }
 
-    private Vector3D computeWaterFlowForce() {
+    private Pair<Vector3D, Boolean> computeWaterFlowForce() {
         Vector3D finalForce = new Vector3D();
-        for (Block block : AABB.waterCollisionBox.add(this.to.toVector()).getBlocks(to.world)) {
-            if (!MatUtils.isLiquid(block.getType())) {
+        boolean inLiquid = false;
+        for (Block block : AABB.WATER_BOX.add(this.to.toVector()).getBlocks(to.world)) {
+            if (!MatUtils.isLiquid(block.getType()) && block.getType() != MatUtils.LILY_PAD.parse()) {
                 continue;
             }
             finalForce.add(McAccessor.INSTANCE.getFlowDirection(block));
+            inLiquid = true;
         }
         if (finalForce.lengthSquared() > 0) {
             finalForce.normalize();
             finalForce.multiply(0.014);
         }
-        return finalForce;
+        return new Pair<>(finalForce, inLiquid);
     }
 
     private float computeFriction() {
@@ -275,7 +280,7 @@ public class MoveEvent extends Event {
         float deltaY = (float) this.velocity.y;
 
         AABB collisionBox = new AABB(from.x - 0.299999, to.y + 0.000001, from.z - 0.299999, from.x + 0.299999, to.y + 1.799999, from.z + 0.299999);
-        boolean hitCeiling = BlockUtils.checkTouchingBlock(collisionBox, to.world, 0.0001).contains(BlockFace.UP);
+        boolean hitCeiling = BlockUtils.checkTouchingBlock(player, collisionBox, to.world, 0.0001).contains(BlockFace.UP);
 
         boolean kbSimilarToJump = this.knockBack != null && (Math.abs(knockBack.y - initJumpVelocity) < 0.001 || hitCeiling);
         boolean leftGround = (player.isOnGround && !this.onGround);

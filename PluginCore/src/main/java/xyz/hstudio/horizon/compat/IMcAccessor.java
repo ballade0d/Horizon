@@ -6,7 +6,9 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import xyz.hstudio.horizon.api.events.inbound.MoveEvent;
+import xyz.hstudio.horizon.data.HoriPlayer;
 import xyz.hstudio.horizon.util.wrap.AABB;
+import xyz.hstudio.horizon.util.wrap.Location;
 import xyz.hstudio.horizon.util.wrap.Vector3D;
 
 public interface IMcAccessor {
@@ -51,12 +53,7 @@ public interface IMcAccessor {
     /**
      * Get the voxel shapes of a block.
      */
-    AABB[] getBoxes(final Block block);
-
-    /**
-     * Get the value of movement speed attribute.
-     */
-    double getMoveFactor(final Player player);
+    AABB[] getBoxes(final HoriPlayer player, final Block block);
 
     /**
      * Create a new transaction packet.
@@ -92,4 +89,9 @@ public interface IMcAccessor {
      * Create an explosion packet
      */
     Object createExplosionPacket(final double x, final double y, final double z);
+
+    /**
+     * Update a block with its data for player
+     */
+    void updateBlock(final HoriPlayer player, final Location loc);
 }
