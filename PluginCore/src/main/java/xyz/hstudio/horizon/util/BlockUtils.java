@@ -15,10 +15,11 @@ import java.util.*;
 
 public class BlockUtils {
 
-    private static final Set<Material> SOLID = new HashSet<>();
-    public static final Set<Material> SHULKER_BOX = new HashSet<>();
+    private static final Set<Material> SOLID = EnumSet.noneOf(Material.class);
+    public static final Set<Material> SHULKER_BOX = EnumSet.noneOf(Material.class);
 
     static {
+        Set<Material> SOLID = new HashSet<>();
         SOLID.add(Material.SNOW);
         SOLID.add(Material.LADDER);
         SOLID.add(Material.VINE);
@@ -62,6 +63,8 @@ public class BlockUtils {
         }
 
         SOLID.removeIf(Objects::isNull);
+
+        BlockUtils.SOLID.addAll(SOLID);
     }
 
     /**

@@ -5,20 +5,11 @@ import java.lang.reflect.Method;
 
 public class SystemClassLoader {
 
-    private static final ClassLoader LOADER = ClassLoader.getSystemClassLoader();
-    private static final Method DEFINE;
+    private static ClassLoader LOADER;
+    private static Method DEFINE;
 
-    public static Class<?> define(byte[] code) throws Throwable {
-        Class<?> result;
-        try {
-            result = (Class<?>) DEFINE.invoke(LOADER, null, code, 0, code.length);
-        } catch (InvocationTargetException e) {
-            throw e.getCause();
-        }
-        return result;
-    }
-
-    static {
+    public static void init(final ClassLoader loader) {
+        LOADER = loader;
         Method define = null;
         try {
             define = ClassLoader.class.getDeclaredMethod("defineClass", String.class, byte[].class, int.class, int.class);
@@ -27,5 +18,15 @@ public class SystemClassLoader {
             e.printStackTrace();
         }
         DEFINE = define;
+    }
+
+    public static Class<?> define(final byte[] code) throws Throwable {
+        Class<?> result;
+        try {
+            result = (Class<?>) DEFINE.invoke(LOADER, null, code, 0, code.length);
+        } catch (InvocationTargetException e) {
+            throw e.getCause();
+        }
+        return result;
     }
 }

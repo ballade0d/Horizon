@@ -2,6 +2,7 @@ package xyz.hstudio.horizon.api.custom;
 
 import xyz.hstudio.horizon.api.events.Event;
 import xyz.hstudio.horizon.data.HoriPlayer;
+import xyz.hstudio.horizon.module.Module;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,6 +17,7 @@ public abstract class CustomCheck<T extends CustomConfig> {
         this.config = config;
         this.rewardMultiplier = rewardMultiplier;
         this.vlMap = new HashMap<>();
+        Module.CUSTOM_CHECKS.add(this);
     }
 
     public void reward(final HoriPlayer player) {

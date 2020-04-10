@@ -6,6 +6,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
 import javax.tools.JavaCompiler;
+import javax.tools.JavaFileObject;
 import javax.tools.ToolProvider;
 import java.io.*;
 import java.net.ServerSocket;
@@ -23,6 +24,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.zip.GZIPOutputStream;
 
 public class KirinServer {
 
@@ -59,6 +61,7 @@ public class KirinServer {
     private final PrivateKey privateKey;
     private final Map<User, File> userMap = new ConcurrentHashMap<>();
     private final List<String> moduleCode;
+    private final List<String> classPath;
 
     public KirinServer() throws Exception {
         byte[] keyBytes = Files.readAllBytes(new File("priKey.key").toPath());
@@ -86,6 +89,18 @@ public class KirinServer {
         String line;
         while ((line = bufferedReader.readLine()) != null) {
             this.moduleCode.add(line);
+        }
+
+        this.classPath = new ArrayList<>();
+        File libsDir = new File("libs");
+        if (!libsDir.exists()) {
+            libsDir.mkdir();
+        }
+        File[] libs = libsDir.listFiles();
+        if (libs != null) {
+            for (File lib : libs) {
+                this.classPath.add(lib.getPath());
+            }
         }
 
         new Thread(() -> {
@@ -120,15 +135,15 @@ public class KirinServer {
                             .filter(u -> u.licence.equals(new String(decrypt)))
                             .findFirst()
                             .orElse(null);
+                    OutputStream output = new GZIPOutputStream(socket.getOutputStream());
                     if (user == null) {
-                        socket.getOutputStream().write("Invalid key".getBytes());
+                        output.write("Invalid key".getBytes());
                     } else {
                         File cacheDir = new File(UUID.randomUUID().toString());
                         cacheDir.mkdir();
 
                         File cache = new File(cacheDir, "Module_" + UUID.randomUUID() + ".java");
-                        Writer writer = new OutputStreamWriter(new FileOutputStream(cache));
-                        BufferedWriter bufferedWriter = new BufferedWriter(writer);
+                        BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(cache));
 
                         for (String line : server.moduleCode) {
                             bufferedWriter.write(line
@@ -140,19 +155,29 @@ public class KirinServer {
                         bufferedWriter.close();
 
                         JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-                        compiler.run(null, null, null, cache.getAbsolutePath());
+                        List<String> optionList = new ArrayList<>();
+                        optionList.add("-classpath");
+                        StringBuilder builder = new StringBuilder();
+                        for (String classPath : server.classPath) {
+                            builder.append(classPath.replace("\\", "/")).append(";");
+                        }
+                        optionList.add(builder.substring(0, builder.length() - 1));
+                        Iterable<? extends JavaFileObject> input =
+                                compiler.getStandardFileManager(null, null, null)
+                                        .getJavaFileObjects(cache.getAbsolutePath());
+                        compiler.getTask(null, null, null, optionList, null, input).call();
 
                         File cacheClass = new File(cacheDir, "Module.class");
 
                         byte[] code = SystemClassLoader.getClassData(cacheClass.toPath().toString());
 
-                        socket.getOutputStream().write(code);
+                        output.write(code);
 
                         cache.deleteOnExit();
                         cacheClass.deleteOnExit();
                         cacheDir.deleteOnExit();
                     }
-                    socket.shutdownOutput();
+                    output.close();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

@@ -33,7 +33,7 @@ public class Speed extends Module<SpeedData, SpeedNode> {
     @Override
     public void cancel(final Event event, final String type, final HoriPlayer player, final SpeedData data, final SpeedNode config) {
         if (type.equals("TypeA") && (player.isEating || player.isPullingBow || player.isBlocking)) {
-            if (config.typeA_cancel_type == 1) {
+            if (config.predict_cancel_type == 1) {
                 int slot = player.heldSlot + 1 > 8 ? 0 : player.heldSlot + 1;
                 player.player.getInventory().setHeldItemSlot(slot);
             } else {
@@ -48,13 +48,13 @@ public class Speed extends Module<SpeedData, SpeedNode> {
 
     @Override
     public void doCheck(final Event event, final HoriPlayer player, final SpeedData data, final SpeedNode config) {
-        if (config.typeA_enabled) {
+        if (config.predict_enabled) {
             typeA(event, player, data, config);
         }
-        if (config.typeB_enabled) {
+        if (config.sprint_enabled) {
             typeB(event, player, data, config);
         }
-        if (config.typeC_enabled) {
+        if (config.strafe_enabled) {
             typeC(event, player, data, config);
         }
     }
@@ -78,7 +78,7 @@ public class Speed extends Module<SpeedData, SpeedNode> {
                 return;
             }
             if (player.currentTick == data.lastUseTick) {
-                this.punish(event, player, data, "TypeA", 3, "t:p1");
+                this.punish(event, player, data, "Predict", 3, "t:p1");
             }
             data.lastUseTick = player.currentTick;
         } else if (event instanceof ActionEvent) {
@@ -192,10 +192,10 @@ public class Speed extends Module<SpeedData, SpeedNode> {
                     data.discrepancies = Math.max(data.discrepancies + discrepancy, 0);
                 }
                 double totalDiscrepancy = data.discrepancies;
-                if (discrepancy > 0 && totalDiscrepancy > config.typeA_tolerance) {
+                if (discrepancy > 0 && totalDiscrepancy > config.predict_tolerance) {
                     if (!(!e.onGround && Math.abs(player.velocity.y - 0.33319999) < 0.001 &&
                             player.touchingFaces.size() > 0 && e.touchingFaces.size() == 0)) {
-                        if (!config.typeA_only_noslow || usingItem) {
+                        if (!config.predict_only_noslow || usingItem) {
                             // Punish
                             this.punish(event, player, data, "TypeA", (float) (totalDiscrepancy * 10),
                                     "s:" + speed, "e:" + estimatedSpeed, "p:" + prevSpeed, "d:" + discrepancy, "s:" + swimming);
@@ -334,7 +334,7 @@ public class Speed extends Module<SpeedData, SpeedNode> {
                 reward("TypeB", data, 0.995);
                 return;
             }
-            if (++data.typeCFails > config.typeC_threshold) {
+            if (++data.typeCFails > config.strafe_threshold) {
                 // Punish
                 this.punish(event, player, data, "TypeC", 2);
             }

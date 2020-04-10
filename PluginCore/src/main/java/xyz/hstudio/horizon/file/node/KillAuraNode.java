@@ -7,28 +7,30 @@ import xyz.hstudio.horizon.util.wrap.YamlLoader;
 
 public class KillAuraNode extends CheckFile {
 
-    // TypeA
-    @Load(path = "typeA.enabled")
-    public boolean typeA_enabled = true;
-    // TypeB
-    @Load(path = "typeB.enabled")
-    public boolean typeB_enabled = true;
-    // TypeC
-    @Load(path = "typeC.enabled")
-    public boolean typeC_enabled = true;
-    // TypeD
-    @Load(path = "typeD.enabled")
-    public boolean typeD_enabled = true;
-    // TypeE
-    @Load(path = "typeE.enabled")
-    public boolean typeE_enabled = true;
-    @Load(path = "typeE.cancel_type")
-    public int typeE_cancel_type = 2;
-    // TypeF
-    @Load(path = "typeF.enabled")
-    public boolean typeF_enabled = true;
-    @Load(path = "typeF.cancel_type")
-    public int typeF_cancel_type = 2;
+    // Order
+    @Load(path = "order.enabled")
+    public boolean order_enabled = true;
+    // SuperKb
+    @Load(path = "superkb.enabled")
+    public boolean superkb_enabled = true;
+    // GCD
+    @Load(path = "gcd.enabled")
+    public boolean gcd_enabled = true;
+    @Load(path = "gcd.strict")
+    public boolean gcd_strict = true;
+    // Direction
+    @Load(path = "direction.enabled")
+    public boolean direction_enabled = true;
+    // InteractAutoBlock
+    @Load(path = "interact_autoblock.enabled")
+    public boolean interact_autoblock_enabled = true;
+    @Load(path = "interact_autoblock.cancel_type")
+    public int interact_autoblock_cancel_type = 2;
+    // NormalAutoBlock
+    @Load(path = "normal_autoblock.enabled")
+    public boolean normal_autoblock_enabled = true;
+    @Load(path = "normal_autoblock.cancel_type")
+    public int normal_autoblock_cancel_type = 2;
 
     public KillAuraNode load(final String pathPrefix, final YamlLoader loader) {
         return AbstractFile.load(pathPrefix, this, loader);

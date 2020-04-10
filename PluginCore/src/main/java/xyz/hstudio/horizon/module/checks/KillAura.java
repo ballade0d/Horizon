@@ -35,7 +35,7 @@ public class KillAura extends Module<KillAuraData, KillAuraNode> {
         // TODO: Finish this
         switch (type) {
             case "TypeE": {
-                if (config.typeE_cancel_type == 1) {
+                if (config.interact_autoblock_cancel_type == 1) {
                     int slot = player.heldSlot + 1 > 8 ? 0 : player.heldSlot + 1;
                     player.player.getInventory().setHeldItemSlot(slot);
                 } else {
@@ -45,7 +45,7 @@ public class KillAura extends Module<KillAuraData, KillAuraNode> {
                 break;
             }
             case "TypeF": {
-                if (config.typeF_cancel_type == 1) {
+                if (config.normal_autoblock_cancel_type == 1) {
                     int slot = player.heldSlot + 1 > 8 ? 0 : player.heldSlot + 1;
                     player.player.getInventory().setHeldItemSlot(slot);
                 } else {
@@ -59,22 +59,22 @@ public class KillAura extends Module<KillAuraData, KillAuraNode> {
 
     @Override
     public void doCheck(final Event event, final HoriPlayer player, final KillAuraData data, final KillAuraNode config) {
-        if (config.typeA_enabled) {
+        if (config.order_enabled) {
             typeA(event, player, data, config);
         }
-        if (config.typeB_enabled) {
+        if (config.superkb_enabled) {
             typeB(event, player, data, config);
         }
-        if (config.typeC_enabled) {
+        if (config.gcd_enabled) {
             typeC(event, player, data, config);
         }
-        if (config.typeD_enabled) {
+        if (config.direction_enabled) {
             typeD(event, player, data, config);
         }
-        if (config.typeE_enabled) {
+        if (config.interact_autoblock_enabled) {
             typeE(event, player, data, config);
         }
-        if (config.typeF_enabled) {
+        if (config.normal_autoblock_enabled) {
             typeF(event, player, data, config);
         }
         // TODO: Aim checks.
@@ -107,13 +107,13 @@ public class KillAura extends Module<KillAuraData, KillAuraNode> {
                 if (data.typeAFails > 0) {
                     data.typeAFails--;
                 } else {
-                    reward("TypeA", data, 0.999);
+                    reward("Order", data, 0.999);
                 }
                 return;
             }
             if (++data.typeAFails > 5) {
                 // Punish
-                this.punish(event, player, data, "TypeA", 4, "d:" + deltaT);
+                this.punish(event, player, data, "Order", 4, "d:" + deltaT);
             }
         }
     }
@@ -148,9 +148,9 @@ public class KillAura extends Module<KillAuraData, KillAuraNode> {
             long deltaT = player.currentTick - data.failTypeBTick;
             if (deltaT == 0) {
                 // Punish
-                this.punish(event, player, data, "TypeB", 5, "d:" + deltaT);
+                this.punish(event, player, data, "SuperKb", 5, "d:" + deltaT);
             } else {
-                reward("TypeB", data, 0.999);
+                reward("SuperKb", data, 0.999);
             }
         }
     }
@@ -171,7 +171,7 @@ public class KillAura extends Module<KillAuraData, KillAuraNode> {
                 return;
             }
             // Only execute if player fails any other killaura checks.
-            if (player.currentTick - data.lastFailTick > 5) {
+            if (!config.gcd_strict && player.currentTick - data.lastFailTick > 5) {
                 return;
             }
             float pitchChange = this.getDistance(e.from.pitch, e.to.pitch);
@@ -188,12 +188,12 @@ public class KillAura extends Module<KillAuraData, KillAuraNode> {
             if (gcd <= 131072) {
                 if (++data.gcdFails > 5) {
                     // Punish
-                    this.punish(event, player, data, "TypeC", 3, "g:" + gcd);
+                    this.punish(event, player, data, "GCD", 3, "g:" + gcd);
                 }
             } else if (data.gcdFails > 0) {
                 data.gcdFails--;
             } else {
-                reward("TypeC", data, 0.999);
+                reward("GCD", data, 0.999);
             }
 
             data.lastPitchChange = pitchChange;
@@ -226,12 +226,12 @@ public class KillAura extends Module<KillAuraData, KillAuraNode> {
             if (!e.strafeNormally) {
                 if (++data.typeDFails > 4) {
                     // Punish
-                    this.punish(event, player, data, "TypeD", 3);
+                    this.punish(event, player, data, "Direction", 3);
                 }
             } else if (data.typeDFails > 0) {
                 data.typeDFails--;
             } else {
-                reward("TypeD", data, 0.999);
+                reward("Direction", data, 0.999);
             }
         } else if (event instanceof InteractEntityEvent) {
             InteractEntityEvent e = (InteractEntityEvent) event;
@@ -273,9 +273,9 @@ public class KillAura extends Module<KillAuraData, KillAuraNode> {
 
             if (dirA.dot(dirB) < 0) {
                 // Punish
-                this.punish(event, player, data, "TypeE", 5);
+                this.punish(event, player, data, "InteractAutoBlock", 5);
             } else {
-                reward("TypeE", data, 0.99);
+                reward("InteractAutoBlock", data, 0.99);
             }
 
             data.intersection = null;
@@ -321,9 +321,9 @@ public class KillAura extends Module<KillAuraData, KillAuraNode> {
             }
             if (player.currentTick - data.lastHitTickF < 2) {
                 // Punish
-                this.punish(event, player, data, "TypeF", 5);
+                this.punish(event, player, data, "NormalAutoBlock", 5);
             } else {
-                reward("TypeF", data, 0.99);
+                reward("NormalAutoBlock", data, 0.99);
             }
         }
     }

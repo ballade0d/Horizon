@@ -4,7 +4,7 @@ import xyz.hstudio.horizon.data.Data;
 
 public class InvalidMotionData extends Data {
 
-    // TypeA
+    // Predict
     public float estimatedVelocity;
     public boolean prevGliding;
     // Magic

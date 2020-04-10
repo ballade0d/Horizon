@@ -150,7 +150,7 @@ public class MoveEvent extends Event {
         Vector3D finalForce = new Vector3D();
         boolean inLiquid = false;
         for (Block block : AABB.WATER_BOX.add(this.to.toVector()).getBlocks(to.world)) {
-            if (!MatUtils.isLiquid(block.getType()) && block.getType() != MatUtils.LILY_PAD.parse()) {
+            if (!MatUtils.LIQUID.contains(block.getType())) {
                 continue;
             }
             finalForce.add(McAccessor.INSTANCE.getFlowDirection(block));

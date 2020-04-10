@@ -4,8 +4,6 @@ import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
-import xyz.hstudio.horizon.api.custom.CustomCheck;
-import xyz.hstudio.horizon.api.custom.CustomConfig;
 import xyz.hstudio.horizon.command.Commands;
 import xyz.hstudio.horizon.data.HoriPlayer;
 import xyz.hstudio.horizon.file.AbstractFile;
@@ -19,12 +17,11 @@ import xyz.hstudio.horizon.network.ChannelHandler;
 import xyz.hstudio.horizon.thread.Async;
 import xyz.hstudio.horizon.thread.Sync;
 import xyz.hstudio.horizon.util.BlockUtils;
+import xyz.hstudio.horizon.util.SystemClassLoader;
 import xyz.hstudio.horizon.util.enums.Version;
 import xyz.hstudio.horizon.util.wrap.YamlLoader;
 
 import java.io.File;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -56,6 +53,7 @@ public class Horizon extends JavaPlugin {
 
     public Horizon() {
         Horizon.inst = this;
+        SystemClassLoader.init(this.getClassLoader());
     }
 
     @Override
@@ -99,29 +97,6 @@ public class Horizon extends JavaPlugin {
             } catch (Exception e) {
                 Logger.msg("Kirin", "Failed to init Kirin! Please contact the author for help.");
                 e.printStackTrace();
-            }
-        }
-
-        File checkFolder = new File(folder, "checks");
-        if (!checkFolder.exists()) {
-            checkFolder.mkdirs();
-        }
-        File[] checks = checkFolder.listFiles();
-        if (checks != null) {
-            for (File check : checks) {
-                String name = check.getName().substring(0, check.getName().lastIndexOf("."));
-                try {
-                    Object instance = this.loadCheck(check, name);
-                    if (!(instance instanceof CustomCheck)) {
-                        Logger.msg("Warn", "Custom check " + name + " must implement CustomCheck");
-                        continue;
-                    }
-                    Module.CUSTOM_CHECKS.add((CustomCheck<? extends CustomConfig>) instance);
-                    Logger.msg("Info", "Custom check " + name + " is loaded.");
-                } catch (Exception e) {
-                    Logger.msg("Warn", "Could not load custom check " + name);
-                    e.printStackTrace();
-                }
             }
         }
 
@@ -171,10 +146,5 @@ public class Horizon extends JavaPlugin {
         return config.personalized_themes_enabled ?
                 langMap.getOrDefault(name, langMap.get("original")) :
                 langMap.get("original");
-    }
-
-    private Object loadCheck(final File file, final String name) throws Exception {
-        ClassLoader loader = new URLClassLoader(new URL[]{file.toURI().toURL()}, this.getClassLoader());
-        return loader.loadClass(name).newInstance();
     }
 }

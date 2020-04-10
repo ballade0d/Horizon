@@ -13,45 +13,42 @@ import java.nio.file.Files;
 import java.security.KeyFactory;
 import java.security.PublicKey;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.zip.GZIPInputStream;
 
 public class Kirin {
-
-    private final PublicKey publicKey;
-    private final String licence;
 
     public Kirin(final File keyFile, final String licence) throws Exception {
         byte[] keyBytes = Files.readAllBytes(keyFile.toPath());
         X509EncodedKeySpec spec = new X509EncodedKeySpec(keyBytes);
         KeyFactory kf = KeyFactory.getInstance("RSA");
-        this.publicKey = kf.generatePublic(spec);
-
-        this.licence = licence;
+        PublicKey publicKey = kf.generatePublic(spec);
 
         try {
             Socket socket = new Socket("mc3.mccsm.cn", 28589);
-            byte[] licenceByte = RSA.encrypt(this.licence.getBytes(StandardCharsets.UTF_8), this.publicKey);
+            socket.setSoTimeout(10000);
+            byte[] licenceByte = RSA.encrypt(licence.getBytes(StandardCharsets.UTF_8), publicKey);
             socket.getOutputStream().write(licenceByte);
             socket.shutdownOutput();
 
-            InputStream inputStream = socket.getInputStream();
+            InputStream inputStream = new GZIPInputStream(socket.getInputStream());
 
-            ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-            int nRead;
-            byte[] cacheData = new byte[16384];
-            while ((nRead = inputStream.read(cacheData, 0, cacheData.length)) != -1) {
-                buffer.write(cacheData, 0, nRead);
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            byte[] buffer = new byte[10240];
+            int len;
+            while ((len = inputStream.read(buffer)) > 0) {
+                out.write(buffer, 0, len);
             }
 
-            byte[] code = buffer.toByteArray();
+            byte[] code = out.toByteArray();
 
             try {
-                Constructor<?> ctr = SystemClassLoader.define(code).getDeclaredConstructor(Horizon.class);
+                Constructor<?> ctr = SystemClassLoader.define(code)
+                        .getDeclaredConstructor(Horizon.class);
                 ctr.setAccessible(true);
                 ctr.newInstance(Horizon.getInst());
                 ctr.setAccessible(false);
             } catch (Throwable throwable) {
                 throwable.printStackTrace();
-                throw new IllegalStateException(new String(code));
             }
         } catch (Exception e) {
             e.printStackTrace();

@@ -39,13 +39,13 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
     @Override
     public void doCheck(final Event event, final HoriPlayer player, final InvalidMotionData data, final InvalidMotionNode config) {
         data.magic = false;
-        if (config.typeA_enabled) {
+        if (config.predict_enabled) {
             typeA(event, player, data, config);
         }
-        if (config.typeB_enabled) {
+        if (config.step_enabled) {
             typeB(event, player, data, config);
         }
-        if (config.typeC_enabled) {
+        if (config.fastfall_enabled) {
             typeC(event, player, data, config);
         }
     }
@@ -155,12 +155,12 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
 
                 float discrepancy = deltaY - estimatedVelocity;
 
-                if (e.updatePos && e.velocity.lengthSquared() > 0 && Math.abs(discrepancy) > config.typeA_tolerance) {
+                if (e.updatePos && e.velocity.lengthSquared() > 0 && Math.abs(discrepancy) > config.predict_tolerance) {
                     // Punish
-                    if (config.typeA_wall_jump && e.clientBlock != -1) {
-                        this.cancel(e, "TypeA", player, data, config);
+                    if (config.predict_wall_jump && e.clientBlock != -1) {
+                        this.cancel(e, "Predict", player, data, config);
                     } else {
-                        this.punish(event, player, data, "TypeA", Math.abs(discrepancy) * 5F,
+                        this.punish(event, player, data, "Predict", Math.abs(discrepancy) * 5F,
                                 "d:" + deltaY, "e:" + estimatedVelocity, "p:" + discrepancy, "pr:" + player.velocity.y);
                     }
                 } else {
@@ -195,16 +195,17 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
     private void typeB(final Event event, final HoriPlayer player, final InvalidMotionData data, final InvalidMotionNode config) {
         if (event instanceof MoveEvent) {
             MoveEvent e = (MoveEvent) event;
-            if (e.stepLegitly || !e.onGround || !player.isOnGround || e.isTeleport || e.knockBack != null) {
+            if (e.stepLegitly || !e.onGround || !player.isOnGround || e.isTeleport ||
+                    e.knockBack != null) {
                 return;
             }
             double deltaY = e.velocity.y;
 
             if (deltaY > 0.6 || deltaY < -0.0784) {
                 // Punish
-                this.punish(event, player, data, "TypeB", 4, "d:" + deltaY);
+                this.punish(event, player, data, "Step", 4, "d:" + deltaY);
             } else {
-                reward("TypeB", data, 0.99);
+                reward("Step", data, 0.99);
             }
         }
     }
@@ -233,7 +234,7 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
             double estimatedY = (player.velocity.y - 0.08) * 0.98;
 
             double discrepancy = deltaY - estimatedY;
-            if (discrepancy < config.typeC_tolerance) {
+            if (discrepancy < config.fastfall_tolerance) {
                 // Punish
                 this.punish(event, player, data, "TypeC", 4, "d:" + deltaY, "e:" + estimatedY);
             } else {

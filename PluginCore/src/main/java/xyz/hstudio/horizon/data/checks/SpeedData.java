@@ -4,7 +4,7 @@ import xyz.hstudio.horizon.data.Data;
 
 public class SpeedData extends Data {
 
-    // TypeA
+    // Predict
     public int noMoves;
     public double prevSpeed;
     public double discrepancies;
@@ -13,9 +13,9 @@ public class SpeedData extends Data {
 
     public long lastUseTick;
     public long lastToggleTick;
-    // TypeB
+    // Sprint
     public long lastSprintTick;
     public boolean collisionHorizontal;
-    // TypeC
+    // Strafe
     public int typeCFails;
 }

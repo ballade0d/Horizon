@@ -72,15 +72,15 @@ invalidmotion:
   cancel_vl: 1
   enable_worlds:
     - '*'
-  typeA:
+  predict:
     enabled: true
     tolerance: 0.001
     # Should Horizon only set back but not add any violation levels
     # if player tries to wall-jump?
     wall_jump: true
-  typeB:
+  step:
     enabled: true
-  typeC:
+  fastfall:
     enabled: true
     tolerance: -0.02
   action:
@@ -111,21 +111,24 @@ killaura:
   cancel_vl: 0
   enable_worlds:
     - '*'
-  typeA:
+  order:
     enabled: true
-  typeB:
+  superkb:
     enabled: true
-  typeC:
+  gcd:
     enabled: true
-  typeD:
+    # If strict mode is disabled, gcd check will only run if someone
+    # failed other aura checks.
+    strict: false
+  direction:
     enabled: true
-  typeE:
+  interact_autoblock:
     enabled: true
     # How will Horizon cancel player's action?
     # 1: Swap item slot
     # (Default) 2: Release item
     cancel_type: 2
-  typeF:
+  normal_autoblock:
     enabled: true
     # How will Horizon cancel player's action?
     # 1: Swap item slot
@@ -175,7 +178,7 @@ speed:
   cancel_vl: 1
   enable_worlds:
     - '*'
-  typeA:
+  predict:
     enabled: true
     tolerance: 0.08
     # How will Horizon cancel player's action if player is detected for NoSlow?
@@ -184,9 +187,9 @@ speed:
     cancel_type: 2
     # Should Horizon only checks for NoSlow hacks?
     only_noslow: false
-  typeB:
+  sprint:
     enabled: true
-  typeC:
+  strafe:
     enabled: true
     threshold: 3
   action:
