@@ -124,16 +124,8 @@ killaura:
     enabled: true
   interact_autoblock:
     enabled: true
-    # How will Horizon cancel player's action?
-    # 1: Swap item slot
-    # (Default) 2: Release item
-    cancel_type: 2
   normal_autoblock:
     enabled: true
-    # How will Horizon cancel player's action?
-    # 1: Swap item slot
-    # (Default) 2: Release item
-    cancel_type: 2
   action:
     10:
       - 'horizon notify %player% might be using KillAura'
@@ -181,12 +173,17 @@ speed:
   predict:
     enabled: true
     tolerance: 0.08
-    # How will Horizon cancel player's action if player is detected for NoSlow?
-    # 1: Swap item slot
-    # (Default) 2: Release item
-    cancel_type: 2
-    # Should Horizon only checks for NoSlow hacks?
-    only_noslow: false
+  noslow:
+    enabled: true
+    # How many violation levels will be added if player failed Packet-NoSlow?
+    # If you set it to 0, the check will not add any violation levels.
+    packet_vl: 8
+    # How many violation levels will be added if player failed Predict-NoSlow?
+    # If you set it to -1, dynamic violation addition will be enabled.
+    # If you set it to 0, the check will not add any violation levels.
+    move_vl: -1
+    # Should Horizon always cancel player's behavior when the player failed this check?
+    always_cancel: false
   sprint:
     enabled: true
   strafe:

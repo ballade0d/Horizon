@@ -32,14 +32,9 @@ public class Speed extends Module<SpeedData, SpeedNode> {
 
     @Override
     public void cancel(final Event event, final String type, final HoriPlayer player, final SpeedData data, final SpeedNode config) {
-        if (type.equals("TypeA") && (player.isEating || player.isPullingBow || player.isBlocking)) {
-            if (config.predict_cancel_type == 1) {
-                int slot = player.heldSlot + 1 > 8 ? 0 : player.heldSlot + 1;
-                player.player.getInventory().setHeldItemSlot(slot);
-            } else {
-                McAccessor.INSTANCE.releaseItem(player.player);
-                player.player.updateInventory();
-            }
+        if (type.equals("NoSlow") && (player.isEating || player.isPullingBow || player.isBlocking)) {
+            McAccessor.INSTANCE.releaseItem(player.player);
+            player.player.updateInventory();
         } else {
             event.setCancelled(true);
             Sync.teleport(player, player.position);
@@ -48,8 +43,8 @@ public class Speed extends Module<SpeedData, SpeedNode> {
 
     @Override
     public void doCheck(final Event event, final HoriPlayer player, final SpeedData data, final SpeedNode config) {
-        if (config.predict_enabled) {
-            typeA(event, player, data, config);
+        if (config.predict_enabled || config.noslow_enabled) {
+            typeA(event, player, data, config, config.noslow_enabled);
         }
         if (config.sprint_enabled) {
             typeB(event, player, data, config);
@@ -67,8 +62,8 @@ public class Speed extends Module<SpeedData, SpeedNode> {
      *
      * @author MrCraftGoo
      */
-    private void typeA(final Event event, final HoriPlayer player, final SpeedData data, final SpeedNode config) {
-        if (event instanceof InteractItemEvent) {
+    private void typeA(final Event event, final HoriPlayer player, final SpeedData data, final SpeedNode config, final boolean noSlowEnabled) {
+        if (event instanceof InteractItemEvent && noSlowEnabled) {
             if (player.protocol != 47) {
                 return;
             }
@@ -78,10 +73,10 @@ public class Speed extends Module<SpeedData, SpeedNode> {
                 return;
             }
             if (player.currentTick == data.lastUseTick) {
-                this.punish(event, player, data, "Predict", 3, "t:p1");
+                this.punish(event, player, data, "NoSlow", config.noslow_packet_vl, config.noslow_always_cancel, "t:p1");
             }
             data.lastUseTick = player.currentTick;
-        } else if (event instanceof ActionEvent) {
+        } else if (event instanceof ActionEvent && noSlowEnabled) {
             if (player.protocol != 47) {
                 return;
             }
@@ -91,7 +86,7 @@ public class Speed extends Module<SpeedData, SpeedNode> {
                 return;
             }
             if (player.currentTick == data.lastToggleTick) {
-                this.punish(event, player, data, "TypeA", 3, "t:p2");
+                this.punish(event, player, data, "NoSlow", config.noslow_packet_vl, config.noslow_always_cancel, "t:p2");
             }
             data.lastToggleTick = player.currentTick;
         } else if (event instanceof MoveEvent) {
@@ -195,9 +190,16 @@ public class Speed extends Module<SpeedData, SpeedNode> {
                 if (discrepancy > 0 && totalDiscrepancy > config.predict_tolerance) {
                     if (!(!e.onGround && Math.abs(player.velocity.y - 0.33319999) < 0.001 &&
                             player.touchingFaces.size() > 0 && e.touchingFaces.size() == 0)) {
-                        if (!config.predict_only_noslow || usingItem) {
+                        if (usingItem) {
+                            if (noSlowEnabled) {
+                                // Punish
+                                this.punish(event, player, data, "NoSlow",
+                                        config.noslow_move_vl == -1 ? (float) (totalDiscrepancy * 10F) : config.noslow_move_vl, config.noslow_always_cancel,
+                                        "s:" + speed, "e:" + estimatedSpeed, "p:" + prevSpeed, "d:" + discrepancy, "s:" + swimming);
+                            }
+                        } else {
                             // Punish
-                            this.punish(event, player, data, "TypeA", (float) (totalDiscrepancy * 10),
+                            this.punish(event, player, data, "Predict", (float) (totalDiscrepancy * 10),
                                     "s:" + speed, "e:" + estimatedSpeed, "p:" + prevSpeed, "d:" + discrepancy, "s:" + swimming);
                         }
                     }

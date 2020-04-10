@@ -34,24 +34,10 @@ public class KillAura extends Module<KillAuraData, KillAuraNode> {
     public void cancel(final Event event, final String type, final HoriPlayer player, final KillAuraData data, final KillAuraNode config) {
         // TODO: Finish this
         switch (type) {
-            case "TypeE": {
-                if (config.interact_autoblock_cancel_type == 1) {
-                    int slot = player.heldSlot + 1 > 8 ? 0 : player.heldSlot + 1;
-                    player.player.getInventory().setHeldItemSlot(slot);
-                } else {
-                    McAccessor.INSTANCE.releaseItem(player.player);
-                    player.player.updateInventory();
-                }
-                break;
-            }
+            case "TypeE":
             case "TypeF": {
-                if (config.normal_autoblock_cancel_type == 1) {
-                    int slot = player.heldSlot + 1 > 8 ? 0 : player.heldSlot + 1;
-                    player.player.getInventory().setHeldItemSlot(slot);
-                } else {
-                    McAccessor.INSTANCE.releaseItem(player.player);
-                    player.player.updateInventory();
-                }
+                McAccessor.INSTANCE.releaseItem(player.player);
+                player.player.updateInventory();
                 break;
             }
         }

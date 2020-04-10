@@ -59,15 +59,16 @@ public abstract class Module<K extends Data, V extends CheckFile> {
     }
 
     /**
-     * Punish a player. Still have not been finished yet.
-     *
-     * @param player The player.
-     * @param data   Player's data of this check.
-     * @param type   Check type.
-     * @param weight Violation level addition.
-     * @author MrCraftGoo
+     * Punish a player.
      */
     protected void punish(final Event event, final HoriPlayer player, final K data, final String type, final float weight, final String... args) {
+        this.punish(event, player, data, type, weight, false, args);
+    }
+
+    /**
+     * Punish a player.
+     */
+    protected void punish(final Event event, final HoriPlayer player, final K data, final String type, final float weight, final boolean cancel, final String... args) {
         float oldViolation = data.violations.getOrDefault(type, 0F);
         float nowViolation = oldViolation + weight;
 
@@ -77,7 +78,7 @@ public abstract class Module<K extends Data, V extends CheckFile> {
             return;
         }
 
-        if (nowViolation > config.cancel_vl && config.cancel_vl != -1) {
+        if (cancel || (nowViolation > config.cancel_vl && config.cancel_vl != -1)) {
             this.cancel(event, type, player, data, config);
         }
 

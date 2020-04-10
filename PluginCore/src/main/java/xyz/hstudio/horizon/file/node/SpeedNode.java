@@ -12,10 +12,15 @@ public class SpeedNode extends CheckFile {
     public boolean predict_enabled = true;
     @Load(path = "predict.tolerance")
     public double predict_tolerance = 0.08;
-    @Load(path = "predict.cancel_type")
-    public int predict_cancel_type = 2;
-    @Load(path = "predict.only_noslow")
-    public boolean predict_only_noslow = false;
+    // NoSlow
+    @Load(path = "noslow.enabled")
+    public boolean noslow_enabled = true;
+    @Load(path = "noslow.packet_vl")
+    public int noslow_packet_vl = 8;
+    @Load(path = "noslow.move_vl")
+    public int noslow_move_vl = -1;
+    @Load(path = "noslow.always_cancel")
+    public boolean noslow_always_cancel = false;
     // Sprint
     @Load(path = "sprint.enabled")
     public boolean sprint_enabled = true;

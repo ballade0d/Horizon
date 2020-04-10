@@ -24,13 +24,9 @@ public class KillAuraNode extends CheckFile {
     // InteractAutoBlock
     @Load(path = "interact_autoblock.enabled")
     public boolean interact_autoblock_enabled = true;
-    @Load(path = "interact_autoblock.cancel_type")
-    public int interact_autoblock_cancel_type = 2;
     // NormalAutoBlock
     @Load(path = "normal_autoblock.enabled")
     public boolean normal_autoblock_enabled = true;
-    @Load(path = "normal_autoblock.cancel_type")
-    public int normal_autoblock_cancel_type = 2;
 
     public KillAuraNode load(final String pathPrefix, final YamlLoader loader) {
         return AbstractFile.load(pathPrefix, this, loader);
