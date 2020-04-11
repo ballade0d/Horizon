@@ -4,6 +4,7 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import sun.security.action.GetPropertyAction;
 import xyz.hstudio.horizon.Horizon;
 import xyz.hstudio.horizon.data.HoriPlayer;
+import xyz.hstudio.horizon.module.Module;
 import xyz.hstudio.horizon.util.DateUtils;
 
 import java.io.*;
@@ -94,6 +95,10 @@ public class Async extends Thread {
         try {
             long current = System.nanoTime();
             while (running) {
+
+                for (Module module : Module.MODULE_MAP.values()) {
+                    module.tickAsync(currentTick, module.getConfig());
+                }
 
                 // Run every 80 tick
                 if (currentTick % 80 == 0) {

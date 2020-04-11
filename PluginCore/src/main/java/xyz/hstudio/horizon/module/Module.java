@@ -136,4 +136,7 @@ public abstract class Module<K extends Data, V extends CheckFile> {
     public abstract void cancel(final Event event, final String type, final HoriPlayer player, final K data, final V config);
 
     public abstract void doCheck(final Event event, final HoriPlayer player, final K data, final V config);
+
+    public void tickAsync(final long currentTick, final V config) {
+    }
 }

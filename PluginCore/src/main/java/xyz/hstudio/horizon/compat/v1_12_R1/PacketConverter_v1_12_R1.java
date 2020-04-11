@@ -200,9 +200,6 @@ public class PacketConverter_v1_12_R1 implements IPacketConverter {
 
     private Event convertInteractEntityEvent(final HoriPlayer player, final PacketPlayInUseEntity packet) {
         Entity entity = packet.a(((CraftWorld) player.world).getHandle());
-        if (entity == null) {
-            return null;
-        }
         Vec3D vec3D = packet.c();
         Vector3D intersection;
         if (vec3D == null) {
@@ -214,6 +211,15 @@ public class PacketConverter_v1_12_R1 implements IPacketConverter {
                 packet.a() == PacketPlayInUseEntity.EnumEntityUseAction.ATTACK ?
                         InteractEntityEvent.InteractType.ATTACK :
                         InteractEntityEvent.InteractType.INTERACT;
+        if (entity == null) {
+            PacketDataSerializer serializer = new PacketDataSerializer(Unpooled.buffer());
+            try {
+                packet.b(serializer);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return new InteractCSEntityEvent(player, action, serializer.g());
+        }
         return new InteractEntityEvent(player, action, intersection, entity.getBukkitEntity(), Hand.MAIN_HAND);
     }
 

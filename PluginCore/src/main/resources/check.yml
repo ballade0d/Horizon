@@ -128,9 +128,39 @@ killaura:
     enabled: true
   action:
     10:
-      - 'horizon notify %player% might be using KillAura'
+      - 'horizon notify %player% might be using KillAura, start checking the player with bot.'
+      - 'horizon bot %player% 60'
     20:
       - 'horizon notify %player% is kicked for using KillAura'
+      - 'horizon kick %player% Unfair advantages.'
+killaurabot:
+  enabled: true
+  # Unused
+  cancel_vl: -1
+  enable_worlds:
+    - '*'
+  command_only: true
+  # How long should the update interval of the bot be?
+  # Measured in ticks
+  update_interval: 2
+  xz_distance: 3.3
+  y_distance: 2.0
+  offset:
+    x: 0.5
+    y: 0.8
+    z: 0.5
+  show_damage: true
+  show_swing: true
+  show_armor: true
+  show_on_tab: true
+  realistic_ping: true
+  realistic_name: true
+  respawn_interval: 180
+  action:
+    10:
+      - 'horizon notify %player% hit the bot 10 times'
+    20:
+      - 'horizon notify %player% is kicked for hitting bot'
       - 'horizon kick %player% Unfair advantages.'
 noswing:
   enabled: true

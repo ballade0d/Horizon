@@ -120,6 +120,7 @@ public class Horizon extends JavaPlugin {
         new InvalidMotion();
         new Inventory();
         new KillAura();
+        new KillAuraBot();
         new NoSwing();
         new Scaffold();
         new Speed();

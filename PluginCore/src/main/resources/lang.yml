@@ -14,4 +14,6 @@ cmd_notify_sent: 'Notification is sent.'
 cmd_kick_player_not_found: 'The player is not online.'
 cmd_kick_wrong_usage: 'Usage: /horizon kick <player> <reason>'
 
+cmd_bot: 'Start checking the player.'
+
 cmd_unknown: 'Unknown command!'

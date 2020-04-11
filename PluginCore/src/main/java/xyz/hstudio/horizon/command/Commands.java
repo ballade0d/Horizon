@@ -124,7 +124,7 @@ public class Commands implements TabCompleter, CommandExecutor {
 
     @Cmd(name = "kick", perm = "horizon.cmd.kick")
     public void kick(final CommandSender sender, final String[] args, final String prefix, final LangFile lang) {
-        if (args.length <= 1) {
+        if (args.length < 2) {
             sender.sendMessage(prefix + lang.cmd_kick_wrong_usage);
             return;
         }
@@ -138,6 +138,31 @@ public class Commands implements TabCompleter, CommandExecutor {
             builder.append(args[i]).append(" ");
         }
         player.kickPlayer(builder.toString().trim().replace("%break%", "\n"));
+    }
+
+    @Cmd(name = "bot", perm = "horizon.cmd.bot")
+    public void bot(final CommandSender sender, final String[] args, final String prefix, final LangFile lang) {
+        if (args.length < 2) {
+            sender.sendMessage(prefix + lang.cmd_kick_wrong_usage);
+            return;
+        }
+        Player player = Bukkit.getPlayer(args[0]);
+        if (player == null || !player.isOnline()) {
+            sender.sendMessage(prefix + lang.cmd_kick_player_not_found);
+            return;
+        }
+        HoriPlayer hPlayer = Horizon.PLAYERS.get(player.getUniqueId());
+        if (hPlayer == null) {
+            sender.sendMessage(prefix + lang.cmd_kick_player_not_found);
+            return;
+        }
+        try {
+            int time = Integer.parseInt(args[1]);
+            hPlayer.killAuraBotData.checkEnd = System.currentTimeMillis() + time * 1000L;
+            sender.sendMessage(prefix + lang.cmd_bot);
+        } catch (Exception e) {
+            sender.sendMessage(prefix + lang.cmd_kick_wrong_usage);
+        }
     }
 
     @Override

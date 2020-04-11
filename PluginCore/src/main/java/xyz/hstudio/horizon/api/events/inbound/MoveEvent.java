@@ -77,15 +77,15 @@ public class MoveEvent extends Event {
 
         Pair<Vector3D, Boolean> pair = this.computeWaterFlowForce();
         this.waterFlowForce = pair.key;
-        this.isInLiquid = pair.value;
- /*
-        this.isInLiquid = AABB.collisionBox
-                .shrink(0.001, 0.001, 0.001)
+        //this.isInLiquid = pair.value;
+
+        this.isInLiquid = AABB.NORMAL_BOX
+                .shrink(0, 0.1, 0)
                 .add(this.from.toVector())
                 .getMaterials(to.world)
                 .stream()
-                .anyMatch(MatUtils::isLiquid);
-  */
+                .anyMatch(MatUtils.LIQUID::contains);
+
 
         this.oldFriction = player.friction;
         this.newFriction = this.computeFriction();
