@@ -7,7 +7,7 @@
     <groupId>xyz.hstudio</groupId>
     <artifactId>Horizon</artifactId>
     <packaging>pom</packaging>
-    <version>BETA5</version>
+    <version>BETA6</version>
     <modules>
         <module>KirinServer</module>
         <module>PluginCore</module>
