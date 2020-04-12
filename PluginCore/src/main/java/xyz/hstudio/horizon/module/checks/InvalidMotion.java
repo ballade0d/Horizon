@@ -164,7 +164,7 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
                                 "d:" + deltaY, "e:" + estimatedVelocity, "p:" + discrepancy, "pr:" + player.velocity.y);
                     }
                 } else {
-                    reward("TypeA", data, 0.999);
+                    reward("Predict", data, 0.999);
                 }
 
                 data.estimatedVelocity = estimatedVelocity;
@@ -236,9 +236,9 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
             double discrepancy = deltaY - estimatedY;
             if (discrepancy < config.fastfall_tolerance) {
                 // Punish
-                this.punish(event, player, data, "TypeC", 4, "d:" + deltaY, "e:" + estimatedY);
+                this.punish(event, player, data, "FastFall", 4, "d:" + deltaY, "e:" + estimatedY);
             } else {
-                reward("TypeC", data, 0.99);
+                reward("FastFall", data, 0.99);
             }
         }
     }

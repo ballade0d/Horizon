@@ -9,6 +9,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
+import protocolsupport.api.ProtocolSupportAPI;
 import us.myles.ViaVersion.api.Via;
 import xyz.hstudio.horizon.Horizon;
 import xyz.hstudio.horizon.compat.McAccessor;
@@ -63,6 +64,7 @@ public class HoriPlayer {
     public boolean isOnGround;
     public boolean onGroundReally;
     public boolean isGliding;
+    public boolean isInLiquidStrict;
     public boolean isInLiquid;
     public long lastTeleportAcceptTick = -1;
     public long toggleFlyTick;
@@ -76,9 +78,12 @@ public class HoriPlayer {
     public ChannelPipeline pipeline;
 
     public HoriPlayer(final Player player) {
-        this.protocol = Horizon.getInst().useViaVer ?
-                Via.getAPI().getPlayerVersion(player.getUniqueId()) :
-                Version.VERSION == Version.v1_8_R3 ? 47 : -1;
+        Version viaVer = Horizon.getInst().useViaVer ?
+                Version.getVersion(Via.getAPI().getPlayerVersion(player.getUniqueId())) : Version.VERSION;
+        Version pVer = Horizon.getInst().usePSupport ?
+                Version.getVersion(ProtocolSupportAPI.getProtocolVersion(player).getId()) : Version.VERSION;
+        this.protocol = viaVer == Version.VERSION ? pVer.minProtocol : viaVer.minProtocol;
+        System.out.println(protocol);
         this.player = player;
         this.pipeline = McAccessor.INSTANCE.getPipeline(player);
 

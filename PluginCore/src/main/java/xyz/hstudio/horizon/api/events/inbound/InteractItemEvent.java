@@ -10,11 +10,13 @@ import xyz.hstudio.horizon.util.enums.MatUtils;
 public class InteractItemEvent extends Event {
 
     public final ItemStack itemStack;
+    public final Hand hand;
     public final InteractType interactType;
 
-    public InteractItemEvent(final HoriPlayer player, final ItemStack itemStack, final InteractType interactType) {
+    public InteractItemEvent(final HoriPlayer player, final ItemStack itemStack, final Hand hand, final InteractType interactType) {
         super(player);
         this.itemStack = itemStack;
+        this.hand = hand;
         this.interactType = interactType;
     }
 
@@ -24,7 +26,9 @@ public class InteractItemEvent extends Event {
             return;
         }
         Material mat = this.itemStack.getType();
-        if (this.interactType == InteractType.START_USE_ITEM) {
+        if (this.interactType == InteractType.START_USE_ITEM &&
+                player.player.getGameMode() != GameMode.CREATIVE &&
+                player.player.getGameMode() != GameMode.SPECTATOR) {
             // Player can still eat golden apple even if they're full.
             if (mat.isEdible() && (player.player.getFoodLevel() < 20 || mat == Material.GOLDEN_APPLE || mat == MatUtils.ENCHANTED_GOLDEN_APPLE.parse())) {
                 player.isEating = true;
@@ -40,6 +44,10 @@ public class InteractItemEvent extends Event {
             player.isPullingBow = false;
             player.isBlocking = false;
         }
+    }
+
+    public enum Hand {
+        MAIN, OFF
     }
 
     public enum InteractType {

@@ -33,9 +33,9 @@ badpacket:
   typeD:
     enabled: true
   action:
-    2:
+    5:
       - 'horizon notify %player% might be sending bad packets'
-    4:
+    15:
       - 'horizon notify %player% is kicked for sending bad packets'
       - 'horizon kick %player% Invalid packets.'
 groundspoof:

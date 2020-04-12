@@ -47,6 +47,7 @@ public class Horizon extends JavaPlugin {
     public ConfigFile config;
     public boolean usePapi;
     public boolean useViaVer;
+    public boolean usePSupport;
 
     private BukkitTask syncTask;
     private Async asyncTask;
@@ -89,6 +90,7 @@ public class Horizon extends JavaPlugin {
 
         this.usePapi = Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI");
         this.useViaVer = Bukkit.getPluginManager().isPluginEnabled("ViaVersion");
+        this.usePSupport = Bukkit.getPluginManager().isPluginEnabled("ProtocolSupport");
 
         if (this.config.kirin_enabled) {
             saveResource("pubKey.key", true);

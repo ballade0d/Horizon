@@ -145,7 +145,7 @@ public class PacketConverter_v1_8_R3 implements IPacketConverter {
         if (item == null) {
             return null;
         }
-        return new InteractItemEvent(player, item, interactType);
+        return new InteractItemEvent(player, item, InteractItemEvent.Hand.MAIN, interactType);
     }
 
     private Event convertBlockPlaceEvent(final HoriPlayer player, final PacketPlayInBlockPlace packet) {
@@ -195,7 +195,7 @@ public class PacketConverter_v1_8_R3 implements IPacketConverter {
             if (bukkitItemStack == null) {
                 return null;
             }
-            return new InteractItemEvent(player, bukkitItemStack, InteractItemEvent.InteractType.START_USE_ITEM);
+            return new InteractItemEvent(player, bukkitItemStack, InteractItemEvent.Hand.MAIN, InteractItemEvent.InteractType.START_USE_ITEM);
         }
     }
 

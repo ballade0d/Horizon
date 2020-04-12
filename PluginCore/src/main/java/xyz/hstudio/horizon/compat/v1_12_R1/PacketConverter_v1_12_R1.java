@@ -4,7 +4,7 @@ import io.netty.buffer.Unpooled;
 import net.minecraft.server.v1_12_R1.*;
 import org.bukkit.block.BlockFace;
 import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftInventoryPlayer;
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
 import xyz.hstudio.horizon.api.events.Event;
 import xyz.hstudio.horizon.api.events.inbound.*;
@@ -32,6 +32,8 @@ public class PacketConverter_v1_12_R1 implements IPacketConverter {
             return convertBlockBreakEvent(player, (PacketPlayInBlockDig) packet);
         } else if (packet instanceof PacketPlayInUseItem) {
             return convertBlockPlaceEvent(player, (PacketPlayInUseItem) packet);
+        } else if (packet instanceof PacketPlayInBlockPlace) {
+            return convertInteractItemEvent(player, (PacketPlayInBlockPlace) packet);
         } else if (packet instanceof PacketPlayInUseEntity) {
             return convertInteractEntityEvent(player, (PacketPlayInUseEntity) packet);
         } else if (packet instanceof PacketPlayInHeldItemSlot) {
@@ -148,11 +150,13 @@ public class PacketConverter_v1_12_R1 implements IPacketConverter {
         if (item == null) {
             return null;
         }
-        return new InteractItemEvent(player, item, interactType);
+        return new InteractItemEvent(player, item, InteractItemEvent.Hand.MAIN, interactType);
     }
 
     private Event convertBlockPlaceEvent(final HoriPlayer player, final PacketPlayInUseItem packet) {
-        ItemStack itemStack = ((CraftPlayer) player.player).getHandle().b(packet.c());
+        org.bukkit.inventory.ItemStack bkItem = packet.c() == EnumHand.MAIN_HAND ? player.getHeldItem() :
+                ((CraftInventoryPlayer) player.player.getInventory()).getItemInOffHand();
+        ItemStack itemStack = CraftItemStack.asNMSCopy(bkItem);
         BlockPosition bPos = packet.a();
         int x = bPos.getX();
         int y = bPos.getY();
@@ -192,10 +196,16 @@ public class PacketConverter_v1_12_R1 implements IPacketConverter {
         Location placed = new Location(player.world, x, y, z);
         if (!targetedPosition.equals(new Vector3D(-1, -1, -1))) {
             BlockPlaceEvent.PlaceType placeType = itemStack != null && itemStack.getItem() instanceof ItemBlock ? BlockPlaceEvent.PlaceType.PLACE_BLOCK : BlockPlaceEvent.PlaceType.INTERACT_BLOCK;
-            // Does CraftItemStack#asBukkitCopy perform well?
-            return new BlockPlaceEvent(player, placed, face, itemStack == null ? org.bukkit.Material.AIR : CraftItemStack.asBukkitCopy(itemStack).getType(), interaction, placeType);
+            return new BlockPlaceEvent(player, placed, face, bkItem == null ? org.bukkit.Material.AIR : bkItem.getType(), interaction, placeType);
         }
         return null;
+    }
+
+    private Event convertInteractItemEvent(final HoriPlayer player, final PacketPlayInBlockPlace packet) {
+        boolean main = packet.a() == EnumHand.MAIN_HAND;
+        org.bukkit.inventory.ItemStack bukkitItemStack =
+                main ? player.getHeldItem() : ((CraftInventoryPlayer) player.player.getInventory()).getItemInOffHand();
+        return new InteractItemEvent(player, bukkitItemStack, main ? InteractItemEvent.Hand.MAIN : InteractItemEvent.Hand.OFF, InteractItemEvent.InteractType.START_USE_ITEM);
     }
 
     private Event convertInteractEntityEvent(final HoriPlayer player, final PacketPlayInUseEntity packet) {

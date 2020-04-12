@@ -24,22 +24,27 @@ public class CheckFile extends AbstractFile {
             return loader.get(path);
         }
 
-        Map<Integer, List<String>> map = new HashMap<>();
+        Map<Integer, List<String>> map = new LinkedHashMap<>();
         if (loader.get(path) == null) {
             return map;
         }
+        List<Integer> vls = new ArrayList<>();
         for (String s : loader.getConfigurationSection(path).getKeys(false)) {
             if (!StringUtils.isNumeric(s)) {
                 continue;
             }
-            List<String> list = new ArrayList<>(loader.isList(path + "." + s) ?
-                    loader.getStringList(path + "." + s) :
-                    Collections.singletonList(loader.getString(path + "." + s)));
-            for (int i = 0; i < list.size(); i++) {
-                list.set(i, ChatColor.translateAlternateColorCodes('&', list.get(i)));
+            vls.add(Integer.parseInt(s));
+        }
+        Collections.sort(vls);
+        for (int i = vls.size() - 1; i >= 0; i--) {
+            int vl = vls.get(i);
+            List<String> list = new ArrayList<>(loader.isList(path + "." + vl) ?
+                    loader.getStringList(path + "." + vl) :
+                    Collections.singletonList(loader.getString(path + "." + vl)));
+            for (int line = 0; line < list.size(); line++) {
+                list.set(line, ChatColor.translateAlternateColorCodes('&', list.get(line)));
             }
-            Collections.reverse(list);
-            map.put(Integer.parseInt(s), list);
+            map.put(vl, list);
         }
         return map;
     }

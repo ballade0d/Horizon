@@ -1,18 +1,17 @@
 package xyz.hstudio.horizon.util.enums;
 
-import lombok.Getter;
 import org.bukkit.Bukkit;
 
 import java.util.Arrays;
 
 public enum Version {
 
-    v1_8_R3(47),
-    v1_12_R1(335),
-    v1_13_R2(393),
-    v1_14_R1(477),
-    v1_15_R1(573),
-    UNKNOWN(0);
+    v1_8_R3(47, 47),
+    v1_12_R1(335, 340),
+    v1_13_R2(393, 404),
+    v1_14_R1(477, 498),
+    v1_15_R1(573, 578),
+    UNKNOWN(0, 0);
 
     public static final Version VERSION;
 
@@ -22,33 +21,19 @@ public enum Version {
                 .filter(v -> v.name().equals(rawVersion)).findFirst().orElse(Version.UNKNOWN);
     }
 
-    @Getter
-    private final int protocol;
+    public final int minProtocol;
+    public final int maxProtocol;
 
-    Version(int protocol) {
-        this.protocol = protocol;
+    Version(final int minProtocol, final int maxProtocol) {
+        this.minProtocol = minProtocol;
+        this.maxProtocol = maxProtocol;
     }
 
-    public static Version getNearest(final int protocol) {
-        if (protocol >= v1_15_R1.protocol) {
-            return v1_15_R1;
-        } else if (protocol >= v1_14_R1.protocol) {
-            return v1_14_R1;
-        } else if (protocol >= v1_13_R2.protocol) {
-            return v1_13_R2;
-        } else if (protocol >= v1_12_R1.protocol) {
-            return v1_12_R1;
-        } else if (protocol >= v1_8_R3.protocol) {
-            return v1_8_R3;
-        }
-        return UNKNOWN;
-    }
-
-    public boolean isNewer(final Version version) {
-        return this.protocol >= version.getProtocol();
-    }
-
-    public boolean isOlder(final Version version) {
-        return this.protocol <= version.getProtocol();
+    public static Version getVersion(final int protocol) {
+        return Arrays
+                .stream(values())
+                .filter(v -> v.maxProtocol >= protocol && v.minProtocol <= protocol)
+                .findFirst()
+                .orElse(Version.UNKNOWN);
     }
 }

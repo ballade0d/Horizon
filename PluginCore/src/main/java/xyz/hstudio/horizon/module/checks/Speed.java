@@ -122,15 +122,7 @@ public class Speed extends Module<SpeedData, SpeedNode> {
                 return;
             }
 
-            /*
-            boolean swimming = AABB.waterCollisionBox
-                    .shrink(0.01, 0.01, 0.01)
-                    .add(e.from.toVector())
-                    .getMaterials(e.to.world)
-                    .stream()
-                    .anyMatch(MatUtils::isLiquid);
-             */
-            boolean swimming = player.isInLiquid;
+            boolean swimming = player.isInLiquidStrict;
             boolean usingItem = player.isEating || player.isPullingBow || player.isBlocking;
 
             double estimatedSpeed;
@@ -205,7 +197,7 @@ public class Speed extends Module<SpeedData, SpeedNode> {
                     }
                     data.discrepancies = 0;
                 } else {
-                    reward("TypeA", data, 0.99);
+                    reward("Predict", data, 0.99);
                 }
                 data.negativeDiscrepancies = 0;
                 data.negativeDiscrepanciesCumulative = 0;
@@ -319,9 +311,9 @@ public class Speed extends Module<SpeedData, SpeedNode> {
             double angle = MathUtils.angle(yawVec, moveForce);
             if (angle > Math.PI / 4 + 0.3) {
                 // Punish
-                this.punish(event, player, data, "TypeB", 4, "a:" + angle, "y:" + yaw);
+                this.punish(event, player, data, "Sprint", 4, "a:" + angle, "y:" + yaw);
             } else {
-                reward("TypeB", data, 0.99);
+                reward("Sprint", data, 0.99);
             }
 
             data.collisionHorizontal = collisionHorizontal;
@@ -333,12 +325,12 @@ public class Speed extends Module<SpeedData, SpeedNode> {
             MoveEvent e = (MoveEvent) event;
             if (e.strafeNormally) {
                 data.typeCFails = data.typeCFails > 0 ? data.typeCFails - 1 : 0;
-                reward("TypeB", data, 0.995);
+                reward("Strafe", data, 0.995);
                 return;
             }
             if (++data.typeCFails > config.strafe_threshold) {
                 // Punish
-                this.punish(event, player, data, "TypeC", 2);
+                this.punish(event, player, data, "Strafe", 2);
             }
         }
     }

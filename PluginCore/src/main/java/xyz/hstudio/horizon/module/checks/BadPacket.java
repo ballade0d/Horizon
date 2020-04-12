@@ -58,7 +58,7 @@ public class BadPacket extends Module<BadPacketData, BadPacketNode> {
      */
     private void typeA(final Event event, final HoriPlayer player, final BadPacketData data, final BadPacketNode config) {
         if (event instanceof KeepAliveRespondEvent) {
-            if (player.player.isDead() || player.currentTick < 10) {
+            if (player.player.isDead() || player.currentTick < 20 || player.teleports.size() > 0) {
                 return;
             }
             // A player should send 20 move packets(1.8.8 or lower)
@@ -67,7 +67,7 @@ public class BadPacket extends Module<BadPacketData, BadPacketNode> {
             // but send KeepAlive packets, the player is definitely cheating.
             if (player.currentTick == data.lastTick) {
                 // Punish
-                this.punish(event, player, data, "TypeA", 5);
+                // this.punish(event, player, data, "TypeA", 5);
             } else {
                 reward("TypeA", data, 0.99);
             }
@@ -86,12 +86,13 @@ public class BadPacket extends Module<BadPacketData, BadPacketNode> {
     private void typeB(final Event event, final HoriPlayer player, final BadPacketData data, final BadPacketNode config) {
         if (event instanceof MoveEvent) {
             MoveEvent e = (MoveEvent) event;
-            if (e.moveType != MoveEvent.MoveType.FLYING || e.isTeleport || System.currentTimeMillis() - player.lastTeleportAcceptTick < 1000L) {
+            if (e.moveType != MoveEvent.MoveType.FLYING || e.isTeleport || player.teleports.size() > 0 ||
+                    System.currentTimeMillis() - player.lastTeleportAcceptTick < 1000L) {
                 data.flyingCount = 0;
                 return;
             }
             // A player can send only 19 flying packets in a row.
-            if (++data.flyingCount > 20) {
+            if (++data.flyingCount > 21) {
                 // Punish
                 this.punish(event, player, data, "TypeB", 5);
             } else if (data.flyingCount == 0) {

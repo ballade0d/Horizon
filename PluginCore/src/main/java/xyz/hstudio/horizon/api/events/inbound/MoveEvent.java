@@ -39,6 +39,7 @@ public class MoveEvent extends Event {
     public final boolean isOnSlime;
     public final boolean isOnBed;
     public final Vector3D waterFlowForce;
+    public final boolean isInLiquidStrict;
     public final boolean isInLiquid;
     public final float oldFriction;
     public final float newFriction;
@@ -77,10 +78,9 @@ public class MoveEvent extends Event {
 
         Pair<Vector3D, Boolean> pair = this.computeWaterFlowForce();
         this.waterFlowForce = pair.key;
-        //this.isInLiquid = pair.value;
+        this.isInLiquidStrict = pair.value;
 
         this.isInLiquid = AABB.NORMAL_BOX
-                .shrink(0, 0.1, 0)
                 .add(this.from.toVector())
                 .getMaterials(to.world)
                 .stream()
@@ -402,6 +402,7 @@ public class MoveEvent extends Event {
         player.prevPrevDeltaY = player.velocity.y;
         player.velocity = this.velocity;
         player.touchingFaces = this.touchingFaces;
+        player.isInLiquidStrict = this.isInLiquidStrict;
         player.isInLiquid = this.isInLiquid;
     }
 
