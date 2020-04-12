@@ -54,9 +54,6 @@ public class HealthTag extends Module<Data, HealthTagNode> {
 
     @Override
     public void doCheck(final Event event, final HoriPlayer player, final Data data, final HealthTagNode config) {
-        if (!config.typeA_enabled) {
-            return;
-        }
         if (event instanceof MetaEvent) {
             try {
                 event.rawPacket = this.impl.spoofHealth(player, event.rawPacket);

@@ -112,6 +112,7 @@ public class Horizon extends JavaPlugin {
         new BlockUtils();
 
         // Enable checks
+        new AntiBot();
         new AntiVelocity();
         new BadPacket();
         new GroundSpoof();

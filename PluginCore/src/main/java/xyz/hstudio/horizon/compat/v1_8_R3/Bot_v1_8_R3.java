@@ -8,6 +8,7 @@ import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_8_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_8_R3.util.CraftChatMessage;
 import org.bukkit.entity.Player;
 import xyz.hstudio.horizon.compat.IBot;
 import xyz.hstudio.horizon.data.HoriPlayer;
@@ -43,6 +44,7 @@ public class Bot_v1_8_R3 implements IBot {
         PlayerInteractManager playerInteractManager = new PlayerInteractManager(worldServer);
         EntityPlayer entityPlayer = new EntityPlayer(minecraftServer, worldServer, profile, playerInteractManager);
         Location backLoc = player.getLocation();
+        entityPlayer.listName = CraftChatMessage.fromString("§f" + name)[0];
         entityPlayer.setInvisible(false);
         entityPlayer.setLocation(backLoc.getX(), backLoc.getY(), backLoc.getZ(), backLoc.getYaw(), backLoc.getPitch());
         this.entityPlayer = entityPlayer;

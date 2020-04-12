@@ -1,3 +1,11 @@
+antibot:
+  enabled: true
+  # Unused in this check
+  cancel_vl: -1
+  enable_worlds:
+    - '*'
+  # Unused in this check
+  action: {}
 antivelocity:
   enabled: true
   cancel_vl: 1
@@ -63,8 +71,6 @@ healthtag:
   cancel_vl: 0
   enable_worlds:
     - '*'
-  typeA:
-    enabled: true
   # Unused in this check
   action: {}
 invalidmotion:
