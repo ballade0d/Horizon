@@ -20,7 +20,6 @@ import java.util.stream.Collectors;
 
 public class Commands implements TabCompleter, CommandExecutor {
 
-    // CommandSender, String[], String, Lang
     private final List<Pair<Cmd, Integer>> commands = new ArrayList<>();
 
     public Commands() {
@@ -41,7 +40,7 @@ public class Commands implements TabCompleter, CommandExecutor {
             command.setTabCompleter(this);
             command.setExecutor(this);
         } catch (Exception e) {
-            throw new IllegalStateException("Failed to register commands!");
+            throw new IllegalStateException("Failed to register commands!", e);
         }
         Method[] methods = this.getClass().getMethods();
         for (int i = 0; i < methods.length; i++) {

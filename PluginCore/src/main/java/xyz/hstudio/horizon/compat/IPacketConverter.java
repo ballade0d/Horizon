@@ -5,7 +5,7 @@ import xyz.hstudio.horizon.data.HoriPlayer;
 
 public interface IPacketConverter {
 
-    Event convertIn(final HoriPlayer player, final Object packet);
+    Event convertIn(HoriPlayer player, Object packet);
 
-    Event convertOut(final HoriPlayer player, final Object packet);
+    Event convertOut(HoriPlayer player, Object packet);
 }

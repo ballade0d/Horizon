@@ -6,6 +6,9 @@ import java.security.PrivateKey;
 
 public class RSA {
 
+    private RSA() {
+    }
+
     public static byte[] decrypt(final byte[] raw, final PrivateKey privateKey) throws Exception {
         Cipher cipher = Cipher.getInstance("RSA");
         cipher.init(Cipher.DECRYPT_MODE, privateKey);

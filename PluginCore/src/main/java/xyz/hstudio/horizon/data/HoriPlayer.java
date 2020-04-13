@@ -83,7 +83,6 @@ public class HoriPlayer {
         Version pVer = Horizon.getInst().usePSupport ?
                 Version.getVersion(ProtocolSupportAPI.getProtocolVersion(player).getId()) : Version.VERSION;
         this.protocol = viaVer == Version.VERSION ? pVer.minProtocol : viaVer.minProtocol;
-        System.out.println(protocol);
         this.player = player;
         this.pipeline = McAccessor.INSTANCE.getPipeline(player);
 
@@ -204,5 +203,14 @@ public class HoriPlayer {
     @Override
     public int hashCode() {
         return this.player.getUniqueId().hashCode();
+    }
+
+    @Override
+    public boolean equals(final Object object) {
+        if (!(object instanceof HoriPlayer)) {
+            return false;
+        }
+        HoriPlayer player = (HoriPlayer) object;
+        return this.player.getUniqueId().equals(player.player.getUniqueId());
     }
 }

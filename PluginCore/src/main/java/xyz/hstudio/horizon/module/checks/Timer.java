@@ -14,7 +14,7 @@ public class Timer extends Module<TimerData, TimerNode> {
     private static final long MULTIPLIER = (long) 1E6;
 
     public Timer() {
-        super(ModuleType.Timer, new TimerNode());
+        super(ModuleType.Timer, new TimerNode(), "TypeA");
     }
 
     @Override
@@ -23,7 +23,7 @@ public class Timer extends Module<TimerData, TimerNode> {
     }
 
     @Override
-    public void cancel(final Event event, final String type, final HoriPlayer player, final TimerData data, final TimerNode config) {
+    public void cancel(final Event event, final int type, final HoriPlayer player, final TimerData data, final TimerNode config) {
         event.setCancelled(true);
         Sync.teleport(player, player.position);
     }
@@ -72,7 +72,7 @@ public class Timer extends Module<TimerData, TimerNode> {
             if (diff < -config.typeA_allow_ms) {
                 if (++data.fails > 4) {
                     // Punish
-                    this.punish(event, player, data, "TypeA", (float) (-diff / 50F * 2F),
+                    this.punish(event, player, data, 0, (float) (-diff / 50F * 2F),
                             "d:" + diff, "s:" + (-diff / 50));
 
                     // Reset drift to -45 to stop spam-flagging.
@@ -81,7 +81,7 @@ public class Timer extends Module<TimerData, TimerNode> {
             } else if (data.fails > 0) {
                 data.fails--;
             } else {
-                reward("TypeA", data, 0.995);
+                reward(0, data, 0.995);
             }
             // Reduce drift
             // Inspired by Islandscout, I'll credit him.

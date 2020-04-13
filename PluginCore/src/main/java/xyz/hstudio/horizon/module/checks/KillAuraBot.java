@@ -21,7 +21,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public class KillAuraBot extends Module<KillAuraBotData, KillAuraBotNode> {
 
     public KillAuraBot() {
-        super(ModuleType.KillAuraBot, new KillAuraBotNode());
+        super(ModuleType.KillAuraBot, new KillAuraBotNode(), "Bot");
     }
 
     @Override
@@ -30,7 +30,7 @@ public class KillAuraBot extends Module<KillAuraBotData, KillAuraBotNode> {
     }
 
     @Override
-    public void cancel(final Event event, final String type, final HoriPlayer player, final KillAuraBotData data, final KillAuraBotNode config) {
+    public void cancel(final Event event, final int type, final HoriPlayer player, final KillAuraBotData data, final KillAuraBotNode config) {
     }
 
     @Override
@@ -77,7 +77,7 @@ public class KillAuraBot extends Module<KillAuraBotData, KillAuraBotNode> {
             InteractCSEntityEvent e = (InteractCSEntityEvent) event;
             if (e.id == data.bot.getId()) {
                 // Punish
-                this.punish(event, player, data, "Bot", 1);
+                this.punish(event, player, data, 0, 1);
             }
         }
     }

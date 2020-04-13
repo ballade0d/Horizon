@@ -22,7 +22,7 @@ public class KillAura extends Module<KillAuraData, KillAuraNode> {
     private static final double EXPANDER = Math.pow(2, 24);
 
     public KillAura() {
-        super(ModuleType.KillAura, new KillAuraNode());
+        super(ModuleType.KillAura, new KillAuraNode(), "Order", "SuperKb", "GCD", "Direction", "InteractAutoBlock", "NormalAutoBlock");
     }
 
     @Override
@@ -31,15 +31,11 @@ public class KillAura extends Module<KillAuraData, KillAuraNode> {
     }
 
     @Override
-    public void cancel(final Event event, final String type, final HoriPlayer player, final KillAuraData data, final KillAuraNode config) {
+    public void cancel(final Event event, final int type, final HoriPlayer player, final KillAuraData data, final KillAuraNode config) {
         // TODO: Finish this
-        switch (type) {
-            case "TypeE":
-            case "TypeF": {
-                McAccessor.INSTANCE.releaseItem(player.player);
-                player.player.updateInventory();
-                break;
-            }
+        if (type == 4 || type == 5) {
+            McAccessor.INSTANCE.releaseItem(player.player);
+            player.player.updateInventory();
         }
     }
 
@@ -93,13 +89,13 @@ public class KillAura extends Module<KillAuraData, KillAuraNode> {
                 if (data.typeAFails > 0) {
                     data.typeAFails--;
                 } else {
-                    reward("Order", data, 0.999);
+                    reward(0, data, 0.999);
                 }
                 return;
             }
             if (++data.typeAFails > 5) {
                 // Punish
-                this.punish(event, player, data, "Order", 4, "d:" + deltaT);
+                this.punish(event, player, data, 0, 4, "d:" + deltaT);
             }
         }
     }
@@ -134,9 +130,9 @@ public class KillAura extends Module<KillAuraData, KillAuraNode> {
             long deltaT = player.currentTick - data.failTypeBTick;
             if (deltaT == 0) {
                 // Punish
-                this.punish(event, player, data, "SuperKb", 5, "d:" + deltaT);
+                this.punish(event, player, data, 1, 5, "d:" + deltaT);
             } else {
-                reward("SuperKb", data, 0.999);
+                reward(1, data, 0.999);
             }
         }
     }
@@ -174,12 +170,12 @@ public class KillAura extends Module<KillAuraData, KillAuraNode> {
             if (gcd <= 131072) {
                 if (++data.gcdFails > 5) {
                     // Punish
-                    this.punish(event, player, data, "GCD", 3, "g:" + gcd);
+                    this.punish(event, player, data, 2, 3, "g:" + gcd);
                 }
             } else if (data.gcdFails > 0) {
                 data.gcdFails--;
             } else {
-                reward("GCD", data, 0.999);
+                reward(2, data, 0.999);
             }
 
             data.lastPitchChange = pitchChange;
@@ -212,12 +208,12 @@ public class KillAura extends Module<KillAuraData, KillAuraNode> {
             if (!e.strafeNormally) {
                 if (++data.typeDFails > 4) {
                     // Punish
-                    this.punish(event, player, data, "Direction", 3);
+                    this.punish(event, player, data, 3, 3);
                 }
             } else if (data.typeDFails > 0) {
                 data.typeDFails--;
             } else {
-                reward("Direction", data, 0.999);
+                reward(3, data, 0.999);
             }
         } else if (event instanceof InteractEntityEvent) {
             InteractEntityEvent e = (InteractEntityEvent) event;
@@ -259,9 +255,9 @@ public class KillAura extends Module<KillAuraData, KillAuraNode> {
 
             if (dirA.dot(dirB) < 0) {
                 // Punish
-                this.punish(event, player, data, "InteractAutoBlock", 5);
+                this.punish(event, player, data, 4, 5);
             } else {
-                reward("InteractAutoBlock", data, 0.99);
+                reward(4, data, 0.99);
             }
 
             data.intersection = null;
@@ -307,9 +303,9 @@ public class KillAura extends Module<KillAuraData, KillAuraNode> {
             }
             if (player.currentTick - data.lastHitTickF < 2) {
                 // Punish
-                this.punish(event, player, data, "NormalAutoBlock", 5);
+                this.punish(event, player, data, 5, 5);
             } else {
-                reward("NormalAutoBlock", data, 0.99);
+                reward(5, data, 0.99);
             }
         }
     }

@@ -24,5 +24,5 @@ public abstract class CustomCheck<T extends CustomConfig> {
         this.vlMap.computeIfPresent(player, (k, v) -> v * this.rewardMultiplier);
     }
 
-    public abstract void doCheck(final Event event, final HoriPlayer player, final T config);
+    public abstract void doCheck(Event event, HoriPlayer player, T config);
 }

@@ -11,27 +11,27 @@ public interface IBot {
     Material[] BOOTS = new Material[]{Material.LEATHER_BOOTS, Material.IRON_BOOTS, Material.CHAINMAIL_BOOTS, Material.DIAMOND_BOOTS};
     Material[] HAND = new Material[]{Material.GOLDEN_APPLE, Material.DIAMOND_SWORD, Material.IRON_SWORD, Material.STONE_SWORD, Material.DIAMOND_PICKAXE, Material.COOKED_BEEF};
 
-    void spawn(final HoriPlayer player);
+    void spawn(HoriPlayer player);
 
-    void removeFromTabList(final HoriPlayer player);
+    void removeFromTabList(HoriPlayer player);
 
-    void despawn(final HoriPlayer player);
+    void despawn(HoriPlayer player);
 
-    void updatePing(final HoriPlayer player);
+    void updatePing(HoriPlayer player);
 
-    void setSneaking(final boolean sneaking);
+    void setSneaking(boolean sneaking);
 
-    void setSprinting(final boolean sprinting);
+    void setSprinting(boolean sprinting);
 
-    void updateStatus(final HoriPlayer player);
+    void updateStatus(HoriPlayer player);
 
-    void swingArm(final HoriPlayer player);
+    void swingArm(HoriPlayer player);
 
-    void damage(final HoriPlayer player);
+    void damage(HoriPlayer player);
 
-    void move(final double x, final double y, final double z, final float yaw, final float pitch, final HoriPlayer player);
+    void move(double x, double y, double z, float yaw, float pitch, HoriPlayer player);
 
-    void setArmor(final HoriPlayer player);
+    void setArmor(HoriPlayer player);
 
     int getId();
 

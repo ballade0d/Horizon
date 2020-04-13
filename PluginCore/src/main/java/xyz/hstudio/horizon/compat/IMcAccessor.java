@@ -13,47 +13,47 @@ import xyz.hstudio.horizon.util.wrap.Vector3D;
 
 public interface IMcAccessor {
 
-    ChannelPipeline getPipeline(final Player player);
+    ChannelPipeline getPipeline(Player player);
 
     /**
      * Fast sin method by using nms's ones.
      */
-    float sin(final float v);
+    float sin(float v);
 
     /**
      * Fast cos method by using nms's ones.
      */
-    float cos(final float v);
+    float cos(float v);
 
     /**
      * Check if a player has no hit cooldown.
      */
-    boolean isAccumulated(final Player player);
+    boolean isAccumulated(Player player);
 
     /**
      * Get the friction of a block.
      */
-    float getFriction(final Block block);
+    float getFriction(Block block);
 
     /**
      * Get the bounding box of an entity.
      */
-    AABB getCube(final Entity entity);
+    AABB getCube(Entity entity);
 
     /**
      * Run a task in the main thread.
      */
-    void ensureMainThread(final Runnable task);
+    void ensureMainThread(Runnable task);
 
     /**
      * Get the entity in a specified world by id
      */
-    Entity getEntity(final World world, final int id);
+    Entity getEntity(World world, int id);
 
     /**
      * Get the voxel shapes of a block.
      */
-    AABB[] getBoxes(final HoriPlayer player, final Block block);
+    AABB[] getBoxes(HoriPlayer player, Block block);
 
     /**
      * Create a new transaction packet.
@@ -63,35 +63,35 @@ public interface IMcAccessor {
     /**
      * Get the flow direction of liquid
      */
-    Vector3D getFlowDirection(final Block block);
+    Vector3D getFlowDirection(Block block);
 
     /**
      * Stop a player from using item.
      */
-    void releaseItem(final Player player);
+    void releaseItem(Player player);
 
     /**
      * Check if a block is solid
      */
-    boolean isSolid(final Block block);
+    boolean isSolid(Block block);
 
     /**
      * Check if player is colliding entities
      */
-    boolean isCollidingEntities(final World world, final Player player, final AABB aabb);
+    boolean isCollidingEntities(World world, Player player, AABB aabb);
 
     /**
      * Set onGround statue of a move packet.
      */
-    void setOnGround(final MoveEvent e, final boolean onGround);
+    void setOnGround(MoveEvent e, boolean onGround);
 
     /**
      * Create an explosion packet
      */
-    Object createExplosionPacket(final double x, final double y, final double z);
+    Object createExplosionPacket(double x, double y, double z);
 
     /**
      * Update a block with its data for player
      */
-    void updateBlock(final HoriPlayer player, final Location loc);
+    void updateBlock(HoriPlayer player, Location loc);
 }

@@ -12,7 +12,7 @@ import xyz.hstudio.horizon.util.enums.MatUtils;
 public class AntiVelocity extends Module<AntiVelocityData, AntiVelocityNode> {
 
     public AntiVelocity() {
-        super(ModuleType.AntiVelocity, new AntiVelocityNode());
+        super(ModuleType.AntiVelocity, new AntiVelocityNode(), "TypeA");
     }
 
     @Override
@@ -21,7 +21,7 @@ public class AntiVelocity extends Module<AntiVelocityData, AntiVelocityNode> {
     }
 
     @Override
-    public void cancel(final Event event, final String type, final HoriPlayer player, final AntiVelocityData data, final AntiVelocityNode config) {
+    public void cancel(final Event event, final int type, final HoriPlayer player, final AntiVelocityData data, final AntiVelocityNode config) {
     }
 
     @Override
@@ -47,9 +47,9 @@ public class AntiVelocity extends Module<AntiVelocityData, AntiVelocityNode> {
             }
             if (e.failedKnockBack && !e.collidingBlocks.contains(MatUtils.COBWEB.parse()) && !e.isTeleport && e.to.y > 0) {
                 // Punish
-                this.punish(event, player, data, "TypeA", 4);
+                this.punish(event, player, data, 0, 4);
             } else {
-                reward("TypeA", data, 0.999);
+                reward(0, data, 0.999);
             }
         }
     }

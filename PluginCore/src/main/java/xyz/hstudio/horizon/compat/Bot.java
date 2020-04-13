@@ -10,6 +10,9 @@ import xyz.hstudio.horizon.util.enums.Version;
 
 public class Bot {
 
+    private Bot() {
+    }
+
     public static IBot createBot(final Player player, final boolean realisticName) {
         switch (Version.VERSION) {
             case v1_8_R3:

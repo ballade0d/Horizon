@@ -13,7 +13,7 @@ import xyz.hstudio.horizon.util.wrap.Location;
 public class GroundSpoof extends Module<GroundSpoofData, GroundSpoofNode> {
 
     public GroundSpoof() {
-        super(ModuleType.GroundSpoof, new GroundSpoofNode());
+        super(ModuleType.GroundSpoof, new GroundSpoofNode(), "TypeA");
     }
 
     @Override
@@ -22,7 +22,7 @@ public class GroundSpoof extends Module<GroundSpoofData, GroundSpoofNode> {
     }
 
     @Override
-    public void cancel(final Event event, final String type, final HoriPlayer player, final GroundSpoofData data, final GroundSpoofNode config) {
+    public void cancel(final Event event, final int type, final HoriPlayer player, final GroundSpoofData data, final GroundSpoofNode config) {
         McAccessor.INSTANCE.setOnGround((MoveEvent) event, false);
     }
 
@@ -62,9 +62,9 @@ public class GroundSpoof extends Module<GroundSpoofData, GroundSpoofNode> {
                 e.onGround = false;
 
                 // Punish
-                this.punish(event, player, data, "TypeA", 3);
+                this.punish(event, player, data, 0, 3);
             } else {
-                reward("TypeA", data, 0.999);
+                reward(0, data, 0.999);
             }
         }
     }

@@ -15,6 +15,9 @@ import java.util.*;
 
 public class BlockUtils {
 
+    private BlockUtils() {
+    }
+
     private static final Set<Material> SOLID = EnumSet.noneOf(Material.class);
     public static final Set<Material> SHULKER_BOX = EnumSet.noneOf(Material.class);
 

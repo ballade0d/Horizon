@@ -30,8 +30,8 @@
             <url>https://repo.viaversion.com/</url>
         </repository>
         <repository>
-            <id>protocolsupport</id>
-            <url>https://jitpack.io/</url>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
         </repository>
     </repositories>
 
@@ -90,11 +90,10 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>protocolsupport</groupId>
+            <groupId>com.github.ProtocolSupport</groupId>
             <artifactId>ProtocolSupport</artifactId>
-            <version>4.28</version>
-            <systemPath>D:/Minecraft/Plugin/Depends/ProtocolSupport.jar</systemPath>
-            <scope>system</scope>
+            <version>513e8f0371</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 

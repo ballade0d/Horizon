@@ -9,6 +9,9 @@ import xyz.hstudio.horizon.util.enums.Version;
 
 public class McAccessor {
 
+    private McAccessor() {
+    }
+
     public static final IMcAccessor INSTANCE;
 
     static {

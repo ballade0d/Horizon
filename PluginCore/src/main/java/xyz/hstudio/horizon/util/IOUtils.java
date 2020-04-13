@@ -5,6 +5,9 @@ import java.io.Reader;
 
 public class IOUtils {
 
+    private IOUtils() {
+    }
+
     public static String toString(final Reader reader) {
         try {
             BufferedReader in = new BufferedReader(reader);

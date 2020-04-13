@@ -20,7 +20,7 @@ import xyz.hstudio.horizon.util.wrap.Vector3D;
 public class HitBox extends Module<HitBoxData, HitBoxNode> {
 
     public HitBox() {
-        super(ModuleType.HitBox, new HitBoxNode());
+        super(ModuleType.HitBox, new HitBoxNode(), "TypeA");
     }
 
     @Override
@@ -29,7 +29,7 @@ public class HitBox extends Module<HitBoxData, HitBoxNode> {
     }
 
     @Override
-    public void cancel(final Event event, final String type, final HoriPlayer player, final HitBoxData data, final HitBoxNode config) {
+    public void cancel(final Event event, final int type, final HoriPlayer player, final HitBoxData data, final HitBoxNode config) {
         event.setCancelled(true);
     }
 
@@ -88,9 +88,9 @@ public class HitBox extends Module<HitBoxData, HitBoxNode> {
 
             if (reach > config.typeA_max_reach) {
                 // Punish
-                this.punish(event, player, data, "TypeA", (float) ((reach - config.typeA_max_reach) * 10));
+                this.punish(event, player, data, 0, (float) ((reach - config.typeA_max_reach) * 10));
             } else {
-                reward("TypeA", data, 0.995);
+                reward(0, data, 0.995);
             }
         }
     }

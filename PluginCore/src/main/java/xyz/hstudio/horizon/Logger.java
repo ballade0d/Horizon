@@ -5,6 +5,9 @@ import org.bukkit.command.ConsoleCommandSender;
 
 public class Logger {
 
+    private Logger() {
+    }
+
     private static final ConsoleCommandSender SENDER = Bukkit.getConsoleSender();
 
     public static void msg(final String prefix, final Object object) {

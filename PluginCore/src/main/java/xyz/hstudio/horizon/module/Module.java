@@ -20,17 +20,18 @@ import java.util.*;
 
 public abstract class Module<K extends Data, V extends CheckFile> {
 
-    // Use LinkedHashMap to keep the check order.
     public static final Map<ModuleType, Module<? extends Data, ? extends CheckFile>> MODULE_MAP = new LinkedHashMap<>(16, 1);
     public static final List<CustomCheck<? extends CustomConfig>> CUSTOM_CHECKS = new LinkedList<>();
 
     private final ModuleType moduleType;
     @Getter
     private final V config;
+    private final String[] types;
 
-    public Module(final ModuleType moduleType, final V config) {
+    public Module(final ModuleType moduleType, final V config, final String... types) {
         this.moduleType = moduleType;
         this.config = AbstractFile.load(moduleType.name().toLowerCase(), config, Horizon.getInst().checkLoader);
+        this.types = types;
         Module.MODULE_MAP.put(moduleType, this);
     }
 
@@ -61,14 +62,14 @@ public abstract class Module<K extends Data, V extends CheckFile> {
     /**
      * Punish a player.
      */
-    protected void punish(final Event event, final HoriPlayer player, final K data, final String type, final float weight, final String... args) {
+    protected void punish(final Event event, final HoriPlayer player, final K data, final int type, final float weight, final String... args) {
         this.punish(event, player, data, type, weight, false, args);
     }
 
     /**
      * Punish a player.
      */
-    protected void punish(final Event event, final HoriPlayer player, final K data, final String type, final float weight, final boolean cancel, final String... args) {
+    protected void punish(final Event event, final HoriPlayer player, final K data, final int type, final float weight, final boolean cancel, final String... args) {
         float oldViolation = data.violations.getOrDefault(type, 0F);
         float nowViolation = oldViolation + weight;
 
@@ -103,7 +104,7 @@ public abstract class Module<K extends Data, V extends CheckFile> {
             player.sendMessage(Horizon.getInst().config.prefix + player.getLang().verbose
                     .replace("%player%", player.player.getName())
                     .replace("%check%", this.moduleType.name())
-                    .replace("%type%", type)
+                    .replace("%type%", this.types[type])
                     .replace("%vl_total%", String.valueOf(nowViolation))
                     .replace("%vl_addition%", String.valueOf(weight))
                     .replace("%ping%", String.valueOf(player.ping))
@@ -114,7 +115,7 @@ public abstract class Module<K extends Data, V extends CheckFile> {
             Async.LOG.addLast(Horizon.getInst().getLang(Horizon.getInst().config.personalized_themes_default_lang).verbose
                     .replace("%player%", player.player.getName())
                     .replace("%check%", this.moduleType.name())
-                    .replace("%type%", type)
+                    .replace("%type%", this.types[type])
                     .replace("%vl_total%", String.valueOf(nowViolation))
                     .replace("%vl_addition%", String.valueOf(weight))
                     .replace("%ping%", String.valueOf(player.ping))
@@ -125,17 +126,17 @@ public abstract class Module<K extends Data, V extends CheckFile> {
         data.lastFailTick = player.currentTick;
     }
 
-    protected void reward(final String type, final K data, final double multiplier) {
+    protected void reward(final int type, final K data, final double multiplier) {
         float nowViolation = data.violations.getOrDefault(type, 0F);
         nowViolation *= multiplier;
         data.violations.put(type, nowViolation);
     }
 
-    public abstract K getData(final HoriPlayer player);
+    public abstract K getData(HoriPlayer player);
 
-    public abstract void cancel(final Event event, final String type, final HoriPlayer player, final K data, final V config);
+    public abstract void cancel(Event event, int type, HoriPlayer player, K data, V config);
 
-    public abstract void doCheck(final Event event, final HoriPlayer player, final K data, final V config);
+    public abstract void doCheck(Event event, HoriPlayer player, K data, V config);
 
     public void tickAsync(final long currentTick, final V config) {
     }

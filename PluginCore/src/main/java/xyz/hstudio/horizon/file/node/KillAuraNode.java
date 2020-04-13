@@ -17,7 +17,7 @@ public class KillAuraNode extends CheckFile {
     @Load(path = "gcd.enabled")
     public boolean gcd_enabled = true;
     @Load(path = "gcd.strict")
-    public boolean gcd_strict = true;
+    public boolean gcd_strict = false;
     // Direction
     @Load(path = "direction.enabled")
     public boolean direction_enabled = true;

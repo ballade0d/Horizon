@@ -12,7 +12,7 @@ import xyz.hstudio.horizon.module.Module;
 public class NoSwing extends Module<NoSwingData, NoSwingNode> {
 
     public NoSwing() {
-        super(ModuleType.NoSwing, new NoSwingNode());
+        super(ModuleType.NoSwing, new NoSwingNode(), "TypeA");
     }
 
     @Override
@@ -21,7 +21,7 @@ public class NoSwing extends Module<NoSwingData, NoSwingNode> {
     }
 
     @Override
-    public void cancel(final Event event, final String type, final HoriPlayer player, final NoSwingData data, final NoSwingNode config) {
+    public void cancel(final Event event, final int type, final HoriPlayer player, final NoSwingData data, final NoSwingNode config) {
         event.setCancelled(true);
     }
 
@@ -42,9 +42,9 @@ public class NoSwing extends Module<NoSwingData, NoSwingNode> {
             }
             if (data.animationExpected) {
                 // Punish
-                this.punish(event, player, data, "TypeA", 5);
+                this.punish(event, player, data, 0, 5);
             } else {
-                reward("TypeA", data, 0.999);
+                reward(0, data, 0.999);
             }
             data.animationExpected = true;
         }

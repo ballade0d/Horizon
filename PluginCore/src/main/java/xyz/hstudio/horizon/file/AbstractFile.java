@@ -7,7 +7,7 @@ import java.lang.reflect.Field;
 
 public abstract class AbstractFile {
 
-    public abstract Object getValue(final String path, final YamlLoader loader, final Class<?> type);
+    public abstract Object getValue(String path, YamlLoader loader, Class<?> type);
 
     public static <T extends AbstractFile> T load(final String pathPrefix, final T instance, final YamlLoader loader) {
         Field[] fields = instance.getClass().getFields();

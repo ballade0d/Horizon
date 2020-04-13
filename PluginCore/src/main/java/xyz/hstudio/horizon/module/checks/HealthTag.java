@@ -49,7 +49,7 @@ public class HealthTag extends Module<Data, HealthTagNode> {
     }
 
     @Override
-    public void cancel(final Event event, final String type, final HoriPlayer player, final Data data, final HealthTagNode config) {
+    public void cancel(final Event event, final int type, final HoriPlayer player, final Data data, final HealthTagNode config) {
     }
 
     @Override
@@ -63,7 +63,7 @@ public class HealthTag extends Module<Data, HealthTagNode> {
     }
 
     private interface Impl {
-        Object spoofHealth(final HoriPlayer player, final Object packet) throws IOException;
+        Object spoofHealth(HoriPlayer player, Object packet) throws IOException;
     }
 
     private static class Impl_v1_8_R3 implements Impl {

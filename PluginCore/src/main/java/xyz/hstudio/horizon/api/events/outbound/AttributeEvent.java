@@ -43,6 +43,8 @@ public class AttributeEvent extends Event {
                         // Idk what operation 1 do, figure it out sometime.
                         player.moveFactor += player.moveFactor * modifier.value;
                         break;
+                    default:
+                        break;
                 }
             }
             break;

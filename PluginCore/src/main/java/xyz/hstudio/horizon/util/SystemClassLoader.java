@@ -5,6 +5,9 @@ import java.lang.reflect.Method;
 
 public class SystemClassLoader {
 
+    private SystemClassLoader() {
+    }
+
     private static ClassLoader LOADER;
     private static Method DEFINE;
 

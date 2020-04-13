@@ -2,6 +2,7 @@ package xyz.hstudio.horizon;
 
 import lombok.Getter;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 import xyz.hstudio.horizon.command.Commands;
@@ -111,7 +112,7 @@ public class Horizon extends JavaPlugin {
         new Listeners();
         new Commands();
         // Load static code block
-        new BlockUtils();
+        BlockUtils.isSolid(Material.AIR);
 
         // Enable checks
         new AntiBot();

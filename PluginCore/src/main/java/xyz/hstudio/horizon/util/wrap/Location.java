@@ -194,8 +194,8 @@ public class Location implements Cloneable {
     public Location clone() {
         try {
             return (Location) super.clone();
-        } catch (CloneNotSupportedException var2) {
-            throw new Error(var2);
+        } catch (CloneNotSupportedException e) {
+            throw new IllegalStateException(e);
         }
     }
 }

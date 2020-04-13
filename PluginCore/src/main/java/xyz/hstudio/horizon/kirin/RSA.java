@@ -6,6 +6,9 @@ import java.security.PublicKey;
 
 public class RSA {
 
+    private RSA() {
+    }
+
     public static byte[] encrypt(final byte[] raw, final PublicKey publicKey) throws Exception {
         Cipher cipher = Cipher.getInstance("RSA");
         cipher.init(Cipher.ENCRYPT_MODE, publicKey);

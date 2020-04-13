@@ -16,7 +16,7 @@ import java.util.List;
 
 class Module {
 
-    public Module(final Horizon horizon) throws Exception {
+    Module(final Horizon horizon) throws Exception {
         Bukkit.getConsoleSender().sendMessage("(H|Kirin) Verified successfully!");
         Bukkit.getConsoleSender().sendMessage("(H|Kirin) Hello {user} <3");
 

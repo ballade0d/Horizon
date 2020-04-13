@@ -13,7 +13,7 @@ import xyz.hstudio.horizon.module.Module;
 public class Inventory extends Module<InventoryData, InventoryNode> {
 
     public Inventory() {
-        super(ModuleType.Inventory, new InventoryNode());
+        super(ModuleType.Inventory, new InventoryNode(), "TypeA");
     }
 
     @Override
@@ -22,7 +22,7 @@ public class Inventory extends Module<InventoryData, InventoryNode> {
     }
 
     @Override
-    public void cancel(final Event event, final String type, final HoriPlayer player, final InventoryData data, final InventoryNode config) {
+    public void cancel(final Event event, final int type, final HoriPlayer player, final InventoryData data, final InventoryNode config) {
         McAccessor.INSTANCE.ensureMainThread(() -> player.player.closeInventory());
     }
 
@@ -84,7 +84,7 @@ public class Inventory extends Module<InventoryData, InventoryNode> {
                 // Block Inventory Rotation
 
                 // Punish
-                this.punish(event, player, data, "TypeA", 3, "t:rot");
+                this.punish(event, player, data, 0, 3, "t:rot");
             }
 
             if (e.knockBack != null) {
@@ -99,7 +99,7 @@ public class Inventory extends Module<InventoryData, InventoryNode> {
                 // Block Inventory Position
 
                 // Punish
-                this.punish(event, player, data, "TypeA", 3, "t:pos");
+                this.punish(event, player, data, 0, 3, "t:pos");
             }
         } else if (event instanceof ActionEvent) {
             ActionEvent e = (ActionEvent) event;
@@ -111,7 +111,7 @@ public class Inventory extends Module<InventoryData, InventoryNode> {
                 // Block Inventory Sprint/Sneak/Glide
 
                 // Punish
-                this.punish(event, player, data, "TypeA", 5, "t:action");
+                this.punish(event, player, data, 0, 5, "t:action");
             }
         } else if (event instanceof InteractEntityEvent) {
             if (!data.inventoryOpened) {
@@ -121,7 +121,7 @@ public class Inventory extends Module<InventoryData, InventoryNode> {
                 // Block Inventory Hit
 
                 // Punish
-                this.punish(event, player, data, "TypeA", 5, "t:hit");
+                this.punish(event, player, data, 0, 5, "t:hit");
             }
         }
     }

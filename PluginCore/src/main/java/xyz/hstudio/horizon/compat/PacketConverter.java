@@ -9,6 +9,9 @@ import xyz.hstudio.horizon.util.enums.Version;
 
 public class PacketConverter {
 
+    private PacketConverter() {
+    }
+
     public static final IPacketConverter INSTANCE;
 
     static {

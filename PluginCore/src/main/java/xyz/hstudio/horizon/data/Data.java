@@ -5,7 +5,7 @@ import java.util.Map;
 
 public abstract class Data {
 
-    public Map<String, Float> violations = new HashMap<>();
+    public Map<Integer, Float> violations = new HashMap<>();
 
     public long lastFailTick = 0;
 }

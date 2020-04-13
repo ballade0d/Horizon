@@ -18,7 +18,7 @@ import java.util.stream.DoubleStream;
 public class Scaffold extends Module<ScaffoldData, ScaffoldNode> {
 
     public Scaffold() {
-        super(ModuleType.Scaffold, new ScaffoldNode());
+        super(ModuleType.Scaffold, new ScaffoldNode(), "TypeA", "TypeB", "TypeC", "TypeD");
     }
 
     @Override
@@ -27,7 +27,7 @@ public class Scaffold extends Module<ScaffoldData, ScaffoldNode> {
     }
 
     @Override
-    public void cancel(final Event event, final String type, final HoriPlayer player, final ScaffoldData data, final ScaffoldNode config) {
+    public void cancel(final Event event, final int type, final HoriPlayer player, final ScaffoldData data, final ScaffoldNode config) {
         // TODO: Finish this
     }
 
@@ -69,16 +69,16 @@ public class Scaffold extends Module<ScaffoldData, ScaffoldNode> {
             Block b = e.getTargetLocation().getBlock();
             if (e.face == BlockPlaceEvent.BlockFace.INVALID) {
                 // Punish
-                this.punish(event, player, data, "TypeA", 5, "p:1");
+                this.punish(event, player, data, 0, 5, "p:1");
             } else if (DoubleStream.of(interaction.x, interaction.y, interaction.z)
                     .anyMatch(d -> d > 1 || d < 0)) {
                 // Punish
-                this.punish(event, player, data, "TypeA", 5, "1:" + interaction);
+                this.punish(event, player, data, 0, 5, "1:" + interaction);
             } else if (b != null && b.getType() == Material.AIR) {
                 // Punish
-                this.punish(event, player, data, "TypeA", 5, "p:2");
+                this.punish(event, player, data, 0, 5, "p:2");
             } else {
-                reward("TypeA", data, 0.999);
+                reward(0, data, 0.999);
             }
         }
     }
@@ -100,9 +100,9 @@ public class Scaffold extends Module<ScaffoldData, ScaffoldNode> {
             float angle = player.position.getDirection().angle(e.getPlaceBlockFace());
             if (angle > Math.toRadians(config.typeB_max_angle)) {
                 // Punish
-                this.punish(event, player, data, "TypeB", 4);
+                this.punish(event, player, data, 1, 4);
             } else {
-                reward("TypeB", data, 0.999);
+                reward(1, data, 0.999);
             }
         }
     }
@@ -127,13 +127,13 @@ public class Scaffold extends Module<ScaffoldData, ScaffoldNode> {
                 if (data.typeCFails > 0) {
                     data.typeCFails--;
                 } else {
-                    reward("TypeC", data, 0.999);
+                    reward(2, data, 0.999);
                 }
                 return;
             }
             if (++data.typeCFails > 4) {
                 // Punish
-                this.punish(event, player, data, "TypeC", 4);
+                this.punish(event, player, data, 2, 4);
             }
         } else if (event instanceof MoveEvent) {
             long now = System.currentTimeMillis();
@@ -159,12 +159,12 @@ public class Scaffold extends Module<ScaffoldData, ScaffoldNode> {
             if (!e.strafeNormally) {
                 if (++data.typeDFails > 4) {
                     // Punish
-                    this.punish(event, player, data, "TypeD", 3);
+                    this.punish(event, player, data, 3, 3);
                 }
             } else if (data.typeDFails > 0) {
                 data.typeDFails--;
             } else {
-                reward("TypeD", data, 0.999);
+                reward(3, data, 0.999);
             }
         } else if (event instanceof BlockPlaceEvent) {
             BlockPlaceEvent e = (BlockPlaceEvent) event;

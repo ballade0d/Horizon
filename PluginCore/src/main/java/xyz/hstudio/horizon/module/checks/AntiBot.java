@@ -44,7 +44,7 @@ public class AntiBot extends Module<Data, AntiBotNode> {
     }
 
     @Override
-    public void cancel(final Event event, final String type, final HoriPlayer player, final Data data, final AntiBotNode config) {
+    public void cancel(final Event event, final int type, final HoriPlayer player, final Data data, final AntiBotNode config) {
     }
 
     @Override
@@ -59,7 +59,7 @@ public class AntiBot extends Module<Data, AntiBotNode> {
     }
 
     private interface Impl {
-        Object spoofGround(final HoriPlayer player, final Object packet) throws Exception;
+        Object spoofGround(HoriPlayer player, Object packet) throws Exception;
     }
 
     private static class Impl_v1_8_R3 implements Impl {

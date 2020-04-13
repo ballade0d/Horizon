@@ -7,6 +7,9 @@ import java.io.InputStream;
 
 public class SystemClassLoader {
 
+    private SystemClassLoader() {
+    }
+
     public static byte[] getClassData(final String path) {
         try {
             InputStream is = new FileInputStream(new File(path));

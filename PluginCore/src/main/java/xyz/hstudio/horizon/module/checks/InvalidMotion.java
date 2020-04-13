@@ -22,7 +22,7 @@ import java.util.Objects;
 public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> {
 
     public InvalidMotion() {
-        super(ModuleType.InvalidMotion, new InvalidMotionNode());
+        super(ModuleType.InvalidMotion, new InvalidMotionNode(), "Predict", "Step", "FastFall");
     }
 
     @Override
@@ -31,7 +31,7 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
     }
 
     @Override
-    public void cancel(final Event event, final String type, final HoriPlayer player, final InvalidMotionData data, final InvalidMotionNode config) {
+    public void cancel(final Event event, final int type, final HoriPlayer player, final InvalidMotionData data, final InvalidMotionNode config) {
         event.setCancelled(true);
         Sync.teleport(player, player.position);
     }
@@ -158,13 +158,13 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
                 if (e.updatePos && e.velocity.lengthSquared() > 0 && Math.abs(discrepancy) > config.predict_tolerance) {
                     // Punish
                     if (config.predict_wall_jump && e.clientBlock != -1) {
-                        this.cancel(e, "Predict", player, data, config);
+                        this.cancel(e, 0, player, data, config);
                     } else {
-                        this.punish(event, player, data, "Predict", Math.abs(discrepancy) * 5F,
+                        this.punish(event, player, data, 0, Math.abs(discrepancy) * 5F,
                                 "d:" + deltaY, "e:" + estimatedVelocity, "p:" + discrepancy, "pr:" + player.velocity.y);
                     }
                 } else {
-                    reward("Predict", data, 0.999);
+                    reward(0, data, 0.999);
                 }
 
                 data.estimatedVelocity = estimatedVelocity;
@@ -203,9 +203,9 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
 
             if (deltaY > 0.6 || deltaY < -0.0784) {
                 // Punish
-                this.punish(event, player, data, "Step", 4, "d:" + deltaY);
+                this.punish(event, player, data, 1, 4, "d:" + deltaY);
             } else {
-                reward("Step", data, 0.99);
+                reward(1, data, 0.99);
             }
         }
     }
@@ -236,9 +236,9 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
             double discrepancy = deltaY - estimatedY;
             if (discrepancy < config.fastfall_tolerance) {
                 // Punish
-                this.punish(event, player, data, "FastFall", 4, "d:" + deltaY, "e:" + estimatedY);
+                this.punish(event, player, data, 2, 4, "d:" + deltaY, "e:" + estimatedY);
             } else {
-                reward("FastFall", data, 0.99);
+                reward(2, data, 0.99);
             }
         }
     }

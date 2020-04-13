@@ -257,7 +257,7 @@ public class Vector3D implements Cloneable {
         try {
             return (Vector3D) super.clone();
         } catch (CloneNotSupportedException e) {
-            throw new Error(e);
+            throw new IllegalStateException(e);
         }
     }
 

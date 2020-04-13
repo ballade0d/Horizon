@@ -22,7 +22,7 @@ import java.util.Set;
 public class Speed extends Module<SpeedData, SpeedNode> {
 
     public Speed() {
-        super(ModuleType.Speed, new SpeedNode());
+        super(ModuleType.Speed, new SpeedNode(), "Predict", "NoSlow", "Sprint", "Strafe");
     }
 
     @Override
@@ -31,8 +31,8 @@ public class Speed extends Module<SpeedData, SpeedNode> {
     }
 
     @Override
-    public void cancel(final Event event, final String type, final HoriPlayer player, final SpeedData data, final SpeedNode config) {
-        if (type.equals("NoSlow") && (player.isEating || player.isPullingBow || player.isBlocking)) {
+    public void cancel(final Event event, final int type, final HoriPlayer player, final SpeedData data, final SpeedNode config) {
+        if (type == 1 && (player.isEating || player.isPullingBow || player.isBlocking)) {
             McAccessor.INSTANCE.releaseItem(player.player);
             player.player.updateInventory();
         } else {
@@ -73,7 +73,7 @@ public class Speed extends Module<SpeedData, SpeedNode> {
                 return;
             }
             if (player.currentTick == data.lastUseTick) {
-                this.punish(event, player, data, "NoSlow", config.noslow_packet_vl, config.noslow_always_cancel, "t:p1");
+                this.punish(event, player, data, 1, config.noslow_packet_vl, config.noslow_always_cancel, "t:p1");
             }
             data.lastUseTick = player.currentTick;
         } else if (event instanceof ActionEvent && noSlowEnabled) {
@@ -86,7 +86,7 @@ public class Speed extends Module<SpeedData, SpeedNode> {
                 return;
             }
             if (player.currentTick == data.lastToggleTick) {
-                this.punish(event, player, data, "NoSlow", config.noslow_packet_vl, config.noslow_always_cancel, "t:p2");
+                this.punish(event, player, data, 1, config.noslow_packet_vl, config.noslow_always_cancel, "t:p2");
             }
             data.lastToggleTick = player.currentTick;
         } else if (event instanceof MoveEvent) {
@@ -185,19 +185,19 @@ public class Speed extends Module<SpeedData, SpeedNode> {
                         if (usingItem) {
                             if (noSlowEnabled) {
                                 // Punish
-                                this.punish(event, player, data, "NoSlow",
+                                this.punish(event, player, data, 1,
                                         config.noslow_move_vl == -1 ? (float) (totalDiscrepancy * 10F) : config.noslow_move_vl, config.noslow_always_cancel,
                                         "s:" + speed, "e:" + estimatedSpeed, "p:" + prevSpeed, "d:" + discrepancy, "s:" + swimming);
                             }
                         } else {
                             // Punish
-                            this.punish(event, player, data, "Predict", (float) (totalDiscrepancy * 10),
+                            this.punish(event, player, data, 0, (float) (totalDiscrepancy * 10),
                                     "s:" + speed, "e:" + estimatedSpeed, "p:" + prevSpeed, "d:" + discrepancy, "s:" + swimming);
                         }
                     }
                     data.discrepancies = 0;
                 } else {
-                    reward("Predict", data, 0.99);
+                    reward(0, data, 0.99);
                 }
                 data.negativeDiscrepancies = 0;
                 data.negativeDiscrepanciesCumulative = 0;
@@ -311,9 +311,9 @@ public class Speed extends Module<SpeedData, SpeedNode> {
             double angle = MathUtils.angle(yawVec, moveForce);
             if (angle > Math.PI / 4 + 0.3) {
                 // Punish
-                this.punish(event, player, data, "Sprint", 4, "a:" + angle, "y:" + yaw);
+                this.punish(event, player, data, 2, 4, "a:" + angle, "y:" + yaw);
             } else {
-                reward("Sprint", data, 0.99);
+                reward(2, data, 0.99);
             }
 
             data.collisionHorizontal = collisionHorizontal;
@@ -325,12 +325,12 @@ public class Speed extends Module<SpeedData, SpeedNode> {
             MoveEvent e = (MoveEvent) event;
             if (e.strafeNormally) {
                 data.typeCFails = data.typeCFails > 0 ? data.typeCFails - 1 : 0;
-                reward("Strafe", data, 0.995);
+                reward(3, data, 0.995);
                 return;
             }
             if (++data.typeCFails > config.strafe_threshold) {
                 // Punish
-                this.punish(event, player, data, "Strafe", 2);
+                this.punish(event, player, data, 3, 2);
             }
         }
     }

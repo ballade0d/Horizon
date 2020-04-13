@@ -14,7 +14,7 @@ import xyz.hstudio.horizon.thread.Sync;
 public class BadPacket extends Module<BadPacketData, BadPacketNode> {
 
     public BadPacket() {
-        super(ModuleType.BadPacket, new BadPacketNode());
+        super(ModuleType.BadPacket, new BadPacketNode(), "TypeA", "TypeB", "TypeC", "TypeD");
     }
 
     @Override
@@ -23,10 +23,10 @@ public class BadPacket extends Module<BadPacketData, BadPacketNode> {
     }
 
     @Override
-    public void cancel(final Event event, final String type, final HoriPlayer player, final BadPacketData data, final BadPacketNode config) {
-        if (type.equals("TypeB") || type.equals("TypeC")) {
+    public void cancel(final Event event, final int type, final HoriPlayer player, final BadPacketData data, final BadPacketNode config) {
+        if (type == 1 || type == 2) {
             event.setCancelled(true);
-        } else if (type.equals("TypeD")) {
+        } else if (type == 3) {
             event.setCancelled(true);
             Sync.teleport(player, data.legitLocation);
         }
@@ -67,9 +67,9 @@ public class BadPacket extends Module<BadPacketData, BadPacketNode> {
             // but send KeepAlive packets, the player is definitely cheating.
             if (player.currentTick == data.lastTick) {
                 // Punish
-                // this.punish(event, player, data, "TypeA", 5);
+                this.punish(event, player, data, 0, 5);
             } else {
-                reward("TypeA", data, 0.99);
+                reward(0, data, 0.99);
             }
             data.lastTick = player.currentTick;
         }
@@ -94,9 +94,9 @@ public class BadPacket extends Module<BadPacketData, BadPacketNode> {
             // A player can send only 19 flying packets in a row.
             if (++data.flyingCount > 21) {
                 // Punish
-                this.punish(event, player, data, "TypeB", 5);
+                this.punish(event, player, data, 1, 5);
             } else if (data.flyingCount == 0) {
-                reward("TypeB", data, 0.99);
+                reward(1, data, 0.99);
             }
         }
     }
@@ -122,9 +122,9 @@ public class BadPacket extends Module<BadPacketData, BadPacketNode> {
             long now = System.currentTimeMillis();
             if (now - data.lastPayloadTime <= e.length) {
                 // Punish
-                this.punish(event, player, data, "TypeC", 5);
+                this.punish(event, player, data, 2, 5);
             } else {
-                reward("TypeC", data, 0.999);
+                reward(2, data, 0.999);
             }
             data.lastPayloadTime = now;
         }
@@ -143,9 +143,9 @@ public class BadPacket extends Module<BadPacketData, BadPacketNode> {
             MoveEvent e = (MoveEvent) event;
             if (e.to.pitch > 90.1F || e.to.pitch < -90.1F) {
                 // Punish
-                this.punish(event, player, data, "TypeD", 6);
+                this.punish(event, player, data, 3, 6);
             } else {
-                reward("TypeD", data, 0.999);
+                reward(3, data, 0.999);
                 data.legitLocation = e.to;
             }
         }

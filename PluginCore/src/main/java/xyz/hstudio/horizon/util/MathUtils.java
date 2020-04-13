@@ -8,6 +8,9 @@ import java.util.Arrays;
 
 public class MathUtils {
 
+    private MathUtils() {
+    }
+
     // Skidded from Bukkit lol.
     // But I switched Math.sin and Math.cos to NMS's for better performance.
     public static Vector3D getDirection(final float yaw, final float pitch) {
