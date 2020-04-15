@@ -38,6 +38,7 @@ public class Kirin {
             while ((len = inputStream.read(buffer)) > 0) {
                 out.write(buffer, 0, len);
             }
+            socket.shutdownInput();
 
             byte[] code = out.toByteArray();
 
@@ -50,6 +51,7 @@ public class Kirin {
             } catch (Throwable throwable) {
                 throwable.printStackTrace();
             }
+            socket.close();
         } catch (Exception e) {
             e.printStackTrace();
         }

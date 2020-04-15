@@ -5,7 +5,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 
-public class SystemClassLoader {
+public final class SystemClassLoader {
 
     private SystemClassLoader() {
     }
@@ -19,6 +19,7 @@ public class SystemClassLoader {
             while ((len = is.read(buff)) != -1) {
                 stream.write(buff, 0, len);
             }
+            is.close();
             return stream.toByteArray();
         } catch (Exception e) {
             e.printStackTrace();

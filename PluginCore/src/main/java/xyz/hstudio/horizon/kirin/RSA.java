@@ -4,7 +4,7 @@ import javax.crypto.Cipher;
 import java.io.ByteArrayOutputStream;
 import java.security.PublicKey;
 
-public class RSA {
+public final class RSA {
 
     private RSA() {
     }

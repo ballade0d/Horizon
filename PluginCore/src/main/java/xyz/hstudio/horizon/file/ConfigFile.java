@@ -17,6 +17,9 @@ public class ConfigFile extends AbstractFile {
     @Load(path = "command_alias")
     public List<String> command_alias = Arrays.asList("hz", "hori");
 
+    @Load(path = "op_bypass")
+    public boolean op_bypass = false;
+
     @Load(path = "personalized_themes.enabled")
     public boolean personalized_themes_enabled = true;
     @Load(path = "personalized_themes.default_lang")

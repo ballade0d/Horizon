@@ -28,6 +28,8 @@ public class ActionEvent extends Event {
             case STOP_SPRINTING:
                 player.isSprinting = false;
                 break;
+            default:
+                break;
         }
     }
 

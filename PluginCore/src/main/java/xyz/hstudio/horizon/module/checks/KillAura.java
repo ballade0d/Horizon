@@ -202,11 +202,11 @@ public class KillAura extends Module<KillAuraData, KillAuraNode> {
     private void typeD(final Event event, final HoriPlayer player, final KillAuraData data, final KillAuraNode config) {
         if (event instanceof MoveEvent) {
             MoveEvent e = (MoveEvent) event;
-            if (player.currentTick - data.lastHitTickD > 5 || e.isTeleport) {
+            if (player.currentTick - data.lastHitTickD > 10 || e.isTeleport) {
                 return;
             }
             if (!e.strafeNormally) {
-                if (++data.typeDFails > 4) {
+                if (++data.typeDFails > 3) {
                     // Punish
                     this.punish(event, player, data, 3, 3);
                 }

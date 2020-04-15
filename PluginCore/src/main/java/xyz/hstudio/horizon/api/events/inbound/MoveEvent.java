@@ -165,7 +165,7 @@ public class MoveEvent extends Event {
 
     private float computeFriction() {
         float friction = 0.91F;
-        if (player.isOnGround) {
+        if (player.onGround) {
             Block b = player.position.add(0, -1, 0).getBlock();
             if (b != null) {
                 friction *= McAccessor.INSTANCE.getFriction(b);
@@ -222,13 +222,13 @@ public class MoveEvent extends Event {
 
         int expiredKbs = 0;
 
-        boolean jump = player.isOnGround && Math.abs(0.42 - velocity.y) < 0.00001;
+        boolean jump = player.onGround && Math.abs(0.42 - velocity.y) < 0.00001;
         boolean flying = player.isFlying();
 
         double sprintMultiplier = flying ? (player.isSprinting ? 2 : 1) : (player.isSprinting ? 1.3 : 1);
         double weirdConstant = (jump && player.isSprinting ? 0.2518462 : (player.isInLiquid ? 0.0196 : 0.098));
         double baseMultiplier = flying ? (10 * player.player.getFlySpeed()) : (5 * player.player.getWalkSpeed() * (1 + player.getPotionEffectAmplifier("SPEED") * 0.2));
-        double maxDiscrepancy = weirdConstant * baseMultiplier * sprintMultiplier + 0.003;
+        double maxDiscrepancy = weirdConstant * baseMultiplier * sprintMultiplier + (to.y < 0 ? 0.001 : 0.003);
 
         Pair<Vector3D, Long> kb;
         for (int kbIndex = 0, size = velocities.size(); kbIndex < size; kbIndex++) {
@@ -239,32 +239,36 @@ public class MoveEvent extends Event {
                 continue;
             }
             Vector3D kbVelocity = kb.key;
+            if (!collidingBlocks.contains(MatUtils.COBWEB.parse())) {
+                double y = kbVelocity.y;
 
-            double y = kbVelocity.y;
+                if (!((touchingFaces.contains(BlockFace.UP) && y > 0) || (touchingFaces.contains(BlockFace.DOWN) && y < 0)) &&
+                        Math.abs(y - velocity.y) > 0.01 &&
+                        !jump && !player.isInLiquid && !this.stepLegitly) {
+                    continue;
+                }
 
-            if (!((touchingFaces.contains(BlockFace.UP) && y > 0) || (touchingFaces.contains(BlockFace.DOWN) && y < 0)) &&
-                    Math.abs(y - velocity.y) > 0.01 &&
-                    !jump && !player.isInLiquid && !this.stepLegitly) {
-                continue;
+                double x = hitSlowdown ? 0.6 * kbVelocity.x : kbVelocity.x;
+                double minThresX = x - maxDiscrepancy;
+                double maxThresX = x + maxDiscrepancy;
+                double z = hitSlowdown ? 0.6 * kbVelocity.z : kbVelocity.z;
+                double minThresZ = z - maxDiscrepancy;
+                double maxThresZ = z + maxDiscrepancy;
+
+                if (!((touchingFaces.contains(BlockFace.EAST) && x > 0) || (touchingFaces.contains(BlockFace.WEST) && x < 0)) &&
+                        !(velocity.x <= maxThresX && velocity.x >= minThresX)) {
+                    continue;
+                }
+                if (!((touchingFaces.contains(BlockFace.SOUTH) && z > 0) || (touchingFaces.contains(BlockFace.NORTH) && z < 0)) &&
+                        !(velocity.z <= maxThresZ && velocity.z >= minThresZ)) {
+                    continue;
+                }
+                velocities.subList(0, kbIndex + 1).clear();
+                return kbVelocity;
+            } else {
+                velocities.subList(0, kbIndex + 1).clear();
+                return kbVelocity;
             }
-
-            double x = hitSlowdown ? 0.6 * kbVelocity.x : kbVelocity.x;
-            double minThresX = x - maxDiscrepancy;
-            double maxThresX = x + maxDiscrepancy;
-            double z = hitSlowdown ? 0.6 * kbVelocity.z : kbVelocity.z;
-            double minThresZ = z - maxDiscrepancy;
-            double maxThresZ = z + maxDiscrepancy;
-
-            if (!((touchingFaces.contains(BlockFace.EAST) && x > 0) || (touchingFaces.contains(BlockFace.WEST) && x < 0)) &&
-                    !(velocity.x <= maxThresX && velocity.x >= minThresX)) {
-                continue;
-            }
-            if (!((touchingFaces.contains(BlockFace.SOUTH) && z > 0) || (touchingFaces.contains(BlockFace.NORTH) && z < 0)) &&
-                    !(velocity.z <= maxThresZ && velocity.z >= minThresZ)) {
-                continue;
-            }
-            velocities.subList(0, kbIndex + 1).clear();
-            return kbVelocity;
         }
         velocities.subList(0, expiredKbs).clear();
         return null;
@@ -283,15 +287,13 @@ public class MoveEvent extends Event {
         boolean hitCeiling = BlockUtils.checkTouchingBlock(player, collisionBox, to.world, 0.0001).contains(BlockFace.UP);
 
         boolean kbSimilarToJump = this.knockBack != null && (Math.abs(knockBack.y - initJumpVelocity) < 0.001 || hitCeiling);
-        boolean leftGround = (player.isOnGround && !this.onGround);
-        return !kbSimilarToJump && ((initJumpVelocity == 0 && player.isOnGround) || leftGround) && (deltaY == initJumpVelocity || hitCeiling);
+        boolean leftGround = (player.onGround && !this.onGround);
+        return !kbSimilarToJump && ((initJumpVelocity == 0 && player.onGround) || leftGround) && (deltaY == initJumpVelocity || hitCeiling);
     }
 
     /**
      * Check if player's strafing is normal.
      * I learnt this from Islandscout, but much lighter than his.
-     * <p>
-     * TODO: Ignore when colliding entities
      *
      * @author Islandscout, MrCraftGoo
      */
@@ -396,7 +398,7 @@ public class MoveEvent extends Event {
     @Override
     public void post() {
         player.position = this.to;
-        player.isOnGround = this.onGround;
+        player.onGround = this.onGround;
         player.onGroundReally = this.onGroundReally;
         player.friction = this.newFriction;
         player.prevPrevDeltaY = player.velocity.y;

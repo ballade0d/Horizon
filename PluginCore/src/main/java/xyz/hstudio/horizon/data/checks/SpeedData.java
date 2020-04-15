@@ -16,6 +16,7 @@ public class SpeedData extends Data {
     // Sprint
     public long lastSprintTick;
     public boolean collisionHorizontal;
+    public int sprintFails;
     // Strafe
     public int typeCFails;
 }

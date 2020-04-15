@@ -13,7 +13,7 @@ import xyz.hstudio.horizon.util.wrap.Vector3D;
 
 import java.util.*;
 
-public class BlockUtils {
+public final class BlockUtils {
 
     private BlockUtils() {
     }
@@ -22,42 +22,42 @@ public class BlockUtils {
     public static final Set<Material> SHULKER_BOX = EnumSet.noneOf(Material.class);
 
     static {
-        Set<Material> SOLID = new HashSet<>();
-        SOLID.add(Material.SNOW);
-        SOLID.add(Material.LADDER);
-        SOLID.add(Material.VINE);
-        SOLID.add(MatUtils.LILY_PAD.parse());
-        SOLID.add(MatUtils.COCOA_BEANS.parse());
-        SOLID.add(MatUtils.END_ROD.parse());
-        SOLID.add(MatUtils.CHORUS_FLOWER.parse());
-        SOLID.add(MatUtils.CHORUS_PLANT.parse());
-        SOLID.add(MatUtils.SEA_PICKLE.parse());
-        SOLID.add(MatUtils.FARMLAND.parse());
-        SOLID.add(MatUtils.SCAFFOLDING.parse());
-        SOLID.add(MatUtils.BAMBOO.parse());
+        Set<Material> solid = new HashSet<>();
+        solid.add(Material.SNOW);
+        solid.add(Material.LADDER);
+        solid.add(Material.VINE);
+        solid.add(MatUtils.LILY_PAD.parse());
+        solid.add(MatUtils.COCOA_BEANS.parse());
+        solid.add(MatUtils.END_ROD.parse());
+        solid.add(MatUtils.CHORUS_FLOWER.parse());
+        solid.add(MatUtils.CHORUS_PLANT.parse());
+        solid.add(MatUtils.SEA_PICKLE.parse());
+        solid.add(MatUtils.FARMLAND.parse());
+        solid.add(MatUtils.SCAFFOLDING.parse());
+        solid.add(MatUtils.BAMBOO.parse());
 
-        SOLID.add(MatUtils.REPEATER.parse());
+        solid.add(MatUtils.REPEATER.parse());
 
-        SOLID.add(Material.FLOWER_POT);
+        solid.add(Material.FLOWER_POT);
 
         for (Material material : Material.values()) {
             if (material.name().startsWith("LEGACY_")) {
                 continue;
             }
             if (material.name().contains("COMPARATOR") || material.name().contains("DIODE")) {
-                SOLID.add(material);
+                solid.add(material);
             }
             // For 1.13+ potted flower material
             if (material.name().contains("POTTED")) {
-                SOLID.add(material);
+                solid.add(material);
             }
             // For 1.13+ skull
             if (material.isBlock() && (material.name().contains("SKULL") || material.name().contains("HEAD"))) {
-                SOLID.add(material);
+                solid.add(material);
             }
             // For 1.13+ carpet
             if (material.name().contains("CARPET")) {
-                SOLID.add(material);
+                solid.add(material);
             }
             // For 1.12+ shulker box
             if (material.name().contains("SHULKER_BOX")) {
@@ -65,9 +65,9 @@ public class BlockUtils {
             }
         }
 
-        SOLID.removeIf(Objects::isNull);
+        solid.removeIf(Objects::isNull);
 
-        BlockUtils.SOLID.addAll(SOLID);
+        BlockUtils.SOLID.addAll(solid);
     }
 
     /**

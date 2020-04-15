@@ -8,7 +8,7 @@ import xyz.hstudio.horizon.compat.v1_15_R1.Bot_v1_15_R1;
 import xyz.hstudio.horizon.compat.v1_8_R3.Bot_v1_8_R3;
 import xyz.hstudio.horizon.util.enums.Version;
 
-public class Bot {
+public final class Bot {
 
     private Bot() {
     }

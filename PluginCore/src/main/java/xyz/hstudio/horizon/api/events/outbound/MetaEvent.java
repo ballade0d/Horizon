@@ -30,9 +30,11 @@ public class MetaEvent extends Event {
                 }
                 byte statue = (byte) object.object;
                 if ((statue & 16) != 16) {
-                    player.isEating = false;
-                    player.isPullingBow = false;
-                    player.isBlocking = false;
+                    player.sendSimulatedAction(() -> {
+                        player.isEating = false;
+                        player.isPullingBow = false;
+                        player.isBlocking = false;
+                    });
                     break;
                 }
             }
@@ -41,13 +43,15 @@ public class MetaEvent extends Event {
                 if (object.index == 6) {
                     byte statue = (byte) object.object;
                     if ((statue & 1) != 1) {
-                        player.isEating = false;
-                        player.isPullingBow = false;
-                        player.isBlocking = false;
+                        player.sendSimulatedAction(() -> {
+                            player.isEating = false;
+                            player.isPullingBow = false;
+                            player.isBlocking = false;
+                        });
                     }
                 } else if (object.index == 0) {
                     byte statue = (byte) object.object;
-                    player.isGliding = (statue & 128) == 128;
+                    player.sendSimulatedAction(() -> player.isGliding = (statue & 128) == 128);
                 }
             }
         } else {
@@ -55,13 +59,15 @@ public class MetaEvent extends Event {
                 if (object.index == 7) {
                     byte statue = (byte) object.object;
                     if ((statue & 1) != 1) {
-                        player.isEating = false;
-                        player.isPullingBow = false;
-                        player.isBlocking = false;
+                        player.sendSimulatedAction(() -> {
+                            player.isEating = false;
+                            player.isPullingBow = false;
+                            player.isBlocking = false;
+                        });
                     }
                 } else if (object.index == 0) {
                     byte statue = (byte) object.object;
-                    player.isGliding = (statue & 128) == 128;
+                    player.sendSimulatedAction(() -> player.isGliding = (statue & 128) == 128);
                 }
             }
         }

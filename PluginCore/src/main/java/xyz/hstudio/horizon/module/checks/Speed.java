@@ -22,7 +22,9 @@ import java.util.Set;
 public class Speed extends Module<SpeedData, SpeedNode> {
 
     public Speed() {
-        super(ModuleType.Speed, new SpeedNode(), "Predict", "NoSlow", "Sprint", "Strafe");
+        // The first NoSlow is for Packet NoSlow
+        // The second is for Move NoSlow
+        super(ModuleType.Speed, new SpeedNode(), "Predict", "NoSlow", "NoSlow", "Sprint", "Strafe");
     }
 
     @Override
@@ -32,9 +34,11 @@ public class Speed extends Module<SpeedData, SpeedNode> {
 
     @Override
     public void cancel(final Event event, final int type, final HoriPlayer player, final SpeedData data, final SpeedNode config) {
-        if (type == 1 && (player.isEating || player.isPullingBow || player.isBlocking)) {
+        if (type == 2 && (player.isEating || player.isPullingBow || player.isBlocking)) {
             McAccessor.INSTANCE.releaseItem(player.player);
             player.player.updateInventory();
+        } else if (type == 1) {
+            event.setCancelled(true);
         } else {
             event.setCancelled(true);
             Sync.teleport(player, player.position);
@@ -145,7 +149,7 @@ public class Speed extends Module<SpeedData, SpeedNode> {
                         player.getEnchantmentEffectAmplifier("DEPTH_STRIDER"), player.isSprinting, e.onGround);
             } else {
                 // Normal function
-                boolean jump = e.jumpLegitly || (e.stepLegitly && player.isOnGround && player.isSprinting);
+                boolean jump = e.jumpLegitly || (e.stepLegitly && player.onGround && player.isSprinting);
 
                 float friction = e.oldFriction;
                 float maxForce = this.computeMaxInputForce(player, e.newFriction, usingItem);
@@ -185,7 +189,7 @@ public class Speed extends Module<SpeedData, SpeedNode> {
                         if (usingItem) {
                             if (noSlowEnabled) {
                                 // Punish
-                                this.punish(event, player, data, 1,
+                                this.punish(event, player, data, 2,
                                         config.noslow_move_vl == -1 ? (float) (totalDiscrepancy * 10F) : config.noslow_move_vl, config.noslow_always_cancel,
                                         "s:" + speed, "e:" + estimatedSpeed, "p:" + prevSpeed, "d:" + discrepancy, "s:" + swimming);
                             }
@@ -241,7 +245,7 @@ public class Speed extends Module<SpeedData, SpeedNode> {
         boolean sprinting = player.isSprinting && !player.isSneaking && player.getPotionEffectAmplifier("BLINDNESS") <= 0;
 
         float multiplier;
-        if (player.isOnGround) {
+        if (player.onGround) {
             multiplier = player.moveFactor * 0.16277136F / (newFriction * newFriction * newFriction);
             float groundMultiplier = 5 * player.player.getWalkSpeed();
             multiplier *= groundMultiplier;
@@ -277,7 +281,6 @@ public class Speed extends Module<SpeedData, SpeedNode> {
                 data.lastSprintTick = player.currentTick;
             }
 
-            // TODO: Ignore if colliding entities
             if (e.isInLiquid || player.currentTick - player.lastTeleportAcceptTick < 3 || e.knockBack != null || e.collidingBlocks.contains(Material.LADDER) ||
                     e.collidingBlocks.contains(Material.VINE) || (collisionHorizontal && !data.collisionHorizontal) ||
                     player.isFlying() || player.currentTick - data.lastSprintTick < 2 || player.getVehicle() != null ||
@@ -310,10 +313,14 @@ public class Speed extends Module<SpeedData, SpeedNode> {
 
             double angle = MathUtils.angle(yawVec, moveForce);
             if (angle > Math.PI / 4 + 0.3) {
-                // Punish
-                this.punish(event, player, data, 2, 4, "a:" + angle, "y:" + yaw);
+                if (++data.sprintFails > 2) {
+                    // Punish
+                    this.punish(event, player, data, 3, 4, "a:" + angle, "y:" + yaw);
+                }
+            } else if (data.sprintFails == 0) {
+                reward(3, data, 0.99);
             } else {
-                reward(2, data, 0.99);
+                data.sprintFails--;
             }
 
             data.collisionHorizontal = collisionHorizontal;
@@ -325,12 +332,12 @@ public class Speed extends Module<SpeedData, SpeedNode> {
             MoveEvent e = (MoveEvent) event;
             if (e.strafeNormally) {
                 data.typeCFails = data.typeCFails > 0 ? data.typeCFails - 1 : 0;
-                reward(3, data, 0.995);
+                reward(4, data, 0.995);
                 return;
             }
             if (++data.typeCFails > config.strafe_threshold) {
                 // Punish
-                this.punish(event, player, data, 3, 2);
+                this.punish(event, player, data, 4, 2);
             }
         }
     }

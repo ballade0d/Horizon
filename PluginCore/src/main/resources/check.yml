@@ -2,15 +2,13 @@ antibot:
   enabled: true
   # Unused in this check
   cancel_vl: -1
-  enable_worlds:
-    - '*'
+  disable_worlds: []
   # Unused in this check
   action: {}
 antivelocity:
   enabled: true
   cancel_vl: 1
-  enable_worlds:
-    - '*'
+  disable_worlds: []
   typeA:
     enabled: true
   action:
@@ -22,8 +20,7 @@ antivelocity:
 badpacket:
   enabled: true
   cancel_vl: 0
-  enable_worlds:
-    - '*'
+  disable_worlds: []
   typeA:
     enabled: true
   typeB:
@@ -41,8 +38,7 @@ badpacket:
 groundspoof:
   enabled: true
   cancel_vl: 0
-  enable_worlds:
-    - '*'
+  disable_worlds: []
   typeA:
     enabled: true
   action:
@@ -54,8 +50,7 @@ groundspoof:
 hitbox:
   enabled: true
   cancel_vl: 1
-  enable_worlds:
-    - '*'
+  disable_worlds: []
   typeA:
     enabled: true
     max_reach: 3.1
@@ -69,15 +64,13 @@ healthtag:
   enabled: true
   # Unused in this check
   cancel_vl: 0
-  enable_worlds:
-    - '*'
+  disable_worlds: []
   # Unused in this check
   action: {}
 invalidmotion:
   enabled: true
   cancel_vl: 1
-  enable_worlds:
-    - '*'
+  disable_worlds: []
   predict:
     enabled: true
     tolerance: 0.001
@@ -86,9 +79,6 @@ invalidmotion:
     wall_jump: true
   step:
     enabled: true
-  fastfall:
-    enabled: true
-    tolerance: -0.02
   action:
     20:
       - 'horizon notify %player% might be moving unexpectedly'
@@ -98,8 +88,7 @@ invalidmotion:
 inventory:
   enabled: true
   cancel_vl: 0
-  enable_worlds:
-    - '*'
+  disable_worlds: []
   typeA:
     enabled: true
     checkRotation: true
@@ -115,8 +104,7 @@ inventory:
 killaura:
   enabled: true
   cancel_vl: 0
-  enable_worlds:
-    - '*'
+  disable_worlds: []
   order:
     enabled: true
   superkb:
@@ -143,8 +131,7 @@ killaurabot:
   enabled: true
   # Unused
   cancel_vl: -1
-  enable_worlds:
-    - '*'
+  disable_worlds: []
   command_only: true
   # How long should the update interval of the bot be?
   # Measured in ticks
@@ -171,8 +158,7 @@ killaurabot:
 noswing:
   enabled: true
   cancel_vl: 0
-  enable_worlds:
-    - '*'
+  disable_worlds: []
   typeA:
     enabled: true
   action:
@@ -184,8 +170,7 @@ noswing:
 scaffold:
   enabled: true
   cancel_vl: 0
-  enable_worlds:
-    - '*'
+  disable_worlds: []
   typeA:
     enabled: true
   typeB:
@@ -204,8 +189,7 @@ scaffold:
 speed:
   enabled: true
   cancel_vl: 1
-  enable_worlds:
-    - '*'
+  disable_worlds: []
   predict:
     enabled: true
     tolerance: 0.08
@@ -234,8 +218,7 @@ speed:
 timer:
   enabled: true
   cancel_vl: 1
-  enable_worlds:
-    - '*'
+  disable_worlds: []
   typeA:
     enabled: true
     allow_ms: 50

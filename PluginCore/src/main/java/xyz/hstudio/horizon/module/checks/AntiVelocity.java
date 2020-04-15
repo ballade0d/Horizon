@@ -7,7 +7,6 @@ import xyz.hstudio.horizon.data.HoriPlayer;
 import xyz.hstudio.horizon.data.checks.AntiVelocityData;
 import xyz.hstudio.horizon.file.node.AntiVelocityNode;
 import xyz.hstudio.horizon.module.Module;
-import xyz.hstudio.horizon.util.enums.MatUtils;
 
 public class AntiVelocity extends Module<AntiVelocityData, AntiVelocityNode> {
 
@@ -45,7 +44,7 @@ public class AntiVelocity extends Module<AntiVelocityData, AntiVelocityNode> {
             if (player.teleports.size() > 0) {
                 return;
             }
-            if (e.failedKnockBack && !e.collidingBlocks.contains(MatUtils.COBWEB.parse()) && !e.isTeleport && e.to.y > 0) {
+            if (e.failedKnockBack && !e.isTeleport) {
                 // Punish
                 this.punish(event, player, data, 0, 4);
             } else {

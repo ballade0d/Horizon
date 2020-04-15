@@ -3,7 +3,7 @@ package xyz.hstudio.horizon;
 import org.bukkit.Bukkit;
 import org.bukkit.command.ConsoleCommandSender;
 
-public class Logger {
+public final class Logger {
 
     private Logger() {
     }

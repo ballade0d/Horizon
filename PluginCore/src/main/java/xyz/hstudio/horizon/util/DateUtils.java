@@ -3,7 +3,7 @@ package xyz.hstudio.horizon.util;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-public class DateUtils {
+public final class DateUtils {
 
     private DateUtils() {
     }

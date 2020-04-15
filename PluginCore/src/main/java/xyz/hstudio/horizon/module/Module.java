@@ -44,12 +44,17 @@ public abstract class Module<K extends Data, V extends CheckFile> {
      * @author MrCraftGoo
      */
     public static void doCheck(final Event event, final HoriPlayer player) {
+        if (player.player.isOp() && Horizon.getInst().config.op_bypass) {
+            return;
+        }
         for (Module modules : Module.MODULE_MAP.values()) {
             if (!modules.config.enabled) {
                 continue;
             }
-            if (!modules.config.enable_worlds.contains("*") &&
-                    !modules.config.enable_worlds.contains(player.position.world.getName())) {
+            if (modules.config.disable_worlds.contains(player.position.world.getName())) {
+                continue;
+            }
+            if (player.player.hasPermission("horizon.bypass." + modules.moduleType.name())) {
                 continue;
             }
             if (event.isCancelled()) {

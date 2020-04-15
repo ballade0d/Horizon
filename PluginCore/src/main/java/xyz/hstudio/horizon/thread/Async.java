@@ -1,44 +1,37 @@
 package xyz.hstudio.horizon.thread;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import sun.security.action.GetPropertyAction;
 import xyz.hstudio.horizon.Horizon;
-import xyz.hstudio.horizon.data.HoriPlayer;
 import xyz.hstudio.horizon.module.Module;
 import xyz.hstudio.horizon.util.DateUtils;
 
-import java.io.*;
-import java.security.AccessController;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Deque;
-import java.util.concurrent.*;
+import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.zip.GZIPOutputStream;
 
-public class Async extends Thread {
+public class Async implements Runnable {
 
-    private static final ExecutorService THREAD_POOL = Executors.newFixedThreadPool(2,
-            new ThreadFactoryBuilder()
+    private static final ScheduledExecutorService THREAD_POOL =
+            Executors.newSingleThreadScheduledExecutor(new ThreadFactoryBuilder()
                     .setDaemon(true)
                     .setNameFormat("Horizon Processing Thread")
                     .build());
+
     public static final Deque<String> LOG = new ConcurrentLinkedDeque<>();
 
-    public static <T> Future<T> submit(final Callable<T> callable) {
-        return THREAD_POOL.submit(callable);
-    }
-
-    public static void execute(final Runnable command) {
-        THREAD_POOL.execute(command);
-    }
-
-    private FileWriter logWriter;
-    private String lineSeparator;
+    private final FileOutputStream logOutput;
+    private final byte[] lineSeparator;
 
     public Async() {
-        super("Horizon Processing Thread");
-        this.setDaemon(true);
-
         try {
             File logs = new File(Horizon.getInst().getDataFolder(), "logs");
             if (!logs.exists()) {
@@ -77,14 +70,14 @@ public class Async extends Thread {
             File log = new File(logs, date + "-" + (count + 1) + ".log");
             log.createNewFile();
 
-            this.logWriter = new FileWriter(log, true);
+            this.logOutput = new FileOutputStream(log, true);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new IllegalStateException(e);
         }
 
-        lineSeparator = AccessController.doPrivileged(new GetPropertyAction("line.separator"));
+        this.lineSeparator = System.lineSeparator().getBytes();
 
-        this.start();
+        Async.THREAD_POOL.scheduleAtFixedRate(this, 50L, 50L, TimeUnit.MILLISECONDS);
     }
 
     private long currentTick;
@@ -93,35 +86,22 @@ public class Async extends Thread {
     @Override
     public void run() {
         try {
-            long current = System.nanoTime();
-            while (running) {
-
-                for (Module module : Module.MODULE_MAP.values()) {
-                    module.tickAsync(currentTick, module.getConfig());
-                }
-
-                // Run every 80 tick
-                if (currentTick % 80 == 0) {
-                    Horizon.PLAYERS.values().forEach(HoriPlayer::sendRequest);
-                }
-
-                String time = "[" + DateUtils.now() + "] ";
-                for (String message : Async.LOG) {
-                    this.logWriter.write(time + message);
-                    this.logWriter.write(lineSeparator);
-                }
-                Async.LOG.clear();
-                this.logWriter.flush();
-
-                currentTick++;
-
-                current = (current + 50000000L - System.nanoTime()) / 1000000L;
-                // Wait for 1 tick
-                if (current > 0) {
-                    Thread.sleep(current);
-                }
-                current = System.nanoTime();
+            for (Module module : Module.MODULE_MAP.values()) {
+                module.tickAsync(currentTick, module.getConfig());
             }
+
+            long currTime = System.currentTimeMillis();
+            Horizon.PLAYERS.values().forEach(player -> player.tick(currentTick, currTime));
+
+            String time = "[" + DateUtils.now() + "] ";
+            for (String message : Async.LOG) {
+                this.logOutput.write((time + message).getBytes());
+                this.logOutput.write(lineSeparator);
+            }
+            Async.LOG.clear();
+            this.logOutput.flush();
+
+            currentTick++;
         } catch (Throwable throwable) {
             throwable.printStackTrace();
         }

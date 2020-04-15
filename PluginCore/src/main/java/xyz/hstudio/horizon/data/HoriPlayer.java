@@ -42,6 +42,7 @@ public class HoriPlayer {
     public final ScaffoldData scaffoldData = new ScaffoldData();
     public final SpeedData speedData = new SpeedData();
     public final TimerData timerData = new TimerData();
+    private final Map<Runnable, Long> simulatedCmds = new ConcurrentHashMap<>();
     public final int protocol;
     public Player player;
     public long currentTick;
@@ -61,7 +62,7 @@ public class HoriPlayer {
     public boolean isEating;
     public boolean isPullingBow;
     public boolean isBlocking;
-    public boolean isOnGround;
+    public boolean onGround;
     public boolean onGroundReally;
     public boolean isGliding;
     public boolean isInLiquidStrict;
@@ -181,12 +182,27 @@ public class HoriPlayer {
         return 0;
     }
 
-    /**
-     * Send transaction request to the client.
-     */
-    public void sendRequest() {
-        this.lastRequestSent = System.currentTimeMillis();
-        this.sendPacket(McAccessor.INSTANCE.newTransactionPacket());
+    public void sendSimulatedAction(final Runnable action) {
+        this.simulatedCmds.put(action, System.currentTimeMillis());
+    }
+
+    public void tick(final long currentTick, final long currTime) {
+        if (this.simulatedCmds.size() == 0) {
+            return;
+        }
+        for (Map.Entry<Runnable, Long> entry : this.simulatedCmds.entrySet()) {
+            if (currTime - entry.getValue() < this.ping) {
+                continue;
+            }
+            entry.getKey().run();
+            this.simulatedCmds.remove(entry.getKey());
+        }
+
+        // Send transaction request to the client.
+        if (currentTick % 80 == 0) {
+            this.lastRequestSent = System.currentTimeMillis();
+            this.sendPacket(McAccessor.INSTANCE.newTransactionPacket());
+        }
     }
 
     /**

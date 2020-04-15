@@ -2,7 +2,7 @@ package xyz.hstudio.horizon.util;
 
 import java.util.concurrent.ThreadLocalRandom;
 
-public class RandomUtils {
+public final class RandomUtils {
 
     private RandomUtils() {
     }

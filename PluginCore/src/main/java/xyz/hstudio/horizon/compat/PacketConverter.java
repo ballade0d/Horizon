@@ -7,7 +7,7 @@ import xyz.hstudio.horizon.compat.v1_15_R1.PacketConverter_v1_15_R1;
 import xyz.hstudio.horizon.compat.v1_8_R3.PacketConverter_v1_8_R3;
 import xyz.hstudio.horizon.util.enums.Version;
 
-public class PacketConverter {
+public final class PacketConverter {
 
     private PacketConverter() {
     }

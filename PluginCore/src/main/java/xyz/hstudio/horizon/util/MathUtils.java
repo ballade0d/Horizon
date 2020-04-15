@@ -6,7 +6,7 @@ import xyz.hstudio.horizon.util.wrap.Vector3D;
 
 import java.util.Arrays;
 
-public class MathUtils {
+public final class MathUtils {
 
     private MathUtils() {
     }

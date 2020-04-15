@@ -18,6 +18,7 @@ import xyz.hstudio.horizon.util.enums.MatUtils;
 import xyz.hstudio.horizon.util.wrap.Vector3D;
 
 import java.util.Objects;
+import java.util.Set;
 
 public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> {
 
@@ -45,9 +46,6 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
         if (config.step_enabled) {
             typeB(event, player, data, config);
         }
-        if (config.fastfall_enabled) {
-            typeC(event, player, data, config);
-        }
     }
 
     /**
@@ -66,14 +64,11 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
 
             // TODO: Handle Vehicle
 
-            if (!e.onGround && !e.isTeleport && player.teleports.size() == 0 && !e.jumpLegitly && !e.stepLegitly && e.knockBack == null && e.piston.size() == 0 &&
-                    player.currentTick - player.leaveVehicleTick > 1 && player.getVehicle() == null && !player.isFlying() &&
-                    !player.player.isDead() && !e.isOnSlime && !e.isOnBed && !e.isInLiquid && !player.isInLiquid &&
-                    !e.collidingBlocks.contains(Material.LADDER) && !e.collidingBlocks.contains(Material.VINE) &&
-                    !e.collidingBlocks.contains(MatUtils.SCAFFOLDING.parse()) && !e.collidingBlocks.contains(MatUtils.KELP.parse()) &&
-                    !e.collidingBlocks.contains(MatUtils.KELP_PLANT.parse()) && !e.collidingBlocks.contains(MatUtils.BUBBLE_COLUMN.parse()) &&
-                    !e.collidingBlocks.contains(MatUtils.SWEET_BERRY_BUSH.parse()) &&
-                    e.collidingBlocks.stream().noneMatch(BlockUtils.SHULKER_BOX::contains)) {
+            if (!player.isFlying() && (!e.onGround || !player.onGround) && !e.isTeleport && player.teleports.size() == 0 &&
+                    !e.jumpLegitly && !e.stepLegitly && e.knockBack == null && e.piston.size() == 0 &&
+                    player.currentTick - player.leaveVehicleTick > 1 && player.getVehicle() == null &&
+                    !player.player.isDead() && !e.isOnSlime && !e.isOnBed && !e.isInLiquid &&
+                    !player.isInLiquid && !inSpecialBlock(e.collidingBlocks)) {
 
                 int levitation = player.getPotionEffectAmplifier("LEVITATION");
                 // Supports SLOW_FALLING potion effect
@@ -103,14 +98,19 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
                         estimatedVelocity = deltaY;
                     }
                 } else if (data.prevGliding) {
+                    // Glide landing
                     estimatedVelocity = 0;
                 } else if (player.currentTick - data.attemptGlideTick < 2) {
+                    // Fix glide false positive
                     estimatedVelocity = deltaY;
                 } else if (levitation > 0) {
+                    // Handle levitation potion effect
                     estimatedVelocity = prevEstimatedVelocity + (0.05F * levitation - prevEstimatedVelocity) * 0.2F;
                 } else if (e.collidingBlocks.contains(MatUtils.COBWEB.parse())) {
+                    // Handle Cobweb
                     estimatedVelocity = -0.00392F;
                 } else {
+                    // Normal Air function
                     estimatedVelocity = (prevEstimatedVelocity - gravity) * 0.98F;
                 }
                 if (Math.abs(estimatedVelocity) < 0.005 && estimatedVelocity != 0) {
@@ -129,13 +129,13 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
                 if (Math.abs(deltaY + 0.0784) < 0.001 && Math.abs(player.velocity.y - 0.2) < 0.001 && !e.onGround) {
                     estimatedVelocity = deltaY;
                 }
-                if ((estimatedVelocity == -0.0784F || estimatedVelocity == 0F) && player.isOnGround && deltaY == 0) {
+                if ((estimatedVelocity == -0.0784F || estimatedVelocity == 0F) && player.onGround && deltaY == 0) {
                     estimatedVelocity = deltaY;
                     data.magic = true;
                 }
 
                 // Fix the false positives when towering
-                if (player.isOnGround && !e.onGround && player.velocity.y == 0 && (Math.abs(deltaY - 0.4044449) < 0.001 || Math.abs(deltaY - 0.3955759) < 0.001)) {
+                if (player.onGround && !e.onGround && player.velocity.y == 0 && (Math.abs(deltaY - 0.4044449) < 0.001 || Math.abs(deltaY - 0.3955759) < 0.001)) {
                     deltaY = estimatedVelocity = 0.42F;
                 }
 
@@ -154,20 +154,35 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
                 }
 
                 float discrepancy = deltaY - estimatedVelocity;
-
-                if (e.updatePos && e.velocity.lengthSquared() > 0 && Math.abs(discrepancy) > config.predict_tolerance) {
-                    // Punish
-                    if (config.predict_wall_jump && e.clientBlock != -1) {
-                        this.cancel(e, 0, player, data, config);
+                if (e.onGround && !player.onGround) {
+                    if (Math.abs(discrepancy) > config.predict_tolerance && (deltaY < Math.min(estimatedVelocity, 0) || deltaY > Math.max(estimatedVelocity, 0))) {
+                        // Punish
+                        if (config.predict_wall_jump && e.clientBlock != -1) {
+                            this.cancel(e, 0, player, data, config);
+                        } else {
+                            this.punish(event, player, data, 0, Math.abs(discrepancy) * 5F,
+                                    "d:" + deltaY, "e:" + estimatedVelocity, "p:" + discrepancy, "pr:" + player.velocity.y, "t:l");
+                        }
                     } else {
-                        this.punish(event, player, data, 0, Math.abs(discrepancy) * 5F,
-                                "d:" + deltaY, "e:" + estimatedVelocity, "p:" + discrepancy, "pr:" + player.velocity.y);
+                        reward(0, data, 0.999);
                     }
-                } else {
-                    reward(0, data, 0.999);
+
+                    data.estimatedVelocity = 0;
+                } else if (e.updatePos && e.velocity.lengthSquared() > 0) {
+                    if (Math.abs(discrepancy) > config.predict_tolerance) {
+                        // Punish
+                        if (config.predict_wall_jump && e.clientBlock != -1) {
+                            this.cancel(e, 0, player, data, config);
+                        } else {
+                            this.punish(event, player, data, 0, Math.abs(discrepancy) * 5F,
+                                    "d:" + deltaY, "e:" + estimatedVelocity, "p:" + discrepancy, "pr:" + player.velocity.y, "t:a");
+                        }
+                    } else {
+                        reward(0, data, 0.999);
+                    }
+                    data.estimatedVelocity = estimatedVelocity;
                 }
 
-                data.estimatedVelocity = estimatedVelocity;
             } else {
                 if (e.onGround || (e.touchingFaces.contains(BlockFace.UP) && deltaY > 0)) {
                     data.estimatedVelocity = 0;
@@ -184,6 +199,17 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
         }
     }
 
+    private boolean inSpecialBlock(final Set<Material> collidingBlocks) {
+        return collidingBlocks.contains(Material.LADDER) ||
+                collidingBlocks.contains(Material.VINE) ||
+                collidingBlocks.contains(MatUtils.SCAFFOLDING.parse()) ||
+                collidingBlocks.contains(MatUtils.KELP.parse()) ||
+                collidingBlocks.contains(MatUtils.KELP_PLANT.parse()) ||
+                collidingBlocks.contains(MatUtils.BUBBLE_COLUMN.parse()) ||
+                collidingBlocks.contains(MatUtils.SWEET_BERRY_BUSH.parse()) ||
+                collidingBlocks.stream().anyMatch(BlockUtils.SHULKER_BOX::contains);
+    }
+
     /**
      * A simple Step check
      * <p>
@@ -195,7 +221,7 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
     private void typeB(final Event event, final HoriPlayer player, final InvalidMotionData data, final InvalidMotionNode config) {
         if (event instanceof MoveEvent) {
             MoveEvent e = (MoveEvent) event;
-            if (e.stepLegitly || !e.onGround || !player.isOnGround || e.isTeleport ||
+            if (e.stepLegitly || !e.onGround || !player.onGround || e.isTeleport ||
                     e.knockBack != null) {
                 return;
             }
@@ -206,39 +232,6 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
                 this.punish(event, player, data, 1, 4, "d:" + deltaY);
             } else {
                 reward(1, data, 0.99);
-            }
-        }
-    }
-
-    /**
-     * A simple FastFall check.
-     * TypeA also checks for FastFall, but it only detects if onGround == false,
-     * however, if the client falls too fast, onGround will be true,
-     * this check will fix the bypass.
-     * <p>
-     * Accuracy: 9/10 - Should not have any false positives.
-     * Efficiency: 10/10 - Detects most FastFall instantly.
-     *
-     * @author MrCraftGoo
-     */
-    private void typeC(final Event event, final HoriPlayer player, final InvalidMotionData data, final InvalidMotionNode config) {
-        if (event instanceof MoveEvent) {
-            MoveEvent e = (MoveEvent) event;
-
-            if (player.currentTick - player.lastTeleportAcceptTick < 2 || player.teleports.size() > 0 || !e.onGround || e.knockBack != null || e.touchingFaces.contains(BlockFace.UP) || player.touchingFaces.contains(BlockFace.UP) ||
-                    e.collidingBlocks.contains(MatUtils.LADDER.parse()) || e.collidingBlocks.contains(MatUtils.VINE.parse()) ||
-                    player.isFlying() || player.player.isSleeping() || player.position.isOnGround(player, false, 0.001)) {
-                return;
-            }
-            double deltaY = e.velocity.y;
-            double estimatedY = (player.velocity.y - 0.08) * 0.98;
-
-            double discrepancy = deltaY - estimatedY;
-            if (discrepancy < config.fastfall_tolerance) {
-                // Punish
-                this.punish(event, player, data, 2, 4, "d:" + deltaY, "e:" + estimatedY);
-            } else {
-                reward(2, data, 0.99);
             }
         }
     }

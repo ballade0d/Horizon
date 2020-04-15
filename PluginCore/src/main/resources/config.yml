@@ -4,6 +4,8 @@ log: true
 
 command_alias: [hz, hori]
 
+op_bypass: false
+
 # Personalized Themes Module
 # It will pickup themes individually for each player according to their client language.
 personalized_themes:

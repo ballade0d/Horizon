@@ -25,3 +25,34 @@ permissions:
     default: op
   horizon.verbose:
     default: false
+  horizon.bypass.*:
+    default: false
+    children:
+      horizon.bypass.antibot:
+        default: false
+      horizon.bypass.antivelocity:
+        default: false
+      horizon.bypass.badpacket:
+        default: false
+      horizon.bypass.groundspoof:
+        default: false
+      horizon.bypass.healthtag:
+        default: false
+      horizon.bypass.hitbox:
+        default: false
+      horizon.bypass.invalidmotion:
+        default: false
+      horizon.bypass.inventory:
+        default: false
+      horizon.bypass.killaura:
+        default: false
+      horizon.bypass.killaurabot:
+        default: false
+      horizon.bypass.noswing:
+        default: false
+      horizon.bypass.scaffold:
+        default: false
+      horizon.bypass.speed:
+        default: false
+      horizon.bypass.timer:
+        default: false

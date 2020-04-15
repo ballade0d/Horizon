@@ -17,11 +17,6 @@ public class InvalidMotionNode extends CheckFile {
     // TypeB
     @Load(path = "step.enabled")
     public boolean step_enabled = true;
-    // TypeC
-    @Load(path = "fastfall.enabled")
-    public boolean fastfall_enabled = true;
-    @Load(path = "fastfall.tolerance")
-    public double fastfall_tolerance = -0.02;
 
     public InvalidMotionNode load(final String pathPrefix, final YamlLoader loader) {
         return AbstractFile.load(pathPrefix, this, loader);
