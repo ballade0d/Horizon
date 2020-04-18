@@ -129,7 +129,7 @@ public class Commands implements TabCompleter, CommandExecutor {
         }
         Player player = Bukkit.getPlayer(args[0]);
         if (player == null || !player.isOnline()) {
-            sender.sendMessage(prefix + lang.cmd_kick_player_not_found);
+            sender.sendMessage(prefix + lang.cmd_player_not_found);
             return;
         }
         StringBuilder builder = new StringBuilder();
@@ -142,17 +142,17 @@ public class Commands implements TabCompleter, CommandExecutor {
     @Cmd(name = "bot", perm = "horizon.cmd.bot")
     public void bot(final CommandSender sender, final String[] args, final String prefix, final LangFile lang) {
         if (args.length < 2) {
-            sender.sendMessage(prefix + lang.cmd_kick_wrong_usage);
+            sender.sendMessage(prefix + lang.cmd_bot_wrong_usage);
             return;
         }
         Player player = Bukkit.getPlayer(args[0]);
         if (player == null || !player.isOnline()) {
-            sender.sendMessage(prefix + lang.cmd_kick_player_not_found);
+            sender.sendMessage(prefix + lang.cmd_player_not_found);
             return;
         }
         HoriPlayer hPlayer = Horizon.PLAYERS.get(player.getUniqueId());
         if (hPlayer == null) {
-            sender.sendMessage(prefix + lang.cmd_kick_player_not_found);
+            sender.sendMessage(prefix + lang.cmd_player_not_found);
             return;
         }
         try {
@@ -160,14 +160,19 @@ public class Commands implements TabCompleter, CommandExecutor {
             hPlayer.killAuraBotData.checkEnd = System.currentTimeMillis() + time * 1000L;
             sender.sendMessage(prefix + lang.cmd_bot);
         } catch (Exception e) {
-            sender.sendMessage(prefix + lang.cmd_kick_wrong_usage);
+            sender.sendMessage(prefix + lang.cmd_bot_wrong_usage);
         }
     }
 
     @Override
     public List<String> onTabComplete(final CommandSender sender, final Command command, final String alias, final String[] args) {
         if (args.length == 1) {
-            return this.commands.stream().map(pair -> pair.key.name()).sorted().collect(Collectors.toList());
+            return this.commands
+                    .stream()
+                    .map(pair -> pair.key.name())
+                    .filter(name -> name.startsWith(args[0]))
+                    .sorted()
+                    .collect(Collectors.toList());
         }
         return Collections.emptyList();
     }

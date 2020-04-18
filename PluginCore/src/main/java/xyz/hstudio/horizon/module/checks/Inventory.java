@@ -72,7 +72,7 @@ public class Inventory extends Module<InventoryData, InventoryNode> {
             }
 
             // It's impossible to rotate if inventory is opened.
-            if (config.typeA_checkRotation && e.hasDeltaRot()) {
+            if (config.typeA_checkRotation && e.hasDeltaRot() && player.currentTick - data.inventoryOpenTick >= 21) {
                 // Block Inventory Rotation
 
                 // Punish

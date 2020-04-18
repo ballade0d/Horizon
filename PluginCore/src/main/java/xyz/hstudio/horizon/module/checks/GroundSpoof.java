@@ -50,10 +50,13 @@ public class GroundSpoof extends Module<GroundSpoofData, GroundSpoofNode> {
             }
             // Player is not on ground but appears on ground.
             if (e.onGround) {
-                Location checkLoc = new Location(e.to.world, e.from.x, e.to.y, e.from.z);
                 // Do another check to make sure if player is really not on ground
                 // to avoid some false positives.
-                if (checkLoc.isOnGround(player, false, 0.025)) {
+                Location checkLoc = new Location(e.to.world, e.from.x, e.to.y, e.from.z);
+                if (checkLoc.isOnGround(player, false, 0.3)) {
+                    return;
+                }
+                if (e.to.isOnGround(player, false, 0.3)) {
                     return;
                 }
                 if (e.clientBlock != -1) {

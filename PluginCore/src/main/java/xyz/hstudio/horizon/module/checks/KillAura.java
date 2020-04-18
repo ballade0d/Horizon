@@ -149,7 +149,7 @@ public class KillAura extends Module<KillAuraData, KillAuraNode> {
     private void typeC(final Event event, final HoriPlayer player, final KillAuraData data, final KillAuraNode config) {
         if (event instanceof MoveEvent) {
             MoveEvent e = (MoveEvent) event;
-            if (!e.updateRot) {
+            if (!e.updateRot || e.isTeleport) {
                 return;
             }
             // Only execute if player fails any other killaura checks.
@@ -170,7 +170,7 @@ public class KillAura extends Module<KillAuraData, KillAuraNode> {
             if (gcd <= 131072) {
                 if (++data.gcdFails > 5) {
                     // Punish
-                    this.punish(event, player, data, 2, 3, "g:" + gcd);
+                    this.punish(event, player, data, 2, 3, "gcd:" + gcd);
                 }
             } else if (data.gcdFails > 0) {
                 data.gcdFails--;
@@ -183,7 +183,7 @@ public class KillAura extends Module<KillAuraData, KillAuraNode> {
     }
 
     private long greatestCommonDivisor(final int current, final int previous) {
-        return previous <= 16384 ? current : this.greatestCommonDivisor(previous, current % previous);
+        return previous <= 32768 ? current : this.greatestCommonDivisor(previous, current % previous);
     }
 
     private float getDistance(final float from, final float to) {

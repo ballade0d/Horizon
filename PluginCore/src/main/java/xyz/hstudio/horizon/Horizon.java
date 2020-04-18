@@ -23,6 +23,7 @@ import xyz.hstudio.horizon.util.enums.Version;
 import xyz.hstudio.horizon.util.wrap.YamlLoader;
 
 import java.io.File;
+import java.net.URLClassLoader;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -145,6 +146,12 @@ public class Horizon extends JavaPlugin {
             this.syncTask.cancel();
         }
         this.asyncTask.running = false;
+
+        try {
+            ((URLClassLoader) this.getClassLoader()).close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public LangFile getLang(final String name) {

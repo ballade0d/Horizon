@@ -18,7 +18,7 @@
 
     <repositories>
         <repository>
-            <id>spigot-repo</id>
+            <id>spigot-api-repo</id>
             <url>https://hub.spigotmc.org/nexus/content/groups/public/</url>
         </repository>
         <repository>
@@ -30,7 +30,7 @@
             <url>https://repo.viaversion.com/</url>
         </repository>
         <repository>
-            <id>jitpack.io</id>
+            <id>protocolsupport</id>
             <url>https://jitpack.io</url>
         </repository>
     </repositories>

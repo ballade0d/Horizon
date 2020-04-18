@@ -147,7 +147,7 @@ killaurabot:
   show_armor: true
   show_on_tab: true
   realistic_ping: true
-  realistic_name: true
+  realistic_name: false
   respawn_interval: 180
   action:
     10:
