@@ -7,6 +7,7 @@ import xyz.hstudio.horizon.api.events.Event;
 import xyz.hstudio.horizon.api.events.inbound.ActionEvent;
 import xyz.hstudio.horizon.api.events.inbound.InteractItemEvent;
 import xyz.hstudio.horizon.api.events.inbound.MoveEvent;
+import xyz.hstudio.horizon.api.events.outbound.AttributeEvent;
 import xyz.hstudio.horizon.compat.McAccessor;
 import xyz.hstudio.horizon.data.HoriPlayer;
 import xyz.hstudio.horizon.data.checks.SpeedData;
@@ -17,6 +18,7 @@ import xyz.hstudio.horizon.util.MathUtils;
 import xyz.hstudio.horizon.util.enums.MatUtils;
 import xyz.hstudio.horizon.util.wrap.Vector3D;
 
+import java.util.List;
 import java.util.Set;
 
 public class Speed extends Module<SpeedData, SpeedNode> {
@@ -246,7 +248,7 @@ public class Speed extends Module<SpeedData, SpeedNode> {
 
         float multiplier;
         if (player.onGround) {
-            multiplier = player.moveFactor * 0.16277136F / (newFriction * newFriction * newFriction);
+            multiplier = getMoveFactor(player.moveModifiers) * 0.16277136F / (newFriction * newFriction * newFriction);
             float groundMultiplier = 5 * player.player.getWalkSpeed();
             multiplier *= groundMultiplier;
 
@@ -268,6 +270,23 @@ public class Speed extends Module<SpeedData, SpeedNode> {
             float finalForce = (float) Math.sqrt(2 * componentForce * componentForce);
             return finalForce * (sprinting ? 1.3F : 1);
         }
+    }
+
+    private float getMoveFactor(final List<AttributeEvent.AttributeModifier> modifiers) {
+        float value = 0.1F;
+        for (AttributeEvent.AttributeModifier modifier : modifiers) {
+            switch (modifier.operation) {
+                case 0:
+                    value += modifier.value;
+                    continue;
+                case 1:
+                case 2:
+                    value += value * modifier.value;
+                    continue;
+                default:
+            }
+        }
+        return value;
     }
 
     private void typeB(final Event event, final HoriPlayer player, final SpeedData data, final SpeedNode config) {

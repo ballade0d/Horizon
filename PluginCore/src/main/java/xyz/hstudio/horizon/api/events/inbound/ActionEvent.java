@@ -1,6 +1,7 @@
 package xyz.hstudio.horizon.api.events.inbound;
 
 import xyz.hstudio.horizon.api.events.Event;
+import xyz.hstudio.horizon.api.events.outbound.AttributeEvent;
 import xyz.hstudio.horizon.data.HoriPlayer;
 
 public class ActionEvent extends Event {
@@ -23,7 +24,7 @@ public class ActionEvent extends Event {
                 break;
             case START_SPRINTING:
                 player.isSprinting = true;
-                player.moveFactor += player.moveFactor * 0.3F;
+                player.moveModifiers.add(new AttributeEvent.AttributeModifier(AttributeEvent.SPRINT_UUID, 0.3, 2));
                 break;
             case STOP_SPRINTING:
                 player.isSprinting = false;

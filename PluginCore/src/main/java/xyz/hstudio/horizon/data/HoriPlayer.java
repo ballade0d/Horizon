@@ -12,6 +12,7 @@ import org.bukkit.potion.PotionEffect;
 import protocolsupport.api.ProtocolSupportAPI;
 import us.myles.ViaVersion.api.Via;
 import xyz.hstudio.horizon.Horizon;
+import xyz.hstudio.horizon.api.events.outbound.AttributeEvent;
 import xyz.hstudio.horizon.compat.McAccessor;
 import xyz.hstudio.horizon.data.checks.*;
 import xyz.hstudio.horizon.file.LangFile;
@@ -55,6 +56,7 @@ public class HoriPlayer {
     public final List<Pair<Vector3D, Long>> velocities = new LinkedList<>();
     public final Map<Location, Long> teleports = new ConcurrentHashMap<>();
     public final Map<Location, Map.Entry<Long, Material>> clientBlocks = new ConcurrentHashMap<>();
+    public List<AttributeEvent.AttributeModifier> moveModifiers = new ArrayList<>();
     public List<AABB> piston = new ArrayList<>();
     public Set<BlockFace> touchingFaces = EnumSet.noneOf(BlockFace.class);
     public boolean isSneaking;
@@ -75,7 +77,6 @@ public class HoriPlayer {
     public long lastTeleportTime;
     public long ping;
     public long lastRequestSent;
-    public float moveFactor = 0.1F;
     public ChannelPipeline pipeline;
 
     public HoriPlayer(final Player player) {

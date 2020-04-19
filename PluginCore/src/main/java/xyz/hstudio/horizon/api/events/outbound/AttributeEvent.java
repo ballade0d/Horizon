@@ -1,6 +1,6 @@
 package xyz.hstudio.horizon.api.events.outbound;
 
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 import xyz.hstudio.horizon.api.events.Event;
 import xyz.hstudio.horizon.data.HoriPlayer;
 
@@ -10,7 +10,7 @@ import java.util.UUID;
 
 public class AttributeEvent extends Event {
 
-    private static final UUID SPRINT_UUID = UUID.fromString("662a6b8d-da3e-4c1c-8813-96ea6097278d");
+    public static final UUID SPRINT_UUID = UUID.fromString("662a6b8d-da3e-4c1c-8813-96ea6097278d");
 
     public final List<AttributeSnapshot> snapshots;
 
@@ -26,34 +26,17 @@ public class AttributeEvent extends Event {
                 continue;
             }
             if (snapshot.modifiers.size() == 0 && !player.isSprinting) {
-                player.moveFactor = (float) snapshot.baseValue;
                 player.speedData.attributeBypass = true;
                 player.sendSimulatedAction(() -> player.speedData.attributeBypass = false);
+                player.moveModifiers.clear();
                 break;
             }
             snapshot.modifiers.sort(Comparator.comparingInt(o -> o.operation));
-            for (AttributeModifier modifier : snapshot.modifiers) {
-                if (modifier.uuid.equals(SPRINT_UUID)) {
-                    break;
-                }
-                switch (modifier.operation) {
-                    case 0:
-                        player.moveFactor += modifier.value;
-                        break;
-                    case 1:
-                    case 2:
-                        // Idk what operation 1 do, figure it out sometime.
-                        player.moveFactor += player.moveFactor * modifier.value;
-                        break;
-                    default:
-                        break;
-                }
-            }
-            break;
+            player.moveModifiers = snapshot.modifiers;
         }
     }
 
-    @RequiredArgsConstructor
+    @AllArgsConstructor
     public static class AttributeSnapshot {
         public final String key;
         public final double baseValue;
@@ -61,7 +44,7 @@ public class AttributeEvent extends Event {
         public final List<AttributeModifier> modifiers;
     }
 
-    @RequiredArgsConstructor
+    @AllArgsConstructor
     public static class AttributeModifier {
         public final UUID uuid;
         public final double value;
