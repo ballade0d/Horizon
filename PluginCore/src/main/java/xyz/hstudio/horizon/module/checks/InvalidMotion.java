@@ -142,7 +142,8 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
                         (Math.abs(player.velocity.y - 0.2) < 0.001 || Math.abs(player.velocity.y - 0.325) < 0.001)) {
                     estimatedVelocity = deltaY;
                 }
-                if ((estimatedVelocity == -0.0784F || estimatedVelocity == 0F) && player.onGround && deltaY == 0) {
+                if ((estimatedVelocity == -0.0784F || estimatedVelocity == 0F) && player.velocity.y == 0 && player.onGround && !e.onGround && deltaY == 0 &&
+                        !e.cube.add(-0.1, 1.6, -0.1, 0.1, 1.8, 0.1).getMaterials(e.to.world).isEmpty()) {
                     estimatedVelocity = deltaY;
                     data.magic = true;
                 }
