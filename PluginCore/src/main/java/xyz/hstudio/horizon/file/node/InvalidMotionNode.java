@@ -17,6 +17,9 @@ public class InvalidMotionNode extends CheckFile {
     // TypeB
     @Load(path = "step.enabled")
     public boolean step_enabled = true;
+    // TypeC
+    @Load(path = "packet.enabled")
+    public boolean packet_enabled = true;
 
     public InvalidMotionNode load(final String pathPrefix, final YamlLoader loader) {
         return AbstractFile.load(pathPrefix, this, loader);

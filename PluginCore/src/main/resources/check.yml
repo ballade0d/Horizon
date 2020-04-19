@@ -79,6 +79,8 @@ invalidmotion:
     wall_jump: true
   step:
     enabled: true
+  packet:
+    enabled: true
   action:
     20:
       - 'horizon notify %player% might be moving unexpectedly'

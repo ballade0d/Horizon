@@ -5,6 +5,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import xyz.hstudio.horizon.api.ModuleType;
 import xyz.hstudio.horizon.api.events.Event;
+import xyz.hstudio.horizon.api.events.inbound.AbilitiesEvent;
 import xyz.hstudio.horizon.api.events.inbound.ActionEvent;
 import xyz.hstudio.horizon.api.events.inbound.MoveEvent;
 import xyz.hstudio.horizon.compat.McAccessor;
@@ -24,7 +25,7 @@ import java.util.Set;
 public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> {
 
     public InvalidMotion() {
-        super(ModuleType.InvalidMotion, new InvalidMotionNode(), "Predict", "Step", "FastFall");
+        super(ModuleType.InvalidMotion, new InvalidMotionNode(), "Predict", "Step", "Packet");
     }
 
     @Override
@@ -46,6 +47,9 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
         }
         if (config.step_enabled) {
             typeB(event, player, data, config);
+        }
+        if (config.packet_enabled) {
+            typeC(event, player, data, config);
         }
     }
 
@@ -233,27 +237,38 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
         if (event instanceof MoveEvent) {
             MoveEvent e = (MoveEvent) event;
             if (e.stepLegitly || !e.onGround || !player.onGround || e.isTeleport ||
-                    e.knockBack != null) {
+                    e.knockBack != null || inLadder(e.collidingBlocks) || e.isOnSlime) {
                 return;
             }
             double deltaY = e.velocity.y;
 
             if (deltaY > 0.6 || deltaY < -0.0784) {
                 // Punish
-                this.punish(event, player, data, 1, 4, "d:" + deltaY);
+                this.punish(event, player, data, 1, 4, "d:" + deltaY, "t:a");
+            } else if (e.onGroundReally && Math.abs(player.prevPrevDeltaY - 0.333) < 0.01 &&
+                    Math.abs(player.velocity.y - 0.248) < 0.01 && deltaY <= 0) {
+                // Punish
+                this.punish(event, player, data, 1, 3, "d:" + deltaY, "t:b");
             } else {
                 reward(1, data, 0.99);
             }
         }
     }
 
-    // Liquid function
-    private void typeD(final Event event, final HoriPlayer player, final InvalidMotionData data, final InvalidMotionNode config) {
-
-    }
-
-    // Ladder function
-    private void typeE(final Event event, final HoriPlayer player, final InvalidMotionData data, final InvalidMotionNode config) {
-
+    /**
+     * An ability packet check.
+     * <p>
+     * Accuracy: 10/10 - Should not have any false positives.
+     * Efficiency: 10/10 - Detects instantly.
+     *
+     * @author MrCraftGoo
+     */
+    private void typeC(final Event event, final HoriPlayer player, final InvalidMotionData data, final InvalidMotionNode config) {
+        if (event instanceof AbilitiesEvent) {
+            if (!player.player.getAllowFlight()) {
+                // Punish
+                this.punish(event, player, data, 2, 6);
+            }
+        }
     }
 }
