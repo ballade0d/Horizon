@@ -16,7 +16,6 @@ public enum MatUtils {
     END_ROD(),
     FARMLAND("SOIL"),
     ENCHANTED_GOLDEN_APPLE("GOLDEN_APPLE"),
-    SLIME_BLOCK("SLIME_BLOCK"),
     KELP(),
     KELP_PLANT(),
     LADDER("LADDER"),

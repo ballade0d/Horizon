@@ -30,11 +30,9 @@ public class MetaEvent extends Event {
                 }
                 byte statue = (byte) object.object;
                 if ((statue & 16) != 16) {
-                    player.sendSimulatedAction(() -> {
-                        player.isEating = false;
-                        player.isPullingBow = false;
-                        player.isBlocking = false;
-                    });
+                    player.isEating = false;
+                    player.isPullingBow = false;
+                    player.isBlocking = false;
                     break;
                 }
             }
@@ -43,11 +41,9 @@ public class MetaEvent extends Event {
                 if (object.index == 6) {
                     byte statue = (byte) object.object;
                     if ((statue & 1) != 1) {
-                        player.sendSimulatedAction(() -> {
-                            player.isEating = false;
-                            player.isPullingBow = false;
-                            player.isBlocking = false;
-                        });
+                        player.isEating = false;
+                        player.isPullingBow = false;
+                        player.isBlocking = false;
                     }
                 } else if (object.index == 0) {
                     byte statue = (byte) object.object;
@@ -59,11 +55,9 @@ public class MetaEvent extends Event {
                 if (object.index == 7) {
                     byte statue = (byte) object.object;
                     if ((statue & 1) != 1) {
-                        player.sendSimulatedAction(() -> {
-                            player.isEating = false;
-                            player.isPullingBow = false;
-                            player.isBlocking = false;
-                        });
+                        player.isEating = false;
+                        player.isPullingBow = false;
+                        player.isBlocking = false;
                     }
                 } else if (object.index == 0) {
                     byte statue = (byte) object.object;

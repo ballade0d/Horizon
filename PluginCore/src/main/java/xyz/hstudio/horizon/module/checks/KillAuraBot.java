@@ -47,7 +47,7 @@ public class KillAuraBot extends Module<KillAuraBotData, KillAuraBotNode> {
                 return;
             }
             Location to = getBotLocation(player.position, config.xz_distance, config.y_distance);
-            McAccessor.INSTANCE.ensureMainThread(() -> {
+            this.run(() -> {
                 bot.move(to.x, to.y, to.z, player.position.yaw, player.position.pitch, player);
                 bot.spawn(player);
                 if (config.show_armor) {
@@ -56,7 +56,7 @@ public class KillAuraBot extends Module<KillAuraBotData, KillAuraBotNode> {
                 if (!config.show_on_tab && !bot.isRealName()) {
                     bot.removeFromTabList(player);
                 }
-            });
+            }, config.async_packet);
             data.bot = bot;
         } else if (event instanceof MoveEvent) {
             MoveEvent e = (MoveEvent) event;
@@ -66,10 +66,10 @@ public class KillAuraBot extends Module<KillAuraBotData, KillAuraBotNode> {
             if (data.bot == null) {
                 return;
             }
-            McAccessor.INSTANCE.ensureMainThread(() -> {
+            this.run(() -> {
                 data.bot.despawn(player);
                 data.bot = null;
-            });
+            }, config.async_packet);
         } else if (event instanceof InteractCSEntityEvent) {
             if (data.bot == null) {
                 return;
@@ -93,14 +93,14 @@ public class KillAuraBot extends Module<KillAuraBotData, KillAuraBotNode> {
                 continue;
             }
             if (System.currentTimeMillis() - bot.getSpawnTime() > config.respawn_interval * 1000L) {
-                McAccessor.INSTANCE.ensureMainThread(() -> bot.despawn(player));
+                this.run(() -> bot.despawn(player), config.async_packet);
                 continue;
             }
             Location to = getBotLocation(player.position, config.xz_distance, config.y_distance);
 
             to.add(new Vector3D(config.offset_x * ThreadLocalRandom.current().nextDouble(), config.offset_y * ThreadLocalRandom.current().nextDouble(), config.offset_z * ThreadLocalRandom.current().nextDouble()));
 
-            McAccessor.INSTANCE.ensureMainThread(() -> {
+            this.run(() -> {
                 bot.move(to.x, to.y, to.z, player.position.yaw, player.position.pitch, player);
 
                 boolean sprinting = ThreadLocalRandom.current().nextBoolean();
@@ -124,7 +124,7 @@ public class KillAuraBot extends Module<KillAuraBotData, KillAuraBotNode> {
                 if (config.realistic_ping && currentTick % 40 == 0) {
                     bot.updatePing(player);
                 }
-            });
+            }, config.async_packet);
         }
     }
 
@@ -132,5 +132,13 @@ public class KillAuraBot extends Module<KillAuraBotData, KillAuraBotNode> {
         double yaw = Math.toRadians(position.yaw);
         return position.clone()
                 .add(Math.sin(yaw) * xz_distance, y_distance, Math.cos(yaw) * -xz_distance);
+    }
+
+    private void run(final Runnable runnable, final boolean async) {
+        if (async) {
+            runnable.run();
+        } else {
+            McAccessor.INSTANCE.ensureMainThread(runnable);
+        }
     }
 }

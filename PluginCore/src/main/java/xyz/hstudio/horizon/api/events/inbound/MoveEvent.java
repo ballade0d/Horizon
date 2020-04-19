@@ -121,13 +121,13 @@ public class MoveEvent extends Event {
      */
     private boolean checkSlime() {
         Block standing = this.from.add(0, -0.01, 0).getBlock();
-        if (standing == null) {
+        if (standing == null || standing.getType() != Material.SLIME_BLOCK) {
             return false;
         }
         float deltaY = (float) this.velocity.y;
         float slimeExpect = (float) (-0.96F * player.prevPrevDeltaY);
-        return standing.getType() == MatUtils.SLIME_BLOCK.parse() && !player.isSneaking &&
-                player.velocity.y <= 0 && deltaY > 0 && deltaY <= slimeExpect;
+        return !player.isSneaking &&
+                player.velocity.y <= 0 && deltaY > 0 && (deltaY <= slimeExpect || deltaY < 0.2);
     }
 
     /**

@@ -13,6 +13,7 @@ public class SpeedData extends Data {
 
     public long lastUseTick;
     public long lastToggleTick;
+    public boolean attributeBypass;
     // Sprint
     public long lastSprintTick;
     public boolean collisionHorizontal;

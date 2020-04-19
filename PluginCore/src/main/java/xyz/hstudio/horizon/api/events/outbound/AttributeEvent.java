@@ -26,7 +26,9 @@ public class AttributeEvent extends Event {
                 continue;
             }
             if (snapshot.modifiers.size() == 0 && !player.isSprinting) {
-                player.sendSimulatedAction(() -> player.moveFactor = (float) snapshot.baseValue);
+                player.moveFactor = (float) snapshot.baseValue;
+                player.speedData.attributeBypass = true;
+                player.sendSimulatedAction(() -> player.speedData.attributeBypass = false);
                 break;
             }
             snapshot.modifiers.sort(Comparator.comparingInt(o -> o.operation));

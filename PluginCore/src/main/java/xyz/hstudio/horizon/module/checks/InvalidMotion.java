@@ -1,6 +1,7 @@
 package xyz.hstudio.horizon.module.checks;
 
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import xyz.hstudio.horizon.api.ModuleType;
 import xyz.hstudio.horizon.api.events.Event;
@@ -76,6 +77,8 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
                 float prevEstimatedVelocity = data.estimatedVelocity;
                 float estimatedVelocity;
 
+                Block feetBlock = e.to.add(0, -1, 0).getBlock();
+
                 if (player.isGliding) {
                     // Gliding function
                     // Fix this, this creates possibility of bypass
@@ -109,6 +112,11 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
                 } else if (e.collidingBlocks.contains(MatUtils.COBWEB.parse())) {
                     // Handle Cobweb
                     estimatedVelocity = -0.00392F;
+                } else if (inLadder(e.collidingBlocks) || (feetBlock != null &&
+                        (feetBlock.getType() == Material.LADDER ||
+                                feetBlock.getType() == Material.VINE))) {
+                    // TODO: Handle it
+                    estimatedVelocity = deltaY;
                 } else {
                     // Normal Air function
                     estimatedVelocity = (prevEstimatedVelocity - gravity) * 0.98F;
@@ -145,7 +153,7 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
                         .getBlocksInLocation(e.to.add(0, -0.2, 0))
                         .stream()
                         .filter(Objects::nonNull)
-                        .anyMatch(b -> b.getType() == MatUtils.SLIME_BLOCK.parse())) {
+                        .anyMatch(b -> b.getType() == Material.SLIME_BLOCK)) {
                     estimatedVelocity = 0;
                 }
 
@@ -162,7 +170,7 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
                             this.cancel(e, 0, player, data, config);
                         } else {
                             this.punish(event, player, data, 0, Math.abs(discrepancy) * 5F,
-                                    "d:" + deltaY, "e:" + estimatedVelocity, "p:" + discrepancy, "pr:" + player.velocity.y, "t:l");
+                                    "d:" + deltaY, "e:" + estimatedVelocity, "r:" + player.velocity.y, "t:l");
                         }
                     } else {
                         reward(0, data, 0.999);
@@ -176,7 +184,7 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
                             this.cancel(e, 0, player, data, config);
                         } else {
                             this.punish(event, player, data, 0, Math.abs(discrepancy) * 5F,
-                                    "d:" + deltaY, "e:" + estimatedVelocity, "p:" + discrepancy, "pr:" + player.velocity.y, "t:a");
+                                    "d:" + deltaY, "e:" + estimatedVelocity, "p:" + player.velocity.y, "t:a");
                         }
                     } else {
                         reward(0, data, 0.999);
@@ -201,14 +209,16 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
     }
 
     private boolean inSpecialBlock(final Set<Material> collidingBlocks) {
-        return collidingBlocks.contains(Material.LADDER) ||
-                collidingBlocks.contains(Material.VINE) ||
-                collidingBlocks.contains(MatUtils.SCAFFOLDING.parse()) ||
+        return collidingBlocks.contains(MatUtils.SCAFFOLDING.parse()) ||
                 collidingBlocks.contains(MatUtils.KELP.parse()) ||
                 collidingBlocks.contains(MatUtils.KELP_PLANT.parse()) ||
                 collidingBlocks.contains(MatUtils.BUBBLE_COLUMN.parse()) ||
                 collidingBlocks.contains(MatUtils.SWEET_BERRY_BUSH.parse()) ||
                 collidingBlocks.stream().anyMatch(BlockUtils.SHULKER_BOX::contains);
+    }
+
+    private boolean inLadder(final Set<Material> collidingBlocks) {
+        return collidingBlocks.contains(Material.LADDER) || collidingBlocks.contains(Material.VINE);
     }
 
     /**

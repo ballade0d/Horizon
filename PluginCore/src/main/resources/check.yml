@@ -120,6 +120,8 @@ killaura:
     enabled: true
   normal_autoblock:
     enabled: true
+  multi:
+    enabled: true
   action:
     10:
       - 'horizon notify %player% might be using KillAura, start checking the player with bot.'
@@ -149,6 +151,9 @@ killaurabot:
   realistic_ping: true
   realistic_name: false
   respawn_interval: 180
+  # Not recommended to enable it on bungee servers (may cause problems).
+  # Recommended to enable it on a single server / waterfall servers.
+  async_packet: false
   action:
     10:
       - 'horizon notify %player% hit the bot 10 times'

@@ -117,7 +117,7 @@ public class Speed extends Module<SpeedData, SpeedNode> {
 
             if (e.knockBack != null || e.piston.size() > 0 || player.isFlying() || e.touchingFaces.contains(BlockFace.UP) ||
                     player.touchingFaces.contains(BlockFace.UP) || player.invalidMotionData.magic ||
-                    player.invalidMotionData.prevGliding) {
+                    player.invalidMotionData.prevGliding || data.attributeBypass) {
                 data.prevSpeed = speed;
                 return;
             }

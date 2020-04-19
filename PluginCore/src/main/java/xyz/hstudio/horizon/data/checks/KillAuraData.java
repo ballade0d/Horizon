@@ -5,6 +5,7 @@ import xyz.hstudio.horizon.util.wrap.Vector3D;
 
 public class KillAuraData extends Data {
 
+    public long lastHitTick = -10000;
     // Order
     public boolean lagging;
     public long lastMove;
@@ -16,11 +17,10 @@ public class KillAuraData extends Data {
     public float lastPitchChange;
     public int gcdFails;
     // Direction
-    public long lastHitTickD = -10000;
     public int typeDFails;
     // InteractAutoBlock
     public Vector3D intersection;
     // NormalAutoBlock
     public boolean interactEntity;
-    public long lastHitTickF = -10000;
+    public long lastIntersectTick = -10000;
 }

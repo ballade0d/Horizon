@@ -27,6 +27,9 @@ public class KillAuraNode extends CheckFile {
     // NormalAutoBlock
     @Load(path = "normal_autoblock.enabled")
     public boolean normal_autoblock_enabled = true;
+    // Multi
+    @Load(path = "multi.enabled")
+    public boolean multi_enabled = true;
 
     public KillAuraNode load(final String pathPrefix, final YamlLoader loader) {
         return AbstractFile.load(pathPrefix, this, loader);

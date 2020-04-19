@@ -22,7 +22,7 @@ public class KillAura extends Module<KillAuraData, KillAuraNode> {
     private static final double EXPANDER = Math.pow(2, 24);
 
     public KillAura() {
-        super(ModuleType.KillAura, new KillAuraNode(), "Order", "SuperKb", "GCD", "Direction", "InteractAutoBlock", "NormalAutoBlock");
+        super(ModuleType.KillAura, new KillAuraNode(), "Order", "SuperKb", "GCD", "Direction", "InteractAutoBlock", "NormalAutoBlock", "Multi");
     }
 
     @Override
@@ -36,6 +36,8 @@ public class KillAura extends Module<KillAuraData, KillAuraNode> {
         if (type == 4 || type == 5) {
             McAccessor.INSTANCE.releaseItem(player.player);
             player.player.updateInventory();
+        } else if (type == 0 || type == 1 || type == 6) {
+            event.setCancelled(true);
         }
     }
 
@@ -58,6 +60,12 @@ public class KillAura extends Module<KillAuraData, KillAuraNode> {
         }
         if (config.normal_autoblock_enabled) {
             typeF(event, player, data, config);
+        }
+        if (config.multi_enabled) {
+            typeG(event, player, data, config);
+        }
+        if (event instanceof InteractEntityEvent && ((InteractEntityEvent) event).action == InteractEntityEvent.InteractType.ATTACK) {
+            data.lastHitTick = player.currentTick;
         }
         // TODO: Aim checks.
     }
@@ -202,7 +210,7 @@ public class KillAura extends Module<KillAuraData, KillAuraNode> {
     private void typeD(final Event event, final HoriPlayer player, final KillAuraData data, final KillAuraNode config) {
         if (event instanceof MoveEvent) {
             MoveEvent e = (MoveEvent) event;
-            if (player.currentTick - data.lastHitTickD > 10 || e.isTeleport) {
+            if (player.currentTick - data.lastHitTick > 10 || e.isTeleport) {
                 return;
             }
             if (!e.strafeNormally) {
@@ -215,17 +223,11 @@ public class KillAura extends Module<KillAuraData, KillAuraNode> {
             } else {
                 reward(3, data, 0.999);
             }
-        } else if (event instanceof InteractEntityEvent) {
-            InteractEntityEvent e = (InteractEntityEvent) event;
-            if (e.action != InteractEntityEvent.InteractType.ATTACK) {
-                return;
-            }
-            data.lastHitTickD = player.currentTick;
         }
     }
 
     /**
-     * An amazing InteractAutoBlock check. May also detect related hacks.
+     * A Interact AutoBlock check. May also detect related hacks.
      * <p>
      * Accuracy: 10/10 - It shouldn't have any false positives
      * Efficiency: 10/10 - Super fast
@@ -265,7 +267,7 @@ public class KillAura extends Module<KillAuraData, KillAuraNode> {
     }
 
     /**
-     * An amazing AutoBlock check. May also detect related hacks.
+     * A Normal AutoBlock check. May also detect related hacks.
      * <p>
      * Accuracy: 10/10 - It shouldn't have any false positives
      * Efficiency: 10/10 - Super fast
@@ -292,7 +294,7 @@ public class KillAura extends Module<KillAuraData, KillAuraNode> {
                 return;
             }
 
-            data.lastHitTickF = player.currentTick;
+            data.lastIntersectTick = player.currentTick;
         } else if (event instanceof InteractItemEvent) {
             InteractItemEvent e = (InteractItemEvent) event;
             if (e.interactType != InteractItemEvent.InteractType.START_USE_ITEM) {
@@ -301,11 +303,34 @@ public class KillAura extends Module<KillAuraData, KillAuraNode> {
             if (data.interactEntity) {
                 return;
             }
-            if (player.currentTick - data.lastHitTickF < 2) {
+            if (player.currentTick - data.lastIntersectTick < 2) {
                 // Punish
                 this.punish(event, player, data, 5, 5);
             } else {
                 reward(5, data, 0.99);
+            }
+        }
+    }
+
+    /**
+     * A MultiAura check.
+     * <p>
+     * Accuracy: 10/10 - It shouldn't have any false positives
+     * Efficiency: 10/10 - Super fast
+     *
+     * @author MrCraftGoo
+     */
+    private void typeG(final Event event, final HoriPlayer player, final KillAuraData data, final KillAuraNode config) {
+        if (event instanceof InteractEntityEvent) {
+            InteractEntityEvent e = (InteractEntityEvent) event;
+            if (player.protocol != 47 || e.action != InteractEntityEvent.InteractType.ATTACK) {
+                return;
+            }
+            if (data.lastHitTick == player.currentTick) {
+                // Punish
+                this.punish(event, player, data, 6, 5);
+            } else {
+                reward(6, data, 0.99);
             }
         }
     }

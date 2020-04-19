@@ -34,4 +34,7 @@ public class KillAuraBotNode extends CheckFile {
     public boolean realistic_name = true;
     @Load(path = "respawn_interval")
     public int respawn_interval = 180;
+
+    @Load(path = "async_packet")
+    public boolean async_packet = false;
 }
