@@ -6,6 +6,7 @@ import org.bukkit.Material;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 import xyz.hstudio.horizon.command.Commands;
+import xyz.hstudio.horizon.compat.IBot;
 import xyz.hstudio.horizon.data.HoriPlayer;
 import xyz.hstudio.horizon.file.AbstractFile;
 import xyz.hstudio.horizon.file.ConfigFile;
@@ -138,7 +139,14 @@ public class Horizon extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        Horizon.PLAYERS.values().forEach(ChannelHandler::unregister);
+        Horizon.PLAYERS.values().forEach(player -> {
+            IBot bot = player.killAuraBotData.bot;
+            if (bot != null) {
+                bot.despawn(player);
+                player.killAuraBotData.bot = null;
+            }
+            ChannelHandler.unregister(player);
+        });
 
         Module.MODULE_MAP.clear();
 

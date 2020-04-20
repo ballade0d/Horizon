@@ -11,7 +11,10 @@ import xyz.hstudio.horizon.util.wrap.AABB;
 import xyz.hstudio.horizon.util.wrap.Location;
 import xyz.hstudio.horizon.util.wrap.Vector3D;
 
-import java.util.*;
+import java.util.EnumSet;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 
 public final class BlockUtils {
 
@@ -88,8 +91,8 @@ public final class BlockUtils {
         return type.isSolid() || SOLID.contains(type);
     }
 
-    public static List<Block> getBlocksInLocation(final Location loc) {
-        List<Block> blocks = new ArrayList<>(8);
+    public static Set<Block> getBlocksInLocation(final Location loc) {
+        Set<Block> blocks = new HashSet<>();
         blocks.add(loc.add(0.3, 0, 0).getBlock());
         blocks.add(loc.add(0, 0, 0.3).getBlock());
         blocks.add(loc.add(-0.3, 0, 0).getBlock());
@@ -98,14 +101,7 @@ public final class BlockUtils {
         blocks.add(loc.add(-0.3, 0, -0.3).getBlock());
         blocks.add(loc.add(0.3, 0, -0.3).getBlock());
         blocks.add(loc.add(-0.3, 0, 0.3).getBlock());
-        Block prevBlock = null;
-        for (int i = blocks.size() - 1; i >= 0; i--) {
-            Block currBlock = blocks.get(i);
-            if (currBlock == null || currBlock.getType() == Material.AIR || currBlock.equals(prevBlock)) {
-                blocks.remove(i);
-            }
-            prevBlock = currBlock;
-        }
+        blocks.remove(null);
         return blocks;
     }
 

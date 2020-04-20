@@ -75,7 +75,7 @@ public class HitBox extends Module<HitBoxData, HitBoxNode> {
             Location targetPos = new Location(targetPlayer.getLocation());
             if (target != null && this.getData(target).history.size() != 0) {
                 // Get the history position to avoid false positives.
-                targetPos = this.getData(target).getHistoryLocation(player.ping, true);
+                targetPos = this.getData(target).getHistoryLocation(McAccessor.INSTANCE.getPing(player.player), true);
             }
             Vector3D move = targetPos.toVector().subtract(targetPlayer.getLocation().toVector());
             AABB targetCube = McAccessor.INSTANCE.getCube(targetPlayer).add(move);

@@ -94,4 +94,9 @@ public interface IMcAccessor {
      * Update a block with its data for player
      */
     void updateBlock(HoriPlayer player, Location loc);
+
+    /**
+     * Get the ping of a player calculated by server
+     */
+    int getPing(Player player);
 }

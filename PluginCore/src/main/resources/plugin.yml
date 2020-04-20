@@ -12,6 +12,7 @@ authors:
 softdepend:
   - PlaceholderAPI
   - ViaVersion
+  - ProtocolSupport
 permissions:
   horizon.cmd.verbose:
     default: op

@@ -246,7 +246,7 @@ public class KillAura extends Module<KillAuraData, KillAuraNode> {
             data.intersection = e.intersection.clone().add(e.entity.getLocation().toVector());
         } else if (event instanceof MoveEvent) {
             MoveEvent e = (MoveEvent) event;
-            if (data.intersection == null || player.getVehicle() != null || e.isTeleport) {
+            if (data.intersection == null || player.getVehicle() != null || e.isTeleport || player.currentTick - data.lastHitTick > 2) {
                 data.intersection = null;
                 return;
             }
@@ -257,7 +257,7 @@ public class KillAura extends Module<KillAuraData, KillAuraNode> {
 
             if (dirA.dot(dirB) < 0) {
                 // Punish
-                this.punish(event, player, data, 4, 5);
+                this.punish(event, player, data, 4, 3);
             } else {
                 reward(4, data, 0.99);
             }
@@ -305,7 +305,7 @@ public class KillAura extends Module<KillAuraData, KillAuraNode> {
             }
             if (player.currentTick - data.lastIntersectTick < 2) {
                 // Punish
-                this.punish(event, player, data, 5, 5);
+                this.punish(event, player, data, 5, 3);
             } else {
                 reward(5, data, 0.99);
             }

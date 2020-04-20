@@ -55,9 +55,9 @@ public class Inventory extends Module<InventoryData, InventoryNode> {
             // Client clicked window, so there should be a window opened.
             if (!data.inventoryOpened) {
                 data.temporarilyBypass = true;
+                data.inventoryOpenTick = player.currentTick;
             }
             data.inventoryOpened = true;
-            data.inventoryOpenTick = player.currentTick;
             data.legitLocation = player.position;
         } else if (event instanceof WindowCloseEvent) {
             // Client closed window
@@ -84,7 +84,6 @@ public class Inventory extends Module<InventoryData, InventoryNode> {
             } else if (e.onGround && player.onGroundReally && data.temporarilyBypass) {
                 data.temporarilyBypass = false;
                 data.inventoryOpenTick = player.currentTick;
-                return;
             }
 
             // Client still sends rotation/position packet after 1~3 tick player open inventory

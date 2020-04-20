@@ -239,7 +239,7 @@ public class MoveEvent extends Event {
                 continue;
             }
             Vector3D kbVelocity = kb.key;
-            if (!collidingBlocks.contains(MatUtils.COBWEB.parse())) {
+            if (!collidingBlocks.contains(MatUtils.COBWEB.parse()) && !collidingBlocks.contains(Material.LADDER) && !collidingBlocks.contains(Material.VINE)) {
                 double y = kbVelocity.y;
 
                 if (!((touchingFaces.contains(BlockFace.UP) && y > 0) || (touchingFaces.contains(BlockFace.DOWN) && y < 0)) &&

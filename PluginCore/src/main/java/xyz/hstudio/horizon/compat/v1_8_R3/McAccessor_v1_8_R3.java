@@ -211,6 +211,8 @@ public class McAccessor_v1_8_R3 implements IMcAccessor {
                 case POSITION_LOOK:
                     serializer.setByte(32, value);
                     break;
+                default:
+                    return;
             }
             packet.a(serializer);
         } catch (Exception ignore) {
@@ -228,5 +230,10 @@ public class McAccessor_v1_8_R3 implements IMcAccessor {
         BlockPosition bPos = new BlockPosition(loc.x, loc.y, loc.z);
         PacketPlayOutBlockChange packet = new PacketPlayOutBlockChange(world, bPos);
         player.sendPacket(packet);
+    }
+
+    @Override
+    public int getPing(final Player player) {
+        return ((CraftPlayer) player).getHandle().ping;
     }
 }

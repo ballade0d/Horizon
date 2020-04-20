@@ -8,9 +8,9 @@ import xyz.hstudio.horizon.data.HoriPlayer;
 import xyz.hstudio.horizon.util.BlockUtils;
 import xyz.hstudio.horizon.util.MathUtils;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * A wrapped Location class. Remember to use this instead of using bukkit's.
@@ -61,12 +61,12 @@ public class Location implements Cloneable {
     }
 
     public boolean isOnGround(final HoriPlayer player, final boolean ignoreOnGround, final double feetDepth) {
-        List<Block> blocks = new ArrayList<>();
+        Set<Block> blocks = new HashSet<>();
         blocks.addAll(BlockUtils.getBlocksInLocation(this));
         blocks.addAll(BlockUtils.getBlocksInLocation(this.add(0, -1, 0)));
         AABB underFeet = new AABB(this.x - 0.3, this.y - feetDepth, this.z - 0.3, this.x + 0.3, this.y, this.z + 0.3);
         AABB topFeet = underFeet.add(0, feetDepth + 0.00001, 0, 0, 0, 0);
-        List<Block> aboveBlocks = !ignoreOnGround ? null : BlockUtils.getBlocksInLocation(this);
+        Set<Block> aboveBlocks = !ignoreOnGround ? null : BlockUtils.getBlocksInLocation(this);
         for (Block block : blocks) {
             if (block.isLiquid() || !BlockUtils.isSolid(block)) {
                 continue;
