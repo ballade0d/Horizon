@@ -9,8 +9,6 @@ public enum Version {
     v1_8_R3(47, 47),
     v1_12_R1(335, 340),
     v1_13_R2(393, 404),
-    v1_14_R1(477, 498),
-    v1_15_R1(573, 578),
     UNKNOWN(0, 0);
 
     public static final Version VERSION;

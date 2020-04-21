@@ -3,8 +3,8 @@ package xyz.hstudio.horizon.util.wrap;
 import org.bukkit.Effect;
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.block.Block;
 import org.bukkit.util.NumberConversions;
+import xyz.hstudio.horizon.wrap.IWrappedBlock;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -146,13 +146,13 @@ public class AABB {
         return null;
     }
 
-    public List<Block> getBlocks(final World world) {
-        List<Block> blocks = new ArrayList<>();
+    public List<IWrappedBlock> getBlocks(final World world) {
+        List<IWrappedBlock> blocks = new ArrayList<>();
         for (int x = NumberConversions.floor(this.minX); x < NumberConversions.ceil(this.maxX); x++) {
             for (int y = NumberConversions.floor(this.minY); y < NumberConversions.ceil(this.maxY); y++) {
                 for (int z = NumberConversions.floor(this.minZ); z < NumberConversions.ceil(this.maxZ); z++) {
-                    Block block = new Location(world, x, y, z).getBlock();
-                    if (block == null || block.isEmpty()) {
+                    IWrappedBlock block = new Location(world, x, y, z).getBlock();
+                    if (block == null || block.getType() == Material.AIR) {
                         continue;
                     }
                     blocks.add(block);
@@ -167,8 +167,8 @@ public class AABB {
         for (int x = NumberConversions.floor(this.minX); x < NumberConversions.ceil(this.maxX); x++) {
             for (int y = NumberConversions.floor(this.minY); y < NumberConversions.ceil(this.maxY); y++) {
                 for (int z = NumberConversions.floor(this.minZ); z < NumberConversions.ceil(this.maxZ); z++) {
-                    Block block = new Location(world, x, y, z).getBlock();
-                    if (block == null || block.isEmpty()) {
+                    IWrappedBlock block = new Location(world, x, y, z).getBlock();
+                    if (block == null || block.getType() == Material.AIR) {
                         continue;
                     }
                     blocks.add(block.getType());

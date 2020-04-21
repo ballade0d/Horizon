@@ -2,7 +2,6 @@ package xyz.hstudio.horizon.api.events.inbound;
 
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Material;
-import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import xyz.hstudio.horizon.Horizon;
 import xyz.hstudio.horizon.api.events.Event;
@@ -17,6 +16,7 @@ import xyz.hstudio.horizon.util.enums.MatUtils;
 import xyz.hstudio.horizon.util.wrap.AABB;
 import xyz.hstudio.horizon.util.wrap.Location;
 import xyz.hstudio.horizon.util.wrap.Vector3D;
+import xyz.hstudio.horizon.wrap.IWrappedBlock;
 
 import java.util.List;
 import java.util.Map;
@@ -120,7 +120,7 @@ public class MoveEvent extends Event {
      * @author Islandscout
      */
     private boolean checkSlime() {
-        Block standing = this.from.add(0, -0.01, 0).getBlock();
+        IWrappedBlock standing = this.from.add(0, -0.01, 0).getBlock();
         if (standing == null || standing.getType() != Material.SLIME_BLOCK) {
             return false;
         }
@@ -136,7 +136,7 @@ public class MoveEvent extends Event {
      * @author MrCraftGoo
      */
     private boolean checkBed() {
-        Block standing = this.from.add(0, -0.01, 0).getBlock();
+        IWrappedBlock standing = this.from.add(0, -0.01, 0).getBlock();
         if (standing == null) {
             return false;
         }
@@ -149,11 +149,11 @@ public class MoveEvent extends Event {
     private Pair<Vector3D, Boolean> computeWaterFlowForce() {
         Vector3D finalForce = new Vector3D();
         boolean inLiquid = false;
-        for (Block block : AABB.WATER_BOX.add(this.to.toVector()).getBlocks(to.world)) {
+        for (IWrappedBlock block : AABB.WATER_BOX.add(this.to.toVector()).getBlocks(to.world)) {
             if (!MatUtils.LIQUID.contains(block.getType())) {
                 continue;
             }
-            finalForce.add(McAccessor.INSTANCE.getFlowDirection(block));
+            finalForce.add(block.getFlowDirection());
             inLiquid = true;
         }
         if (finalForce.lengthSquared() > 0) {
@@ -166,9 +166,9 @@ public class MoveEvent extends Event {
     private float computeFriction() {
         float friction = 0.91F;
         if (player.onGround) {
-            Block b = player.position.add(0, -1, 0).getBlock();
+            IWrappedBlock b = player.position.add(0, -1, 0).getBlock();
             if (b != null) {
-                friction *= McAccessor.INSTANCE.getFriction(b);
+                friction *= b.getFriction();
             }
         }
         return friction;
@@ -239,7 +239,7 @@ public class MoveEvent extends Event {
                 continue;
             }
             Vector3D kbVelocity = kb.key;
-            if (!collidingBlocks.contains(MatUtils.COBWEB.parse()) && !collidingBlocks.contains(Material.LADDER) && !collidingBlocks.contains(Material.VINE)) {
+            if (!collidingBlocks.contains(MatUtils.COBWEB.parse()) && !collidingBlocks.contains(Material.LADDER) && !collidingBlocks.contains(Material.VINE) && piston.size() == 0) {
                 double y = kbVelocity.y;
 
                 if (!((touchingFaces.contains(BlockFace.UP) && y > 0) || (touchingFaces.contains(BlockFace.DOWN) && y < 0)) &&
@@ -307,7 +307,7 @@ public class MoveEvent extends Event {
                 this.isCollidingEntities) {
             return true;
         }
-        Block footBlock = player.position.add(0, -1, 0).getBlock();
+        IWrappedBlock footBlock = player.position.add(0, -1, 0).getBlock();
         if (footBlock == null) {
             return true;
         }

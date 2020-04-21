@@ -14,6 +14,7 @@ import xyz.hstudio.horizon.data.HoriPlayer;
 import xyz.hstudio.horizon.util.enums.Hand;
 import xyz.hstudio.horizon.util.wrap.Location;
 import xyz.hstudio.horizon.util.wrap.Vector3D;
+import xyz.hstudio.horizon.wrap.IWrappedBlock;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -140,7 +141,7 @@ public class PacketConverter_v1_12_R1 implements IPacketConverter {
         if (interactType == null) {
             BlockPosition pos = packet.a();
             Location loc = new Location(player.world, pos.getX(), pos.getY(), pos.getZ());
-            org.bukkit.block.Block b = loc.getBlock();
+            IWrappedBlock b = loc.getBlock();
             if (b == null) {
                 return null;
             }

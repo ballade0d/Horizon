@@ -2,7 +2,6 @@ package xyz.hstudio.horizon.module.checks;
 
 import org.bukkit.GameMode;
 import org.bukkit.Material;
-import org.bukkit.block.Block;
 import xyz.hstudio.horizon.api.ModuleType;
 import xyz.hstudio.horizon.api.events.Event;
 import xyz.hstudio.horizon.api.events.inbound.BlockPlaceEvent;
@@ -12,6 +11,7 @@ import xyz.hstudio.horizon.data.checks.ScaffoldData;
 import xyz.hstudio.horizon.file.node.ScaffoldNode;
 import xyz.hstudio.horizon.module.Module;
 import xyz.hstudio.horizon.util.wrap.Vector3D;
+import xyz.hstudio.horizon.wrap.IWrappedBlock;
 
 import java.util.stream.DoubleStream;
 
@@ -66,7 +66,7 @@ public class Scaffold extends Module<ScaffoldData, ScaffoldNode> {
             }
 
             Vector3D interaction = e.interaction;
-            Block b = e.getTargetLocation().getBlock();
+            IWrappedBlock b = e.getTargetLocation().getBlock();
             if (e.face == BlockPlaceEvent.BlockFace.INVALID) {
                 // Punish
                 this.punish(event, player, data, 0, 5, "p:1");

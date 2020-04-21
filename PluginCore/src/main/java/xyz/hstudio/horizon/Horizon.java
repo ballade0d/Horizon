@@ -147,6 +147,7 @@ public class Horizon extends JavaPlugin {
             }
             ChannelHandler.unregister(player);
         });
+        Horizon.PLAYERS.clear();
 
         Module.MODULE_MAP.clear();
 

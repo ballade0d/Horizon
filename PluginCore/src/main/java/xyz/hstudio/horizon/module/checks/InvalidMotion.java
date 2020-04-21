@@ -1,7 +1,6 @@
 package xyz.hstudio.horizon.module.checks;
 
 import org.bukkit.Material;
-import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import xyz.hstudio.horizon.api.ModuleType;
 import xyz.hstudio.horizon.api.events.Event;
@@ -18,6 +17,7 @@ import xyz.hstudio.horizon.util.BlockUtils;
 import xyz.hstudio.horizon.util.MathUtils;
 import xyz.hstudio.horizon.util.enums.MatUtils;
 import xyz.hstudio.horizon.util.wrap.Vector3D;
+import xyz.hstudio.horizon.wrap.IWrappedBlock;
 
 import java.util.Objects;
 import java.util.Set;
@@ -81,7 +81,7 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
                 float prevEstimatedVelocity = data.estimatedVelocity;
                 float estimatedVelocity;
 
-                Block feetBlock = e.to.add(0, -1, 0).getBlock();
+                IWrappedBlock feetBlock = e.to.add(0, -1, 0).getBlock();
 
                 if (player.isGliding) {
                     // Gliding function
@@ -169,7 +169,7 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
 
                 float discrepancy = deltaY - estimatedVelocity;
                 if (e.onGround && !player.onGround) {
-                    if (Math.abs(discrepancy) > config.predict_tolerance && (deltaY < Math.min(estimatedVelocity, 0) || deltaY > Math.max(estimatedVelocity, 0))) {
+                    if (Math.abs(discrepancy) > config.predict_tolerance && (deltaY < Math.min(estimatedVelocity, 0) || deltaY > Math.max(estimatedVelocity, 0)) && player.currentTick > 20) {
                         // Punish
                         if (config.predict_wall_jump && e.clientBlock != -1) {
                             this.cancel(e, 0, player, data, config);
@@ -183,7 +183,7 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
 
                     data.estimatedVelocity = 0;
                 } else if (e.updatePos && e.velocity.lengthSquared() > 0) {
-                    if (Math.abs(discrepancy) > config.predict_tolerance) {
+                    if (Math.abs(discrepancy) > config.predict_tolerance && player.currentTick > 20) {
                         // Punish
                         if (config.predict_wall_jump && e.clientBlock != -1) {
                             this.cancel(e, 0, player, data, config);

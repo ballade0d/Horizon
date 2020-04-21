@@ -3,10 +3,10 @@ package xyz.hstudio.horizon.util.wrap;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.util.NumberConversions;
-import xyz.hstudio.horizon.compat.McAccessor;
 import xyz.hstudio.horizon.data.HoriPlayer;
 import xyz.hstudio.horizon.util.BlockUtils;
 import xyz.hstudio.horizon.util.MathUtils;
+import xyz.hstudio.horizon.wrap.IWrappedBlock;
 
 import java.util.HashSet;
 import java.util.Objects;
@@ -52,35 +52,31 @@ public class Location implements Cloneable {
         this.pitch = pitch;
     }
 
-    public Block getBlock() {
-        return BlockUtils.getBlock(this);
-    }
-
-    public Block getBlockUnsafe() {
-        return this.world.getBlockAt(this.getBlockX(), this.getBlockY(), this.getBlockZ());
+    public IWrappedBlock getBlock() {
+        return IWrappedBlock.create(Location.getBlock(this));
     }
 
     public boolean isOnGround(final HoriPlayer player, final boolean ignoreOnGround, final double feetDepth) {
-        Set<Block> blocks = new HashSet<>();
+        Set<IWrappedBlock> blocks = new HashSet<>();
         blocks.addAll(BlockUtils.getBlocksInLocation(this));
         blocks.addAll(BlockUtils.getBlocksInLocation(this.add(0, -1, 0)));
         AABB underFeet = new AABB(this.x - 0.3, this.y - feetDepth, this.z - 0.3, this.x + 0.3, this.y, this.z + 0.3);
         AABB topFeet = underFeet.add(0, feetDepth + 0.00001, 0, 0, 0, 0);
-        Set<Block> aboveBlocks = !ignoreOnGround ? null : BlockUtils.getBlocksInLocation(this);
-        for (Block block : blocks) {
+        Set<IWrappedBlock> aboveBlocks = !ignoreOnGround ? null : BlockUtils.getBlocksInLocation(this);
+        for (IWrappedBlock block : blocks) {
             if (block.isLiquid() || !BlockUtils.isSolid(block)) {
                 continue;
             }
-            for (AABB bBox : McAccessor.INSTANCE.getBoxes(player, block)) {
+            for (AABB bBox : block.getBoxes(player)) {
                 if (!bBox.isColliding(underFeet)) {
                     continue;
                 }
                 if (ignoreOnGround) {
-                    for (Block above : aboveBlocks) {
+                    for (IWrappedBlock above : aboveBlocks) {
                         if (above.isLiquid() || !BlockUtils.isSolid(above)) {
                             continue;
                         }
-                        for (AABB aboveBox : McAccessor.INSTANCE.getBoxes(player, above)) {
+                        for (AABB aboveBox : above.getBoxes(player)) {
                             if (aboveBox.isColliding(topFeet)) {
                                 return false;
                             }
@@ -197,5 +193,12 @@ public class Location implements Cloneable {
         } catch (CloneNotSupportedException e) {
             throw new IllegalStateException(e);
         }
+    }
+
+    private static Block getBlock(final Location loc) {
+        if (loc.world.isChunkLoaded(loc.getBlockX() >> 4, loc.getBlockZ() >> 4)) {
+            return loc.world.getBlockAt(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
+        }
+        return null;
     }
 }

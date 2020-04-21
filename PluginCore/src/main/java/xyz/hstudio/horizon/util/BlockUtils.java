@@ -2,14 +2,13 @@ package xyz.hstudio.horizon.util;
 
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import xyz.hstudio.horizon.compat.McAccessor;
 import xyz.hstudio.horizon.data.HoriPlayer;
 import xyz.hstudio.horizon.util.enums.MatUtils;
 import xyz.hstudio.horizon.util.wrap.AABB;
 import xyz.hstudio.horizon.util.wrap.Location;
 import xyz.hstudio.horizon.util.wrap.Vector3D;
+import xyz.hstudio.horizon.wrap.IWrappedBlock;
 
 import java.util.EnumSet;
 import java.util.HashSet;
@@ -73,26 +72,16 @@ public final class BlockUtils {
         BlockUtils.SOLID.addAll(solid);
     }
 
-    /**
-     * Remember to use this method when getting block async.
-     */
-    public static Block getBlock(final Location loc) {
-        if (loc.world.isChunkLoaded(loc.getBlockX() >> 4, loc.getBlockZ() >> 4)) {
-            return loc.getBlockUnsafe();
-        }
-        return null;
-    }
-
-    public static boolean isSolid(final Block block) {
-        return McAccessor.INSTANCE.isSolid(block) || SOLID.contains(block.getType());
+    public static boolean isSolid(final IWrappedBlock block) {
+        return block.isSolid() || SOLID.contains(block.getType());
     }
 
     public static boolean isSolid(final Material type) {
         return type.isSolid() || SOLID.contains(type);
     }
 
-    public static Set<Block> getBlocksInLocation(final Location loc) {
-        Set<Block> blocks = new HashSet<>();
+    public static Set<IWrappedBlock> getBlocksInLocation(final Location loc) {
+        Set<IWrappedBlock> blocks = new HashSet<>();
         blocks.add(loc.add(0.3, 0, 0).getBlock());
         blocks.add(loc.add(0, 0, 0.3).getBlock());
         blocks.add(loc.add(-0.3, 0, 0).getBlock());
@@ -118,11 +107,11 @@ public final class BlockUtils {
         for (int x = (int) (min.x < 0 ? min.x - 1 : min.x); x <= max.x; x++) {
             for (int y = (int) min.y - 1; y <= max.y; y++) {
                 for (int z = (int) (min.z < 0 ? min.z - 1 : min.z); z <= max.z; z++) {
-                    Block b = new Location(world, x, y, z).getBlock();
+                    IWrappedBlock b = new Location(world, x, y, z).getBlock();
                     if (b == null) {
                         continue;
                     }
-                    for (AABB blockBox : McAccessor.INSTANCE.getBoxes(player, b)) {
+                    for (AABB blockBox : b.getBoxes(player)) {
                         if (blockBox.minX > box.maxX && blockBox.minX < max.x) {
                             directions.add(BlockFace.EAST);
                         }

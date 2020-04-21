@@ -64,7 +64,11 @@ public class KillAura extends Module<KillAuraData, KillAuraNode> {
         if (config.multi_enabled) {
             typeG(event, player, data, config);
         }
-        if (event instanceof InteractEntityEvent && ((InteractEntityEvent) event).action == InteractEntityEvent.InteractType.ATTACK) {
+        if (event instanceof InteractEntityEvent) {
+            InteractEntityEvent e = (InteractEntityEvent) event;
+            if (e.action != InteractEntityEvent.InteractType.ATTACK) {
+                return;
+            }
             data.lastHitTick = player.currentTick;
         }
         // TODO: Aim checks.
@@ -282,13 +286,13 @@ public class KillAura extends Module<KillAuraData, KillAuraNode> {
                 return;
             }
             data.interactEntity = false;
-            AABB victimAABB = McAccessor.INSTANCE.getCube(e.entity);
+            AABB victimCube = McAccessor.INSTANCE.getCube(e.entity);
 
             Vector3D eyePos = player.getHeadPosition();
             Vector3D direction = MathUtils.getDirection(player.position.yaw, player.position.pitch);
             Ray ray = new Ray(eyePos, direction);
 
-            Vector3D intersection = victimAABB.intersectsRay(ray, 0, 3);
+            Vector3D intersection = victimCube.intersectsRay(ray, 0, 3);
 
             if (intersection == null) {
                 return;

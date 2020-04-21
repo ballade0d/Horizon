@@ -2,14 +2,12 @@ package xyz.hstudio.horizon.compat;
 
 import io.netty.channel.ChannelPipeline;
 import org.bukkit.World;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import xyz.hstudio.horizon.api.events.inbound.MoveEvent;
 import xyz.hstudio.horizon.data.HoriPlayer;
 import xyz.hstudio.horizon.util.wrap.AABB;
 import xyz.hstudio.horizon.util.wrap.Location;
-import xyz.hstudio.horizon.util.wrap.Vector3D;
 
 public interface IMcAccessor {
 
@@ -31,11 +29,6 @@ public interface IMcAccessor {
     boolean isAccumulated(Player player);
 
     /**
-     * Get the friction of a block.
-     */
-    float getFriction(Block block);
-
-    /**
      * Get the bounding box of an entity.
      */
     AABB getCube(Entity entity);
@@ -51,29 +44,14 @@ public interface IMcAccessor {
     Entity getEntity(World world, int id);
 
     /**
-     * Get the voxel shapes of a block.
-     */
-    AABB[] getBoxes(HoriPlayer player, Block block);
-
-    /**
      * Create a new transaction packet.
      */
     Object newTransactionPacket();
 
     /**
-     * Get the flow direction of liquid
-     */
-    Vector3D getFlowDirection(Block block);
-
-    /**
      * Stop a player from using item.
      */
     void releaseItem(Player player);
-
-    /**
-     * Check if a block is solid
-     */
-    boolean isSolid(Block block);
 
     /**
      * Check if player is colliding entities
