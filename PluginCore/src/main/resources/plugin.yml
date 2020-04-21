@@ -33,6 +33,8 @@ permissions:
         default: false
       horizon.bypass.antivelocity:
         default: false
+      horizon.bypass.autoclicker:
+        default: false
       horizon.bypass.badpacket:
         default: false
       horizon.bypass.groundspoof:

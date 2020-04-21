@@ -29,11 +29,11 @@ public final class MathUtils {
         return Math.acos(dot);
     }
 
-    public static double average(final double[] data) {
-        return Arrays.stream(data).average().orElse(0);
+    public static double average(final Double[] data) {
+        return Arrays.stream(data).mapToDouble(Double::doubleValue).average().orElse(0);
     }
 
-    public static double standardDeviation(final double[] data) {
+    public static double standardDeviation(final Double[] data) {
         double average = average(data);
         double total = 0;
         for (double num : data) {

@@ -6,6 +6,7 @@ import org.bukkit.command.*;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import xyz.hstudio.horizon.Horizon;
+import xyz.hstudio.horizon.Logger;
 import xyz.hstudio.horizon.command.annotation.Cmd;
 import xyz.hstudio.horizon.data.HoriPlayer;
 import xyz.hstudio.horizon.file.LangFile;
@@ -112,12 +113,14 @@ public class Commands implements TabCompleter, CommandExecutor {
         for (String s : args) {
             builder.append(s).append(" ");
         }
+        String msg = builder.toString().trim();
         for (Player player : Bukkit.getOnlinePlayers()) {
             if (!player.hasPermission("horizon.notify")) {
                 continue;
             }
-            player.sendMessage(prefix + builder.toString().trim());
+            player.sendMessage(prefix + msg);
         }
+        Logger.msg("Notify", msg);
         sender.sendMessage(prefix + lang.cmd_notify_sent);
     }
 

@@ -32,6 +32,7 @@ public class HoriPlayer {
     public boolean verbose;
     public boolean analysis;
     public final AntiVelocityData antiVelocityData = new AntiVelocityData();
+    public final AutoClickerData autoClickerData = new AutoClickerData();
     public final BadPacketData badPacketData = new BadPacketData();
     public final GroundSpoofData groundSpoofData = new GroundSpoofData();
     public final HitBoxData hitBoxData = new HitBoxData();

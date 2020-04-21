@@ -106,7 +106,7 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
                     }
                 } else if (data.prevGliding) {
                     // Glide landing
-                    estimatedVelocity = 0;
+                    estimatedVelocity = deltaY;
                 } else if (player.currentTick - data.attemptGlideTick < 2) {
                     // Fix glide false positive
                     estimatedVelocity = deltaY;

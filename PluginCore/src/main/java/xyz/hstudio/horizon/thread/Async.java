@@ -80,7 +80,7 @@ public class Async implements Runnable {
         Async.THREAD_POOL.scheduleAtFixedRate(this, 50L, 50L, TimeUnit.MILLISECONDS);
     }
 
-    private long currentTick;
+    public static long currentTick;
     public volatile boolean running = true;
 
     @Override
