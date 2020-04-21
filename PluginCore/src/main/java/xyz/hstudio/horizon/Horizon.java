@@ -11,7 +11,7 @@ import xyz.hstudio.horizon.data.HoriPlayer;
 import xyz.hstudio.horizon.file.AbstractFile;
 import xyz.hstudio.horizon.file.ConfigFile;
 import xyz.hstudio.horizon.file.LangFile;
-import xyz.hstudio.horizon.kirin.Kirin;
+import xyz.hstudio.horizon.kirin.Verification;
 import xyz.hstudio.horizon.listener.Listeners;
 import xyz.hstudio.horizon.module.Module;
 import xyz.hstudio.horizon.module.checks.*;
@@ -19,7 +19,6 @@ import xyz.hstudio.horizon.network.ChannelHandler;
 import xyz.hstudio.horizon.thread.Async;
 import xyz.hstudio.horizon.thread.Sync;
 import xyz.hstudio.horizon.util.BlockUtils;
-import xyz.hstudio.horizon.util.SystemClassLoader;
 import xyz.hstudio.horizon.util.enums.Version;
 import xyz.hstudio.horizon.util.wrap.YamlLoader;
 
@@ -57,7 +56,6 @@ public class Horizon extends JavaPlugin {
 
     public Horizon() {
         Horizon.inst = this;
-        SystemClassLoader.init(this.getClassLoader());
     }
 
     @Override
@@ -98,7 +96,7 @@ public class Horizon extends JavaPlugin {
         if (this.config.kirin_enabled) {
             saveResource("pubKey.key", true);
             try {
-                new Kirin(new File(folder, "pubKey.key"), this.config.kirin_licence);
+                new Verification(new File(folder, "pubKey.key"), this.config.kirin_licence);
             } catch (Exception e) {
                 Logger.msg("Kirin", "Failed to init Kirin! Please contact the author for help.");
                 e.printStackTrace();

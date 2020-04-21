@@ -26,12 +26,6 @@ public class AntiBot extends Module<Data, AntiBotNode> {
             case v1_13_R2:
                 impl = new Impl_v1_13_R2();
                 break;
-            case v1_14_R1:
-                impl = new Impl_v1_14_R1();
-                break;
-            case v1_15_R1:
-                impl = new Impl_v1_15_R1();
-                break;
             default:
                 impl = null;
                 break;
@@ -122,6 +116,7 @@ public class AntiBot extends Module<Data, AntiBotNode> {
         }
     }
 
+    /*
     private static class Impl_v1_14_R1 implements Impl {
         @Override
         public Object spoofGround(final HoriPlayer player, final Object packet) throws Exception {
@@ -161,4 +156,5 @@ public class AntiBot extends Module<Data, AntiBotNode> {
             return nms;
         }
     }
+     */
 }

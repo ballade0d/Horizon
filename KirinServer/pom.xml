@@ -103,7 +103,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>xyz.hstudio.kirinserver.KirinServer</mainClass>
+                            <mainClass>xyz.hstudio.kirinserver.Verification</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

@@ -31,12 +31,6 @@ public class HealthTag extends Module<Data, HealthTagNode> {
             case v1_13_R2:
                 impl = new Impl_v1_13_R2();
                 break;
-            case v1_14_R1:
-                impl = new Impl_v1_14_R1();
-                break;
-            case v1_15_R1:
-                impl = new Impl_v1_15_R1();
-                break;
             default:
                 impl = null;
                 break;
@@ -222,6 +216,7 @@ public class HealthTag extends Module<Data, HealthTagNode> {
         }
     }
 
+    /*
     private static class Impl_v1_14_R1 implements Impl {
         @Override
         public Object spoofHealth(final HoriPlayer player, final Object packet) throws IOException {
@@ -325,4 +320,5 @@ public class HealthTag extends Module<Data, HealthTagNode> {
             return newPacket;
         }
     }
+     */
 }

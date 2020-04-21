@@ -13,6 +13,7 @@ import org.bukkit.entity.Player;
 import xyz.hstudio.horizon.compat.IBot;
 import xyz.hstudio.horizon.data.HoriPlayer;
 import xyz.hstudio.horizon.util.RandomUtils;
+import xyz.hstudio.horizon.util.wrap.Vector3D;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -22,7 +23,7 @@ import java.util.stream.Collectors;
 
 public class Bot_v1_12_R1 implements IBot {
 
-    private EntityPlayer entityPlayer;
+    private EntityPlayer nms;
     private final boolean realName;
     private final long spawnTime;
 
@@ -47,7 +48,7 @@ public class Bot_v1_12_R1 implements IBot {
         entityPlayer.listName = CraftChatMessage.fromString("§f" + name)[0];
         entityPlayer.setInvisible(false);
         entityPlayer.setLocation(backLoc.getX(), backLoc.getY(), backLoc.getZ(), backLoc.getYaw(), backLoc.getPitch());
-        this.entityPlayer = entityPlayer;
+        this.nms = entityPlayer;
 
         this.spawnTime = System.currentTimeMillis();
     }
@@ -55,75 +56,86 @@ public class Bot_v1_12_R1 implements IBot {
     @Override
     public void spawn(final HoriPlayer player) {
         Packet<?> packet;
-        packet = new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER, entityPlayer);
+        packet = new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER, nms);
         player.sendPacket(packet);
-        packet = new PacketPlayOutNamedEntitySpawn(entityPlayer);
+        packet = new PacketPlayOutNamedEntitySpawn(nms);
         player.sendPacket(packet);
     }
 
     @Override
     public void removeFromTabList(final HoriPlayer player) {
-        Packet<?> packet = new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.REMOVE_PLAYER, entityPlayer);
+        Packet<?> packet = new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.REMOVE_PLAYER, nms);
         player.sendPacket(packet);
     }
 
     @Override
     public void despawn(final HoriPlayer player) {
         Packet<?> packet;
-        packet = new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.REMOVE_PLAYER, entityPlayer);
+        packet = new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.REMOVE_PLAYER, nms);
         player.sendPacket(packet);
-        packet = new PacketPlayOutEntityDestroy(entityPlayer.getId());
+        packet = new PacketPlayOutEntityDestroy(nms.getId());
         player.sendPacket(packet);
     }
 
     @Override
     public void updatePing(final HoriPlayer player) {
         Packet<?> packet;
-        entityPlayer.ping = RandomUtils.randomBoundaryInt(100, 500);
-        packet = new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.UPDATE_LATENCY, entityPlayer);
+        nms.ping = RandomUtils.randomBoundaryInt(100, 500);
+        packet = new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.UPDATE_LATENCY, nms);
         player.sendPacket(packet);
     }
 
     @Override
     public void setSneaking(final boolean sneaking) {
-        entityPlayer.setSneaking(sneaking);
+        nms.setSneaking(sneaking);
     }
 
     @Override
     public void setSprinting(final boolean sprinting) {
-        entityPlayer.setSprinting(sprinting);
+        nms.setSprinting(sprinting);
     }
 
     @Override
     public void updateStatus(final HoriPlayer player) {
         Packet<?> packet;
-        packet = new PacketPlayOutEntityMetadata(entityPlayer.getId(), entityPlayer.getDataWatcher(), true);
+        packet = new PacketPlayOutEntityMetadata(nms.getId(), nms.getDataWatcher(), true);
         player.sendPacket(packet);
     }
 
     @Override
     public void swingArm(final HoriPlayer player) {
         Packet<?> packet;
-        packet = new PacketPlayOutAnimation(entityPlayer, 0);
+        packet = new PacketPlayOutAnimation(nms, 0);
         player.sendPacket(packet);
     }
 
     @Override
     public void damage(final HoriPlayer player) {
         Packet<?> packet;
-        packet = new PacketPlayOutEntityStatus(entityPlayer, (byte) 2);
+        packet = new PacketPlayOutEntityStatus(nms, (byte) 2);
         player.sendPacket(packet);
     }
 
     @Override
     public void move(final double x, final double y, final double z, final float yaw, final float pitch, final HoriPlayer player) {
         Packet<?> packet;
-        entityPlayer.setLocation(x, y, z, yaw, pitch);
-        packet = new PacketPlayOutEntityTeleport(entityPlayer);
+
+        Vector3D relative = new Vector3D(x, y, z).subtract(new Vector3D(nms.locX, nms.locY, nms.locZ));
+
+        nms.locX = x;
+        nms.locY = y;
+        nms.locZ = z;
+
+        if (Math.abs(relative.x) + Math.abs(relative.y) + Math.abs(relative.z) > 8) {
+            packet = new PacketPlayOutEntityTeleport(nms);
+        } else {
+            packet = new PacketPlayOutEntity.PacketPlayOutRelEntityMoveLook(nms.getId(),
+                    (long) (relative.x * 4096L), (long) (relative.y * 4096L), (long) (relative.z * 4096L),
+                    (byte) yaw, (byte) pitch, ThreadLocalRandom.current().nextBoolean());
+        }
+
         player.sendPacket(packet);
-        packet = new PacketPlayOutEntity.PacketPlayOutEntityLook(entityPlayer.getId(), (byte) yaw, (byte) pitch, ThreadLocalRandom.current().nextBoolean());
-        player.sendPacket(packet);
-        packet = new PacketPlayOutEntityHeadRotation(entityPlayer, (byte) yaw);
+        packet = new PacketPlayOutEntityHeadRotation(nms, (byte) yaw);
         player.sendPacket(packet);
     }
 
@@ -132,29 +144,29 @@ public class Bot_v1_12_R1 implements IBot {
         Packet<?> packet;
         ItemStack itemStack;
         itemStack = CraftItemStack.asNMSCopy(new org.bukkit.inventory.ItemStack(HELMET[ThreadLocalRandom.current().nextInt(HELMET.length)]));
-        packet = new PacketPlayOutEntityEquipment(entityPlayer.getId(), EnumItemSlot.HEAD, itemStack);
+        packet = new PacketPlayOutEntityEquipment(nms.getId(), EnumItemSlot.HEAD, itemStack);
         player.sendPacket(packet);
 
         itemStack = CraftItemStack.asNMSCopy(new org.bukkit.inventory.ItemStack(CHESTPLATE[ThreadLocalRandom.current().nextInt(CHESTPLATE.length)]));
-        packet = new PacketPlayOutEntityEquipment(entityPlayer.getId(), EnumItemSlot.CHEST, itemStack);
+        packet = new PacketPlayOutEntityEquipment(nms.getId(), EnumItemSlot.CHEST, itemStack);
         player.sendPacket(packet);
 
         itemStack = CraftItemStack.asNMSCopy(new org.bukkit.inventory.ItemStack(LEGGINGS[ThreadLocalRandom.current().nextInt(LEGGINGS.length)]));
-        packet = new PacketPlayOutEntityEquipment(entityPlayer.getId(), EnumItemSlot.LEGS, itemStack);
+        packet = new PacketPlayOutEntityEquipment(nms.getId(), EnumItemSlot.LEGS, itemStack);
         player.sendPacket(packet);
 
         itemStack = CraftItemStack.asNMSCopy(new org.bukkit.inventory.ItemStack(BOOTS[ThreadLocalRandom.current().nextInt(BOOTS.length)]));
-        packet = new PacketPlayOutEntityEquipment(entityPlayer.getId(), EnumItemSlot.FEET, itemStack);
+        packet = new PacketPlayOutEntityEquipment(nms.getId(), EnumItemSlot.FEET, itemStack);
         player.sendPacket(packet);
 
         itemStack = CraftItemStack.asNMSCopy(new org.bukkit.inventory.ItemStack(HAND[ThreadLocalRandom.current().nextInt(HAND.length)]));
-        packet = new PacketPlayOutEntityEquipment(entityPlayer.getId(), EnumItemSlot.MAINHAND, itemStack);
+        packet = new PacketPlayOutEntityEquipment(nms.getId(), EnumItemSlot.MAINHAND, itemStack);
         player.sendPacket(packet);
     }
 
     @Override
     public int getId() {
-        return entityPlayer.getId();
+        return nms.getId();
     }
 
     @Override
