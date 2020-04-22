@@ -20,7 +20,7 @@ import java.util.zip.GZIPOutputStream;
 
 public class Async implements Runnable {
 
-    private static final ScheduledExecutorService THREAD_POOL =
+    public static final ScheduledExecutorService THREAD_POOL =
             Executors.newSingleThreadScheduledExecutor(new ThreadFactoryBuilder()
                     .setDaemon(true)
                     .setNameFormat("Horizon Processing Thread")

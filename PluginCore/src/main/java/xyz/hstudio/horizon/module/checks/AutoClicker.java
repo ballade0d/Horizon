@@ -50,6 +50,9 @@ public class AutoClicker extends Module<AutoClickerData, AutoClickerNode> {
                     avgCps /= deltaTicks.size();
 
                     List<Double> hitSamples = data.hitSamples;
+                    if (Double.isNaN(avgCps)) {
+                        return;
+                    }
                     hitSamples.add(avgCps);
 
                     avgCps = hitSamples.stream().collect(Collectors.averagingDouble(Double::doubleValue));

@@ -228,12 +228,12 @@ public class MoveEvent extends Event {
         double sprintMultiplier = flying ? (player.isSprinting ? 2 : 1) : (player.isSprinting ? 1.3 : 1);
         double weirdConstant = (jump && player.isSprinting ? 0.2518462 : (player.isInLiquid ? 0.0196 : 0.098));
         double baseMultiplier = flying ? (10 * player.player.getFlySpeed()) : (5 * player.player.getWalkSpeed() * (1 + player.getPotionEffectAmplifier("SPEED") * 0.2));
-        double maxDiscrepancy = weirdConstant * baseMultiplier * sprintMultiplier + (to.y < 0 ? 0.001 : 0.003);
+        double maxDiscrepancy = weirdConstant * baseMultiplier * sprintMultiplier + 0.003;
 
         Pair<Vector3D, Long> kb;
         for (int kbIndex = 0, size = velocities.size(); kbIndex < size; kbIndex++) {
             kb = velocities.get(kbIndex);
-            if (time - kb.value > player.ping + 200) {
+            if (time - kb.value > McAccessor.INSTANCE.getPing(player.player) + 200) {
                 failedKnockBack = true;
                 expiredKbs++;
                 continue;
@@ -243,7 +243,7 @@ public class MoveEvent extends Event {
                 double y = kbVelocity.y;
 
                 if (!((touchingFaces.contains(BlockFace.UP) && y > 0) || (touchingFaces.contains(BlockFace.DOWN) && y < 0)) &&
-                        Math.abs(y - velocity.y) > 0.01 &&
+                        Math.abs(y - velocity.y) > 0.1 &&
                         !jump && !player.isInLiquid && !this.stepLegitly) {
                     continue;
                 }
@@ -377,7 +377,7 @@ public class MoveEvent extends Event {
         long now = System.currentTimeMillis();
         for (Map.Entry<Location, Long> entry : player.teleports.entrySet()) {
             if (entry.getKey().world.equals(this.to.world) && this.to.distanceSquared(entry.getKey()) < 0.001) {
-                if (now - entry.getValue() > player.ping - 50) {
+                if (now - entry.getValue() > McAccessor.INSTANCE.getPing(player.player) - 50) {
                     player.position = entry.getKey();
                     player.lastTeleportAcceptTick = player.currentTick;
                     player.lastTeleportTime = now;
@@ -386,7 +386,7 @@ public class MoveEvent extends Event {
                 } else {
                     return false;
                 }
-            } else if (!player.player.isSleeping() && now - entry.getValue() > player.ping + 250) {
+            } else if (!player.player.isSleeping() && now - entry.getValue() > McAccessor.INSTANCE.getPing(player.player) + 250) {
                 Sync.teleport(player, entry.getKey());
                 player.teleports.remove(entry.getKey());
                 return false;

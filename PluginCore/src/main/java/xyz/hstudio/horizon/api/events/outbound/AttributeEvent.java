@@ -25,10 +25,12 @@ public class AttributeEvent extends Event {
             if (!snapshot.key.equals("generic.movementSpeed")) {
                 continue;
             }
-            if (snapshot.modifiers.size() == 0 && !player.isSprinting) {
-                player.speedData.attributeBypass = true;
-                player.sendSimulatedAction(() -> player.speedData.attributeBypass = false);
-                player.moveModifiers.clear();
+            if (snapshot.modifiers.size() == 0) {
+                if (!player.isSprinting) {
+                    player.speedData.attributeBypass = true;
+                    player.sendSimulatedAction(() -> player.speedData.attributeBypass = false);
+                    player.moveModifiers.clear();
+                }
                 break;
             }
             snapshot.modifiers.sort(Comparator.comparingInt(o -> o.operation));

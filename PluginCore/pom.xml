@@ -64,20 +64,6 @@
             <scope>system</scope>
         </dependency>
         <dependency>
-            <groupId>org.spigotmc</groupId>
-            <artifactId>spigot1.14.4</artifactId>
-            <version>1.14.4</version>
-            <systemPath>D:/Minecraft/Plugin/Cores/Spigot1.14.4.jar</systemPath>
-            <scope>system</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.spigotmc</groupId>
-            <artifactId>spigot1.15.2</artifactId>
-            <version>1.15.2</version>
-            <systemPath>D:/Minecraft/Plugin/Cores/Spigot1.15.2.jar</systemPath>
-            <scope>system</scope>
-        </dependency>
-        <dependency>
             <groupId>me.clip</groupId>
             <artifactId>placeholderapi</artifactId>
             <version>2.10.4</version>

@@ -1,7 +1,6 @@
 package xyz.hstudio.horizon.module.checks;
 
 import org.bukkit.GameMode;
-import org.bukkit.Material;
 import xyz.hstudio.horizon.api.ModuleType;
 import xyz.hstudio.horizon.api.events.Event;
 import xyz.hstudio.horizon.api.events.inbound.BlockPlaceEvent;
@@ -74,9 +73,6 @@ public class Scaffold extends Module<ScaffoldData, ScaffoldNode> {
                     .anyMatch(d -> d > 1 || d < 0)) {
                 // Punish
                 this.punish(event, player, data, 0, 5, "1:" + interaction);
-            } else if (b != null && b.getType() == Material.AIR) {
-                // Punish
-                this.punish(event, player, data, 0, 5, "p:2");
             } else {
                 reward(0, data, 0.999);
             }

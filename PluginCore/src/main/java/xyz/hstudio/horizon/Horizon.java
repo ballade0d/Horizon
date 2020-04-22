@@ -5,7 +5,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
-import xyz.hstudio.horizon.command.Commands;
+import xyz.hstudio.horizon.command.Executors;
 import xyz.hstudio.horizon.compat.IBot;
 import xyz.hstudio.horizon.data.HoriPlayer;
 import xyz.hstudio.horizon.file.AbstractFile;
@@ -110,7 +110,7 @@ public class Horizon extends JavaPlugin {
         this.syncTask = Bukkit.getScheduler().runTaskTimer(this, new Sync(), 1L, 1L);
 
         new Listeners();
-        new Commands();
+        new Executors();
         // Load static code block
         BlockUtils.isSolid(Material.AIR);
 
