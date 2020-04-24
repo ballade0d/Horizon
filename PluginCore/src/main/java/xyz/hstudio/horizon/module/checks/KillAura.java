@@ -1,6 +1,7 @@
 package xyz.hstudio.horizon.module.checks;
 
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import xyz.hstudio.horizon.api.ModuleType;
 import xyz.hstudio.horizon.api.events.Event;
 import xyz.hstudio.horizon.api.events.inbound.ActionEvent;
@@ -22,7 +23,7 @@ public class KillAura extends Module<KillAuraData, KillAuraNode> {
     private static final double EXPANDER = Math.pow(2, 24);
 
     public KillAura() {
-        super(ModuleType.KillAura, new KillAuraNode(), "Order", "SuperKb", "GCD", "Direction", "InteractAutoBlock", "NormalAutoBlock", "Multi");
+        super(ModuleType.KillAura, new KillAuraNode(), "Order", "SuperKb", "GCD", "Direction", "InteractAutoBlock", "NormalAutoBlock", "Multi", "KeepSprint");
     }
 
     @Override
@@ -63,6 +64,9 @@ public class KillAura extends Module<KillAuraData, KillAuraNode> {
         }
         if (config.multi_enabled) {
             typeG(event, player, data, config);
+        }
+        if (config.keep_sprint_enabled) {
+            typeH(event, player, data, config);
         }
         if (event instanceof InteractEntityEvent) {
             InteractEntityEvent e = (InteractEntityEvent) event;
@@ -339,4 +343,38 @@ public class KillAura extends Module<KillAuraData, KillAuraNode> {
             data.prevHit = e.entity.getUniqueId();
         }
     }
+
+    /**
+     * A KeepSprint check.
+     * <p>
+     * Accuracy: 5/10 - Additional physics beyond walking are not accounted for
+     * Efficiency: 9/10 - Detects on second hit
+     *
+     * @author FrozenAnarchy
+     */
+    private void typeH(final Event event, final HoriPlayer player, final KillAuraData data, final KillAuraNode config) {
+        if (event instanceof InteractEntityEvent) {
+            data.lastHitEntity = ((InteractEntityEvent) event).entity;
+        }
+
+        if (event instanceof MoveEvent) {
+            if (!player.isSprinting) {
+                return;
+            }
+            MoveEvent e = (MoveEvent) event;
+            double differenceXZ = (Math.abs(e.from.x - e.to.x) + Math.abs(e.from.z - e.to.z))/2;
+
+
+            //TODO account for teleporting, water, added velocity, flight, swimming, potions, item attributes
+            if (differenceXZ > 0.16
+                    && Math.abs(data.lastHitTick - player.currentTick) < 2
+                    && data.lastHitEntity instanceof Player)
+            {
+                this.punish(event, player, data, 7, 0); //0 Because of 5/10 Eff
+            } else {
+                reward(7, data, 0.99);
+            }
+        }
+    }
+
 }

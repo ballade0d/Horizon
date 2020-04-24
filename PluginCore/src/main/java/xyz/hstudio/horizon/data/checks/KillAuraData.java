@@ -1,5 +1,6 @@
 package xyz.hstudio.horizon.data.checks;
 
+import org.bukkit.entity.Entity;
 import xyz.hstudio.horizon.data.Data;
 import xyz.hstudio.horizon.util.wrap.Vector3D;
 
@@ -27,4 +28,8 @@ public class KillAuraData extends Data {
     public long lastIntersectTick = -10000;
     // Multi
     public UUID prevHit;
+    // KeepSprint
+    public Entity lastHitEntity;
+
+
 }
