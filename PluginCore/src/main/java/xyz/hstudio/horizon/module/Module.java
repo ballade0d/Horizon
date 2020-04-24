@@ -13,14 +13,14 @@ import xyz.hstudio.horizon.compat.McAccessor;
 import xyz.hstudio.horizon.data.Data;
 import xyz.hstudio.horizon.data.HoriPlayer;
 import xyz.hstudio.horizon.file.AbstractFile;
-import xyz.hstudio.horizon.file.CheckFile;
+import xyz.hstudio.horizon.file.CheckNode;
 import xyz.hstudio.horizon.thread.Async;
 
 import java.util.*;
 
-public abstract class Module<K extends Data, V extends CheckFile> {
+public abstract class Module<K extends Data, V extends CheckNode> {
 
-    public static final Map<ModuleType, Module<? extends Data, ? extends CheckFile>> MODULE_MAP = new LinkedHashMap<>(16, 1);
+    public static final Map<ModuleType, Module<? extends Data, ? extends CheckNode>> MODULE_MAP = new LinkedHashMap<>(16, 1);
     public static final List<CustomCheck<? extends CustomConfig>> CUSTOM_CHECKS = new LinkedList<>();
 
     private final ModuleType moduleType;

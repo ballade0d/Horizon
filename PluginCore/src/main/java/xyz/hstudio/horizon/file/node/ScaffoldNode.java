@@ -1,11 +1,11 @@
 package xyz.hstudio.horizon.file.node;
 
 import xyz.hstudio.horizon.file.AbstractFile;
-import xyz.hstudio.horizon.file.CheckFile;
+import xyz.hstudio.horizon.file.CheckNode;
 import xyz.hstudio.horizon.file.Load;
 import xyz.hstudio.horizon.util.wrap.YamlLoader;
 
-public class ScaffoldNode extends CheckFile {
+public class ScaffoldNode extends CheckNode {
 
     // TypeA
     @Load(path = "typeA.enabled")

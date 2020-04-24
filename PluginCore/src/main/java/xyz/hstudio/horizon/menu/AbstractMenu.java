@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.bukkit.inventory.ItemStack;
 
 @RequiredArgsConstructor
-public abstract class IMenu {
+public abstract class AbstractMenu {
 
     protected final MenuHolder holder;
 

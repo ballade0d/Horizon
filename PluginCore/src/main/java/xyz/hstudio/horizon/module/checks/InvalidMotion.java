@@ -51,6 +51,12 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
         if (config.packet_enabled) {
             typeC(event, player, data, config);
         }
+        if (event instanceof MoveEvent) {
+            MoveEvent e = (MoveEvent) event;
+            if (e.clientBlock != -1 && player.clientBlockCount > config.allowed_client_blocks) {
+                cancel(event, 1, player, data, config);
+            }
+        }
     }
 
     /**
@@ -171,32 +177,22 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
                 if (e.onGround && !player.onGround) {
                     if (Math.abs(discrepancy) > config.predict_tolerance && (deltaY < Math.min(estimatedVelocity, 0) || deltaY > Math.max(estimatedVelocity, 0)) && player.currentTick > 20) {
                         // Punish
-                        if (config.predict_wall_jump && e.clientBlock != -1) {
-                            this.cancel(e, 0, player, data, config);
-                        } else {
-                            this.punish(event, player, data, 0, Math.abs(discrepancy) * 5F,
-                                    "d:" + deltaY, "e:" + estimatedVelocity, "r:" + player.velocity.y, "t:l");
-                        }
+                        this.punish(event, player, data, 0, Math.abs(discrepancy) * 5F,
+                                "d:" + deltaY, "e:" + estimatedVelocity, "r:" + player.velocity.y, "t:l");
                     } else {
                         reward(0, data, 0.999);
                     }
-
                     data.estimatedVelocity = 0;
                 } else if (e.updatePos && e.velocity.lengthSquared() > 0) {
                     if (Math.abs(discrepancy) > config.predict_tolerance && player.currentTick > 20) {
                         // Punish
-                        if (config.predict_wall_jump && e.clientBlock != -1) {
-                            this.cancel(e, 0, player, data, config);
-                        } else {
-                            this.punish(event, player, data, 0, Math.abs(discrepancy) * 5F,
-                                    "d:" + deltaY, "e:" + estimatedVelocity, "p:" + player.velocity.y, "t:a");
-                        }
+                        this.punish(event, player, data, 0, Math.abs(discrepancy) * 5F,
+                                "d:" + deltaY, "e:" + estimatedVelocity, "p:" + player.velocity.y, "t:a");
                     } else {
                         reward(0, data, 0.999);
                     }
                     data.estimatedVelocity = estimatedVelocity;
                 }
-
             } else {
                 if (e.onGround || (e.touchingFaces.contains(BlockFace.UP) && deltaY > 0)) {
                     data.estimatedVelocity = 0;

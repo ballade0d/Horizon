@@ -1,7 +1,6 @@
 package xyz.hstudio.horizon.module.checks;
 
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
 import xyz.hstudio.horizon.api.ModuleType;
 import xyz.hstudio.horizon.api.events.Event;
 import xyz.hstudio.horizon.api.events.inbound.ActionEvent;
@@ -347,34 +346,34 @@ public class KillAura extends Module<KillAuraData, KillAuraNode> {
     /**
      * A KeepSprint check.
      * <p>
-     * Accuracy: 5/10 - Additional physics beyond walking are not accounted for
-     * Efficiency: 9/10 - Detects on second hit
+     * Accuracy: 8/10 - May have some falses.
+     * Efficiency: 9/10 - Detects on second hit.
      *
      * @author FrozenAnarchy
      */
     private void typeH(final Event event, final HoriPlayer player, final KillAuraData data, final KillAuraNode config) {
-        if (event instanceof InteractEntityEvent) {
-            data.lastHitEntity = ((InteractEntityEvent) event).entity;
-        }
-
         if (event instanceof MoveEvent) {
-            if (!player.isSprinting) {
+            // Player get slow down after 1 tick
+            if (player.currentTick - player.hitSlowdownTick != 1) {
                 return;
             }
             MoveEvent e = (MoveEvent) event;
-            double differenceXZ = (Math.abs(e.from.x - e.to.x) + Math.abs(e.from.z - e.to.z))/2;
+            // Account for teleport, liquid, velocity, and air
+            if (e.isTeleport || e.isInLiquidStrict || e.knockBack != null || !e.onGroundReally || !e.onGround) {
+                return;
+            }
+            double difference = Math.abs(e.velocity.clone().setY(0).length() - player.velocity.clone().setY(0).length());
 
-
-            //TODO account for teleporting, water, added velocity, flight, swimming, potions, item attributes
-            if (differenceXZ > 0.16
-                    && Math.abs(data.lastHitTick - player.currentTick) < 2
-                    && data.lastHitEntity instanceof Player)
-            {
-                this.punish(event, player, data, 7, 0); //0 Because of 5/10 Eff
+            if (difference < 0.027) {
+                // Add a threshold to avoid some falses
+                if (++data.keepSprintFails > 4) {
+                    this.punish(event, player, data, 7, 2);
+                }
+            } else if (data.keepSprintFails > 0) {
+                data.keepSprintFails--;
             } else {
                 reward(7, data, 0.99);
             }
         }
     }
-
 }

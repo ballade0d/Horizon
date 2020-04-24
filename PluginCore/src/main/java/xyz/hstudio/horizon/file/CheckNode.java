@@ -6,7 +6,7 @@ import xyz.hstudio.horizon.util.wrap.YamlLoader;
 
 import java.util.*;
 
-public class CheckFile extends AbstractFile {
+public class CheckNode extends AbstractFile {
 
     // Cancel Violation
     @Load(path = "cancel_vl")

@@ -16,7 +16,7 @@ import xyz.hstudio.horizon.api.events.outbound.AttributeEvent;
 import xyz.hstudio.horizon.compat.McAccessor;
 import xyz.hstudio.horizon.data.checks.*;
 import xyz.hstudio.horizon.file.LangFile;
-import xyz.hstudio.horizon.menu.IMenu;
+import xyz.hstudio.horizon.menu.AbstractMenu;
 import xyz.hstudio.horizon.network.ChannelHandler;
 import xyz.hstudio.horizon.util.collect.Pair;
 import xyz.hstudio.horizon.util.enums.Version;
@@ -61,6 +61,8 @@ public class HoriPlayer {
     public List<AttributeEvent.AttributeModifier> moveModifiers = new ArrayList<>();
     public List<AABB> piston = new ArrayList<>();
     public Set<BlockFace> touchingFaces = EnumSet.noneOf(BlockFace.class);
+    public Location prevClientBlock;
+    public int clientBlockCount;
     public boolean isSneaking;
     public boolean isSprinting;
     public boolean isEating;
@@ -80,7 +82,7 @@ public class HoriPlayer {
     public long ping;
     public long lastRequestSent;
     public ChannelPipeline pipeline;
-    public IMenu prevMenu;
+    public AbstractMenu prevMenu;
 
     public HoriPlayer(final Player player) {
         Version viaVer = Horizon.getInst().useViaVer ?

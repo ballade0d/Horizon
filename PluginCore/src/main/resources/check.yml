@@ -91,12 +91,14 @@ invalidmotion:
   enabled: true
   cancel_vl: 1
   disable_worlds: []
+  # How many client blocks are allowed?
+  # This will block infinite wall-jump but not cancelling legit players.
+  # Set it to -1 will disable this feature.
+  # Set it to 0 will always cancel wall-jump.
+  allowed_client_blocks: 2
   predict:
     enabled: true
     tolerance: 0.001
-    # Should Horizon only set back but not add any violation levels
-    # if player tries to wall-jump?
-    wall_jump: true
   step:
     enabled: true
   packet:

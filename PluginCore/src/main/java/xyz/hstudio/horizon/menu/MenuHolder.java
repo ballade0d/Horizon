@@ -12,7 +12,7 @@ public class MenuHolder implements InventoryHolder {
     public final Player player;
     public final HoriPlayer hPlayer;
     public Inventory inventory;
-    public IMenu menu;
+    public AbstractMenu menu;
 
     public void open() {
         player.openInventory(inventory);

@@ -1,9 +1,9 @@
 package xyz.hstudio.horizon.file.node;
 
-import xyz.hstudio.horizon.file.CheckFile;
+import xyz.hstudio.horizon.file.CheckNode;
 import xyz.hstudio.horizon.file.Load;
 
-public class KillAuraBotNode extends CheckFile {
+public class KillAuraBotNode extends CheckNode {
 
     @Load(path = "command_only")
     public boolean command_only = true;

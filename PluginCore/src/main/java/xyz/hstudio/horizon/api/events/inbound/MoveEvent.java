@@ -190,6 +190,10 @@ public class MoveEvent extends Event {
             Map.Entry<Long, Material> cBlock = player.clientBlocks.get(loc);
             AABB newAABB = cube.translateTo(loc.toVector());
             if (BlockUtils.isSolid(cBlock.getValue()) && feet.isColliding(newAABB) && !aboveFeet.isColliding(newAABB)) {
+                if (!loc.equals(player.prevClientBlock)) {
+                    player.clientBlockCount++;
+                }
+                player.prevClientBlock = loc;
                 return cBlock.getKey();
             }
         }
@@ -372,7 +376,7 @@ public class MoveEvent extends Event {
                     analysis);
         }
 
-        player.clientBlocks.entrySet().removeIf(next -> player.currentTick - next.getValue().getKey() > 3);
+        player.clientBlocks.entrySet().removeIf(next -> player.currentTick - next.getValue().getKey() > 6);
 
         long now = System.currentTimeMillis();
         for (Map.Entry<Location, Long> entry : player.teleports.entrySet()) {
@@ -406,6 +410,11 @@ public class MoveEvent extends Event {
         player.touchingFaces = this.touchingFaces;
         player.isInLiquidStrict = this.isInLiquidStrict;
         player.isInLiquid = this.isInLiquid;
+
+        if (onGroundReally) {
+            player.clientBlockCount = 0;
+            player.prevClientBlock = null;
+        }
     }
 
     public enum MoveType {

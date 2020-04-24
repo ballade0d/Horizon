@@ -5,10 +5,10 @@ import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import xyz.hstudio.horizon.menu.IMenu;
+import xyz.hstudio.horizon.menu.AbstractMenu;
 import xyz.hstudio.horizon.menu.MenuHolder;
 
-public class MainMenu extends IMenu {
+public class MainMenu extends AbstractMenu {
 
     private static final ItemStack SETTINGS_ITEM;
     private static final ItemStack STATISTICS_ITEM;
