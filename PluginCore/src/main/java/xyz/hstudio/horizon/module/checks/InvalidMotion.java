@@ -36,7 +36,7 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
     @Override
     public void cancel(final Event event, final int type, final HoriPlayer player, final InvalidMotionData data, final InvalidMotionNode config) {
         event.setCancelled(true);
-        Sync.teleport(player, player.position);
+        Sync.teleport(player, type == 1 ? data.safeLoc : player.position);
     }
 
     @Override
@@ -237,13 +237,16 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
     private void typeB(final Event event, final HoriPlayer player, final InvalidMotionData data, final InvalidMotionNode config) {
         if (event instanceof MoveEvent) {
             MoveEvent e = (MoveEvent) event;
-            if (e.stepLegitly || !e.onGround || !player.onGround || e.isTeleport ||
-                    e.knockBack != null || inLadder(e.collidingBlocks) || e.isOnSlime) {
+            if (e.stepLegitly || e.isTeleport || e.knockBack != null || inLadder(e.collidingBlocks) || e.isOnSlime) {
                 return;
             }
             double deltaY = e.velocity.y;
 
-            if (deltaY > 0.6 || deltaY < -0.0784) {
+            if (deltaY == 0) {
+                data.safeLoc = e.to;
+            }
+
+            if (deltaY > 0.6 || deltaY < -0.0784 && e.onGround && player.onGround) {
                 // Punish
                 this.punish(event, player, data, 1, 4, "d:" + deltaY, "t:a");
             } else if (e.onGroundReally && Math.abs(player.prevPrevDeltaY - 0.333) < 0.01 &&

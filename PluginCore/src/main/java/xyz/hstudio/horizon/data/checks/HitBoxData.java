@@ -12,6 +12,8 @@ public class HitBoxData extends Data {
 
     // Hit
     public List<Pair<Location, Long>> history = new ArrayList<>();
+    public float deltaYaw;
+    public float deltaPitch;
 
     public Location getHistoryLocation(final long ping, final boolean lerp) {
         long time = System.currentTimeMillis();

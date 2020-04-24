@@ -1,7 +1,5 @@
 package xyz.hstudio.horizon.util.wrap;
 
-import org.bukkit.Effect;
-import org.bukkit.World;
 import xyz.hstudio.horizon.util.collect.Pair;
 
 public class Ray implements Cloneable {
@@ -31,12 +29,6 @@ public class Ray implements Cloneable {
             e.printStackTrace();
         }
         return null;
-    }
-
-    public void highlight(final World world, final double blocksAway, final double accuracy) {
-        for (double x = 0; x < blocksAway; x += accuracy) {
-            world.playEffect(getPointAtDistance(x).toLocation(world), Effect.COLOURED_DUST, 1);
-        }
     }
 
     public Pair<Vector3D, Vector3D> closestPointsBetweenLines(final Ray other) {

@@ -13,6 +13,7 @@ import xyz.hstudio.horizon.file.ConfigFile;
 import xyz.hstudio.horizon.file.LangFile;
 import xyz.hstudio.horizon.kirin.Verification;
 import xyz.hstudio.horizon.listener.Listeners;
+import xyz.hstudio.horizon.menu.MenuListener;
 import xyz.hstudio.horizon.module.Module;
 import xyz.hstudio.horizon.module.checks.*;
 import xyz.hstudio.horizon.network.ChannelHandler;
@@ -110,6 +111,7 @@ public class Horizon extends JavaPlugin {
         this.syncTask = Bukkit.getScheduler().runTaskTimer(this, new Sync(), 1L, 1L);
 
         new Listeners();
+        new MenuListener();
         new Executors();
         // Load static code block
         BlockUtils.isSolid(Material.AIR);

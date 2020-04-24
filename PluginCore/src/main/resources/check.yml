@@ -68,9 +68,12 @@ hitbox:
   enabled: true
   cancel_vl: 1
   disable_worlds: []
-  typeA:
+  reach:
     enabled: true
     max_reach: 3.1
+  direction:
+    enabled: true
+    box_expansion: 0.2
   action:
     8:
       - 'horizon notify %player% might be using HitBox'
@@ -226,7 +229,7 @@ speed:
     # If you set it to -1, dynamic violation addition will be enabled.
     # If you set it to 0, the check will not add any violation levels.
     move_vl: -1
-    # Should Horizon always cancel player's behavior when the player failed this check?
+    # Should Horizon always cancel player''s behavior when the player failed this check?
     always_cancel: false
   sprint:
     enabled: true

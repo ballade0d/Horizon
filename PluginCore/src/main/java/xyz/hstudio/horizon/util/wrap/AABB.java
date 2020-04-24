@@ -1,6 +1,5 @@
 package xyz.hstudio.horizon.util.wrap;
 
-import org.bukkit.Effect;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.util.NumberConversions;
@@ -84,19 +83,6 @@ public class AABB {
         return !(maxZ < other.minZ) && !(minZ > other.maxZ);
     }
 
-    public AABB highlight(final World world, final double accuracy) {
-        for (double x = this.minX; x <= this.maxX; x += accuracy) {
-            for (double y = this.minY; y <= this.maxY; y += accuracy) {
-                for (double z = this.minZ; z <= this.maxZ; z += accuracy) {
-                    Vector3D position = new Vector3D(x, y, z);
-                    world.playEffect(position.toLocation(world), Effect.COLOURED_DUST, 1);
-                    world.playEffect(position.toLocation(world), Effect.COLOURED_DUST, 1);
-                }
-            }
-        }
-        return this;
-    }
-
     /**
      * Calculates intersection with the given ray between a certain distance
      * interval.
@@ -144,6 +130,64 @@ public class AABB {
             return ray.getPointAtDistance(txmin);
         }
         return null;
+    }
+
+    public boolean betweenRays(final Vector3D pos, final Vector3D dir1, final Vector3D dir2) {
+        if (dir1.dot(dir2) > 0.999) {
+            return this.intersectsRay(new Ray(pos, dir2), 0, Float.MAX_VALUE) != null;
+        } else {
+            Vector3D planeNormal = dir2.clone().crossProduct(dir1);
+            Vector3D[] vertices = this.getVertices();
+            boolean hitPlane = false;
+            boolean above = false;
+            boolean below = false;
+            for (Vector3D vertex : vertices) {
+                vertex.subtract(pos);
+                if (!hitPlane) {
+                    if (vertex.dot(planeNormal) > 0) {
+                        above = true;
+                    } else {
+                        below = true;
+                    }
+                    if (above && below) {
+                        hitPlane = true;
+                    }
+                }
+            }
+            if (!hitPlane) {
+                return false;
+            }
+            Vector3D extraDirToDirNormal = planeNormal.clone().crossProduct(dir2);
+            Vector3D dirToExtraDirNormal = dir1.clone().crossProduct(planeNormal);
+            boolean betweenVectors = false;
+            boolean frontOfExtraDirToDir = false;
+            boolean frontOfDirToExtraDir = false;
+            for (Vector3D vertex : vertices) {
+                if (!frontOfExtraDirToDir && vertex.dot(extraDirToDirNormal) >= 0) {
+                    frontOfExtraDirToDir = true;
+                }
+                if (!frontOfDirToExtraDir && vertex.dot(dirToExtraDirNormal) >= 0) {
+                    frontOfDirToExtraDir = true;
+                }
+
+                if (frontOfExtraDirToDir && frontOfDirToExtraDir) {
+                    betweenVectors = true;
+                    break;
+                }
+            }
+            return betweenVectors;
+        }
+    }
+
+    public Vector3D[] getVertices() {
+        return new Vector3D[]{new Vector3D(minX, minY, minZ),
+                new Vector3D(minX, minY, maxZ),
+                new Vector3D(minX, maxY, minZ),
+                new Vector3D(minX, maxY, maxZ),
+                new Vector3D(maxX, minY, minZ),
+                new Vector3D(maxX, minY, maxZ),
+                new Vector3D(maxX, maxY, minZ),
+                new Vector3D(maxX, maxY, maxZ)};
     }
 
     public List<IWrappedBlock> getBlocks(final World world) {

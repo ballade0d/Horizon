@@ -12,7 +12,8 @@ import xyz.hstudio.horizon.command.annotation.Cmd;
 import xyz.hstudio.horizon.command.annotation.Tab;
 import xyz.hstudio.horizon.data.HoriPlayer;
 import xyz.hstudio.horizon.file.LangFile;
-import xyz.hstudio.horizon.thread.Async;
+import xyz.hstudio.horizon.menu.MenuHolder;
+import xyz.hstudio.horizon.menu.menus.MainMenu;
 import xyz.hstudio.horizon.util.collect.Pair;
 
 import java.lang.reflect.Constructor;
@@ -191,19 +192,14 @@ public class Executors {
             }
         }
 
-        @Cmd(name = "modify", perm = "horizon.cmd.modify")
-        public void modify(final CommandSender sender, final String[] args, final String prefix, final LangFile lang) {
-            if (args.length < 3) {
-                //
-                return;
+        @Cmd(name = "menu", perm = "horizon.cmd.menu", onlyPlayer = true)
+        public void menu(final CommandSender sender, final String[] args, final String prefix, final LangFile lang) {
+            HoriPlayer player = Horizon.PLAYERS.get(((Player) sender).getUniqueId());
+            if (player.prevMenu == null) {
+                new MainMenu(new MenuHolder((Player) sender, player)).open();
+            } else {
+                player.prevMenu.open();
             }
-            if (!Horizon.getInst().checkLoader.contains((args[0] + "." + args[1]).toLowerCase())) {
-                // Did not find
-                return;
-            }
-            Async.THREAD_POOL.execute(() -> {
-                // TODO
-            });
         }
     }
 
