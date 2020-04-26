@@ -91,7 +91,7 @@ public class HitBox extends Module<HitBoxData, HitBoxNode> {
 
             if (reach > config.reach_max_reach) {
                 // Punish
-                this.punish(event, player, data, 0, (float) ((reach - config.reach_max_reach) * 10));
+                this.punish(event, player, data, 0, (float) ((reach - config.reach_max_reach) * 10), "d:" + reach);
             } else {
                 reward(0, data, 0.99);
             }

@@ -5,7 +5,7 @@
     <parent>
         <artifactId>Horizon</artifactId>
         <groupId>xyz.hstudio</groupId>
-        <version>BETA7</version>
+        <version>BETA8</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -26,16 +26,6 @@
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
             <version>2.6</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-            <version>3.9</version>
-        </dependency>
-        <dependency>
-            <groupId>xyz.hstudio</groupId>
-            <artifactId>PluginCore</artifactId>
-            <version>BETA5</version>
         </dependency>
     </dependencies>
 

@@ -2,6 +2,7 @@ package xyz.hstudio.horizon.module;
 
 import lombok.Getter;
 import me.clip.placeholderapi.PlaceholderAPI;
+import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
 import xyz.hstudio.horizon.Horizon;
 import xyz.hstudio.horizon.api.ModuleType;
@@ -22,6 +23,16 @@ public abstract class Module<K extends Data, V extends CheckNode> {
 
     public static final Map<ModuleType, Module<? extends Data, ? extends CheckNode>> MODULE_MAP = new LinkedHashMap<>(16, 1);
     public static final List<CustomCheck<? extends CustomConfig>> CUSTOM_CHECKS = new LinkedList<>();
+
+    private static final String[] ARGS = new String[]{
+            "%player%",
+            "%check%",
+            "%type%",
+            "%vl_total%",
+            "%vl_addition%",
+            "%ping%",
+            "%args%"
+    };
 
     private final ModuleType moduleType;
     @Getter
@@ -47,21 +58,25 @@ public abstract class Module<K extends Data, V extends CheckNode> {
         if (player.player.isOp() && Horizon.getInst().config.op_bypass) {
             return;
         }
-        for (Module modules : Module.MODULE_MAP.values()) {
-            if (!modules.config.enabled) {
+        for (Module module : Module.MODULE_MAP.values()) {
+            if (!module.config.enabled) {
                 continue;
             }
-            if (modules.config.disable_worlds.contains(player.position.world.getName())) {
+            if (module.config.disable_worlds.contains(player.position.world.getName())) {
                 continue;
             }
-            if (player.player.hasPermission("horizon.bypass." + modules.moduleType.name())) {
+            if (module.canBypass(player)) {
                 continue;
             }
             if (event.isCancelled()) {
                 return;
             }
-            modules.doCheck(event, player, modules.getData(player), modules.config);
+            module.doCheck(event, player, module.getData(player), module.config);
         }
+    }
+
+    protected boolean canBypass(final HoriPlayer player) {
+        return player.player.hasPermission("horizon.bypass." + this.moduleType.name());
     }
 
     /**
@@ -95,8 +110,7 @@ public abstract class Module<K extends Data, V extends CheckNode> {
             }
             McAccessor.INSTANCE.ensureMainThread(() -> {
                 for (String rawCmd : entry.getValue()) {
-                    String cmd = rawCmd
-                            .replace("%player%", player.player.getName());
+                    String cmd = StringUtils.replace(rawCmd, "%player%", player.player.getName());
                     cmd = Horizon.getInst().usePapi ? PlaceholderAPI.setPlaceholders(player.player, cmd) : cmd;
                     Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd);
                 }
@@ -106,25 +120,28 @@ public abstract class Module<K extends Data, V extends CheckNode> {
         }
 
         if (player.verbose || player.player.hasPermission("horizon.verbose")) {
-            player.sendMessage(Horizon.getInst().config.prefix + player.getLang().verbose
-                    .replace("%player%", player.player.getName())
-                    .replace("%check%", this.moduleType.name())
-                    .replace("%type%", this.types[type])
-                    .replace("%vl_total%", String.valueOf(nowViolation))
-                    .replace("%vl_addition%", String.valueOf(weight))
-                    .replace("%ping%", String.valueOf(player.ping))
-                    .replace("%args%", Arrays.toString(args)));
+            String verbose = StringUtils.replaceEach(
+                    player.getLang().verbose,
+                    ARGS,
+                    new String[]{player.player.getName(), this.moduleType.name(),
+                            this.types[type], String.valueOf(nowViolation),
+                            String.valueOf(weight), String.valueOf(player.ping),
+                            Arrays.toString(args)
+                    });
+            player.sendMessage(Horizon.getInst().config.prefix + verbose);
         }
 
         if (Horizon.getInst().config.log) {
-            Async.LOG.addLast(Horizon.getInst().getLang(Horizon.getInst().config.personalized_themes_default_lang).verbose
-                    .replace("%player%", player.player.getName())
-                    .replace("%check%", this.moduleType.name())
-                    .replace("%type%", this.types[type])
-                    .replace("%vl_total%", String.valueOf(nowViolation))
-                    .replace("%vl_addition%", String.valueOf(weight))
-                    .replace("%ping%", String.valueOf(player.ping))
-                    .replace("%args%", Arrays.toString(args)));
+            String verbose = StringUtils.replaceEach(
+                    Horizon.getInst().getLang(Horizon.getInst().config.default_lang).verbose,
+                    ARGS,
+                    new String[]{
+                            player.player.getName(), this.moduleType.name(),
+                            this.types[type], String.valueOf(nowViolation),
+                            String.valueOf(weight), String.valueOf(player.ping),
+                            Arrays.toString(args)
+                    });
+            Async.LOG.addLast(verbose);
         }
 
         data.violations.put(type, nowViolation);

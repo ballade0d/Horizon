@@ -36,7 +36,7 @@ public class KillAura extends Module<KillAuraData, KillAuraNode> {
         if (type == 4 || type == 5) {
             McAccessor.INSTANCE.releaseItem(player.player);
             player.player.updateInventory();
-        } else if (type == 0 || type == 1 || type == 6) {
+        } else if (type == 0 || type == 1 || type == 6 || type == 7) {
             event.setCancelled(true);
         }
     }
@@ -64,7 +64,7 @@ public class KillAura extends Module<KillAuraData, KillAuraNode> {
         if (config.multi_enabled) {
             typeG(event, player, data, config);
         }
-        if (config.keep_sprint_enabled) {
+        if (config.keepsprint_enabled) {
             typeH(event, player, data, config);
         }
         if (event instanceof InteractEntityEvent) {
@@ -352,27 +352,9 @@ public class KillAura extends Module<KillAuraData, KillAuraNode> {
      * @author FrozenAnarchy
      */
     private void typeH(final Event event, final HoriPlayer player, final KillAuraData data, final KillAuraNode config) {
-        if (event instanceof MoveEvent) {
-            // Player get slow down after 1 tick
-            if (player.currentTick - player.hitSlowdownTick != 1) {
-                return;
-            }
-            MoveEvent e = (MoveEvent) event;
-            // Account for teleport, liquid, velocity, and air
-            if (e.isTeleport || e.isInLiquidStrict || e.knockBack != null || !e.onGroundReally || !e.onGround) {
-                return;
-            }
-            double difference = Math.abs(e.velocity.clone().setY(0).length() - player.velocity.clone().setY(0).length());
-
-            if (difference < 0.027) {
-                // Add a threshold to avoid some falses
-                if (++data.keepSprintFails > 4) {
-                    this.punish(event, player, data, 7, 2);
-                }
-            } else if (data.keepSprintFails > 0) {
-                data.keepSprintFails--;
-            } else {
-                reward(7, data, 0.99);
+        if (event instanceof InteractEntityEvent) {
+            if (player.currentTick - data.failKeepSprintTick == 2) {
+                this.punish(event, player, data, 7, 2);
             }
         }
     }

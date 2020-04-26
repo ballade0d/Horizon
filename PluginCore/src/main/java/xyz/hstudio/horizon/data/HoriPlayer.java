@@ -93,7 +93,7 @@ public class HoriPlayer {
         this.player = player;
         this.pipeline = McAccessor.INSTANCE.getPipeline(player);
 
-        this.lang = Horizon.getInst().config.personalized_themes_default_lang;
+        this.lang = Horizon.getInst().config.default_lang;
 
         this.world = player.getWorld();
         this.position = new Location(player.getLocation());

@@ -1,6 +1,7 @@
 package xyz.hstudio.horizon.api.events.inbound;
 
 import me.clip.placeholderapi.PlaceholderAPI;
+import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
 import xyz.hstudio.horizon.Horizon;
@@ -25,6 +26,13 @@ import java.util.Set;
 public class MoveEvent extends Event {
 
     private static final double STRAFE_THRESHOLD = Math.toRadians(0.6);
+    private static final String[] ARGS = new String[]{
+            "%y_speed%",
+            "%xz_speed%",
+            "%tick%",
+            "%c_ground%",
+            "%s_ground%"
+    };
 
     public final Location from;
     public final Location to;
@@ -342,9 +350,6 @@ public class MoveEvent extends Event {
         boolean vectorDir = accelDir.clone().crossProduct(yaw).dot(new Vector3D(0, 1, 0)) >= 0;
         double angle = (vectorDir ? 1 : -1) * MathUtils.angle(accelDir, yaw);
 
-        // double multiple = angle / (Math.PI / 4);
-        // return Math.abs(multiple - Math.round(multiple)) <= STRAFE_THRESHOLD;
-
         double modulo = (angle % (Math.PI / 4)) * (4 / Math.PI);
         double error = Math.abs(modulo - Math.round(modulo)) * (Math.PI / 4);
 
@@ -365,15 +370,18 @@ public class MoveEvent extends Event {
 
         if (player.analysis && this.updatePos) {
             LangFile lang = Horizon.getInst().getLang(player.lang);
-            String analysis = Horizon.getInst().config.prefix + lang.analysis
-                    .replace("%y_speed%", String.valueOf(this.velocity.y))
-                    .replace("%xz_speed%", String.valueOf(MathUtils.distance2d(this.velocity.x, this.velocity.z)))
-                    .replace("%tick%", String.valueOf(player.currentTick))
-                    .replace("%c_ground%", String.valueOf(this.onGround))
-                    .replace("%s_ground%", String.valueOf(this.onGroundReally));
-            player.sendMessage(Horizon.getInst().usePapi ?
-                    PlaceholderAPI.setPlaceholders(player.player, analysis) :
-                    analysis);
+            String analysis = StringUtils.replaceEach(
+                    lang.analysis,
+                    ARGS,
+                    new String[]{
+                            String.valueOf(this.velocity.y),
+                            String.valueOf(MathUtils.distance2d(this.velocity.x, this.velocity.z)),
+                            String.valueOf(player.currentTick),
+                            String.valueOf(this.onGround),
+                            String.valueOf(this.onGroundReally)
+                    });
+            player.sendMessage(Horizon.getInst().config.prefix + (Horizon.getInst().usePapi ?
+                    PlaceholderAPI.setPlaceholders(player.player, analysis) : analysis));
         }
 
         player.clientBlocks.entrySet().removeIf(next -> player.currentTick - next.getValue().getKey() > 6);

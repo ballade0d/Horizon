@@ -146,6 +146,8 @@ killaura:
     enabled: true
   multi:
     enabled: true
+  keepsprint:
+    enabled: true
   action:
     10:
       - 'horizon notify %player% might be using KillAura, start checking the player with bot.'

@@ -92,7 +92,9 @@ public class KillAuraBot extends Module<KillAuraBotData, KillAuraBotNode> {
             if ((bot = getData(player).bot) == null) {
                 continue;
             }
-            if (System.currentTimeMillis() - bot.getSpawnTime() > config.respawn_interval * 1000L) {
+            if (this.canBypass(player) ||
+                    System.currentTimeMillis() - bot.getSpawnTime() > config.respawn_interval * 1000L ||
+                    (config.command_only && System.currentTimeMillis() > this.getData(player).checkEnd)) {
                 this.run(() -> bot.despawn(player), config.async_packet);
                 continue;
             }

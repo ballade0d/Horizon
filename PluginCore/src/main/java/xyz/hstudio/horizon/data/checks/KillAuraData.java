@@ -28,5 +28,5 @@ public class KillAuraData extends Data {
     // Multi
     public UUID prevHit;
     // KeepSprint
-    public int keepSprintFails;
+    public long failKeepSprintTick;
 }

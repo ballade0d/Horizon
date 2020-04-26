@@ -25,7 +25,6 @@ import xyz.hstudio.horizon.util.wrap.YamlLoader;
 
 import java.io.File;
 import java.net.URLClassLoader;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -35,15 +34,9 @@ public class Horizon extends JavaPlugin {
     // This is a recoding version.
     // You can contribute us if you want to help horizon become the best anticheat.
 
-    public static final Map<String, Object> VALUES = new HashMap<>();
-
     public static final Map<UUID, HoriPlayer> PLAYERS = new ConcurrentHashMap<>();
     @Getter
     private static Horizon inst;
-
-    public static void addValue(final String path, final Object val) {
-        VALUES.put(path, val);
-    }
 
     public final Map<String, LangFile> langMap = new ConcurrentHashMap<>();
     public YamlLoader checkLoader;

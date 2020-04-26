@@ -23,7 +23,7 @@ public class ConfigFile extends AbstractFile {
     @Load(path = "personalized_themes.enabled")
     public boolean personalized_themes_enabled = true;
     @Load(path = "personalized_themes.default_lang")
-    public String personalized_themes_default_lang = "en_US";
+    public String default_lang = "en_US";
 
     @Load(path = "kirin.enabled")
     public boolean kirin_enabled = false;

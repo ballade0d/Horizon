@@ -31,7 +31,7 @@ public class KillAuraNode extends CheckNode {
     @Load(path = "multi.enabled")
     public boolean multi_enabled = true;
     @Load(path = "keepsprint.enabled")
-    public boolean keep_sprint_enabled = true;
+    public boolean keepsprint_enabled = true;
 
     public KillAuraNode load(final String pathPrefix, final YamlLoader loader) {
         return AbstractFile.load(pathPrefix, this, loader);

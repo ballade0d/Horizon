@@ -3,6 +3,7 @@ package xyz.hstudio.horizon.kirin.module;
 import org.bukkit.configuration.file.FileConfiguration;
 import xyz.hstudio.horizon.Horizon;
 import xyz.hstudio.horizon.Logger;
+import xyz.hstudio.horizon.api.events.outbound.VelocityEvent;
 import xyz.hstudio.horizon.util.wrap.YamlLoader;
 
 import java.io.File;
@@ -33,6 +34,6 @@ public class Kirin {
         }
         FileConfiguration yaml = YamlLoader.loadConfiguration(config);
 
-        Horizon.addValue("use_explosion_packet", yaml.getBoolean("use_explosion_packet", true));
+        VelocityEvent.useExplosionPacket = yaml.getBoolean("use_explosion_packet", true);
     }
 }

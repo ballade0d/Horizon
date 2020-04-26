@@ -42,6 +42,9 @@ public class Speed extends Module<SpeedData, SpeedNode> {
         } else if (type == 1) {
             event.setCancelled(true);
         } else {
+            if (type == 0 && event instanceof MoveEvent && ((MoveEvent) event).hitSlowdown) {
+                return;
+            }
             event.setCancelled(true);
             Sync.teleport(player, player.position);
         }
@@ -199,6 +202,9 @@ public class Speed extends Module<SpeedData, SpeedNode> {
                             // Punish
                             this.punish(event, player, data, 0, (float) (totalDiscrepancy * 10),
                                     "s:" + speed, "e:" + estimatedSpeed, "p:" + prevSpeed, "d:" + discrepancy, "s:" + swimming);
+                            if (e.hitSlowdown) {
+                                player.killAuraData.failKeepSprintTick = player.currentTick;
+                            }
                         }
                     }
                     data.discrepancies = 0;

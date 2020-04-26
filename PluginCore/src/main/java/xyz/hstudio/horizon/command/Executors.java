@@ -1,6 +1,7 @@
 package xyz.hstudio.horizon.command;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.*;
 import org.bukkit.entity.HumanEntity;
@@ -87,7 +88,7 @@ public class Executors {
             }
             LangFile lang = Horizon.getInst().getLang(sender instanceof Player ?
                     Horizon.PLAYERS.get(((Player) sender).getUniqueId()).lang :
-                    Horizon.getInst().config.personalized_themes_default_lang);
+                    Horizon.getInst().config.default_lang);
             String subName = args[0];
             String[] subArgs = ArrayUtils.remove(args, 0);
             for (Pair<Cmd, Integer> pair : cmds) {
@@ -164,7 +165,7 @@ public class Executors {
             for (int i = 1; i < args.length; i++) {
                 builder.append(args[i]).append(" ");
             }
-            player.kickPlayer(builder.toString().trim().replace("%break%", "\n"));
+            player.kickPlayer(StringUtils.replace(builder.toString().trim(), "%break%", "\n"));
         }
 
         @Cmd(name = "bot", perm = "horizon.cmd.bot")
