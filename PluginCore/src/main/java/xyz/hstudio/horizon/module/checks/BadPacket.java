@@ -2,9 +2,7 @@ package xyz.hstudio.horizon.module.checks;
 
 import xyz.hstudio.horizon.api.ModuleType;
 import xyz.hstudio.horizon.api.events.Event;
-import xyz.hstudio.horizon.api.events.inbound.CustomPayloadEvent;
-import xyz.hstudio.horizon.api.events.inbound.KeepAliveRespondEvent;
-import xyz.hstudio.horizon.api.events.inbound.MoveEvent;
+import xyz.hstudio.horizon.api.events.inbound.*;
 import xyz.hstudio.horizon.data.HoriPlayer;
 import xyz.hstudio.horizon.data.checks.BadPacketData;
 import xyz.hstudio.horizon.file.node.BadPacketNode;
@@ -14,7 +12,7 @@ import xyz.hstudio.horizon.thread.Sync;
 public class BadPacket extends Module<BadPacketData, BadPacketNode> {
 
     public BadPacket() {
-        super(ModuleType.BadPacket, new BadPacketNode(), "TypeA", "TypeB", "TypeC", "TypeD");
+        super(ModuleType.BadPacket, new BadPacketNode(), "TypeA", "TypeB", "TypeC", "TypeD", "TypeE");
     }
 
     @Override
@@ -45,6 +43,9 @@ public class BadPacket extends Module<BadPacketData, BadPacketNode> {
         }
         if (config.typeD_enabled) {
             typeD(event, player, data, config);
+        }
+        if (config.typeE_enabled) {
+            typeE(event, player, data, config);
         }
     }
 
@@ -147,6 +148,24 @@ public class BadPacket extends Module<BadPacketData, BadPacketNode> {
             } else {
                 reward(3, data, 0.999);
                 data.legitLocation = e.to;
+            }
+        }
+    }
+
+    /**
+     * An interact check.
+     * <p>
+     * Accuracy: 9/10 - Has very few false positives, testing required.
+     * Efficiency: 9/10 - Has rare occurrences when it stumbles.
+     *
+     * @author FrozenAnarchy
+     */
+    private void typeE(final Event event, final HoriPlayer player, final BadPacketData data, final BadPacketNode config) {
+        if ((event instanceof SwingEvent || event instanceof BlockBreakEvent) && player.protocol > 5) { // Ignore 1.7 players
+            if (player.isBlocking || player.isPullingBow || player.isEating) { //Player can't swing and use item in 1.8+
+                this.punish(event, player, data, 4, 5);
+            } else {
+                this.reward(4, data, 0.99);
             }
         }
     }

@@ -10,6 +10,9 @@ public class NoSwingNode extends CheckNode {
     // TypeA
     @Load(path = "typeA.enabled")
     public boolean typeA_enabled = true;
+    // TypeB
+    @Load(path = "typeB_enabled")
+    public boolean typeB_enabled = true;
 
     public NoSwingNode load(final String pathPrefix, final YamlLoader loader) {
         return AbstractFile.load(pathPrefix, this, loader);
