@@ -16,7 +16,7 @@ public class MenuListener implements Listener {
 
     @EventHandler
     public void onClick(final InventoryClickEvent e) {
-        Inventory inventory = e.getClickedInventory();
+        Inventory inventory = e.getInventory();
         if (inventory == null) {
             return;
         }

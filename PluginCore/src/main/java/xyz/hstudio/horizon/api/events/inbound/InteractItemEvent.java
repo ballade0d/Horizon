@@ -2,6 +2,7 @@ package xyz.hstudio.horizon.api.events.inbound;
 
 import org.bukkit.GameMode;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import xyz.hstudio.horizon.api.events.Event;
 import xyz.hstudio.horizon.data.HoriPlayer;
@@ -25,21 +26,22 @@ public class InteractItemEvent extends Event {
         if (this.itemStack == null) {
             return;
         }
+        Player bPlayer = player.getPlayer();
         Material mat = this.itemStack.getType();
         if (this.interactType == InteractType.START_USE_ITEM &&
-                player.player.getGameMode() != GameMode.CREATIVE &&
-                player.player.getGameMode() != GameMode.SPECTATOR) {
+                bPlayer.getGameMode() != GameMode.CREATIVE &&
+                bPlayer.getGameMode() != GameMode.SPECTATOR) {
             // Player can still eat golden apple even if they're full.
-            if (mat.isEdible() && (player.player.getFoodLevel() < 20 || mat == Material.GOLDEN_APPLE || mat == MatUtils.ENCHANTED_GOLDEN_APPLE.parse())) {
+            if (mat.isEdible() && (bPlayer.getFoodLevel() < 20 || mat == Material.GOLDEN_APPLE || mat == MatUtils.ENCHANTED_GOLDEN_APPLE.parse())) {
                 player.isEating = true;
             }
-            if (mat == Material.BOW && (player.player.getInventory().contains(Material.ARROW) || player.player.getGameMode() == GameMode.CREATIVE)) {
+            if (mat == Material.BOW && bPlayer.getInventory().contains(Material.ARROW)) {
                 player.isPullingBow = true;
             }
             if (MatUtils.BLOCKABLE.contains(mat)) {
                 player.isBlocking = true;
             }
-        } else if (this.interactType == InteractType.RELEASE_USE_ITEM) {
+        } else {
             player.isEating = false;
             player.isPullingBow = false;
             player.isBlocking = false;

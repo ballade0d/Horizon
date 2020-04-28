@@ -20,7 +20,7 @@ public class MetaEvent extends Event {
 
     @Override
     public void post() {
-        if (this.entityId != player.player.getEntityId()) {
+        if (this.entityId != player.getPlayer().getEntityId()) {
             return;
         }
         if (Version.VERSION == Version.v1_8_R3) {

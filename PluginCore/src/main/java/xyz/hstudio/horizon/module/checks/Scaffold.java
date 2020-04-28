@@ -60,7 +60,7 @@ public class Scaffold extends Module<ScaffoldData, ScaffoldNode> {
             if (e.placeType != BlockPlaceEvent.PlaceType.PLACE_BLOCK) {
                 return;
             }
-            if (player.player.getGameMode() == GameMode.CREATIVE) {
+            if (player.getPlayer().getGameMode() == GameMode.CREATIVE) {
                 return;
             }
 

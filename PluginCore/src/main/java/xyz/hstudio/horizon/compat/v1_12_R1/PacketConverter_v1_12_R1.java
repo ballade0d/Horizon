@@ -104,7 +104,7 @@ public class PacketConverter_v1_12_R1 implements IPacketConverter {
         float yaw = packet.a(player.position.yaw);
         float pitch = packet.b(player.position.pitch);
         boolean onGround = packet.a();
-        Location to = new Location(player.player.getWorld(), x, y, z, yaw, pitch);
+        Location to = new Location(player.getPlayer().getWorld(), x, y, z, yaw, pitch);
         if (Math.abs(to.x) >= Integer.MAX_VALUE || Math.abs(to.y) >= Integer.MAX_VALUE || Math.abs(to.z) >= Integer.MAX_VALUE ||
                 Double.isNaN(to.x) || Double.isNaN(to.y) || Double.isNaN(to.z)) {
             // Bad Move, will be blocked by the server.
@@ -156,7 +156,7 @@ public class PacketConverter_v1_12_R1 implements IPacketConverter {
 
     private Event convertBlockPlaceEvent(final HoriPlayer player, final PacketPlayInUseItem packet) {
         org.bukkit.inventory.ItemStack bkItem = packet.c() == EnumHand.MAIN_HAND ? player.getHeldItem() :
-                ((CraftInventoryPlayer) player.player.getInventory()).getItemInOffHand();
+                ((CraftInventoryPlayer) player.getPlayer().getInventory()).getItemInOffHand();
         ItemStack itemStack = CraftItemStack.asNMSCopy(bkItem);
         BlockPosition bPos = packet.a();
         int x = bPos.getX();
@@ -205,7 +205,7 @@ public class PacketConverter_v1_12_R1 implements IPacketConverter {
     private Event convertInteractItemEvent(final HoriPlayer player, final PacketPlayInBlockPlace packet) {
         boolean main = packet.a() == EnumHand.MAIN_HAND;
         org.bukkit.inventory.ItemStack bukkitItemStack =
-                main ? player.getHeldItem() : ((CraftInventoryPlayer) player.player.getInventory()).getItemInOffHand();
+                main ? player.getHeldItem() : ((CraftInventoryPlayer) player.getPlayer().getInventory()).getItemInOffHand();
         return new InteractItemEvent(player, bukkitItemStack, main ? InteractItemEvent.Hand.MAIN : InteractItemEvent.Hand.OFF, InteractItemEvent.InteractType.START_USE_ITEM);
     }
 
@@ -305,7 +305,7 @@ public class PacketConverter_v1_12_R1 implements IPacketConverter {
         int vehicle = serializer.g();
         int[] passengers = serializer.b();
         // Is it efficient?
-        if (IntStream.of(passengers).anyMatch(i -> i == player.player.getEntityId())) {
+        if (IntStream.of(passengers).anyMatch(i -> i == player.getPlayer().getEntityId())) {
             return new VehicleEvent(player, vehicle);
         } else if (player.vehicle == vehicle) {
             return new VehicleEvent(player, -1);
@@ -321,7 +321,7 @@ public class PacketConverter_v1_12_R1 implements IPacketConverter {
             return null;
         }
         int id = serializer.g();
-        if (id != player.player.getEntityId()) {
+        if (id != player.getPlayer().getEntityId()) {
             return null;
         }
         double x = serializer.readShort() / 8000D;
@@ -364,7 +364,7 @@ public class PacketConverter_v1_12_R1 implements IPacketConverter {
         try {
             packet.b(serializer);
             int id = serializer.g();
-            if (id != player.player.getEntityId()) {
+            if (id != player.getPlayer().getEntityId()) {
                 return null;
             }
             List<AttributeEvent.AttributeSnapshot> snapshots = new ArrayList<>();

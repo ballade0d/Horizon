@@ -14,10 +14,10 @@ public class AbilitiesEvent extends Event {
 
     @Override
     public void post() {
-        if (player.player.getAllowFlight() && this.flying) {
+        if (player.getPlayer().getAllowFlight() && this.flying) {
             player.toggleFlyTick = player.currentTick;
         }
-        if (player.player.isFlying() && !this.flying) {
+        if (player.getPlayer().isFlying() && !this.flying) {
             player.toggleFlyTick = player.currentTick;
         }
     }

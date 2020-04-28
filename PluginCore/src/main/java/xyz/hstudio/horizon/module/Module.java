@@ -4,6 +4,7 @@ import lombok.Getter;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import xyz.hstudio.horizon.Horizon;
 import xyz.hstudio.horizon.api.ModuleType;
 import xyz.hstudio.horizon.api.PlayerViolateEvent;
@@ -55,7 +56,7 @@ public abstract class Module<K extends Data, V extends CheckNode> {
      * @author MrCraftGoo
      */
     public static void doCheck(final Event event, final HoriPlayer player) {
-        if (player.player.isOp() && Horizon.getInst().config.op_bypass) {
+        if (player.getPlayer().isOp() && Horizon.getInst().config.op_bypass) {
             return;
         }
         for (Module module : Module.MODULE_MAP.values()) {
@@ -76,7 +77,7 @@ public abstract class Module<K extends Data, V extends CheckNode> {
     }
 
     protected boolean canBypass(final HoriPlayer player) {
-        return player.player.hasPermission("horizon.bypass." + this.moduleType.name());
+        return player.getPlayer().hasPermission("horizon.bypass." + this.moduleType.name());
     }
 
     /**
@@ -90,10 +91,12 @@ public abstract class Module<K extends Data, V extends CheckNode> {
      * Punish a player.
      */
     protected void punish(final Event event, final HoriPlayer player, final K data, final int type, final float weight, final boolean cancel, final String... args) {
+        Player bPlayer = player.getPlayer();
+
         float oldViolation = data.violations.getOrDefault(type, 0F);
         float nowViolation = oldViolation + weight;
 
-        PlayerViolateEvent violateEvent = new PlayerViolateEvent(player.player, this.moduleType, nowViolation, oldViolation);
+        PlayerViolateEvent violateEvent = new PlayerViolateEvent(bPlayer, this.moduleType, nowViolation, oldViolation);
         Bukkit.getPluginManager().callEvent(violateEvent);
         if (violateEvent.isCancelled()) {
             return;
@@ -110,8 +113,8 @@ public abstract class Module<K extends Data, V extends CheckNode> {
             }
             McAccessor.INSTANCE.ensureMainThread(() -> {
                 for (String rawCmd : entry.getValue()) {
-                    String cmd = StringUtils.replace(rawCmd, "%player%", player.player.getName());
-                    cmd = Horizon.getInst().usePapi ? PlaceholderAPI.setPlaceholders(player.player, cmd) : cmd;
+                    String cmd = StringUtils.replace(rawCmd, "%player%", bPlayer.getName());
+                    cmd = Horizon.getInst().usePapi ? PlaceholderAPI.setPlaceholders(bPlayer, cmd) : cmd;
                     Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd);
                 }
             });
@@ -119,11 +122,11 @@ public abstract class Module<K extends Data, V extends CheckNode> {
             break;
         }
 
-        if (player.verbose || player.player.hasPermission("horizon.verbose")) {
+        if (player.verbose || bPlayer.hasPermission("horizon.verbose")) {
             String verbose = StringUtils.replaceEach(
                     player.getLang().verbose,
                     ARGS,
-                    new String[]{player.player.getName(), this.moduleType.name(),
+                    new String[]{bPlayer.getName(), this.moduleType.name(),
                             this.types[type], String.valueOf(nowViolation),
                             String.valueOf(weight), String.valueOf(player.ping),
                             Arrays.toString(args)
@@ -136,7 +139,7 @@ public abstract class Module<K extends Data, V extends CheckNode> {
                     Horizon.getInst().getLang(Horizon.getInst().config.default_lang).verbose,
                     ARGS,
                     new String[]{
-                            player.player.getName(), this.moduleType.name(),
+                            bPlayer.getName(), this.moduleType.name(),
                             this.types[type], String.valueOf(nowViolation),
                             String.valueOf(weight), String.valueOf(player.ping),
                             Arrays.toString(args)

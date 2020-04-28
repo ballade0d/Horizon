@@ -37,8 +37,8 @@ public class Speed extends Module<SpeedData, SpeedNode> {
     @Override
     public void cancel(final Event event, final int type, final HoriPlayer player, final SpeedData data, final SpeedNode config) {
         if (type == 2 && (player.isEating || player.isPullingBow || player.isBlocking)) {
-            McAccessor.INSTANCE.releaseItem(player.player);
-            player.player.updateInventory();
+            McAccessor.INSTANCE.releaseItem(player.getPlayer());
+            player.getPlayer().updateInventory();
         } else if (type == 1) {
             event.setCancelled(true);
         } else {
@@ -255,7 +255,7 @@ public class Speed extends Module<SpeedData, SpeedNode> {
         float multiplier;
         if (player.onGround) {
             multiplier = getMoveFactor(player.moveModifiers) * 0.16277136F / (newFriction * newFriction * newFriction);
-            float groundMultiplier = 5 * player.player.getWalkSpeed();
+            float groundMultiplier = 5 * player.getPlayer().getWalkSpeed();
             multiplier *= groundMultiplier;
 
             float diagonal = (float) Math.sqrt(2 * initForce * initForce);
@@ -265,7 +265,7 @@ public class Speed extends Module<SpeedData, SpeedNode> {
             float componentForce = initForce * multiplier / diagonal;
             return (float) Math.sqrt(2 * componentForce * componentForce);
         } else {
-            float flyMultiplier = 10 * player.player.getFlySpeed();
+            float flyMultiplier = 10 * player.getPlayer().getFlySpeed();
             multiplier = 0.02F * flyMultiplier;
 
             float diagonal = (float) Math.sqrt(2 * initForce * initForce);

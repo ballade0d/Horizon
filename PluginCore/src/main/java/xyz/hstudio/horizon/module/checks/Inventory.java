@@ -23,7 +23,7 @@ public class Inventory extends Module<InventoryData, InventoryNode> {
 
     @Override
     public void cancel(final Event event, final int type, final HoriPlayer player, final InventoryData data, final InventoryNode config) {
-        McAccessor.INSTANCE.ensureMainThread(() -> player.player.closeInventory());
+        McAccessor.INSTANCE.ensureMainThread(() -> player.getPlayer().closeInventory());
     }
 
     @Override

@@ -30,7 +30,7 @@ public class InteractEntityEvent extends Event {
         if (action != InteractType.ATTACK || !(entity instanceof Player)) {
             return true;
         }
-        if (McAccessor.INSTANCE.isAccumulated(player.player)) {
+        if (McAccessor.INSTANCE.isAccumulated(player.getPlayer())) {
             ItemStack itemStack = player.getHeldItem();
             if (player.isSprinting || (itemStack != null && itemStack.containsEnchantment(Enchantment.KNOCKBACK))) {
                 player.hitSlowdownTick = player.currentTick;

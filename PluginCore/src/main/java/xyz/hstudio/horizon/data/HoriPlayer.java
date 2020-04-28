@@ -1,6 +1,7 @@
 package xyz.hstudio.horizon.data;
 
 import io.netty.channel.ChannelPipeline;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.BlockFace;
@@ -47,7 +48,7 @@ public class HoriPlayer {
     public final TimerData timerData = new TimerData();
     private final Map<Runnable, Long> simulatedCmds = new ConcurrentHashMap<>();
     public final int protocol;
-    public Player player;
+    public final UUID uuid;
     public long currentTick;
     public World world;
     public Location position;
@@ -90,7 +91,7 @@ public class HoriPlayer {
         Version pVer = Horizon.getInst().usePSupport ?
                 Version.getVersion(ProtocolSupportAPI.getProtocolVersion(player).getId()) : Version.VERSION;
         this.protocol = viaVer == Version.VERSION ? pVer.minProtocol : viaVer.minProtocol;
-        this.player = player;
+        this.uuid = player.getUniqueId();
         this.pipeline = McAccessor.INSTANCE.getPipeline(player);
 
         this.lang = Horizon.getInst().config.default_lang;
@@ -101,7 +102,11 @@ public class HoriPlayer {
 
         ChannelHandler.register(this, this.pipeline);
 
-        Horizon.PLAYERS.put(player.getUniqueId(), this);
+        Horizon.PLAYERS.put(uuid, this);
+    }
+
+    public Player getPlayer() {
+        return Bukkit.getPlayer(this.uuid);
     }
 
     public void addClientBlock(final Location location, final long initTick, final Material type) {
@@ -118,14 +123,14 @@ public class HoriPlayer {
      * @return The item in main hand.
      */
     public ItemStack getHeldItem() {
-        return this.player.getInventory().getItem(this.heldSlot);
+        return getPlayer().getInventory().getItem(this.heldSlot);
     }
 
     /**
      * Check if player is flying
      */
     public boolean isFlying() {
-        return this.currentTick - this.toggleFlyTick <= 5L || this.player.isFlying();
+        return this.currentTick - this.toggleFlyTick <= 5L || getPlayer().isFlying();
     }
 
     /**
@@ -135,18 +140,18 @@ public class HoriPlayer {
      */
     public Vector3D getHeadPosition() {
         if (this.getVehicle() != null) {
-            return position.toVector().setY(position.y + player.getEyeHeight());
+            return position.toVector().setY(position.y + getPlayer().getEyeHeight());
         }
         Vector3D add = new Vector3D(0, this.isSneaking ? 1.54 : 1.62, 0);
         return this.position.toVector().add(add);
     }
 
     public void teleport(final Location location) {
-        this.player.teleport(new org.bukkit.Location(location.world, location.x, location.y, location.z, location.yaw, location.pitch));
+        getPlayer().teleport(new org.bukkit.Location(location.world, location.x, location.y, location.z, location.yaw, location.pitch));
     }
 
     public void sendMessage(final String msg) {
-        McAccessor.INSTANCE.ensureMainThread(() -> this.player.sendMessage(msg));
+        McAccessor.INSTANCE.ensureMainThread(() -> getPlayer().sendMessage(msg));
     }
 
     /**
@@ -163,7 +168,7 @@ public class HoriPlayer {
      * Get the level of an active potion.
      */
     public int getPotionEffectAmplifier(final String name) {
-        for (PotionEffect e : this.player.getActivePotionEffects()) {
+        for (PotionEffect e : getPlayer().getActivePotionEffects()) {
             if (e.getType().getName().equals(name)) {
                 return e.getAmplifier() + 1;
             }
@@ -175,7 +180,7 @@ public class HoriPlayer {
      * Get the level of an active enchantment
      */
     public int getEnchantmentEffectAmplifier(final String name) {
-        for (ItemStack item : this.player.getInventory().getArmorContents()) {
+        for (ItemStack item : getPlayer().getInventory().getArmorContents()) {
             if (item == null || item.getType() == Material.AIR) {
                 continue;
             }
@@ -224,7 +229,7 @@ public class HoriPlayer {
 
     @Override
     public int hashCode() {
-        return this.player.getUniqueId().hashCode();
+        return uuid.hashCode();
     }
 
     @Override
@@ -233,6 +238,6 @@ public class HoriPlayer {
             return false;
         }
         HoriPlayer player = (HoriPlayer) object;
-        return this.player.getUniqueId().equals(player.player.getUniqueId());
+        return uuid.equals(player.uuid);
     }
 }

@@ -70,10 +70,10 @@ public class HealthTag extends Module<Data, HealthTagNode> {
             int id = serializer.e();
             List<DataWatcher.WatchableObject> objects = net.minecraft.server.v1_8_R3.DataWatcher.b(serializer);
 
-            if (id == player.player.getEntityId() || objects == null) {
+            if (id == player.getPlayer().getEntityId() || objects == null) {
                 return packet;
             }
-            net.minecraft.server.v1_8_R3.Entity entity = ((org.bukkit.craftbukkit.v1_8_R3.CraftWorld) player.player.getWorld()).getHandle().a(id);
+            net.minecraft.server.v1_8_R3.Entity entity = ((org.bukkit.craftbukkit.v1_8_R3.CraftWorld) player.getPlayer().getWorld()).getHandle().a(id);
             if (entity == null) {
                 return packet;
             }
@@ -122,10 +122,10 @@ public class HealthTag extends Module<Data, HealthTagNode> {
             int id = serializer.g();
             List<net.minecraft.server.v1_12_R1.DataWatcher.Item<?>> objects = net.minecraft.server.v1_12_R1.DataWatcher.b(serializer);
 
-            if (id == player.player.getEntityId() || objects == null) {
+            if (id == player.getPlayer().getEntityId() || objects == null) {
                 return packet;
             }
-            net.minecraft.server.v1_12_R1.Entity entity = ((org.bukkit.craftbukkit.v1_12_R1.CraftWorld) player.player.getWorld()).getHandle().getEntity(id);
+            net.minecraft.server.v1_12_R1.Entity entity = ((org.bukkit.craftbukkit.v1_12_R1.CraftWorld) player.getPlayer().getWorld()).getHandle().getEntity(id);
             if (entity == null) {
                 return packet;
             }
@@ -136,7 +136,7 @@ public class HealthTag extends Module<Data, HealthTagNode> {
             if (!(craftEntity instanceof HumanEntity) && !(craftEntity instanceof Monster) && !(craftEntity instanceof Animals) && !(craftEntity instanceof Golem) && !(craftEntity instanceof WaterMob) && !(craftEntity instanceof Villager)) {
                 return packet;
             }
-            if (player.player.getVehicle() != null && player.player.getVehicle().getUniqueId().equals(craftEntity.getUniqueId())) {
+            if (player.getPlayer().getVehicle() != null && player.getPlayer().getVehicle().getUniqueId().equals(craftEntity.getUniqueId())) {
                 return packet;
             }
 
@@ -174,10 +174,10 @@ public class HealthTag extends Module<Data, HealthTagNode> {
             int id = serializer.g();
             List<net.minecraft.server.v1_13_R2.DataWatcher.Item<?>> objects = net.minecraft.server.v1_13_R2.DataWatcher.b(serializer);
 
-            if (id == player.player.getEntityId() || objects == null) {
+            if (id == player.getPlayer().getEntityId() || objects == null) {
                 return packet;
             }
-            net.minecraft.server.v1_13_R2.Entity entity = ((org.bukkit.craftbukkit.v1_13_R2.CraftWorld) player.player.getWorld()).getHandle().getEntity(id);
+            net.minecraft.server.v1_13_R2.Entity entity = ((org.bukkit.craftbukkit.v1_13_R2.CraftWorld) player.getPlayer().getWorld()).getHandle().getEntity(id);
             if (entity == null) {
                 return packet;
             }
@@ -188,7 +188,7 @@ public class HealthTag extends Module<Data, HealthTagNode> {
             if (!(craftEntity instanceof HumanEntity) && !(craftEntity instanceof Monster) && !(craftEntity instanceof Animals) && !(craftEntity instanceof Golem) && !(craftEntity instanceof WaterMob) && !(craftEntity instanceof Villager)) {
                 return packet;
             }
-            if (player.player.getVehicle() != null && player.player.getVehicle().getUniqueId().equals(craftEntity.getUniqueId())) {
+            if (player.getPlayer().getVehicle() != null && player.getPlayer().getVehicle().getUniqueId().equals(craftEntity.getUniqueId())) {
                 return packet;
             }
 

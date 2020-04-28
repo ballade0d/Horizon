@@ -24,7 +24,7 @@ autoclicker:
   typeA:
     enabled: true
     min_encounter_cps: 6.0
-    min_check_cps: 9.0
+    min_check_cps: 14.0
     sample_size: 20
     samples: 5
     stdev: 0.7
@@ -239,7 +239,7 @@ speed:
     enabled: true
   strafe:
     enabled: true
-    threshold: 3
+    threshold: 2
   action:
     15:
       - 'horizon notify %player% might be moving faster than legit'

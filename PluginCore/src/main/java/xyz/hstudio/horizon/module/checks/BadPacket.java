@@ -59,7 +59,7 @@ public class BadPacket extends Module<BadPacketData, BadPacketNode> {
      */
     private void typeA(final Event event, final HoriPlayer player, final BadPacketData data, final BadPacketNode config) {
         if (event instanceof KeepAliveRespondEvent) {
-            if (player.player.isDead() || player.currentTick < 20 || player.teleports.size() > 0) {
+            if (player.getPlayer().isDead() || player.currentTick < 20 || player.teleports.size() > 0) {
                 return;
             }
             // A player should send 20 move packets(1.8.8 or lower)
@@ -161,8 +161,9 @@ public class BadPacket extends Module<BadPacketData, BadPacketNode> {
      * @author FrozenAnarchy
      */
     private void typeE(final Event event, final HoriPlayer player, final BadPacketData data, final BadPacketNode config) {
-        if ((event instanceof SwingEvent || event instanceof BlockBreakEvent) && player.protocol > 5) { // Ignore 1.7 players
-            if (player.isBlocking || player.isPullingBow || player.isEating) { //Player can't swing and use item in 1.8+
+        // Ignore 1.7 players
+        if ((event instanceof SwingEvent || event instanceof BlockBreakEvent) && player.protocol > 5) {
+            if (player.isBlocking || player.isPullingBow || player.isEating) {
                 this.punish(event, player, data, 4, 5);
             } else {
                 this.reward(4, data, 0.99);

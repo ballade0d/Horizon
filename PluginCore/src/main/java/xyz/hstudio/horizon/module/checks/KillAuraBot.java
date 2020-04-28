@@ -42,7 +42,7 @@ public class KillAuraBot extends Module<KillAuraBotData, KillAuraBotNode> {
             if (data.bot != null) {
                 return;
             }
-            IBot bot = Bot.createBot(player.player, config.realistic_name);
+            IBot bot = Bot.createBot(player.getPlayer(), config.realistic_name);
             if (bot == null) {
                 return;
             }

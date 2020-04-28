@@ -99,7 +99,7 @@ public class PacketConverter_v1_8_R3 implements IPacketConverter {
         float yaw = hasLook ? packet.d() : player.position.yaw;
         float pitch = hasLook ? packet.e() : player.position.pitch;
         boolean onGround = packet.f();
-        Location to = new Location(player.player.getWorld(), x, y, z, yaw, pitch);
+        Location to = new Location(player.getPlayer().getWorld(), x, y, z, yaw, pitch);
         if (Math.abs(to.x) >= Integer.MAX_VALUE || Math.abs(to.y) >= Integer.MAX_VALUE || Math.abs(to.z) >= Integer.MAX_VALUE ||
                 Double.isNaN(to.x) || Double.isNaN(to.y) || Double.isNaN(to.z)) {
             // Bad Move, will be blocked by the server.
@@ -298,7 +298,7 @@ public class PacketConverter_v1_8_R3 implements IPacketConverter {
         int vehicle = serializer.readInt();
         // 0 = mount/dismount, 1 = leash/unleash
         int action = serializer.readUnsignedByte();
-        if (action != 0 || id != player.player.getEntityId()) {
+        if (action != 0 || id != player.getPlayer().getEntityId()) {
             return null;
         }
         return new VehicleEvent(player, vehicle);
@@ -312,7 +312,7 @@ public class PacketConverter_v1_8_R3 implements IPacketConverter {
             return null;
         }
         int id = serializer.e();
-        if (id != player.player.getEntityId()) {
+        if (id != player.getPlayer().getEntityId()) {
             return null;
         }
         double x = serializer.readShort() / 8000D;
@@ -355,7 +355,7 @@ public class PacketConverter_v1_8_R3 implements IPacketConverter {
         try {
             packet.b(serializer);
             int id = serializer.e();
-            if (id != player.player.getEntityId()) {
+            if (id != player.getPlayer().getEntityId()) {
                 return null;
             }
             List<AttributeEvent.AttributeSnapshot> snapshots = new ArrayList<>();

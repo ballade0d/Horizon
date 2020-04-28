@@ -67,7 +67,7 @@ public class HitBox extends Module<HitBoxData, HitBoxNode> {
             if (e.action != InteractEntityEvent.InteractType.ATTACK) {
                 return;
             }
-            if (player.player.getGameMode() != GameMode.SURVIVAL && player.player.getGameMode() != GameMode.ADVENTURE) {
+            if (player.getPlayer().getGameMode() != GameMode.SURVIVAL && player.getPlayer().getGameMode() != GameMode.ADVENTURE) {
                 return;
             }
             HoriPlayer target = Horizon.PLAYERS.get(e.entity.getUniqueId());
@@ -78,7 +78,7 @@ public class HitBox extends Module<HitBoxData, HitBoxNode> {
             Location targetPos = target.position;
             if (this.getData(target).history.size() != 0) {
                 // Get the history position to avoid false positives.
-                targetPos = this.getData(target).getHistoryLocation(McAccessor.INSTANCE.getPing(player.player), true);
+                targetPos = this.getData(target).getHistoryLocation(McAccessor.INSTANCE.getPing(player.getPlayer()), true);
             }
             Vector3D move = targetPos.toVector().subtract(target.position.toVector());
             AABB targetCube = McAccessor.INSTANCE.getCube(e.entity).add(move);
@@ -124,10 +124,11 @@ public class HitBox extends Module<HitBoxData, HitBoxNode> {
             Location targetPos = target.position;
             if (this.getData(target).history.size() != 0) {
                 // Get the history position to avoid false positives.
-                targetPos = this.getData(target).getHistoryLocation(McAccessor.INSTANCE.getPing(player.player), true);
+                targetPos = this.getData(target).getHistoryLocation(McAccessor.INSTANCE.getPing(player.getPlayer()), true);
             }
             Vector3D move = targetPos.toVector().subtract(target.position.toVector());
             AABB targetCube = McAccessor.INSTANCE.getCube(e.entity).add(move);
+            targetCube = targetCube.expand(0.3, 0.3, 0.3);
 
             if (targetCube.distance(playerPos) > 0.5 && !targetCube.betweenRays(playerPos, dir, extraDir)) {
                 // Punish

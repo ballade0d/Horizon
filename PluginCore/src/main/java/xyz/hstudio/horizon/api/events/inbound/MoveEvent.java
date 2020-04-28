@@ -70,7 +70,7 @@ public class MoveEvent extends Event {
         this.onGround = onGround;
         this.velocity = new Vector3D(to.x - from.x, to.y - from.y, to.z - from.z);
         // Get player's bounding box and move it to the update position.
-        this.cube = McAccessor.INSTANCE.getCube(player.player).add(this.velocity);
+        this.cube = McAccessor.INSTANCE.getCube(player.getPlayer()).add(this.velocity);
         this.updatePos = updatePos;
         this.updateRot = updateRot;
         this.moveType = moveType;
@@ -79,7 +79,7 @@ public class MoveEvent extends Event {
 
         this.onGroundReally = this.to.isOnGround(player, false, 0.001);
 
-        this.isCollidingEntities = McAccessor.INSTANCE.isCollidingEntities(to.world, player.player, cube);
+        this.isCollidingEntities = McAccessor.INSTANCE.isCollidingEntities(to.world, player.getPlayer(), cube);
 
         this.isOnSlime = this.checkSlime();
         this.isOnBed = this.checkBed();
@@ -239,13 +239,13 @@ public class MoveEvent extends Event {
 
         double sprintMultiplier = flying ? (player.isSprinting ? 2 : 1) : (player.isSprinting ? 1.3 : 1);
         double weirdConstant = (jump && player.isSprinting ? 0.2518462 : (player.isInLiquid ? 0.0196 : 0.098));
-        double baseMultiplier = flying ? (10 * player.player.getFlySpeed()) : (5 * player.player.getWalkSpeed() * (1 + player.getPotionEffectAmplifier("SPEED") * 0.2));
+        double baseMultiplier = flying ? (10 * player.getPlayer().getFlySpeed()) : (5 * player.getPlayer().getWalkSpeed() * (1 + player.getPotionEffectAmplifier("SPEED") * 0.2));
         double maxDiscrepancy = weirdConstant * baseMultiplier * sprintMultiplier + 0.003;
 
         Pair<Vector3D, Long> kb;
         for (int kbIndex = 0, size = velocities.size(); kbIndex < size; kbIndex++) {
             kb = velocities.get(kbIndex);
-            if (time - kb.value > McAccessor.INSTANCE.getPing(player.player) + 200) {
+            if (time - kb.value > McAccessor.INSTANCE.getPing(player.getPlayer()) + 200) {
                 failedKnockBack = true;
                 expiredKbs++;
                 continue;
@@ -381,7 +381,7 @@ public class MoveEvent extends Event {
                             String.valueOf(this.onGroundReally)
                     });
             player.sendMessage(Horizon.getInst().config.prefix + (Horizon.getInst().usePapi ?
-                    PlaceholderAPI.setPlaceholders(player.player, analysis) : analysis));
+                    PlaceholderAPI.setPlaceholders(player.getPlayer(), analysis) : analysis));
         }
 
         player.clientBlocks.entrySet().removeIf(next -> player.currentTick - next.getValue().getKey() > 6);
@@ -389,7 +389,7 @@ public class MoveEvent extends Event {
         long now = System.currentTimeMillis();
         for (Map.Entry<Location, Long> entry : player.teleports.entrySet()) {
             if (entry.getKey().world.equals(this.to.world) && this.to.distanceSquared(entry.getKey()) < 0.001) {
-                if (now - entry.getValue() > McAccessor.INSTANCE.getPing(player.player) - 50) {
+                if (now - entry.getValue() > McAccessor.INSTANCE.getPing(player.getPlayer()) - 50) {
                     player.position = entry.getKey();
                     player.lastTeleportAcceptTick = player.currentTick;
                     player.lastTeleportTime = now;
@@ -398,7 +398,7 @@ public class MoveEvent extends Event {
                 } else {
                     return false;
                 }
-            } else if (!player.player.isSleeping() && now - entry.getValue() > McAccessor.INSTANCE.getPing(player.player) + 250) {
+            } else if (!player.getPlayer().isSleeping() && now - entry.getValue() > McAccessor.INSTANCE.getPing(player.getPlayer()) + 250) {
                 Sync.teleport(player, entry.getKey());
                 player.teleports.remove(entry.getKey());
                 return false;
