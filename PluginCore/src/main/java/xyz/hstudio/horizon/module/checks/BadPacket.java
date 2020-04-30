@@ -1,5 +1,7 @@
 package xyz.hstudio.horizon.module.checks;
 
+import org.bukkit.Material;
+import org.bukkit.block.Block;
 import xyz.hstudio.horizon.api.ModuleType;
 import xyz.hstudio.horizon.api.events.Event;
 import xyz.hstudio.horizon.api.events.inbound.*;
@@ -8,11 +10,15 @@ import xyz.hstudio.horizon.data.checks.BadPacketData;
 import xyz.hstudio.horizon.file.node.BadPacketNode;
 import xyz.hstudio.horizon.module.Module;
 import xyz.hstudio.horizon.thread.Sync;
+import xyz.hstudio.horizon.util.wrap.Location;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class BadPacket extends Module<BadPacketData, BadPacketNode> {
 
     public BadPacket() {
-        super(ModuleType.BadPacket, new BadPacketNode(), "TypeA", "TypeB", "TypeC", "TypeD", "TypeE");
+        super(ModuleType.BadPacket, new BadPacketNode(), "TypeA", "TypeB", "TypeC", "TypeD", "TypeE", "TypeF");
     }
 
     @Override
@@ -46,6 +52,9 @@ public class BadPacket extends Module<BadPacketData, BadPacketNode> {
         }
         if (config.typeE_enabled) {
             typeE(event, player, data, config);
+        }
+        if (config.typeF_enabled){
+            typeF(event, player, data, config);
         }
     }
 
@@ -167,6 +176,25 @@ public class BadPacket extends Module<BadPacketData, BadPacketNode> {
                 this.punish(event, player, data, 4, 5);
             } else {
                 this.reward(4, data, 0.99);
+            }
+        }
+    }
+
+    /**
+     * An anti hunger check
+     * <p>
+     * Accuracy: 10/10 - Should not have false positives.
+     * Efficiency: 10/10 - Detects related hacks almost instantly.
+     *
+     * @author Ciph3r
+     */
+    private void typeF(final Event event, final HoriPlayer player, final BadPacketData data, final BadPacketNode config) {
+        if(event instanceof MoveEvent){
+            MoveEvent e = (MoveEvent) event;
+            if(player.getPlayer().getFoodLevel() <= 6 && player.isSprinting){
+                this.punish(event, player, data, 5, 5);
+            } else {
+                this.reward(5, data, 0.99);
             }
         }
     }
