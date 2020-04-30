@@ -52,7 +52,7 @@ public class MetaEvent extends Event {
             }
         } else {
             for (WatchableObject object : this.objects) {
-                if (object.index == 7) {
+                if (object.index == 6) {
                     byte statue = (byte) object.object;
                     if ((statue & 1) != 1) {
                         player.isEating = false;

@@ -9,7 +9,6 @@ import xyz.hstudio.horizon.api.events.Event;
 import xyz.hstudio.horizon.compat.McAccessor;
 import xyz.hstudio.horizon.data.HoriPlayer;
 import xyz.hstudio.horizon.file.LangFile;
-import xyz.hstudio.horizon.thread.Sync;
 import xyz.hstudio.horizon.util.BlockUtils;
 import xyz.hstudio.horizon.util.MathUtils;
 import xyz.hstudio.horizon.util.collect.Pair;
@@ -388,7 +387,7 @@ public class MoveEvent extends Event {
 
         long now = System.currentTimeMillis();
         for (Map.Entry<Location, Long> entry : player.teleports.entrySet()) {
-            if (entry.getKey().world.equals(this.to.world) && this.to.distanceSquared(entry.getKey()) < 0.001) {
+            if (entry.getKey().world.equals(this.to.world) && this.to.distanceSquared(entry.getKey()) < 0.01) {
                 if (now - entry.getValue() > McAccessor.INSTANCE.getPing(player.getPlayer()) - 50) {
                     player.position = entry.getKey();
                     player.lastTeleportAcceptTick = player.currentTick;
@@ -399,7 +398,7 @@ public class MoveEvent extends Event {
                     return false;
                 }
             } else if (!player.getPlayer().isSleeping() && now - entry.getValue() > McAccessor.INSTANCE.getPing(player.getPlayer()) + 250) {
-                Sync.teleport(player, entry.getKey());
+                // Sync.teleport(player, entry.getKey());
                 player.teleports.remove(entry.getKey());
                 return false;
             }
