@@ -1,7 +1,6 @@
 package xyz.hstudio.horizon.data;
 
 import io.netty.channel.ChannelPipeline;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.BlockFace;
@@ -48,11 +47,12 @@ public class HoriPlayer {
     public final TimerData timerData = new TimerData();
     private final Map<Runnable, Long> simulatedCmds = new ConcurrentHashMap<>();
     public final int protocol;
-    public final UUID uuid;
+    public final Player player;
     public long currentTick;
     public World world;
     public Location position;
     public int heldSlot;
+    public int foodLevel;
     public float friction;
     public double prevPrevDeltaY;
     public Vector3D velocity = new Vector3D(0, 0, 0);
@@ -91,7 +91,7 @@ public class HoriPlayer {
         Version pVer = Horizon.getInst().usePSupport ?
                 Version.getVersion(ProtocolSupportAPI.getProtocolVersion(player).getId()) : Version.VERSION;
         this.protocol = viaVer == Version.VERSION ? pVer.minProtocol : viaVer.minProtocol;
-        this.uuid = player.getUniqueId();
+        this.player = player;
         this.pipeline = McAccessor.INSTANCE.getPipeline(player);
 
         this.lang = Horizon.getInst().config.default_lang;
@@ -99,14 +99,15 @@ public class HoriPlayer {
         this.world = player.getWorld();
         this.position = new Location(player.getLocation());
         this.heldSlot = player.getInventory().getHeldItemSlot();
+        this.foodLevel = player.getFoodLevel();
 
         ChannelHandler.register(this, this.pipeline);
 
-        Horizon.PLAYERS.put(uuid, this);
+        Horizon.PLAYERS.put(player.getUniqueId(), this);
     }
 
     public Player getPlayer() {
-        return Bukkit.getPlayer(this.uuid);
+        return player;
     }
 
     public void addClientBlock(final Location location, final long initTick, final Material type) {
@@ -229,7 +230,7 @@ public class HoriPlayer {
 
     @Override
     public int hashCode() {
-        return uuid.hashCode();
+        return player.hashCode();
     }
 
     @Override
@@ -238,6 +239,6 @@ public class HoriPlayer {
             return false;
         }
         HoriPlayer player = (HoriPlayer) object;
-        return uuid.equals(player.uuid);
+        return this.player.getUniqueId().equals(player.getPlayer().getUniqueId());
     }
 }

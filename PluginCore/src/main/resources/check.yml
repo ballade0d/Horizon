@@ -48,8 +48,6 @@ badpacket:
     enabled: true
   typeE:
     enabled: true
-  typeF:
-    enabled: true
   action:
     5:
       - 'horizon notify %player% might be sending bad packets'

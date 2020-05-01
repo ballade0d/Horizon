@@ -113,7 +113,12 @@ public abstract class Module<K extends Data, V extends CheckNode> {
             }
             McAccessor.INSTANCE.ensureMainThread(() -> {
                 for (String rawCmd : entry.getValue()) {
-                    String cmd = StringUtils.replace(rawCmd, "%player%", bPlayer.getName());
+                    String cmd = StringUtils.replaceEach(rawCmd, ARGS,
+                            new String[]{bPlayer.getName(), this.moduleType.name(),
+                                    this.types[type], String.valueOf(nowViolation),
+                                    String.valueOf(weight), String.valueOf(player.ping),
+                                    Arrays.toString(args)
+                            });
                     cmd = Horizon.getInst().usePapi ? PlaceholderAPI.setPlaceholders(bPlayer, cmd) : cmd;
                     Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd);
                 }

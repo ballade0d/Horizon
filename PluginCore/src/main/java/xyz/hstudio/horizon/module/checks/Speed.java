@@ -41,6 +41,9 @@ public class Speed extends Module<SpeedData, SpeedNode> {
             player.getPlayer().updateInventory();
         } else if (type == 1) {
             event.setCancelled(true);
+            if (event instanceof MoveEvent) {
+                Sync.teleport(player, player.position);
+            }
         } else {
             if (type == 0 && event instanceof MoveEvent && ((MoveEvent) event).hitSlowdown) {
                 return;
@@ -69,9 +72,17 @@ public class Speed extends Module<SpeedData, SpeedNode> {
      * Accuracy: 9/10 - It has some rare false positives.
      * Efficiency: 9/10 - Detects most move related hacks instantly.
      *
-     * @author MrCraftGoo
+     * @author MrCraftGoo, Cipher
      */
     private void typeA(final Event event, final HoriPlayer player, final SpeedData data, final SpeedNode config, final boolean noSlowEnabled) {
+        if (event instanceof MoveEvent) {
+            // Avoid ping influence
+            if (player.foodLevel < 6 && player.isSprinting) {
+                this.punish(event, player, data, 1, 4);
+            } else {
+                this.reward(1, data, 0.99);
+            }
+        }
         if (event instanceof InteractItemEvent && noSlowEnabled) {
             if (player.protocol != 47) {
                 return;
@@ -217,7 +228,7 @@ public class Speed extends Module<SpeedData, SpeedNode> {
                 data.negativeDiscrepancies = discrepancy;
                 data.negativeDiscrepanciesCumulative = data.negativeDiscrepanciesCumulative + speed;
             }
-            data.prevSpeed = speed;
+            data.prevSpeed = e.collidingBlocks.contains(MatUtils.COBWEB.parse()) ? 0 : speed;
         }
     }
 

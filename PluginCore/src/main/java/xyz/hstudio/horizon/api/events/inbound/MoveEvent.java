@@ -230,6 +230,7 @@ public class MoveEvent extends Event {
             return null;
         }
         long time = System.currentTimeMillis();
+        int ping = McAccessor.INSTANCE.getPing(player.getPlayer());
 
         int expiredKbs = 0;
 
@@ -244,7 +245,9 @@ public class MoveEvent extends Event {
         Pair<Vector3D, Long> kb;
         for (int kbIndex = 0, size = velocities.size(); kbIndex < size; kbIndex++) {
             kb = velocities.get(kbIndex);
-            if (time - kb.value > McAccessor.INSTANCE.getPing(player.getPlayer()) + 200) {
+
+            int timeDiff = (int) (time - kb.value);
+            if (timeDiff < ping - 100 || timeDiff > ping + 300) {
                 failedKnockBack = true;
                 expiredKbs++;
                 continue;

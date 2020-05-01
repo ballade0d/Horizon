@@ -19,10 +19,9 @@ public class BadPacketNode extends CheckNode {
     // TypeD
     @Load(path = "typeD.enabled")
     public boolean typeD_enabled = true;
+    // TypeE
     @Load(path = "typeE.enabled")
     public boolean typeE_enabled = true;
-    @Load(path = "typeF.enabled")
-    public boolean typeF_enabled = true;
 
     public BadPacketNode load(final String pathPrefix, final YamlLoader loader) {
         return AbstractFile.load(pathPrefix, this, loader);

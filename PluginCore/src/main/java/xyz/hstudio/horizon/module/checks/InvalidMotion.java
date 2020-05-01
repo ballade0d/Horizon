@@ -122,7 +122,7 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
                     estimatedVelocity = prevEstimatedVelocity + (0.05F * levitation - prevEstimatedVelocity) * 0.2F;
                 } else if (e.collidingBlocks.contains(MatUtils.COBWEB.parse())) {
                     // Handle Cobweb
-                    estimatedVelocity = -0.00392F;
+                    estimatedVelocity = (prevEstimatedVelocity * 0.98F - 0.0784F) * 0.05F;
                 } else if (inLadder(e.collidingBlocks) || (feetBlock != null &&
                         (feetBlock.getType() == Material.LADDER ||
                                 feetBlock.getType() == Material.VINE))) {
@@ -192,7 +192,8 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
                     } else {
                         reward(0, data, 0.999);
                     }
-                    data.estimatedVelocity = estimatedVelocity;
+                    data.estimatedVelocity = e.collidingBlocks.contains(MatUtils.COBWEB.parse()) ?
+                            0 : estimatedVelocity;
                 }
             } else {
                 if (e.onGround || (e.touchingFaces.contains(BlockFace.UP) && deltaY > 0)) {

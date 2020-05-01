@@ -281,6 +281,8 @@ public class PacketConverter_v1_8_R3 implements IPacketConverter {
             return convertAttributeEvent(player, (PacketPlayOutUpdateAttributes) packet);
         } else if (packet instanceof PacketPlayOutEntity) {
             return convertUpdatePosEvent(player, (PacketPlayOutEntity) packet);
+        } else if (packet instanceof PacketPlayOutUpdateHealth) {
+            return convertUpdateHealthEvent(player, (PacketPlayOutUpdateHealth) packet);
         }
         return null;
     }
@@ -392,5 +394,15 @@ public class PacketConverter_v1_8_R3 implements IPacketConverter {
             return null;
         }
         return new UpdatePosEvent(player, packet);
+    }
+
+    private Event convertUpdateHealthEvent(final HoriPlayer player, final PacketPlayOutUpdateHealth packet) {
+        PacketDataSerializer serializer = new PacketDataSerializer(Unpooled.buffer(16));
+        try {
+            packet.b(serializer);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new UpdateHealthEvent(player, serializer.readFloat(), serializer.e(), serializer.readFloat());
     }
 }
