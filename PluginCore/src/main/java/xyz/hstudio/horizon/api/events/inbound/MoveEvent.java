@@ -52,12 +52,12 @@ public class MoveEvent extends Event {
     public final float newFriction;
     public final List<AABB> piston;
     public final Set<Material> collidingBlocks;
-    public final long clientBlock;
     public final Set<BlockFace> touchingFaces;
     public final boolean stepLegitly;
     public final Vector3D knockBack;
     public final boolean jumpLegitly;
     public final boolean strafeNormally;
+    public final long clientBlock;
     public boolean failedKnockBack;
     public boolean onGround;
     public boolean isTeleport;
@@ -102,12 +102,12 @@ public class MoveEvent extends Event {
         // This will only get the blocks that are colliding horizontally.
         this.collidingBlocks = this.cube.add(-0.0001, 0.0001, -0.0001, 0.0001, 0, 0.0001).getMaterials(to.world);
 
-        this.clientBlock = this.getClientBlock();
         this.touchingFaces = BlockUtils.checkTouchingBlock(player, new AABB(to.x - 0.299999, to.y + 0.000001, to.z - 0.299999, to.x + 0.299999, to.y + 1.799999, to.z + 0.299999), to.world, 0.0001);
         this.stepLegitly = this.checkStep();
         this.knockBack = this.checkKnockBack();
         this.jumpLegitly = this.checkJump();
         this.strafeNormally = this.checkStrafe();
+        this.clientBlock = this.getClientBlock();
     }
 
     private List<AABB> checkBlock() {
@@ -197,7 +197,8 @@ public class MoveEvent extends Event {
             Map.Entry<Long, Material> cBlock = player.clientBlocks.get(loc);
             AABB newAABB = cube.translateTo(loc.toVector());
             if (BlockUtils.isSolid(cBlock.getValue()) && feet.isColliding(newAABB) && !aboveFeet.isColliding(newAABB)) {
-                if (!loc.equals(player.prevClientBlock)) {
+                boolean tower = player.onGround && !onGround && player.velocity.y == 0 && (Math.abs(velocity.y - 0.4044449) < 0.001 || Math.abs(velocity.y - 0.3955759) < 0.001);
+                if (!loc.equals(player.prevClientBlock) && (velocity.y == 0 || tower || jumpLegitly)) {
                     player.clientBlockCount++;
                 }
                 player.prevClientBlock = loc;
@@ -301,7 +302,7 @@ public class MoveEvent extends Event {
         boolean hitCeiling = BlockUtils.checkTouchingBlock(player, collisionBox, to.world, 0.0001).contains(BlockFace.UP);
 
         boolean kbSimilarToJump = this.knockBack != null && (Math.abs(knockBack.y - initJumpVelocity) < 0.001 || hitCeiling);
-        boolean leftGround = (player.onGround && !this.onGround);
+        boolean leftGround = player.onGround && !this.onGround;
         return !kbSimilarToJump && ((initJumpVelocity == 0 && player.onGround) || leftGround) && (deltaY == initJumpVelocity || hitCeiling);
     }
 

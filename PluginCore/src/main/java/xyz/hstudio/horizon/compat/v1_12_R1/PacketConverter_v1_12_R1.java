@@ -2,6 +2,7 @@ package xyz.hstudio.horizon.compat.v1_12_R1;
 
 import io.netty.buffer.Unpooled;
 import net.minecraft.server.v1_12_R1.*;
+import org.apache.commons.lang3.ArrayUtils;
 import org.bukkit.block.BlockFace;
 import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftInventoryPlayer;
@@ -292,6 +293,8 @@ public class PacketConverter_v1_12_R1 implements IPacketConverter {
             return convertUpdatePosEvent(player, (PacketPlayOutEntity) packet);
         } else if (packet instanceof PacketPlayOutUpdateHealth) {
             return convertUpdateHealthEvent(player, (PacketPlayOutUpdateHealth) packet);
+        } else if (packet instanceof PacketPlayOutEntityDestroy) {
+            return convertEntityDestroyEvent(player, (PacketPlayOutEntityDestroy) packet);
         }
         return null;
     }
@@ -413,5 +416,24 @@ public class PacketConverter_v1_12_R1 implements IPacketConverter {
             e.printStackTrace();
         }
         return new UpdateHealthEvent(player, serializer.readFloat(), serializer.g(), serializer.readFloat());
+    }
+
+    private Event convertEntityDestroyEvent(final HoriPlayer player, final PacketPlayOutEntityDestroy packet) {
+        PacketDataSerializer serializer = new PacketDataSerializer(Unpooled.buffer(8));
+        try {
+            packet.b(serializer);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        int[] ids = new int[serializer.g()];
+        for (int i = 0; i < ids.length; ++i) {
+            ids[i] = serializer.g();
+        }
+        if (ArrayUtils.contains(ids, player.vehicle)) {
+            player.vehicle = -1;
+            player.leaveVehicleTick = player.currentTick;
+            player.sendSimulatedAction(() -> player.leaveVehicleTick = player.currentTick);
+        }
+        return null;
     }
 }

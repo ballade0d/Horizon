@@ -4,6 +4,10 @@ import com.google.common.primitives.Primitives;
 import xyz.hstudio.horizon.util.wrap.YamlLoader;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public abstract class AbstractFile {
 
@@ -24,6 +28,10 @@ public abstract class AbstractFile {
 
             if (value == null) {
                 continue;
+            }
+
+            if (field.getType() == Set.class && value.getClass() == ArrayList.class) {
+                value = new HashSet<>((List<String>) value);
             }
 
             // Double.class.isAssignableFrom(double.class) is false :/

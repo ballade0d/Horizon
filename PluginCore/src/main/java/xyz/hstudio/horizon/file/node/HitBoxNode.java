@@ -16,7 +16,7 @@ public class HitBoxNode extends CheckNode {
     @Load(path = "direction.enabled")
     public boolean direction_enabled = true;
     @Load(path = "direction.box_expansion")
-    public double direction_box_expansion = 0.2;
+    public double direction_box_expansion = 0.3;
 
     public HitBoxNode load(final String pathPrefix, final YamlLoader loader) {
         return AbstractFile.load(pathPrefix, this, loader);

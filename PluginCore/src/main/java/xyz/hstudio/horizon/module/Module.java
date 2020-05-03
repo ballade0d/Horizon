@@ -60,13 +60,10 @@ public abstract class Module<K extends Data, V extends CheckNode> {
             return;
         }
         for (Module module : Module.MODULE_MAP.values()) {
-            if (!module.config.enabled) {
+            if (!module.config.enabled || module.canBypass(player)) {
                 continue;
             }
-            if (module.config.disable_worlds.contains(player.position.world.getName())) {
-                continue;
-            }
-            if (module.canBypass(player)) {
+            if (module.config.disable_worlds.contains(player.world.getName())) {
                 continue;
             }
             if (event.isCancelled()) {
@@ -102,7 +99,7 @@ public abstract class Module<K extends Data, V extends CheckNode> {
             return;
         }
 
-        if (cancel || (nowViolation > config.cancel_vl && config.cancel_vl != -1)) {
+        if ((cancel || (nowViolation > config.cancel_vl && config.cancel_vl != -1)) && !player.player.hasPermission("horizon.nocancel")) {
             this.cancel(event, type, player, data, config);
         }
 

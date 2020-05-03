@@ -26,6 +26,8 @@ permissions:
     default: op
   horizon.verbose:
     default: false
+  horizon.nocancel:
+    default: false
   horizon.bypass.*:
     default: false
     children:

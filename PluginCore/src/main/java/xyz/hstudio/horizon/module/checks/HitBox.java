@@ -128,7 +128,7 @@ public class HitBox extends Module<HitBoxData, HitBoxNode> {
             }
             Vector3D move = targetPos.toVector().subtract(target.position.toVector());
             AABB targetCube = McAccessor.INSTANCE.getCube(e.entity).add(move);
-            targetCube = targetCube.expand(0.3, 0.3, 0.3);
+            targetCube = targetCube.expand(config.direction_box_expansion, config.direction_box_expansion, config.direction_box_expansion);
 
             if (targetCube.distance(playerPos) > 0.5 && !targetCube.betweenRays(playerPos, dir, extraDir)) {
                 // Punish

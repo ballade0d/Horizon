@@ -14,7 +14,7 @@ public class CheckNode extends AbstractFile {
     @Load(path = "enabled")
     public boolean enabled = true;
     @Load(path = "disable_worlds")
-    public List<String> disable_worlds = Collections.emptyList();
+    public Set<String> disable_worlds = Collections.emptySet();
     @Load(path = "action")
     public Map<Integer, List<String>> action = new HashMap<>();
 

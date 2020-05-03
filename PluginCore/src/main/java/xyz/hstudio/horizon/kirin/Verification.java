@@ -44,7 +44,7 @@ public class Verification {
 
             String result = new String(code);
 
-            if (result.equals("FAILED")) {
+            if ("FAILED".equals(result)) {
                 Logger.msg("Kirin", "Invalid key.");
             } else {
                 new Kirin(Horizon.getInst(), result);

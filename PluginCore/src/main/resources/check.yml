@@ -75,7 +75,7 @@ hitbox:
     max_reach: 3.1
   direction:
     enabled: true
-    box_expansion: 0.2
+    box_expansion: 0.3
   action:
     8:
       - 'horizon notify %player% might be using HitBox'

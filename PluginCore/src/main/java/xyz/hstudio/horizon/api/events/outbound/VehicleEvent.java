@@ -17,6 +17,7 @@ public class VehicleEvent extends Event {
         player.vehicle = vehicle;
         if (vehicle == -1) {
             player.leaveVehicleTick = player.currentTick;
+            player.sendSimulatedAction(() -> player.leaveVehicleTick = player.currentTick);
         }
     }
 }

@@ -116,8 +116,8 @@ public class BadPacket extends Module<BadPacketData, BadPacketNode> {
 
             String brand = e.brand;
             // Only checks for these 2 brands
-            if (!brand.equalsIgnoreCase("MC|BEdit") &&
-                    !brand.equalsIgnoreCase("MC|BSign")) {
+            if (!"MC|BEdit".equalsIgnoreCase(brand) &&
+                    !"MC|BSign".equalsIgnoreCase(brand)) {
                 return;
             }
             long now = System.currentTimeMillis();

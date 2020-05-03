@@ -22,7 +22,7 @@ public class AttributeEvent extends Event {
     @Override
     public void post() {
         for (AttributeSnapshot snapshot : this.snapshots) {
-            if (!snapshot.key.equals("generic.movementSpeed")) {
+            if (!"generic.movementSpeed".equals(snapshot.key)) {
                 continue;
             }
             if (snapshot.modifiers.size() == 0) {
