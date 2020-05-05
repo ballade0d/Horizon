@@ -89,6 +89,25 @@ healthtag:
   disable_worlds: []
   # Unused in this check
   action: {}
+interact:
+  enabled: true
+  cancel_vl: 0
+  disable_worlds: []
+  packet:
+    enabled: true
+  angle:
+    enabled: true
+    max_angle: 90.0
+  order:
+    enabled: true
+  direction:
+    enabled: true
+  action:
+    12:
+      - 'horizon notify %player% might be using Interact related hacks.'
+    22:
+      - 'horizon notify %player% is kicked for Interact'
+      - 'horizon kick %player% Unfair advantages.'
 invalidmotion:
   enabled: true
   cancel_vl: 1
@@ -200,25 +219,6 @@ noswing:
     10:
       - 'horizon notify %player% is kicked for using NoSwing'
       - 'horizon kick %player% Did not swing arm.'
-scaffold:
-  enabled: true
-  cancel_vl: 0
-  disable_worlds: []
-  typeA:
-    enabled: true
-  typeB:
-    enabled: true
-    max_angle: 90.0
-  typeC:
-    enabled: true
-  typeD:
-    enabled: true
-  action:
-    12:
-      - 'horizon notify %player% might be using Scaffold'
-    22:
-      - 'horizon notify %player% is kicked for using Scaffold'
-      - 'horizon kick %player% Unfair advantages.'
 speed:
   enabled: true
   cancel_vl: 1
@@ -241,7 +241,7 @@ speed:
     enabled: true
   strafe:
     enabled: true
-    threshold: 2
+    threshold: 1
   action:
     15:
       - 'horizon notify %player% might be moving faster than legit'

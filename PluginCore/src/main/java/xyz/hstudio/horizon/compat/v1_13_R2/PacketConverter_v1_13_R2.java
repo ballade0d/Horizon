@@ -3,7 +3,6 @@ package xyz.hstudio.horizon.compat.v1_13_R2;
 import io.netty.buffer.Unpooled;
 import net.minecraft.server.v1_13_R2.*;
 import org.apache.commons.lang3.ArrayUtils;
-import org.bukkit.block.BlockFace;
 import org.bukkit.craftbukkit.v1_13_R2.CraftWorld;
 import org.bukkit.craftbukkit.v1_13_R2.inventory.CraftInventoryPlayer;
 import org.bukkit.craftbukkit.v1_13_R2.inventory.CraftItemStack;
@@ -12,6 +11,7 @@ import xyz.hstudio.horizon.api.events.inbound.*;
 import xyz.hstudio.horizon.api.events.outbound.*;
 import xyz.hstudio.horizon.compat.IPacketConverter;
 import xyz.hstudio.horizon.data.HoriPlayer;
+import xyz.hstudio.horizon.util.enums.BlockFace;
 import xyz.hstudio.horizon.util.enums.Hand;
 import xyz.hstudio.horizon.util.wrap.Location;
 import xyz.hstudio.horizon.util.wrap.Vector3D;
@@ -146,7 +146,30 @@ public class PacketConverter_v1_13_R2 implements IPacketConverter {
             if (b == null) {
                 return null;
             }
-            return new BlockBreakEvent(player, b, BlockFace.valueOf(packet.c().name()), player.getHeldItem(), digType);
+            BlockFace face;
+            switch (packet.c()) {
+                case UP:
+                    face = BlockFace.TOP;
+                    break;
+                case DOWN:
+                    face = BlockFace.BOTTOM;
+                    break;
+                case NORTH:
+                    face = BlockFace.NORTH;
+                    break;
+                case SOUTH:
+                    face = BlockFace.SOUTH;
+                    break;
+                case WEST:
+                    face = BlockFace.WEST;
+                    break;
+                case EAST:
+                    face = BlockFace.EAST;
+                    break;
+                default:
+                    return null;
+            }
+            return new BlockBreakEvent(player, b, face, player.getHeldItem(), digType);
         }
         org.bukkit.inventory.ItemStack item = player.getHeldItem();
         if (item == null) {
@@ -164,34 +187,34 @@ public class PacketConverter_v1_13_R2 implements IPacketConverter {
         int y = bPos.getY();
         int z = bPos.getZ();
         Vector3D targetedPosition = new Vector3D(x, y, z);
-        BlockPlaceEvent.BlockFace face;
+        BlockFace face;
         switch (packet.c()) {
             case DOWN:
                 y -= 1;
-                face = BlockPlaceEvent.BlockFace.BOTTOM;
+                face = BlockFace.BOTTOM;
                 break;
             case UP:
                 y += 1;
-                face = BlockPlaceEvent.BlockFace.TOP;
+                face = BlockFace.TOP;
                 break;
             case NORTH:
                 z -= 1;
-                face = BlockPlaceEvent.BlockFace.NORTH;
+                face = BlockFace.NORTH;
                 break;
             case SOUTH:
                 z += 1;
-                face = BlockPlaceEvent.BlockFace.SOUTH;
+                face = BlockFace.SOUTH;
                 break;
             case WEST:
                 x -= 1;
-                face = BlockPlaceEvent.BlockFace.WEST;
+                face = BlockFace.WEST;
                 break;
             case EAST:
                 x += 1;
-                face = BlockPlaceEvent.BlockFace.EAST;
+                face = BlockFace.EAST;
                 break;
             default:
-                face = BlockPlaceEvent.BlockFace.INVALID;
+                face = BlockFace.INVALID;
                 break;
         }
         Vector3D interaction = new Vector3D(packet.e(), packet.f(), packet.g());

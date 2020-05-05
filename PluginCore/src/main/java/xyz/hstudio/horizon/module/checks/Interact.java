@@ -3,45 +3,57 @@ package xyz.hstudio.horizon.module.checks;
 import org.bukkit.GameMode;
 import xyz.hstudio.horizon.api.ModuleType;
 import xyz.hstudio.horizon.api.events.Event;
+import xyz.hstudio.horizon.api.events.inbound.BlockBreakEvent;
 import xyz.hstudio.horizon.api.events.inbound.BlockPlaceEvent;
 import xyz.hstudio.horizon.api.events.inbound.MoveEvent;
+import xyz.hstudio.horizon.compat.McAccessor;
 import xyz.hstudio.horizon.data.HoriPlayer;
-import xyz.hstudio.horizon.data.checks.ScaffoldData;
-import xyz.hstudio.horizon.file.node.ScaffoldNode;
+import xyz.hstudio.horizon.data.checks.InteractData;
+import xyz.hstudio.horizon.file.node.InteractNode;
 import xyz.hstudio.horizon.module.Module;
+import xyz.hstudio.horizon.util.enums.BlockFace;
 import xyz.hstudio.horizon.util.wrap.Vector3D;
-import xyz.hstudio.horizon.wrap.IWrappedBlock;
 
 import java.util.stream.DoubleStream;
 
-public class Scaffold extends Module<ScaffoldData, ScaffoldNode> {
+public class Interact extends Module<InteractData, InteractNode> {
 
-    public Scaffold() {
-        super(ModuleType.Scaffold, new ScaffoldNode(), "TypeA", "TypeB", "TypeC", "TypeD");
+    public Interact() {
+        super(ModuleType.Interact, new InteractNode(), "Packet", "Angle", "Order", "Direction");
     }
 
     @Override
-    public ScaffoldData getData(final HoriPlayer player) {
-        return player.scaffoldData;
+    public InteractData getData(final HoriPlayer player) {
+        return player.interactData;
     }
 
     @Override
-    public void cancel(final Event event, final int type, final HoriPlayer player, final ScaffoldData data, final ScaffoldNode config) {
-        // TODO: Finish this
+    public void cancel(final Event event, final int type, final HoriPlayer player, final InteractData data, final InteractNode config) {
+        if (type == 0 || type == 1 || type == 2) {
+            if (event instanceof BlockBreakEvent) {
+                BlockBreakEvent e = (BlockBreakEvent) event;
+                e.setCancelled(true);
+                McAccessor.INSTANCE.updateBlock(player, e.block.getPos());
+            } else if (event instanceof BlockPlaceEvent) {
+                BlockPlaceEvent e = (BlockPlaceEvent) event;
+                e.setCancelled(true);
+                McAccessor.INSTANCE.updateBlock(player, e.placed);
+            }
+        }
     }
 
     @Override
-    public void doCheck(final Event event, final HoriPlayer player, final ScaffoldData data, final ScaffoldNode config) {
-        if (config.typeA_enabled) {
+    public void doCheck(final Event event, final HoriPlayer player, final InteractData data, final InteractNode config) {
+        if (config.packet_enabled) {
             typeA(event, player, data, config);
         }
-        if (config.typeB_enabled) {
+        if (config.angle_enabled) {
             typeB(event, player, data, config);
         }
-        if (config.typeC_enabled) {
+        if (config.order_enabled) {
             typeC(event, player, data, config);
         }
-        if (config.typeD_enabled) {
+        if (config.direction_enabled) {
             typeD(event, player, data, config);
         }
     }
@@ -54,7 +66,7 @@ public class Scaffold extends Module<ScaffoldData, ScaffoldNode> {
      *
      * @author MrCraftGoo
      */
-    private void typeA(final Event event, final HoriPlayer player, final ScaffoldData data, final ScaffoldNode config) {
+    private void typeA(final Event event, final HoriPlayer player, final InteractData data, final InteractNode config) {
         if (event instanceof BlockPlaceEvent) {
             BlockPlaceEvent e = (BlockPlaceEvent) event;
             if (e.placeType != BlockPlaceEvent.PlaceType.PLACE_BLOCK) {
@@ -65,8 +77,7 @@ public class Scaffold extends Module<ScaffoldData, ScaffoldNode> {
             }
 
             Vector3D interaction = e.interaction;
-            IWrappedBlock b = e.getTargetLocation().getBlock();
-            if (e.face == BlockPlaceEvent.BlockFace.INVALID) {
+            if (e.face == BlockFace.INVALID) {
                 // Punish
                 this.punish(event, player, data, 0, 5, "p:1");
             } else if (DoubleStream.of(interaction.x, interaction.y, interaction.z)
@@ -80,23 +91,35 @@ public class Scaffold extends Module<ScaffoldData, ScaffoldNode> {
     }
 
     /**
-     * An easy place angle check.
+     * An angle check.
      * <p>
      * Accuracy: 9/10 - It may have a bit false positives.
-     * Efficiency: 6/10 - Detects some poorly made Scaffold/Tower.
+     * Efficiency: 7/10 - Detects some poorly made Scaffold/Tower.
      *
      * @author MrCraftGoo
      */
-    private void typeB(final Event event, final HoriPlayer player, final ScaffoldData data, final ScaffoldNode config) {
+    private void typeB(final Event event, final HoriPlayer player, final InteractData data, final InteractNode config) {
         if (event instanceof BlockPlaceEvent) {
             BlockPlaceEvent e = (BlockPlaceEvent) event;
             if (e.placeType != BlockPlaceEvent.PlaceType.PLACE_BLOCK) {
                 return;
             }
             float angle = player.position.getDirection().angle(e.getPlaceBlockFace());
-            if (angle > Math.toRadians(config.typeB_max_angle)) {
+            if (angle > Math.toRadians(config.angle_max_angle)) {
                 // Punish
-                this.punish(event, player, data, 1, 4);
+                this.punish(event, player, data, 1, 4, "t:place");
+            } else {
+                reward(1, data, 0.999);
+            }
+        } else if (event instanceof BlockBreakEvent) {
+            BlockBreakEvent e = (BlockBreakEvent) event;
+            if (e.digType != BlockBreakEvent.DigType.COMPLETE) {
+                return;
+            }
+            float angle = player.position.getDirection().angle(e.getBreakBlockFace());
+            if (angle > Math.toRadians(config.angle_max_angle)) {
+                // Punish
+                this.punish(event, player, data, 1, 4, "t:break");
             } else {
                 reward(1, data, 0.999);
             }
@@ -111,7 +134,7 @@ public class Scaffold extends Module<ScaffoldData, ScaffoldNode> {
      *
      * @author MrCraftGoo
      */
-    private void typeC(final Event event, final HoriPlayer player, final ScaffoldData data, final ScaffoldNode config) {
+    private void typeC(final Event event, final HoriPlayer player, final InteractData data, final InteractNode config) {
         if (event instanceof BlockPlaceEvent) {
             BlockPlaceEvent e = (BlockPlaceEvent) event;
             if (e.placeType != BlockPlaceEvent.PlaceType.PLACE_BLOCK) {
@@ -139,21 +162,21 @@ public class Scaffold extends Module<ScaffoldData, ScaffoldNode> {
     }
 
     /**
-     * A direction check. It can detect a large amount of scaffold.
+     * A direction check. It can detect a large amount of Scaffold.
      * <p>
-     * Accuracy: 7/10 - It may have some false positives
+     * Accuracy: 8/10 - It may have some false positives
      * Efficiency: 10/10 - Super fast
      *
      * @author MrCraftGoo
      */
-    private void typeD(final Event event, final HoriPlayer player, final ScaffoldData data, final ScaffoldNode config) {
+    private void typeD(final Event event, final HoriPlayer player, final InteractData data, final InteractNode config) {
         if (event instanceof MoveEvent) {
             MoveEvent e = (MoveEvent) event;
             if (player.currentTick - data.lastPlaceTick > 6 || e.isTeleport) {
                 return;
             }
             if (!e.strafeNormally) {
-                if (++data.typeDFails > 4) {
+                if (++data.typeDFails > 3) {
                     // Punish
                     this.punish(event, player, data, 3, 3);
                 }

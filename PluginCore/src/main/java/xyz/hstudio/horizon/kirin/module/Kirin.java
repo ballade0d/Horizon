@@ -7,30 +7,21 @@ import xyz.hstudio.horizon.api.events.outbound.VelocityEvent;
 import xyz.hstudio.horizon.util.wrap.YamlLoader;
 
 import java.io.File;
-import java.io.FileWriter;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Kirin {
 
-    public Kirin(final Horizon horizon, final String name) throws Exception {
-        Logger.msg("Kirin", "Verified successfully!");
-        Logger.msg("Kirin", "Hello " + name + " <3");
+    public final List<CControl> cControls = new ArrayList<>();
 
-        List<String> lines = new ArrayList<>();
-        lines.add("# Should Horizon replace Velocity packet with Explosion packet?");
-        lines.add("# This can make some anti velocity hacks unavailable.");
-        lines.add("use_explosion_packet: true");
+    public Kirin(final Horizon horizon, final String name) throws Exception {
+        Logger.msg("Kirin", "Verified successfully. Thanks for using Kirin!");
+        Logger.msg("Kirin", "Hello " + name + " <3");
 
         File config = new File(horizon.getDataFolder(), "kirin.yml");
         if (!config.exists()) {
-            FileWriter writer = new FileWriter(config);
-            for (String line : lines) {
-                writer.write(line);
-                writer.write(System.lineSeparator());
-            }
-            writer.flush();
-            writer.close();
+            Files.copy(horizon.getResource("xyz/hstudio/horizon/kirin.yml"), config.toPath());
         }
         FileConfiguration yaml = YamlLoader.loadConfiguration(config);
 

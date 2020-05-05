@@ -1,4 +1,4 @@
-package xyz.hstudio.horizon.kirin;
+package xyz.hstudio.horizon.kirin.verification;
 
 import javax.crypto.Cipher;
 import java.io.ByteArrayOutputStream;

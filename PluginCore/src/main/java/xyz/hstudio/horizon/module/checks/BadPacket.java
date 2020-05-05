@@ -3,6 +3,7 @@ package xyz.hstudio.horizon.module.checks;
 import xyz.hstudio.horizon.api.ModuleType;
 import xyz.hstudio.horizon.api.events.Event;
 import xyz.hstudio.horizon.api.events.inbound.*;
+import xyz.hstudio.horizon.compat.McAccessor;
 import xyz.hstudio.horizon.data.HoriPlayer;
 import xyz.hstudio.horizon.data.checks.BadPacketData;
 import xyz.hstudio.horizon.file.node.BadPacketNode;
@@ -27,6 +28,9 @@ public class BadPacket extends Module<BadPacketData, BadPacketNode> {
         } else if (type == 3) {
             event.setCancelled(true);
             Sync.teleport(player, data.legitLocation);
+        } else if (type == 4) {
+            McAccessor.INSTANCE.releaseItem(player.getPlayer());
+            player.getPlayer().updateInventory();
         }
     }
 
@@ -165,7 +169,7 @@ public class BadPacket extends Module<BadPacketData, BadPacketNode> {
         if (player.protocol <= 5) {
             return;
         }
-        if (event instanceof SwingEvent || event instanceof BlockBreakEvent) {
+        if (event instanceof InteractEntityEvent || event instanceof BlockBreakEvent || event instanceof BlockPlaceEvent) {
             if (player.isBlocking || player.isPullingBow || player.isEating) {
                 this.punish(event, player, data, 4, 5);
             } else {

@@ -32,7 +32,6 @@ public class KillAura extends Module<KillAuraData, KillAuraNode> {
 
     @Override
     public void cancel(final Event event, final int type, final HoriPlayer player, final KillAuraData data, final KillAuraNode config) {
-        // TODO: Finish this
         if (type == 4 || type == 5) {
             McAccessor.INSTANCE.releaseItem(player.getPlayer());
             player.getPlayer().updateInventory();

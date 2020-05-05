@@ -11,7 +11,8 @@ import xyz.hstudio.horizon.data.HoriPlayer;
 import xyz.hstudio.horizon.file.AbstractFile;
 import xyz.hstudio.horizon.file.ConfigFile;
 import xyz.hstudio.horizon.file.LangFile;
-import xyz.hstudio.horizon.kirin.Verification;
+import xyz.hstudio.horizon.kirin.module.Kirin;
+import xyz.hstudio.horizon.kirin.verification.Verification;
 import xyz.hstudio.horizon.listener.Listeners;
 import xyz.hstudio.horizon.menu.MenuListener;
 import xyz.hstudio.horizon.module.Module;
@@ -44,6 +45,7 @@ public class Horizon extends JavaPlugin {
     public boolean usePapi;
     public boolean useViaVer;
     public boolean usePSupport;
+    public Kirin kirin;
 
     private BukkitTask syncTask;
     private Async asyncTask;
@@ -90,7 +92,7 @@ public class Horizon extends JavaPlugin {
         if (this.config.kirin_enabled) {
             saveResource("pubKey.key", true);
             try {
-                new Verification(new File(folder, "pubKey.key"), this.config.kirin_licence);
+                this.kirin = new Verification(new File(folder, "pubKey.key"), this.config.kirin_licence).connect();
             } catch (Exception e) {
                 Logger.msg("Kirin", "Failed to init Kirin! Please contact the author for help.");
                 e.printStackTrace();
@@ -122,7 +124,7 @@ public class Horizon extends JavaPlugin {
         new KillAura();
         new KillAuraBot();
         new NoSwing();
-        new Scaffold();
+        new Interact();
         new Speed();
         new Timer();
 

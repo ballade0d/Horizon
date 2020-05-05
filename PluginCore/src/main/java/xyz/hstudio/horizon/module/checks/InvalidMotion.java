@@ -78,7 +78,7 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
             if (!player.isFlying() && (!e.onGround || !player.onGround) && !e.isTeleport && player.teleports.size() == 0 &&
                     !e.jumpLegitly && !e.stepLegitly && e.knockBack == null && e.piston.size() == 0 &&
                     player.currentTick - player.leaveVehicleTick > 1 && player.getVehicle() == null &&
-                    !player.getPlayer().isDead() && !e.isOnSlime && !e.isOnBed && !e.isInLiquid && e.clientBlock == -1 &&
+                    !player.getPlayer().isDead() && !e.isOnSlime && !e.isOnBed && !e.isInLiquid &&
                     !player.isInLiquid && !inSpecialBlock(e.collidingBlocks)) {
 
                 int levitation = player.getPotionEffectAmplifier("LEVITATION");

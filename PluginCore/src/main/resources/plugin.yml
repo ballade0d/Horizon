@@ -45,6 +45,8 @@ permissions:
         default: false
       horizon.bypass.hitbox:
         default: false
+      horizon.bypass.interact:
+        default: false
       horizon.bypass.invalidmotion:
         default: false
       horizon.bypass.inventory:
@@ -54,8 +56,6 @@ permissions:
       horizon.bypass.killaurabot:
         default: false
       horizon.bypass.noswing:
-        default: false
-      horizon.bypass.scaffold:
         default: false
       horizon.bypass.speed:
         default: false

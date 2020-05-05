@@ -10,6 +10,7 @@ import org.bukkit.event.player.*;
 import xyz.hstudio.horizon.Horizon;
 import xyz.hstudio.horizon.compat.McAccessor;
 import xyz.hstudio.horizon.data.HoriPlayer;
+import xyz.hstudio.horizon.kirin.module.CControl;
 import xyz.hstudio.horizon.util.wrap.AABB;
 import xyz.hstudio.horizon.util.wrap.Location;
 import xyz.hstudio.horizon.util.wrap.Vector3D;
@@ -23,7 +24,15 @@ public class Listeners implements Listener {
 
     @EventHandler
     public void onJoin(final PlayerJoinEvent event) {
-        Bukkit.getScheduler().callSyncMethod(Horizon.getInst(), () -> new HoriPlayer(event.getPlayer()));
+        Bukkit.getScheduler().runTask(Horizon.getInst(), () -> {
+            HoriPlayer player = new HoriPlayer(event.getPlayer());
+            if (Horizon.getInst().kirin == null) {
+                return;
+            }
+            for (CControl cControl : Horizon.getInst().kirin.cControls) {
+                cControl.onJoin(player);
+            }
+        });
     }
 
     @EventHandler

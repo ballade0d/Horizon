@@ -1,10 +1,11 @@
 package xyz.hstudio.horizon.api.events.inbound;
 
 import org.bukkit.Material;
-import org.bukkit.block.BlockFace;
 import org.bukkit.inventory.ItemStack;
 import xyz.hstudio.horizon.api.events.Event;
 import xyz.hstudio.horizon.data.HoriPlayer;
+import xyz.hstudio.horizon.util.enums.BlockFace;
+import xyz.hstudio.horizon.util.wrap.Vector3D;
 import xyz.hstudio.horizon.wrap.IWrappedBlock;
 
 public class BlockBreakEvent extends Event {
@@ -20,6 +21,46 @@ public class BlockBreakEvent extends Event {
         this.direction = direction;
         this.itemStack = itemStack;
         this.digType = digType;
+    }
+
+    public Vector3D getBreakBlockFace() {
+        switch (direction) {
+            case TOP:
+                return new Vector3D(0, -1, 0);
+            case BOTTOM:
+                return new Vector3D(0, 1, 0);
+            case SOUTH:
+                return new Vector3D(0, 0, -1);
+            case NORTH:
+                return new Vector3D(0, 0, 1);
+            case WEST:
+                return new Vector3D(1, 0, 0);
+            case EAST:
+                return new Vector3D(-1, 0, 0);
+            case INVALID:
+            default:
+                return new Vector3D(0, 0, 0);
+        }
+    }
+
+    public Vector3D getTargetBlockFace() {
+        switch (direction) {
+            case TOP:
+                return new Vector3D(0, 1, 0);
+            case BOTTOM:
+                return new Vector3D(0, -1, 0);
+            case SOUTH:
+                return new Vector3D(0, 0, 1);
+            case NORTH:
+                return new Vector3D(0, 0, -1);
+            case WEST:
+                return new Vector3D(-1, 0, 0);
+            case EAST:
+                return new Vector3D(1, 0, 0);
+            case INVALID:
+            default:
+                return new Vector3D(0, 0, 0);
+        }
     }
 
     @Override
