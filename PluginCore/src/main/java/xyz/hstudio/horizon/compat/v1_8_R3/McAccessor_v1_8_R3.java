@@ -77,7 +77,7 @@ public class McAccessor_v1_8_R3 implements IMcAccessor {
     @Override
     public boolean isCollidingEntities(final org.bukkit.World world, final Player player, final AABB aabb) {
         World w = ((CraftWorld) world).getHandle();
-        return w.getEntities(((CraftPlayer) player).getHandle(), new AxisAlignedBB(aabb.minX, aabb.minY, aabb.minZ, aabb.maxX, aabb.maxY, aabb.maxZ))
+        return w.getEntities(((CraftPlayer) player).getHandle(), new AxisAlignedBB(aabb.minX + 0.1, aabb.minY + 0.1, aabb.minZ + 0.1, aabb.maxX + 0.1, aabb.maxY + 0.1, aabb.maxZ + 0.1))
                 .size() > 0;
     }
 

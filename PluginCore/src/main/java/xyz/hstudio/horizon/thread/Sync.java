@@ -11,6 +11,9 @@ public class Sync implements Runnable {
     private static final Map<HoriPlayer, Location> pendingTeleports = new ConcurrentHashMap<>();
 
     public static void teleport(final HoriPlayer player, final Location to) {
+        if (player == null || to == null) {
+            return;
+        }
         pendingTeleports.put(player, to);
     }
 
