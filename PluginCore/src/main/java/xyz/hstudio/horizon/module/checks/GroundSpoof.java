@@ -45,6 +45,7 @@ public class GroundSpoof extends Module<GroundSpoofData, GroundSpoofNode> {
         if (event instanceof MoveEvent) {
             MoveEvent e = (MoveEvent) event;
             // Only check if player is not on ground
+            // TODO: Fix FP when a block is removed under player
             if (e.onGroundReally || player.currentTick < 20 || e.stepLegitly || e.isTeleport || player.isFlying()) {
                 return;
             }

@@ -150,6 +150,7 @@ public class MoveEvent extends Event {
         }
         float deltaY = (float) this.velocity.y;
         float bedExpect = (float) (-0.62F * player.prevPrevDeltaY);
+        // TODO: Look into this
         return standing.getType().name().contains("BED") && !player.isSneaking &&
                 player.velocity.y <= 0 && deltaY > 0 && deltaY <= bedExpect;
     }
