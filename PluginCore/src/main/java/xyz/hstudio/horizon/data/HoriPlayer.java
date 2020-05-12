@@ -47,7 +47,7 @@ public class HoriPlayer {
     public final TimerData timerData = new TimerData();
     private final Map<Runnable, Long> simulatedCmds = new ConcurrentHashMap<>();
     public final int protocol;
-    public final Player player;
+    private final Player player;
     public long currentTick;
     public World world;
     public Location position;

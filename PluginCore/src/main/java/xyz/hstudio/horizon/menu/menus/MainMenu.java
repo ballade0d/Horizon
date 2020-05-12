@@ -8,41 +8,49 @@ import org.bukkit.inventory.meta.ItemMeta;
 import xyz.hstudio.horizon.menu.AbstractMenu;
 import xyz.hstudio.horizon.menu.MenuHolder;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class MainMenu extends AbstractMenu {
 
-    private static final ItemStack SETTINGS_ITEM;
-    private static final ItemStack STATISTICS_ITEM;
-    private static final ItemStack RELOAD_ITEM;
+    private static final Map<Integer, ItemStack> ITEMS;
 
     static {
+        ITEMS = new HashMap<>();
         ItemMeta meta;
 
-        SETTINGS_ITEM = new ItemStack(Material.COMMAND);
-        meta = SETTINGS_ITEM.getItemMeta();
+        ItemStack settings = new ItemStack(Material.COMMAND);
+        meta = settings.getItemMeta();
         meta.setDisplayName("§aSettings");
         //
-        SETTINGS_ITEM.setItemMeta(meta);
+        settings.setItemMeta(meta);
 
-        STATISTICS_ITEM = new ItemStack(Material.SIGN);
-        meta = STATISTICS_ITEM.getItemMeta();
+        ITEMS.put(10, settings);
+
+        ItemStack statistics = new ItemStack(Material.SIGN);
+        meta = statistics.getItemMeta();
         meta.setDisplayName("§aStatistics");
         //
-        STATISTICS_ITEM.setItemMeta(meta);
+        statistics.setItemMeta(meta);
 
-        RELOAD_ITEM = new ItemStack(Material.EMERALD_BLOCK);
-        meta = RELOAD_ITEM.getItemMeta();
+        ITEMS.put(13, statistics);
+
+        ItemStack reload = new ItemStack(Material.EMERALD_BLOCK);
+        meta = reload.getItemMeta();
         meta.setDisplayName("§aReload");
         //
-        RELOAD_ITEM.setItemMeta(meta);
+        reload.setItemMeta(meta);
+
+        ITEMS.put(16, reload);
     }
 
     public MainMenu(final MenuHolder holder) {
         super(holder);
         Inventory inventory = Bukkit.createInventory(holder, 27, "§9§lHorizon");
 
-        inventory.setItem(10, SETTINGS_ITEM);
-        inventory.setItem(13, STATISTICS_ITEM);
-        inventory.setItem(16, RELOAD_ITEM);
+        for (Map.Entry<Integer, ItemStack> entry : ITEMS.entrySet()) {
+            inventory.setItem(entry.getKey(), entry.getValue());
+        }
 
         holder.inventory = inventory;
         holder.menu = this;
@@ -50,22 +58,16 @@ public class MainMenu extends AbstractMenu {
 
     @Override
     public void onClick(final int slot, final ItemStack item) {
-        if (slot == 10 && item.equals(SETTINGS_ITEM)) {
+        if (slot == 10 && item.equals(ITEMS.get(10))) {
             // TODO
-        } else if (slot == 13 && item.equals(STATISTICS_ITEM)) {
+        } else if (slot == 13 && item.equals(ITEMS.get(13))) {
             // TODO
-        } else if (slot == 16 && item.equals(RELOAD_ITEM)) {
+        } else if (slot == 16 && item.equals(ITEMS.get(16))) {
             // TODO
         }
     }
 
     @Override
-    public void onClose() {
-        holder.hPlayer.prevMenu = this;
-    }
-
-    @Override
-    public void open() {
-        holder.open();
+    public void onOpen() {
     }
 }

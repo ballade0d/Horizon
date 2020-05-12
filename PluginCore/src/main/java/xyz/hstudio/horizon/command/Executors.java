@@ -165,7 +165,20 @@ public class Executors {
             for (int i = 1; i < args.length; i++) {
                 builder.append(args[i]).append(" ");
             }
-            player.kickPlayer(StringUtils.replace(builder.toString().trim(), "%break%", "\n"));
+            String reason = builder.toString().trim();
+            player.kickPlayer(Horizon.getInst().applyPAPI(player, StringUtils.replace(reason, "%break%", "\n")));
+
+            for (String broadcast : lang.kick_broadcast) {
+                Bukkit.broadcastMessage(Horizon.getInst().applyPAPI(player,
+                        StringUtils.replaceEach(broadcast,
+                                new String[]{
+                                        "%prefix%", "%player%", "%reason%"
+                                },
+                                new String[]{
+                                        Horizon.getInst().config.prefix, player.getName(), reason
+                                }
+                        )));
+            }
         }
 
         @Cmd(name = "bot", perm = "horizon.cmd.bot")

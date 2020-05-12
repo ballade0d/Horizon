@@ -19,7 +19,8 @@ public class KillAuraData extends Data {
     public float lastPitchChange;
     public int gcdFails;
     // Direction
-    public int typeDFails;
+    public long lastStrafeTick;
+    public int directionFails;
     // InteractAutoBlock
     public Vector3D intersection;
     // NormalAutoBlock

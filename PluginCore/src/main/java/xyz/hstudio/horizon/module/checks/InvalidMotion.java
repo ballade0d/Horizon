@@ -145,13 +145,17 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
                     deltaY = estimatedVelocity = 0;
                 }
                 if (Math.abs(deltaY + 0.0784) < 0.001 && !e.onGround &&
-                        (Math.abs(player.velocity.y - 0.2) < 0.001 || Math.abs(player.velocity.y - 0.325) < 0.001)) {
+                        (Math.abs(player.velocity.y - 0.2) < 0.001 || Math.abs(player.velocity.y - 0.325) < 0.001 || Math.abs(player.velocity.y - 0.0125) < 0.001)) {
                     estimatedVelocity = deltaY;
                 }
                 if ((estimatedVelocity == -0.0784F || estimatedVelocity == 0F) && player.velocity.y == 0 && player.onGround && !e.onGround && deltaY == 0 &&
                         !e.cube.add(-0.1, 1.6, -0.1, 0.1, 1.8, 0.1).getMaterials(e.to.world).isEmpty()) {
                     estimatedVelocity = deltaY;
                     data.magic = true;
+                }
+                // Fix the false positives when there's trapdoor above and there's slime under
+                if (deltaY == 0 && estimatedVelocity == -0.0784F && (Math.abs(player.velocity.y - 0.0125) < 0.001 || player.velocity.y == 0F) && !e.onGround && !player.onGround && feetBlock.getType() == Material.SLIME_BLOCK) {
+                    estimatedVelocity = deltaY;
                 }
 
                 // Fix the false positives when towering
@@ -243,7 +247,7 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
                 data.safeLoc = e.to;
             }
 
-            if (deltaY > 0.6 || deltaY < -0.0784 && e.onGround && player.onGround) {
+            if ((deltaY > 0.6 || deltaY < -0.0784) && e.onGround && player.onGround) {
                 // Punish
                 this.punish(event, player, data, 1, 4, "d:" + deltaY, "t:a");
             } else if (e.onGroundReally && Math.abs(player.prevPrevDeltaY - 0.333) < 0.01 &&

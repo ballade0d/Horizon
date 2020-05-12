@@ -21,7 +21,7 @@ public class Kirin {
 
         File config = new File(horizon.getDataFolder(), "kirin.yml");
         if (!config.exists()) {
-            Files.copy(horizon.getResource("xyz/hstudio/horizon/kirin.yml"), config.toPath());
+            Files.copy(horizon.getResource("kirin/kirin.yml"), config.toPath());
         }
         FileConfiguration yaml = YamlLoader.loadConfiguration(config);
 

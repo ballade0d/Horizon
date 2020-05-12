@@ -29,7 +29,7 @@ public class Interact extends Module<InteractData, InteractNode> {
 
     @Override
     public void cancel(final Event event, final int type, final HoriPlayer player, final InteractData data, final InteractNode config) {
-        if (type == 0 || type == 1 || type == 2) {
+        if (type == 0 || type == 1 || type == 2 || type == 3) {
             if (event instanceof BlockBreakEvent) {
                 BlockBreakEvent e = (BlockBreakEvent) event;
                 e.setCancelled(true);
@@ -172,25 +172,27 @@ public class Interact extends Module<InteractData, InteractNode> {
     private void typeD(final Event event, final HoriPlayer player, final InteractData data, final InteractNode config) {
         if (event instanceof MoveEvent) {
             MoveEvent e = (MoveEvent) event;
-            if (player.currentTick - data.lastPlaceTick > 6 || e.isTeleport) {
+            if (e.isTeleport) {
                 return;
             }
             if (!e.strafeNormally) {
-                if (++data.typeDFails > 3) {
-                    // Punish
-                    this.punish(event, player, data, 3, 3);
-                }
-            } else if (data.typeDFails > 0) {
-                data.typeDFails--;
-            } else {
-                reward(3, data, 0.999);
+                data.lastStrafeTick = player.currentTick;
             }
         } else if (event instanceof BlockPlaceEvent) {
             BlockPlaceEvent e = (BlockPlaceEvent) event;
             if (e.placeType != BlockPlaceEvent.PlaceType.PLACE_BLOCK) {
                 return;
             }
-            data.lastPlaceTick = player.currentTick;
+            if (player.currentTick - data.lastStrafeTick <= 3) {
+                if (++data.directionFails > 2) {
+                    // Punish
+                    this.punish(event, player, data, 3, 3);
+                }
+            } else if (data.directionFails > 0) {
+                data.directionFails--;
+            } else {
+                reward(3, data, 0.999);
+            }
         }
     }
 }

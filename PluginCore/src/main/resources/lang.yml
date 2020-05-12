@@ -18,3 +18,13 @@ cmd_bot_wrong_usage: 'Usage: /horizon bot <player> <time>'
 
 cmd_player_not_found: 'The player is not online.'
 cmd_unknown: 'Unknown command!'
+
+# A list of ban messages to send in the chat when a player gets kicked.
+# If you want to disable it, set it to [] (example: kick_broadcast: [])
+# Available placeholders:
+# - %prefix%
+# - %player%
+# - %reason%
+# - All placeholders in PAPI plugin
+kick_broadcast:
+  - '%prefix% §c%player% §9has been kicked from the network for cheating!'

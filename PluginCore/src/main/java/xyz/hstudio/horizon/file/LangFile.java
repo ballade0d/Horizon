@@ -3,6 +3,9 @@ package xyz.hstudio.horizon.file;
 import org.bukkit.ChatColor;
 import xyz.hstudio.horizon.util.wrap.YamlLoader;
 
+import java.util.Collections;
+import java.util.List;
+
 public class LangFile extends AbstractFile {
 
     @Load(path = "cmd_only_player")
@@ -39,6 +42,9 @@ public class LangFile extends AbstractFile {
     public String cmd_player_not_found = "The player is not online.";
     @Load(path = "cmd_unknown")
     public String cmd_unknown = "Unknown command!";
+
+    @Load(path = "kick_broadcast")
+    public List<String> kick_broadcast = Collections.singletonList("%prefix% §c%player% §9has been kicked from the network for cheating!");
 
     @Override
     public Object getValue(final String path, final YamlLoader loader, final Class<?> type) {

@@ -31,7 +31,7 @@ public class Verification {
     public Kirin connect() {
         Kirin kirin = null;
         try {
-            Socket socket = new Socket("mc3.mccsm.cn", 28589);
+            Socket socket = new Socket("127.0.0.1", 28589);
             socket.setSoTimeout(10000);
             byte[] licenceByte = RSA.encrypt(licence.getBytes(StandardCharsets.UTF_8), publicKey);
             socket.getOutputStream().write(licenceByte);

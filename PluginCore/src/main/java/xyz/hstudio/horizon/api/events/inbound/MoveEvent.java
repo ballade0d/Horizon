@@ -1,6 +1,5 @@
 package xyz.hstudio.horizon.api.events.inbound;
 
-import me.clip.placeholderapi.PlaceholderAPI;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
@@ -127,8 +126,10 @@ public class MoveEvent extends Event {
      * @author Islandscout
      */
     private boolean checkSlime() {
-        IWrappedBlock standing = this.from.add(0, -0.01, 0).getBlock();
-        if (standing == null || standing.getType() != Material.SLIME_BLOCK) {
+        IWrappedBlock standingOn = this.from.add(0, -0.01, 0).getBlock();
+        IWrappedBlock standingDown = from.add(0, -1, 0).getBlock();
+        if (standingOn == null || standingDown == null ||
+                (standingOn.getType() != Material.SLIME_BLOCK && !((standingOn.getType().name().contains("CARPET") || standingOn.getType().name().contains("TRAPDOOR") || standingOn.getType().name().contains("TRAP_DOOR")) && standingDown.getType() == Material.SLIME_BLOCK))) {
             return false;
         }
         float deltaY = (float) this.velocity.y;
@@ -383,8 +384,7 @@ public class MoveEvent extends Event {
                             String.valueOf(this.onGround),
                             String.valueOf(this.onGroundReally)
                     });
-            player.sendMessage(Horizon.getInst().config.prefix + (Horizon.getInst().usePapi ?
-                    PlaceholderAPI.setPlaceholders(player.getPlayer(), analysis) : analysis));
+            player.sendMessage(Horizon.getInst().config.prefix + Horizon.getInst().applyPAPI(player.getPlayer(), analysis));
         }
 
         player.clientBlocks.entrySet().removeIf(next -> player.currentTick - next.getValue().getKey() > 6);

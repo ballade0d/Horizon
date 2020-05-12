@@ -35,7 +35,7 @@ public class KillAura extends Module<KillAuraData, KillAuraNode> {
         if (type == 4 || type == 5) {
             McAccessor.INSTANCE.releaseItem(player.getPlayer());
             player.getPlayer().updateInventory();
-        } else if (type == 0 || type == 1 || type == 6 || type == 7) {
+        } else if (type == 0 || type == 1 || type == 3 || type == 6 || type == 7) {
             event.setCancelled(true);
         }
     }
@@ -216,16 +216,24 @@ public class KillAura extends Module<KillAuraData, KillAuraNode> {
     private void typeD(final Event event, final HoriPlayer player, final KillAuraData data, final KillAuraNode config) {
         if (event instanceof MoveEvent) {
             MoveEvent e = (MoveEvent) event;
-            if (player.currentTick - data.lastHitTick > 10 || e.isTeleport) {
+            if (e.isTeleport) {
                 return;
             }
             if (!e.strafeNormally) {
-                if (++data.typeDFails > 3) {
+                data.lastStrafeTick = player.currentTick;
+            }
+        } else if (event instanceof InteractEntityEvent) {
+            InteractEntityEvent e = (InteractEntityEvent) event;
+            if (e.action != InteractEntityEvent.InteractType.ATTACK) {
+                return;
+            }
+            if (player.currentTick - data.lastStrafeTick <= 5) {
+                if (++data.directionFails > 2) {
                     // Punish
                     this.punish(event, player, data, 3, 3);
                 }
-            } else if (data.typeDFails > 0) {
-                data.typeDFails--;
+            } else if (data.directionFails > 0) {
+                data.directionFails--;
             } else {
                 reward(3, data, 0.999);
             }

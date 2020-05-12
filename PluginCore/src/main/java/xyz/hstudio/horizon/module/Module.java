@@ -1,7 +1,6 @@
 package xyz.hstudio.horizon.module;
 
 import lombok.Getter;
-import me.clip.placeholderapi.PlaceholderAPI;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -74,7 +73,7 @@ public abstract class Module<K extends Data, V extends CheckNode> {
     }
 
     protected boolean canBypass(final HoriPlayer player) {
-        return player.getPlayer().hasPermission("horizon.bypass." + this.moduleType.name());
+        return player.getPlayer().hasPermission("horizon.bypass." + this.moduleType.name().toLowerCase());
     }
 
     /**
@@ -99,7 +98,7 @@ public abstract class Module<K extends Data, V extends CheckNode> {
             return;
         }
 
-        if ((cancel || (nowViolation > config.cancel_vl && config.cancel_vl != -1)) && !player.player.hasPermission("horizon.nocancel")) {
+        if ((cancel || (nowViolation > config.cancel_vl && config.cancel_vl != -1)) && !player.getPlayer().hasPermission("horizon.nocancel")) {
             this.cancel(event, type, player, data, config);
         }
 
@@ -116,7 +115,7 @@ public abstract class Module<K extends Data, V extends CheckNode> {
                                     String.valueOf(weight), String.valueOf(player.ping),
                                     Arrays.toString(args)
                             });
-                    cmd = Horizon.getInst().usePapi ? PlaceholderAPI.setPlaceholders(bPlayer, cmd) : cmd;
+                    cmd = Horizon.getInst().applyPAPI(bPlayer, cmd);
                     Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd);
                 }
             });

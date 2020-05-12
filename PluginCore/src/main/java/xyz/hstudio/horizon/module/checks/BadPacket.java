@@ -169,7 +169,9 @@ public class BadPacket extends Module<BadPacketData, BadPacketNode> {
         if (player.protocol <= 5) {
             return;
         }
-        if (event instanceof InteractEntityEvent || event instanceof BlockBreakEvent || event instanceof BlockPlaceEvent) {
+        if ((event instanceof InteractEntityEvent && ((InteractEntityEvent) event).action == InteractEntityEvent.InteractType.ATTACK) ||
+                (event instanceof BlockBreakEvent && ((BlockBreakEvent) event).digType == BlockBreakEvent.DigType.COMPLETE) ||
+                event instanceof BlockPlaceEvent && ((BlockPlaceEvent) event).placeType == BlockPlaceEvent.PlaceType.PLACE_BLOCK) {
             if (player.isBlocking || player.isPullingBow || player.isEating) {
                 this.punish(event, player, data, 4, 5);
             } else {

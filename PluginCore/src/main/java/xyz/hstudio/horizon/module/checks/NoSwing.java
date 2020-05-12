@@ -33,7 +33,7 @@ public class NoSwing extends Module<NoSwingData, NoSwingNode> {
             typeA(event, player, data, config);
         }
         if (config.typeB_enabled) {
-            typeB(event, player, data, config);
+            // typeB(event, player, data, config);
         }
     }
 
@@ -55,13 +55,12 @@ public class NoSwing extends Module<NoSwingData, NoSwingNode> {
         }
     }
 
-    // This check has rare false positives; more testing is required.
     private void typeB(final Event event, final HoriPlayer player, final NoSwingData data, final NoSwingNode config) {
         if (event instanceof SwingEvent) {
             data.animationExpected = false;
         } else if (event instanceof BlockBreakEvent) {
             BlockBreakEvent e = (BlockBreakEvent) event;
-            if (e.digType != BlockBreakEvent.DigType.START) {
+            if (e.digType != BlockBreakEvent.DigType.COMPLETE) {
                 return;
             }
             if (data.animationExpected) {

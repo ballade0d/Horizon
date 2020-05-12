@@ -10,6 +10,6 @@ public class InteractData extends Data {
     public int typeCFails;
 
     // TypeD
-    public long lastPlaceTick = -10000;
-    public int typeDFails;
+    public long lastStrafeTick;
+    public int directionFails;
 }

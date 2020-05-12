@@ -10,7 +10,14 @@ public abstract class AbstractMenu {
 
     public abstract void onClick(int slot, ItemStack item);
 
-    public abstract void onClose();
+    public abstract void onOpen();
 
-    public abstract void open();
+    public void onClose() {
+        holder.hPlayer.prevMenu = this;
+    }
+
+    public void open() {
+        holder.open();
+        this.onOpen();
+    }
 }

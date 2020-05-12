@@ -21,13 +21,6 @@ autoclicker:
   enabled: true
   cancel_vl: 1
   disable_worlds: []
-  typeA:
-    enabled: true
-    min_encounter_cps: 6.0
-    min_check_cps: 14.0
-    sample_size: 20
-    samples: 5
-    stdev: 0.7
   action:
     8:
       - 'horizon notify %player% might be using AutoClicker'
