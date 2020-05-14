@@ -7,22 +7,22 @@ import org.bukkit.entity.Player;
 import xyz.hstudio.horizon.Horizon;
 import xyz.hstudio.horizon.api.ModuleType;
 import xyz.hstudio.horizon.api.PlayerViolateEvent;
-import xyz.hstudio.horizon.api.custom.CustomCheck;
-import xyz.hstudio.horizon.api.custom.CustomConfig;
-import xyz.hstudio.horizon.api.events.Event;
 import xyz.hstudio.horizon.compat.McAccessor;
 import xyz.hstudio.horizon.data.Data;
 import xyz.hstudio.horizon.data.HoriPlayer;
+import xyz.hstudio.horizon.events.Event;
 import xyz.hstudio.horizon.file.AbstractFile;
 import xyz.hstudio.horizon.file.CheckNode;
 import xyz.hstudio.horizon.thread.Async;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 public abstract class Module<K extends Data, V extends CheckNode> {
 
     public static final Map<ModuleType, Module<? extends Data, ? extends CheckNode>> MODULE_MAP = new LinkedHashMap<>(16, 1);
-    public static final List<CustomCheck<? extends CustomConfig>> CUSTOM_CHECKS = new LinkedList<>();
 
     private static final String[] ARGS = new String[]{
             "%player%",
@@ -92,7 +92,7 @@ public abstract class Module<K extends Data, V extends CheckNode> {
         float oldViolation = data.violations.getOrDefault(type, 0F);
         float nowViolation = oldViolation + weight;
 
-        PlayerViolateEvent violateEvent = new PlayerViolateEvent(bPlayer, this.moduleType, nowViolation, oldViolation);
+        PlayerViolateEvent violateEvent = new PlayerViolateEvent(bPlayer, this.moduleType, this.types[type], nowViolation, oldViolation);
         Bukkit.getPluginManager().callEvent(violateEvent);
         if (violateEvent.isCancelled()) {
             return;

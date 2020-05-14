@@ -1,12 +1,12 @@
-package xyz.hstudio.horizon.api.events.inbound;
+package xyz.hstudio.horizon.events.inbound;
 
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
 import xyz.hstudio.horizon.Horizon;
-import xyz.hstudio.horizon.api.events.Event;
 import xyz.hstudio.horizon.compat.McAccessor;
 import xyz.hstudio.horizon.data.HoriPlayer;
+import xyz.hstudio.horizon.events.Event;
 import xyz.hstudio.horizon.file.LangFile;
 import xyz.hstudio.horizon.util.BlockUtils;
 import xyz.hstudio.horizon.util.MathUtils;
@@ -49,7 +49,7 @@ public class MoveEvent extends Event {
     public final boolean isInLiquid;
     public final float oldFriction;
     public final float newFriction;
-    public final List<AABB> piston;
+    public final Set<AABB> piston;
     public final Set<Material> collidingBlocks;
     public final Set<BlockFace> touchingFaces;
     public final boolean stepLegitly;
@@ -109,14 +109,10 @@ public class MoveEvent extends Event {
         this.clientBlock = this.getClientBlock();
     }
 
-    private List<AABB> checkBlock() {
-        List<AABB> piston = player.piston;
+    private Set<AABB> checkBlock() {
+        Set<AABB> piston = player.piston;
         AABB cube = this.cube.add(-velocity.x, -velocity.y, -velocity.z);
-        for (int i = piston.size() - 1; i >= 0; i--) {
-            if (!piston.get(i).isColliding(cube)) {
-                piston.remove(i);
-            }
-        }
+        piston.removeIf(aabb -> !aabb.isColliding(cube));
         return piston;
     }
 
@@ -149,7 +145,7 @@ public class MoveEvent extends Event {
             return false;
         }
         float deltaY = (float) this.velocity.y;
-        float bedExpect = (float) (-0.62F * player.prevPrevDeltaY);
+        float bedExpect = (float) (-0.66F * player.prevPrevDeltaY);
         // TODO: Look into this
         return standing.getType().name().contains("BED") && !player.isSneaking &&
                 player.velocity.y <= 0 && deltaY > 0 && deltaY <= bedExpect;
@@ -250,7 +246,7 @@ public class MoveEvent extends Event {
             kb = velocities.get(kbIndex);
 
             int timeDiff = (int) (time - kb.value);
-            if (timeDiff < ping - 100 || timeDiff > ping + 300) {
+            if (timeDiff > ping + 300) {
                 failedKnockBack = true;
                 expiredKbs++;
                 continue;

@@ -1,10 +1,10 @@
 package xyz.hstudio.horizon.module.checks;
 
 import xyz.hstudio.horizon.api.ModuleType;
-import xyz.hstudio.horizon.api.events.Event;
-import xyz.hstudio.horizon.api.events.inbound.MoveEvent;
 import xyz.hstudio.horizon.data.HoriPlayer;
 import xyz.hstudio.horizon.data.checks.TimerData;
+import xyz.hstudio.horizon.events.Event;
+import xyz.hstudio.horizon.events.inbound.MoveEvent;
 import xyz.hstudio.horizon.file.node.TimerNode;
 import xyz.hstudio.horizon.module.Module;
 import xyz.hstudio.horizon.thread.Sync;
@@ -62,8 +62,8 @@ public class Timer extends Module<TimerData, TimerNode> {
             long delta = timeElapsed - 50 * MULTIPLIER;
             drift += delta;
 
-            if (drift > 1000 * MULTIPLIER) {
-                drift = 1000 * MULTIPLIER;
+            if (drift > 10000 * MULTIPLIER) {
+                drift = 10000 * MULTIPLIER;
             }
 
             double diff = drift * 1E-6;

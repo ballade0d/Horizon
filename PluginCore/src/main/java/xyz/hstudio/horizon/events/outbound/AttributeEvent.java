@@ -1,8 +1,8 @@
-package xyz.hstudio.horizon.api.events.outbound;
+package xyz.hstudio.horizon.events.outbound;
 
 import lombok.AllArgsConstructor;
-import xyz.hstudio.horizon.api.events.Event;
 import xyz.hstudio.horizon.data.HoriPlayer;
+import xyz.hstudio.horizon.events.Event;
 
 import java.util.Comparator;
 import java.util.List;

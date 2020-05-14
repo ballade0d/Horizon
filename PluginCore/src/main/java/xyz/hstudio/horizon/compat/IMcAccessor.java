@@ -4,8 +4,8 @@ import io.netty.channel.ChannelPipeline;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import xyz.hstudio.horizon.api.events.inbound.MoveEvent;
 import xyz.hstudio.horizon.data.HoriPlayer;
+import xyz.hstudio.horizon.events.inbound.MoveEvent;
 import xyz.hstudio.horizon.util.wrap.AABB;
 import xyz.hstudio.horizon.util.wrap.Location;
 

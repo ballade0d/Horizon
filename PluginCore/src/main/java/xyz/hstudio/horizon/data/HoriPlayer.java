@@ -1,6 +1,7 @@
 package xyz.hstudio.horizon.data;
 
 import io.netty.channel.ChannelPipeline;
+import io.netty.util.internal.ConcurrentSet;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.BlockFace;
@@ -12,9 +13,9 @@ import org.bukkit.potion.PotionEffect;
 import protocolsupport.api.ProtocolSupportAPI;
 import us.myles.ViaVersion.api.Via;
 import xyz.hstudio.horizon.Horizon;
-import xyz.hstudio.horizon.api.events.outbound.AttributeEvent;
 import xyz.hstudio.horizon.compat.McAccessor;
 import xyz.hstudio.horizon.data.checks.*;
+import xyz.hstudio.horizon.events.outbound.AttributeEvent;
 import xyz.hstudio.horizon.file.LangFile;
 import xyz.hstudio.horizon.menu.AbstractMenu;
 import xyz.hstudio.horizon.network.ChannelHandler;
@@ -60,7 +61,7 @@ public class HoriPlayer {
     public final Map<Location, Long> teleports = new ConcurrentHashMap<>();
     public final Map<Location, Map.Entry<Long, Material>> clientBlocks = new ConcurrentHashMap<>();
     public List<AttributeEvent.AttributeModifier> moveModifiers = new ArrayList<>();
-    public List<AABB> piston = new ArrayList<>();
+    public Set<AABB> piston = new ConcurrentSet<>();
     public Set<BlockFace> touchingFaces = EnumSet.noneOf(BlockFace.class);
     public Location prevClientBlock;
     public int clientBlockCount;

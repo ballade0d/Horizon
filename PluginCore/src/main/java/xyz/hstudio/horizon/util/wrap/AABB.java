@@ -230,6 +230,37 @@ public class AABB {
     }
 
     @Override
+    public int hashCode() {
+        long var1 = Double.doubleToLongBits(this.minX);
+        int var3 = (int) (var1 ^ var1 >>> 32);
+        var1 = Double.doubleToLongBits(this.minY);
+        var3 = 31 * var3 + (int) (var1 ^ var1 >>> 32);
+        var1 = Double.doubleToLongBits(this.minZ);
+        var3 = 31 * var3 + (int) (var1 ^ var1 >>> 32);
+        var1 = Double.doubleToLongBits(this.maxX);
+        var3 = 31 * var3 + (int) (var1 ^ var1 >>> 32);
+        var1 = Double.doubleToLongBits(this.maxY);
+        var3 = 31 * var3 + (int) (var1 ^ var1 >>> 32);
+        var1 = Double.doubleToLongBits(this.maxZ);
+        var3 = 31 * var3 + (int) (var1 ^ var1 >>> 32);
+        return var3;
+    }
+
+    @Override
+    public boolean equals(final Object other) {
+        if (this == other) {
+            return true;
+        } else if (!(other instanceof AABB)) {
+            return false;
+        } else {
+            AABB aabb = (AABB) other;
+            return Double.compare(aabb.minX, this.minX) == 0 && Double.compare(aabb.minY, this.minY) == 0 &&
+                    Double.compare(aabb.minZ, this.minZ) == 0 && Double.compare(aabb.maxX, this.maxX) == 0 &&
+                    Double.compare(aabb.maxY, this.maxY) == 0 && Double.compare(aabb.maxZ, this.maxZ) == 0;
+        }
+    }
+
+    @Override
     public String toString() {
         return "minX:" + this.minX + ", minY:" + this.minY + ", minZ:" + this.minZ + ", maxX:" + this.maxX + ", maxY:" + this.maxY + ", maxZ:" + this.maxZ;
     }

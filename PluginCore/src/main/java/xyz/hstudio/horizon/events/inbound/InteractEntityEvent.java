@@ -1,12 +1,12 @@
-package xyz.hstudio.horizon.api.events.inbound;
+package xyz.hstudio.horizon.events.inbound;
 
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import xyz.hstudio.horizon.api.events.Event;
 import xyz.hstudio.horizon.compat.McAccessor;
 import xyz.hstudio.horizon.data.HoriPlayer;
+import xyz.hstudio.horizon.events.Event;
 import xyz.hstudio.horizon.util.enums.Hand;
 import xyz.hstudio.horizon.util.wrap.Vector3D;
 

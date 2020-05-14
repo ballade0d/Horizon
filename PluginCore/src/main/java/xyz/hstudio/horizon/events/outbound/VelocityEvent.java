@@ -1,8 +1,8 @@
-package xyz.hstudio.horizon.api.events.outbound;
+package xyz.hstudio.horizon.events.outbound;
 
-import xyz.hstudio.horizon.api.events.Event;
 import xyz.hstudio.horizon.compat.McAccessor;
 import xyz.hstudio.horizon.data.HoriPlayer;
+import xyz.hstudio.horizon.events.Event;
 import xyz.hstudio.horizon.util.collect.Pair;
 import xyz.hstudio.horizon.util.wrap.Vector3D;
 

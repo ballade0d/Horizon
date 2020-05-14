@@ -2,13 +2,13 @@ package xyz.hstudio.horizon.module.checks;
 
 import org.bukkit.GameMode;
 import xyz.hstudio.horizon.api.ModuleType;
-import xyz.hstudio.horizon.api.events.Event;
-import xyz.hstudio.horizon.api.events.inbound.BlockBreakEvent;
-import xyz.hstudio.horizon.api.events.inbound.BlockPlaceEvent;
-import xyz.hstudio.horizon.api.events.inbound.MoveEvent;
 import xyz.hstudio.horizon.compat.McAccessor;
 import xyz.hstudio.horizon.data.HoriPlayer;
 import xyz.hstudio.horizon.data.checks.InteractData;
+import xyz.hstudio.horizon.events.Event;
+import xyz.hstudio.horizon.events.inbound.BlockBreakEvent;
+import xyz.hstudio.horizon.events.inbound.BlockPlaceEvent;
+import xyz.hstudio.horizon.events.inbound.MoveEvent;
 import xyz.hstudio.horizon.file.node.InteractNode;
 import xyz.hstudio.horizon.module.Module;
 import xyz.hstudio.horizon.util.enums.BlockFace;

@@ -23,6 +23,8 @@ public class PlayerViolateEvent extends Event implements Cancellable {
     @Getter
     private final ModuleType type;
     @Getter
+    private final String module;
+    @Getter
     private final float nowViolation;
     @Getter
     private final float oldViolation;
@@ -30,7 +32,7 @@ public class PlayerViolateEvent extends Event implements Cancellable {
     @Setter
     private boolean cancelled;
 
-    public PlayerViolateEvent(final Player player, final ModuleType type, final float nowViolation, final float oldViolation) {
+    public PlayerViolateEvent(final Player player, final ModuleType type, final String module, final float nowViolation, final float oldViolation) {
         super(true);
         if (Arrays.stream(Thread.currentThread().getStackTrace())
                 .noneMatch(element -> element.getClassName().equals(Module.class.getName()))) {
@@ -38,6 +40,7 @@ public class PlayerViolateEvent extends Event implements Cancellable {
         }
         this.player = player;
         this.type = type;
+        this.module = module;
         this.nowViolation = nowViolation;
         this.oldViolation = oldViolation;
         this.cancelled = false;

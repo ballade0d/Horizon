@@ -1,12 +1,12 @@
 package xyz.hstudio.horizon.module.checks;
 
 import xyz.hstudio.horizon.api.ModuleType;
-import xyz.hstudio.horizon.api.events.Event;
-import xyz.hstudio.horizon.api.events.inbound.*;
-import xyz.hstudio.horizon.api.events.outbound.CloseWindowEvent;
 import xyz.hstudio.horizon.compat.McAccessor;
 import xyz.hstudio.horizon.data.HoriPlayer;
 import xyz.hstudio.horizon.data.checks.InventoryData;
+import xyz.hstudio.horizon.events.Event;
+import xyz.hstudio.horizon.events.inbound.*;
+import xyz.hstudio.horizon.events.outbound.CloseWindowEvent;
 import xyz.hstudio.horizon.file.node.InventoryNode;
 import xyz.hstudio.horizon.module.Module;
 
@@ -81,7 +81,7 @@ public class Inventory extends Module<InventoryData, InventoryNode> {
 
             if (e.knockBack != null) {
                 data.temporarilyBypass = true;
-            } else if (e.onGround && player.onGroundReally && data.temporarilyBypass) {
+            } else if (player.onGround && player.onGroundReally && data.temporarilyBypass) {
                 data.temporarilyBypass = false;
                 data.inventoryOpenTick = player.currentTick;
             }

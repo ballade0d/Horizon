@@ -4,5 +4,8 @@ import xyz.hstudio.horizon.data.Data;
 
 public class NoSwingData extends Data {
 
-    public boolean animationExpected;
+    // TypeA
+    public boolean hitSwingExpected;
+    // TypeB
+    public boolean interactSwingExpected;
 }

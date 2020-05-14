@@ -1,11 +1,11 @@
-package xyz.hstudio.horizon.api.events.inbound;
+package xyz.hstudio.horizon.events.inbound;
 
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import xyz.hstudio.horizon.api.events.Event;
 import xyz.hstudio.horizon.data.HoriPlayer;
+import xyz.hstudio.horizon.events.Event;
 import xyz.hstudio.horizon.util.enums.MatUtils;
 
 public class InteractItemEvent extends Event {

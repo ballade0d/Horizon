@@ -3,7 +3,7 @@ package xyz.hstudio.horizon.kirin.module;
 import org.bukkit.configuration.file.FileConfiguration;
 import xyz.hstudio.horizon.Horizon;
 import xyz.hstudio.horizon.Logger;
-import xyz.hstudio.horizon.api.events.outbound.VelocityEvent;
+import xyz.hstudio.horizon.events.outbound.VelocityEvent;
 import xyz.hstudio.horizon.util.wrap.YamlLoader;
 
 import java.io.File;

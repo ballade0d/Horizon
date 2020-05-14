@@ -1,7 +1,7 @@
-package xyz.hstudio.horizon.api.events.inbound;
+package xyz.hstudio.horizon.events.inbound;
 
-import xyz.hstudio.horizon.api.events.Event;
 import xyz.hstudio.horizon.data.HoriPlayer;
+import xyz.hstudio.horizon.events.Event;
 
 public class InteractCSEntityEvent extends Event {
 

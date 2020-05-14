@@ -1,10 +1,10 @@
 package xyz.hstudio.horizon.module.checks;
 
 import xyz.hstudio.horizon.api.ModuleType;
-import xyz.hstudio.horizon.api.events.Event;
-import xyz.hstudio.horizon.api.events.inbound.MoveEvent;
 import xyz.hstudio.horizon.data.HoriPlayer;
 import xyz.hstudio.horizon.data.checks.AntiVelocityData;
+import xyz.hstudio.horizon.events.Event;
+import xyz.hstudio.horizon.events.inbound.MoveEvent;
 import xyz.hstudio.horizon.file.node.AntiVelocityNode;
 import xyz.hstudio.horizon.module.Module;
 

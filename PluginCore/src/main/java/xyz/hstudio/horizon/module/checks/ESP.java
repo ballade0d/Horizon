@@ -1,9 +1,9 @@
 package xyz.hstudio.horizon.module.checks;
 
 import xyz.hstudio.horizon.api.ModuleType;
-import xyz.hstudio.horizon.api.events.Event;
 import xyz.hstudio.horizon.data.Data;
 import xyz.hstudio.horizon.data.HoriPlayer;
+import xyz.hstudio.horizon.events.Event;
 import xyz.hstudio.horizon.file.node.ESPNode;
 import xyz.hstudio.horizon.module.Module;
 
