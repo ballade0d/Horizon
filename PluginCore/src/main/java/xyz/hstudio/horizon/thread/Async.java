@@ -87,6 +87,9 @@ public class Async implements Runnable {
     public void run() {
         try {
             for (Module module : Module.MODULE_MAP.values()) {
+                if (!module.getConfig().enabled) {
+                    continue;
+                }
                 module.tickAsync(currentTick, module.getConfig());
             }
 

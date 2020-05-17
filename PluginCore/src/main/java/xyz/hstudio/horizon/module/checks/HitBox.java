@@ -37,9 +37,6 @@ public class HitBox extends Module<HitBoxData, HitBoxNode> {
     public void doCheck(final Event event, final HoriPlayer player, final HitBoxData data, final HitBoxNode config) {
         if (event instanceof MoveEvent) {
             MoveEvent e = (MoveEvent) event;
-            if (!e.updatePos) {
-                return;
-            }
             data.history.add(new Pair<>(e.to, System.currentTimeMillis()));
             if (data.history.size() > 30) {
                 data.history.remove(0);
@@ -130,7 +127,10 @@ public class HitBox extends Module<HitBoxData, HitBoxNode> {
             AABB targetCube = McAccessor.INSTANCE.getCube(e.entity).add(move);
             targetCube = targetCube.expand(config.direction_box_expansion, config.direction_box_expansion, config.direction_box_expansion);
 
-            if (targetCube.distance(playerPos) > 0.5 && !targetCube.betweenRays(playerPos, dir, extraDir)) {
+            Vector3D toVictim = targetPos.toVector().setY(0).subtract(playerPos.clone().setY(0));
+            boolean behind = toVictim.clone().normalize().dot(dir.clone().setY(0).normalize()) < 0 &&
+                    toVictim.lengthSquared() > targetCube.getMax().setY(0).subtract(targetCube.getMin().setY(0)).lengthSquared();
+            if (behind || !targetCube.betweenRays(playerPos, dir, extraDir)) {
                 // Punish
                 this.punish(event, player, data, 1, 3);
             } else {

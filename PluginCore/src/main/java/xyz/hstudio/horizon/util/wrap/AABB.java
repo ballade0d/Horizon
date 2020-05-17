@@ -229,6 +229,14 @@ public class AABB {
         return Math.sqrt(NumberConversions.square(distX) + NumberConversions.square(distY) + NumberConversions.square(distZ));
     }
 
+    public Vector3D getMin() {
+        return new Vector3D(minX, minY, minZ);
+    }
+
+    public Vector3D getMax() {
+        return new Vector3D(maxX, maxY, maxZ);
+    }
+
     @Override
     public int hashCode() {
         long var1 = Double.doubleToLongBits(this.minX);

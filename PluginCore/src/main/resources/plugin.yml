@@ -39,6 +39,8 @@ permissions:
         default: false
       horizon.bypass.badpacket:
         default: false
+      horizon.bypass.esp:
+        default: false
       horizon.bypass.groundspoof:
         default: false
       horizon.bypass.healthtag:

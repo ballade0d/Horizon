@@ -36,6 +36,7 @@ public class HoriPlayer {
     public final AntiVelocityData antiVelocityData = new AntiVelocityData();
     public final AutoClickerData autoClickerData = new AutoClickerData();
     public final BadPacketData badPacketData = new BadPacketData();
+    public final ESPData espData = new ESPData();
     public final GroundSpoofData groundSpoofData = new GroundSpoofData();
     public final HitBoxData hitBoxData = new HitBoxData();
     public final InvalidMotionData invalidMotionData = new InvalidMotionData();
@@ -58,7 +59,8 @@ public class HoriPlayer {
     public double prevPrevDeltaY;
     public Vector3D velocity = new Vector3D(0, 0, 0);
     public final List<Pair<Vector3D, Long>> velocities = new LinkedList<>();
-    public final Map<Location, Long> teleports = new ConcurrentHashMap<>();
+    public Location teleportLoc;
+    public long teleportTime;
     public final Map<Location, Map.Entry<Long, Material>> clientBlocks = new ConcurrentHashMap<>();
     public List<AttributeEvent.AttributeModifier> moveModifiers = new ArrayList<>();
     public Set<AABB> piston = new ConcurrentSet<>();
@@ -80,9 +82,6 @@ public class HoriPlayer {
     public long hitSlowdownTick = -1;
     public int vehicle = -1;
     public long leaveVehicleTick = -1;
-    public long lastTeleportTime;
-    public long ping;
-    public long lastRequestSent;
     public ChannelPipeline pipeline;
     public AbstractMenu prevMenu;
 
@@ -204,17 +203,11 @@ public class HoriPlayer {
             return;
         }
         for (Map.Entry<Runnable, Long> entry : this.simulatedCmds.entrySet()) {
-            if (currTime - entry.getValue() < this.ping) {
+            if (currTime - entry.getValue() < McAccessor.INSTANCE.getPing(player)) {
                 continue;
             }
             entry.getKey().run();
             this.simulatedCmds.remove(entry.getKey());
-        }
-
-        // Send transaction request to the client.
-        if (currentTick % 80 == 0) {
-            this.lastRequestSent = System.currentTimeMillis();
-            this.sendPacket(McAccessor.INSTANCE.newTransactionPacket());
         }
     }
 

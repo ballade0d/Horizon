@@ -75,7 +75,7 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
 
             // TODO: Handle Vehicle
 
-            if (!player.isFlying() && (!e.onGround || !player.onGround) && !e.isTeleport && player.teleports.size() == 0 &&
+            if (!player.isFlying() && (!e.onGround || !player.onGround) && !e.isTeleport &&
                     !e.jumpLegitly && !e.stepLegitly && e.knockBack == null && e.piston.size() == 0 &&
                     player.currentTick - player.leaveVehicleTick > 1 && player.getVehicle() == null &&
                     !player.getPlayer().isDead() && !e.isOnSlime && !e.isOnBed && !e.isInLiquid &&
@@ -220,6 +220,7 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
                 collidingBlocks.contains(MatUtils.KELP_PLANT.parse()) ||
                 collidingBlocks.contains(MatUtils.BUBBLE_COLUMN.parse()) ||
                 collidingBlocks.contains(MatUtils.SWEET_BERRY_BUSH.parse()) ||
+                collidingBlocks.contains(Material.CACTUS) ||
                 collidingBlocks.stream().anyMatch(BlockUtils.SHULKER_BOX::contains);
     }
 

@@ -63,7 +63,7 @@ public class BadPacket extends Module<BadPacketData, BadPacketNode> {
      */
     private void typeA(final Event event, final HoriPlayer player, final BadPacketData data, final BadPacketNode config) {
         if (event instanceof KeepAliveRespondEvent) {
-            if (player.getPlayer().isDead() || player.currentTick < 20 || player.teleports.size() > 0) {
+            if (player.getPlayer().isDead() || player.currentTick < 20) {
                 return;
             }
             // A player should send 20 move packets(1.8.8 or lower)
@@ -91,7 +91,7 @@ public class BadPacket extends Module<BadPacketData, BadPacketNode> {
     private void typeB(final Event event, final HoriPlayer player, final BadPacketData data, final BadPacketNode config) {
         if (event instanceof MoveEvent) {
             MoveEvent e = (MoveEvent) event;
-            if (e.moveType != MoveEvent.MoveType.FLYING || e.isTeleport || player.teleports.size() > 0 ||
+            if (e.moveType != MoveEvent.MoveType.FLYING || e.isTeleport ||
                     System.currentTimeMillis() - player.lastTeleportAcceptTick < 1000L) {
                 data.flyingCount = 0;
                 return;

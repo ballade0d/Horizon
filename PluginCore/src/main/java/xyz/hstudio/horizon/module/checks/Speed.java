@@ -137,7 +137,7 @@ public class Speed extends Module<SpeedData, SpeedNode> {
                 data.prevSpeed = speed;
                 return;
             }
-            if (player.teleports.size() > 0 || e.isTeleport || player.getVehicle() != null ||
+            if (e.isTeleport || player.getVehicle() != null ||
                     player.currentTick - player.leaveVehicleTick <= 1 || player.isGliding) {
                 return;
             }
@@ -367,6 +367,9 @@ public class Speed extends Module<SpeedData, SpeedNode> {
     private void typeC(final Event event, final HoriPlayer player, final SpeedData data, final SpeedNode config) {
         if (event instanceof MoveEvent) {
             MoveEvent e = (MoveEvent) event;
+            if (e.isTeleport) {
+                return;
+            }
             if (e.strafeNormally) {
                 data.typeCFails = data.typeCFails > 0 ? data.typeCFails - 1 : 0;
                 reward(4, data, 0.995);

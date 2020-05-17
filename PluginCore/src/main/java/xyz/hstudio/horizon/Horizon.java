@@ -118,6 +118,7 @@ public class Horizon extends JavaPlugin {
         new AntiVelocity();
         new AutoClicker();
         new BadPacket();
+        new ESP();
         new GroundSpoof();
         new HealthTag();
         new HitBox();

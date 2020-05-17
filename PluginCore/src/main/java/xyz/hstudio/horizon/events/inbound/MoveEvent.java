@@ -8,6 +8,7 @@ import xyz.hstudio.horizon.compat.McAccessor;
 import xyz.hstudio.horizon.data.HoriPlayer;
 import xyz.hstudio.horizon.events.Event;
 import xyz.hstudio.horizon.file.LangFile;
+import xyz.hstudio.horizon.thread.Sync;
 import xyz.hstudio.horizon.util.BlockUtils;
 import xyz.hstudio.horizon.util.MathUtils;
 import xyz.hstudio.horizon.util.collect.Pair;
@@ -329,6 +330,9 @@ public class MoveEvent extends Event {
         if (this.hitSlowdown) {
             prevVelocity.multiply(0.6);
         }
+        if (this.collidingBlocks.contains(Material.SOUL_SAND)) {
+            prevVelocity.multiply(0.4);
+        }
         if (Math.abs(prevVelocity.x * this.oldFriction) < 0.005) {
             prevVelocity.setX(0);
         }
@@ -387,22 +391,26 @@ public class MoveEvent extends Event {
         player.clientBlocks.entrySet().removeIf(next -> player.currentTick - next.getValue().getKey() > 6);
 
         long now = System.currentTimeMillis();
-        for (Map.Entry<Location, Long> entry : player.teleports.entrySet()) {
-            if (entry.getKey().world.equals(this.to.world) && this.to.distanceSquared(entry.getKey()) < 0.01) {
-                if (now - entry.getValue() > McAccessor.INSTANCE.getPing(player.getPlayer()) - 50) {
-                    player.position = entry.getKey();
+        if (player.teleportLoc != null) {
+            if (player.teleportLoc.world.equals(this.to.world) && this.to.distanceSquared(player.teleportLoc) < 0.01) {
+                if (now - player.teleportTime > McAccessor.INSTANCE.getPing(player.getPlayer()) - 50) {
+                    player.position = player.teleportLoc;
                     player.lastTeleportAcceptTick = player.currentTick;
-                    player.lastTeleportTime = now;
                     this.isTeleport = true;
-                    player.teleports.remove(entry.getKey());
+
+                    player.teleportLoc = null;
                 } else {
                     return false;
                 }
-            } else if (!player.getPlayer().isSleeping() && now - entry.getValue() > McAccessor.INSTANCE.getPing(player.getPlayer()) + 250) {
-                // Sync.teleport(player, entry.getKey());
-                player.teleports.remove(entry.getKey());
+            } else if (!player.getPlayer().isSleeping() && now - player.teleportTime > McAccessor.INSTANCE.getPing(player.getPlayer()) + 250) {
+                Sync.teleport(player, player.teleportLoc);
                 return false;
             }
+        }
+
+        if (!isTeleport && Math.abs(velocity.y - -0.098) < 0.0000001 && (knockBack == null || Math.abs(knockBack.y - -0.098) > 0.0000001)) {
+            player.teleportLoc = new Location(player.getPlayer().getLocation());
+            return false;
         }
         return true;
     }

@@ -12,7 +12,6 @@ import org.bukkit.entity.Player;
 import xyz.hstudio.horizon.compat.IMcAccessor;
 import xyz.hstudio.horizon.data.HoriPlayer;
 import xyz.hstudio.horizon.events.inbound.MoveEvent;
-import xyz.hstudio.horizon.util.RandomUtils;
 import xyz.hstudio.horizon.util.wrap.AABB;
 import xyz.hstudio.horizon.util.wrap.Location;
 
@@ -63,11 +62,6 @@ public class McAccessor_v1_12_R1 implements IMcAccessor {
     public org.bukkit.entity.Entity getEntity(org.bukkit.World world, int id) {
         Entity nmsEntity = ((CraftWorld) world).getHandle().getEntity(id);
         return nmsEntity == null ? null : nmsEntity.getBukkitEntity();
-    }
-
-    @Override
-    public Object newTransactionPacket() {
-        return new PacketPlayOutTransaction(0, RandomUtils.nextShort(), false);
     }
 
     @Override
@@ -126,5 +120,27 @@ public class McAccessor_v1_12_R1 implements IMcAccessor {
     @Override
     public int getPing(final Player player) {
         return ((CraftPlayer) player).getHandle().ping;
+    }
+
+    @Override
+    public void showPlayer(final Player player, final Player show) {
+        EntityPlayer observer = ((CraftPlayer) player).getHandle();
+        EntityTracker tracker = ((WorldServer) observer.world).tracker;
+        EntityPlayer other = ((CraftPlayer) show).getHandle();
+        EntityTrackerEntry entry = tracker.trackedEntities.get(other.getId());
+        if (entry != null && !entry.trackedPlayers.contains(observer)) {
+            entry.updatePlayer(observer);
+        }
+    }
+
+    @Override
+    public void hidePlayer(final Player player, final Player hide) {
+        EntityPlayer observer = ((CraftPlayer) player).getHandle();
+        EntityTracker tracker = ((WorldServer) observer.world).tracker;
+        EntityPlayer other = ((CraftPlayer) hide).getHandle();
+        EntityTrackerEntry entry = tracker.trackedEntities.get(other.getId());
+        if (entry != null) {
+            entry.clear(observer);
+        }
     }
 }

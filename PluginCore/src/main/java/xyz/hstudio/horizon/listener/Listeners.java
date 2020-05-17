@@ -25,12 +25,15 @@ public class Listeners implements Listener {
     @EventHandler
     public void onJoin(final PlayerJoinEvent event) {
         Bukkit.getScheduler().runTask(Horizon.getInst(), () -> {
-            HoriPlayer player = new HoriPlayer(event.getPlayer());
-            if (Horizon.getInst().kirin == null) {
-                return;
-            }
-            for (CControl cControl : Horizon.getInst().kirin.cControls) {
-                cControl.onJoin(player);
+            try {
+                HoriPlayer player = new HoriPlayer(event.getPlayer());
+                if (Horizon.getInst().kirin == null) {
+                    return;
+                }
+                for (CControl cControl : Horizon.getInst().kirin.cControls) {
+                    cControl.onJoin(player);
+                }
+            } catch (Throwable ignore) {
             }
         });
     }
@@ -47,7 +50,8 @@ public class Listeners implements Listener {
         if (player == null) {
             return;
         }
-        player.teleports.put(new Location(e.getTo()), System.currentTimeMillis());
+        player.teleportLoc = new Location(e.getTo());
+        player.teleportTime = System.currentTimeMillis();
         player.world = e.getTo().getWorld();
 
         if (e.getCause() == PlayerTeleportEvent.TeleportCause.UNKNOWN &&
@@ -67,7 +71,8 @@ public class Listeners implements Listener {
         if (player == null) {
             return;
         }
-        player.teleports.put(new Location(e.getRespawnLocation()), System.currentTimeMillis());
+        player.teleportLoc = new Location(e.getRespawnLocation());
+        player.teleportTime = System.currentTimeMillis();
         player.world = e.getRespawnLocation().getWorld();
     }
 
@@ -78,7 +83,8 @@ public class Listeners implements Listener {
         if (player == null) {
             return;
         }
-        player.teleports.put(new Location(p.getLocation()), System.currentTimeMillis());
+        player.teleportLoc = new Location(p.getLocation());
+        player.teleportTime = System.currentTimeMillis();
         player.world = p.getWorld();
     }
 

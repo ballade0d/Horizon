@@ -44,11 +44,6 @@ public interface IMcAccessor {
     Entity getEntity(World world, int id);
 
     /**
-     * Create a new transaction packet.
-     */
-    Object newTransactionPacket();
-
-    /**
      * Stop a player from using item.
      */
     void releaseItem(Player player);
@@ -77,4 +72,8 @@ public interface IMcAccessor {
      * Get the ping of a player calculated by server
      */
     int getPing(Player player);
+
+    void showPlayer(Player player, Player show);
+
+    void hidePlayer(Player player, Player hide);
 }

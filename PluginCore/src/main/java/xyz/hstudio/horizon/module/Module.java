@@ -102,6 +102,8 @@ public abstract class Module<K extends Data, V extends CheckNode> {
             this.cancel(event, type, player, data, config);
         }
 
+        int ping = McAccessor.INSTANCE.getPing(bPlayer);
+
         for (Map.Entry<Integer, List<String>> entry : config.action.entrySet()) {
             int vl = entry.getKey();
             if (!(oldViolation < vl && nowViolation >= vl)) {
@@ -112,7 +114,7 @@ public abstract class Module<K extends Data, V extends CheckNode> {
                     String cmd = StringUtils.replaceEach(rawCmd, ARGS,
                             new String[]{bPlayer.getName(), this.moduleType.name(),
                                     this.types[type], String.valueOf(nowViolation),
-                                    String.valueOf(weight), String.valueOf(player.ping),
+                                    String.valueOf(weight), String.valueOf(ping),
                                     Arrays.toString(args)
                             });
                     cmd = Horizon.getInst().applyPAPI(bPlayer, cmd);
@@ -129,7 +131,7 @@ public abstract class Module<K extends Data, V extends CheckNode> {
                     ARGS,
                     new String[]{bPlayer.getName(), this.moduleType.name(),
                             this.types[type], String.valueOf(nowViolation),
-                            String.valueOf(weight), String.valueOf(player.ping),
+                            String.valueOf(weight), String.valueOf(ping),
                             Arrays.toString(args)
                     });
             player.sendMessage(Horizon.getInst().config.prefix + verbose);
@@ -142,7 +144,7 @@ public abstract class Module<K extends Data, V extends CheckNode> {
                     new String[]{
                             bPlayer.getName(), this.moduleType.name(),
                             this.types[type], String.valueOf(nowViolation),
-                            String.valueOf(weight), String.valueOf(player.ping),
+                            String.valueOf(weight), String.valueOf(ping),
                             Arrays.toString(args)
                     });
             Async.LOG.addLast(verbose);
