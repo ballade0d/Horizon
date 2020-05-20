@@ -26,7 +26,7 @@ public class Speed extends Module<SpeedData, SpeedNode> {
     public Speed() {
         // The first NoSlow is for Packet NoSlow
         // The second is for Move NoSlow
-        super(ModuleType.Speed, new SpeedNode(), "Predict", "NoSlow", "NoSlow", "Sprint", "Strafe");
+        super(ModuleType.Speed, new SpeedNode(), "Predict", "NoSlow", "NoSlow", "Sprint", "StrafeA", "StrafeB");
     }
 
     @Override
@@ -63,6 +63,7 @@ public class Speed extends Module<SpeedData, SpeedNode> {
         }
         if (config.strafe_enabled) {
             typeC(event, player, data, config);
+            typeD(event, player, data, config);
         }
     }
 
@@ -367,7 +368,7 @@ public class Speed extends Module<SpeedData, SpeedNode> {
     private void typeC(final Event event, final HoriPlayer player, final SpeedData data, final SpeedNode config) {
         if (event instanceof MoveEvent) {
             MoveEvent e = (MoveEvent) event;
-            if (e.isTeleport) {
+            if (e.isTeleport || e.knockBack != null) {
                 return;
             }
             if (e.strafeNormally) {
@@ -377,7 +378,35 @@ public class Speed extends Module<SpeedData, SpeedNode> {
             }
             if (++data.typeCFails > config.strafe_threshold) {
                 // Punish
-                this.punish(event, player, data, 4, 2);
+                this.punish(event, player, data, 4, 2, "t:a");
+            }
+        }
+    }
+
+    private void typeD(final Event event, final HoriPlayer player, final SpeedData data, final SpeedNode config) {
+        if (event instanceof MoveEvent) {
+            MoveEvent e = (MoveEvent) event;
+
+            if (player.isFlying() || e.knockBack != null || !e.touchingFaces.isEmpty() ||
+                    !player.touchingFaces.isEmpty() || player.getVehicle() != null || e.isInLiquidStrict) {
+                return;
+            }
+
+            Vector3D move = e.velocity.clone().setY(0);
+            Vector3D prevMove = player.velocity.clone().setY(0);
+            double deltaAngle = MathUtils.angle(move, prevMove);
+
+            double prevSpeed = e.hitSlowdown ? prevMove.length() * 0.6 : prevMove.length();
+            double magnitude = e.oldFriction * prevSpeed - 0.026001;
+
+            if (move.lengthSquared() > 0.05 && deltaAngle > 0.2) {
+                // Punish
+                this.punish(event, player, data, 5, 2);
+            } else if (prevMove.lengthSquared() > 0.01 && move.length() < magnitude) {
+                // Punish
+                this.punish(event, player, data, 5, 2);
+            } else {
+                reward(5, data, 0.995);
             }
         }
     }

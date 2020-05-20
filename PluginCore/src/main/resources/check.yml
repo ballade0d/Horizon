@@ -52,6 +52,7 @@ esp:
   # Unused in this check
   cancel_vl: 0
   disable_worlds: []
+  update_interval: 2
   check_angle: false
   max_distance: 80.0
   # Unused in this check

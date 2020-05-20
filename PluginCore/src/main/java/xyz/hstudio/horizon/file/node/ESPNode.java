@@ -7,6 +7,8 @@ import xyz.hstudio.horizon.util.wrap.YamlLoader;
 
 public class ESPNode extends CheckNode {
 
+    @Load(path = "update_interval")
+    public int update_interval = 2;
     @Load(path = "check_angle")
     public boolean check_angle = false;
     @Load(path = "max_distance")

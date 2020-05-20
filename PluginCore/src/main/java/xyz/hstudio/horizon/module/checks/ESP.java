@@ -37,7 +37,7 @@ public class ESP extends Module<ESPData, ESPNode> {
 
     @Override
     public void tickAsync(final long currentTick, final ESPNode config) {
-        if (currentTick % 2 != 0) {
+        if (currentTick % config.update_interval != 0) {
             return;
         }
         for (HoriPlayer observer : Horizon.PLAYERS.values()) {
@@ -53,9 +53,6 @@ public class ESP extends Module<ESPData, ESPNode> {
                 if (!player.world.getUID().equals(observer.world.getUID())) {
                     continue;
                 }
-                if (player.position.distance(observer.position) > config.max_distance) {
-                    continue;
-                }
                 if (player.getPlayer().getUniqueId().equals(observer.getPlayer().getUniqueId())) {
                     continue;
                 }
@@ -63,7 +60,8 @@ public class ESP extends Module<ESPData, ESPNode> {
                     continue;
                 }
                 ESPData data = this.getData(observer);
-                if (!isTargetPosInSight(observer, player.getHeadPosition(), config.check_angle)) {
+                if (player.position.distance(observer.position) > config.max_distance ||
+                        !isTargetPosInSight(observer, player.getHeadPosition(), config.check_angle)) {
                     // Hide
                     if (data.hiddenPlayers.contains(player.getPlayer().getUniqueId())) {
                         continue;
