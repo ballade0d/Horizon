@@ -5,6 +5,7 @@ import org.bukkit.inventory.ItemStack;
 import xyz.hstudio.horizon.data.HoriPlayer;
 import xyz.hstudio.horizon.events.Event;
 import xyz.hstudio.horizon.util.enums.BlockFace;
+import xyz.hstudio.horizon.util.wrap.ClientBlock;
 import xyz.hstudio.horizon.util.wrap.Vector3D;
 import xyz.hstudio.horizon.wrap.IWrappedBlock;
 
@@ -66,7 +67,7 @@ public class BlockBreakEvent extends Event {
     @Override
     public void post() {
         if (this.digType == DigType.COMPLETE) {
-            player.addClientBlock(this.block.getPos(), player.currentTick, Material.AIR);
+            player.addClientBlock(block.getPos(), new ClientBlock(player.currentTick, Material.AIR));
         }
     }
 

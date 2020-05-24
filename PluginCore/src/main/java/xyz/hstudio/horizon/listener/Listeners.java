@@ -1,11 +1,13 @@
 package xyz.hstudio.horizon.listener;
 
 import org.bukkit.Bukkit;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPistonExtendEvent;
+import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.player.*;
 import xyz.hstudio.horizon.Horizon;
 import xyz.hstudio.horizon.compat.McAccessor;
@@ -90,9 +92,24 @@ public class Listeners implements Listener {
 
     @EventHandler
     public void onPistonExtend(final BlockPistonExtendEvent e) {
-        int length = e.getBlocks().size() + 1;
+        int length = e.getBlocks().size() + 2;
+        BlockFace face = e.getDirection();
         Vector3D pos = new Vector3D(e.getBlock().getX(), e.getBlock().getY(), e.getBlock().getZ());
-        Vector3D dir = pos.add(new Vector3D(e.getDirection().getModX() * length, e.getDirection().getModY() * length, e.getDirection().getModZ() * length));
+        Vector3D dir = pos.add(new Vector3D(face.getModX() * length, face.getModY() * length, face.getModZ() * length));
+        AABB aabb = new AABB(-0.1, -0.1, -0.1, 1.1, 1.1, 1.1).add(dir);
+        Horizon.PLAYERS
+                .values()
+                .stream()
+                .filter(p -> p.world.equals(e.getBlock().getWorld()))
+                .forEach(p -> p.piston.add(aabb));
+    }
+
+    @EventHandler
+    public void onPistonRetract(final BlockPistonRetractEvent e) {
+        int length = e.getBlocks().size() + 1;
+        BlockFace face = e.getDirection().getOppositeFace();
+        Vector3D pos = new Vector3D(e.getBlock().getX(), e.getBlock().getY(), e.getBlock().getZ());
+        Vector3D dir = pos.add(new Vector3D(face.getModX() * length, face.getModY() * length, face.getModZ() * length));
         AABB aabb = new AABB(-0.1, -0.1, -0.1, 1.1, 1.1, 1.1).add(dir);
         Horizon.PLAYERS
                 .values()

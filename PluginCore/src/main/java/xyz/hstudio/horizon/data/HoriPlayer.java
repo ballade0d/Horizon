@@ -22,6 +22,7 @@ import xyz.hstudio.horizon.network.ChannelHandler;
 import xyz.hstudio.horizon.util.collect.Pair;
 import xyz.hstudio.horizon.util.enums.Version;
 import xyz.hstudio.horizon.util.wrap.AABB;
+import xyz.hstudio.horizon.util.wrap.ClientBlock;
 import xyz.hstudio.horizon.util.wrap.Location;
 import xyz.hstudio.horizon.util.wrap.Vector3D;
 
@@ -61,7 +62,7 @@ public class HoriPlayer {
     public final List<Pair<Vector3D, Long>> velocities = new LinkedList<>();
     public Location teleportLoc;
     public long teleportTime;
-    public final Map<Location, Map.Entry<Long, Material>> clientBlocks = new ConcurrentHashMap<>();
+    public final Map<Location, ClientBlock> clientBlocks = new ConcurrentHashMap<>();
     public List<AttributeEvent.AttributeModifier> moveModifiers = new ArrayList<>();
     public Set<AABB> piston = new ConcurrentSet<>();
     public Set<BlockFace> touchingFaces = EnumSet.noneOf(BlockFace.class);
@@ -110,11 +111,11 @@ public class HoriPlayer {
         return player;
     }
 
-    public void addClientBlock(final Location location, final long initTick, final Material type) {
+    public void addClientBlock(final Location location, final ClientBlock clientBlock) {
         if (clientBlocks.size() >= 12) {
             return;
         }
-        clientBlocks.put(location, new AbstractMap.SimpleImmutableEntry<>(initTick, type));
+        clientBlocks.put(location, clientBlock);
     }
 
     /**

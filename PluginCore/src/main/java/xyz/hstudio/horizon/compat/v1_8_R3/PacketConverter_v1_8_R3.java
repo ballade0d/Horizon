@@ -301,6 +301,8 @@ public class PacketConverter_v1_8_R3 implements IPacketConverter {
             return convertUpdateHealthEvent(player, (PacketPlayOutUpdateHealth) packet);
         } else if (packet instanceof PacketPlayOutEntityDestroy) {
             return convertEntityDestroyEvent(player, (PacketPlayOutEntityDestroy) packet);
+        } else if (packet instanceof PacketPlayOutBlockChange) {
+            return convertBlockUpdateEvent(player, (PacketPlayOutBlockChange) packet);
         }
         return null;
     }
@@ -455,5 +457,17 @@ public class PacketConverter_v1_8_R3 implements IPacketConverter {
             player.sendSimulatedAction(() -> player.leaveVehicleTick = player.currentTick);
         }
         return null;
+    }
+
+    private Event convertBlockUpdateEvent(final HoriPlayer player, final PacketPlayOutBlockChange packet) {
+        PacketDataSerializer serializer = new PacketDataSerializer(Unpooled.buffer(8));
+        try {
+            packet.b(serializer);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        BlockPosition pos = serializer.c();
+        IBlockData data = Block.d.a(serializer.e());
+        return new BlockUpdateEvent(player, IWrappedBlock.create(player.world, pos, data));
     }
 }

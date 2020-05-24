@@ -14,12 +14,12 @@ import xyz.hstudio.horizon.util.MathUtils;
 import xyz.hstudio.horizon.util.collect.Pair;
 import xyz.hstudio.horizon.util.enums.MatUtils;
 import xyz.hstudio.horizon.util.wrap.AABB;
+import xyz.hstudio.horizon.util.wrap.ClientBlock;
 import xyz.hstudio.horizon.util.wrap.Location;
 import xyz.hstudio.horizon.util.wrap.Vector3D;
 import xyz.hstudio.horizon.wrap.IWrappedBlock;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 public class MoveEvent extends Event {
@@ -50,7 +50,7 @@ public class MoveEvent extends Event {
     public final boolean isInLiquid;
     public final float oldFriction;
     public final float newFriction;
-    public final Set<AABB> piston;
+    public final boolean piston;
     public final Set<Material> collidingBlocks;
     public final Set<BlockFace> touchingFaces;
     public final boolean stepLegitly;
@@ -110,11 +110,11 @@ public class MoveEvent extends Event {
         this.clientBlock = this.getClientBlock();
     }
 
-    private Set<AABB> checkBlock() {
+    private boolean checkBlock() {
         Set<AABB> piston = player.piston;
-        AABB cube = this.cube.add(-velocity.x, -velocity.y, -velocity.z);
-        piston.removeIf(aabb -> !aabb.isColliding(cube));
-        return piston;
+        AABB cube = this.cube.add(-velocity.x, -velocity.y, -velocity.z).expand(0.1, 0.1, 0.1);
+        piston.removeIf(aabb -> !cube.isColliding(aabb));
+        return !piston.isEmpty();
     }
 
     /**
@@ -147,7 +147,6 @@ public class MoveEvent extends Event {
         }
         float deltaY = (float) this.velocity.y;
         float bedExpect = (float) (-0.66F * player.prevPrevDeltaY);
-        // TODO: Look into this
         return standing.getType().name().contains("BED") && !player.isSneaking &&
                 player.velocity.y <= 0 && deltaY > 0 && deltaY <= bedExpect;
     }
@@ -180,11 +179,6 @@ public class MoveEvent extends Event {
         return friction;
     }
 
-    /**
-     * Get player's client block.
-     *
-     * @author Islandscout
-     */
     private long getClientBlock() {
         AABB feet = new AABB(to.toVector().add(new Vector3D(-0.3, -0.02, -0.3)), to.toVector().add(new Vector3D(0.3, 0, 0.3)));
         AABB aboveFeet = feet.add(0, 0.20001, 0);
@@ -193,15 +187,15 @@ public class MoveEvent extends Event {
             if (!to.world.equals(loc.world)) {
                 continue;
             }
-            Map.Entry<Long, Material> cBlock = player.clientBlocks.get(loc);
+            ClientBlock cBlock = player.clientBlocks.get(loc);
             AABB newAABB = cube.translateTo(loc.toVector());
-            if (BlockUtils.isSolid(cBlock.getValue()) && feet.isColliding(newAABB) && !aboveFeet.isColliding(newAABB)) {
+            if (feet.isColliding(newAABB) && !aboveFeet.isColliding(newAABB) && BlockUtils.isSolid(cBlock.material)) {
                 boolean tower = player.onGround && !onGround && player.velocity.y == 0 && (Math.abs(velocity.y - 0.4044449) < 0.001 || Math.abs(velocity.y - 0.3955759) < 0.001);
                 if (!loc.equals(player.prevClientBlock) && (velocity.y == 0 || tower || jumpLegitly)) {
                     player.clientBlockCount++;
                 }
                 player.prevClientBlock = loc;
-                return cBlock.getKey();
+                return cBlock.initTick;
             }
         }
         return -1;
@@ -253,7 +247,7 @@ public class MoveEvent extends Event {
                 continue;
             }
             Vector3D kbVelocity = kb.key;
-            if (!collidingBlocks.contains(MatUtils.COBWEB.parse()) && !collidingBlocks.contains(Material.LADDER) && !collidingBlocks.contains(Material.VINE) && piston.size() == 0) {
+            if (!collidingBlocks.contains(MatUtils.COBWEB.parse()) && !collidingBlocks.contains(Material.LADDER) && !collidingBlocks.contains(Material.VINE) && !piston) {
                 double y = kbVelocity.y;
 
                 if (!((touchingFaces.contains(BlockFace.UP) && y > 0) || (touchingFaces.contains(BlockFace.DOWN) && y < 0)) &&
@@ -388,7 +382,7 @@ public class MoveEvent extends Event {
             player.sendMessage(Horizon.getInst().config.prefix + Horizon.getInst().applyPAPI(player.getPlayer(), analysis));
         }
 
-        player.clientBlocks.entrySet().removeIf(next -> player.currentTick - next.getValue().getKey() > 6);
+        player.clientBlocks.entrySet().removeIf(next -> player.currentTick - next.getValue().initTick > 6);
 
         long now = System.currentTimeMillis();
         if (player.teleportLoc != null) {

@@ -31,6 +31,16 @@ public class WrappedBlock_v1_13_R2 implements IWrappedBlock {
         this.z = block.getZ();
     }
 
+    public WrappedBlock_v1_13_R2(final org.bukkit.World world, final BlockPosition bPos, final IBlockData data) {
+        this.world = ((CraftWorld) world).getHandle();
+        this.bPos = bPos;
+        this.data = data;
+        this.type = CraftMagicNumbers.getMaterial(data.getBlock());
+        this.x = bPos.getX();
+        this.y = bPos.getY();
+        this.z = bPos.getZ();
+    }
+
     @Override
     public Material getType() {
         return this.type;

@@ -76,7 +76,7 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
             // TODO: Handle Vehicle
 
             if (!player.isFlying() && (!e.onGround || !player.onGround) && !e.isTeleport &&
-                    !e.jumpLegitly && !e.stepLegitly && e.knockBack == null && e.piston.size() == 0 &&
+                    !e.jumpLegitly && !e.stepLegitly && e.knockBack == null && !e.piston &&
                     player.currentTick - player.leaveVehicleTick > 1 && player.getVehicle() == null &&
                     !player.getPlayer().isDead() && !e.isOnSlime && !e.isOnBed && !e.isInLiquid &&
                     !player.isInLiquid && !inSpecialBlock(e.collidingBlocks)) {

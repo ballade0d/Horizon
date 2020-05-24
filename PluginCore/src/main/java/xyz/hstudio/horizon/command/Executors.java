@@ -224,7 +224,7 @@ public class Executors {
                 return Collections.emptyList();
             }
             if (args.length == 1) {
-                return tabs
+                return cmds
                         .stream()
                         .map(pair -> pair.key.name())
                         .filter(name -> name.startsWith(args[0]))

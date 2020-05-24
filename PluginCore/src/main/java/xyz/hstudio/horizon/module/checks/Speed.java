@@ -132,7 +132,7 @@ public class Speed extends Module<SpeedData, SpeedNode> {
                 data.noMoves++;
             }
 
-            if (e.knockBack != null || e.piston.size() > 0 || player.isFlying() || e.touchingFaces.contains(BlockFace.UP) ||
+            if (e.knockBack != null || e.piston || player.isFlying() || e.touchingFaces.contains(BlockFace.UP) ||
                     player.touchingFaces.contains(BlockFace.UP) || player.invalidMotionData.magic ||
                     player.invalidMotionData.prevGliding || data.attributeBypass) {
                 data.prevSpeed = speed;
@@ -323,7 +323,7 @@ public class Speed extends Module<SpeedData, SpeedNode> {
                     (collisionHorizontal && !data.collisionHorizontal) || player.isFlying() ||
                     player.currentTick - data.lastSprintTick < 2 || player.getVehicle() != null ||
                     player.currentTick - player.leaveVehicleTick < 1 || e.velocity.clone().setY(0).lengthSquared() < 0.04 ||
-                    e.piston.size() > 0 || e.isCollidingEntities || data.collisionHorizontal) {
+                    e.piston || e.isCollidingEntities || data.collisionHorizontal) {
                 return;
             }
 
@@ -387,7 +387,7 @@ public class Speed extends Module<SpeedData, SpeedNode> {
         if (event instanceof MoveEvent) {
             MoveEvent e = (MoveEvent) event;
 
-            if (player.isFlying() || e.knockBack != null || !e.touchingFaces.isEmpty() ||
+            if (player.isFlying() || e.knockBack != null || !e.touchingFaces.isEmpty() || e.piston ||
                     !player.touchingFaces.isEmpty() || player.getVehicle() != null || e.isInLiquidStrict) {
                 return;
             }
