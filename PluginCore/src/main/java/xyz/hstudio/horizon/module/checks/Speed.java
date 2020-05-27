@@ -387,8 +387,8 @@ public class Speed extends Module<SpeedData, SpeedNode> {
         if (event instanceof MoveEvent) {
             MoveEvent e = (MoveEvent) event;
 
-            if (player.isFlying() || e.knockBack != null || !e.touchingFaces.isEmpty() || e.piston ||
-                    !player.touchingFaces.isEmpty() || player.getVehicle() != null || e.isInLiquidStrict) {
+            if (player.isFlying() || e.onGround || player.onGround || e.isTeleport || e.knockBack != null || !e.touchingFaces.isEmpty() ||
+                    e.piston || !player.touchingFaces.isEmpty() || player.getVehicle() != null || e.isInLiquidStrict) {
                 return;
             }
 

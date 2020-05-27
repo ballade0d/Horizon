@@ -92,7 +92,7 @@ public abstract class Module<K extends Data, V extends CheckNode> {
         float oldViolation = data.violations.getOrDefault(type, 0F);
         float nowViolation = oldViolation + weight;
 
-        PlayerViolateEvent violateEvent = new PlayerViolateEvent(bPlayer, this.moduleType, this.types[type], nowViolation, oldViolation);
+        PlayerViolateEvent violateEvent = new PlayerViolateEvent(bPlayer, this.moduleType, this.types[type], args, nowViolation, oldViolation);
         Bukkit.getPluginManager().callEvent(violateEvent);
         if (violateEvent.isCancelled()) {
             return;
