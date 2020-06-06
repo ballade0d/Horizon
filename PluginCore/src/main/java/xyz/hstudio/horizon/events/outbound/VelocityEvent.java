@@ -13,16 +13,21 @@ public class VelocityEvent extends Event {
     public final double x;
     public final double y;
     public final double z;
+    public final boolean additive;
 
-    public VelocityEvent(final HoriPlayer player, final double x, final double y, final double z) {
+    public VelocityEvent(final HoriPlayer player, final double x, final double y, final double z, final boolean additive) {
         super(player);
         this.x = x;
         this.y = y;
         this.z = z;
+        this.additive = additive;
     }
 
     @Override
     public void post() {
+        if (additive) {
+            return;
+        }
         player.velocities.add(new Pair<>(new Vector3D(x, y, z), System.currentTimeMillis()));
         if (useExplosionPacket) {
             this.setCancelled(true);

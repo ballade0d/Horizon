@@ -23,7 +23,7 @@ public class BadPacket extends Module<BadPacketData, BadPacketNode> {
 
     @Override
     public void cancel(final Event event, final int type, final HoriPlayer player, final BadPacketData data, final BadPacketNode config) {
-        if (type == 1 || type == 2) {
+        if (type == 1 || type == 2 || type == 5) {
             event.setCancelled(true);
         } else if (type == 3) {
             event.setCancelled(true);
@@ -50,6 +50,9 @@ public class BadPacket extends Module<BadPacketData, BadPacketNode> {
         }
         if (config.typeE_enabled) {
             typeE(event, player, data, config);
+        }
+        if (config.typeF_enabled) {
+            typeF(event, player, data, config);
         }
     }
 
@@ -176,6 +179,27 @@ public class BadPacket extends Module<BadPacketData, BadPacketNode> {
                 this.punish(event, player, data, 4, 5);
             } else {
                 this.reward(4, data, 0.99);
+            }
+        }
+    }
+
+    /**
+     * KineticSneak/BadPacket check.
+     * <p>
+     * Accuracy: 10/10 - Should not have any false positives.
+     * Efficiency: 10/10 - Detects instantly
+     *
+     * @author MrCraftGoo
+     */
+    private void typeF(final Event event, final HoriPlayer player, final BadPacketData data, final BadPacketNode config) {
+        // Inspired by Cipher
+        if (event instanceof ActionEvent) {
+            ActionEvent e = (ActionEvent) event;
+            if (e.action != ActionEvent.Action.STOP_SNEAKING) {
+                return;
+            }
+            if (!player.isSneaking && !player.getPlayer().isSneaking()) {
+                this.punish(event, player, data, 5, 4);
             }
         }
     }

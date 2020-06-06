@@ -57,6 +57,11 @@ public class WrappedBlock_v1_8_R3 implements IWrappedBlock {
     }
 
     @Override
+    public boolean isOccluding() {
+        return this.data.getBlock().isOccluding();
+    }
+
+    @Override
     public Object getData() {
         return this.data;
     }

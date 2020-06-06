@@ -44,7 +44,7 @@ public class Inventory extends Module<InventoryData, InventoryNode> {
     private void typeA(final Event event, final HoriPlayer player, final InventoryData data, final InventoryNode config) {
         if (event instanceof ClientCommandEvent) {
             ClientCommandEvent e = (ClientCommandEvent) event;
-            // In 1.8.8 or lower, client will send this packet when opening player inventory.
+            // In 1.8.8 or lower, the client will send this packet when opening player inventory.
             // However, this won't work in 1.9+.
             if (e.command == ClientCommandEvent.ClientCommand.OPEN_INVENTORY_ACHIEVEMENT) {
                 data.inventoryOpened = data.temporarilyBypass = true;
@@ -52,7 +52,7 @@ public class Inventory extends Module<InventoryData, InventoryNode> {
                 data.legitLocation = player.position;
             }
         } else if (event instanceof WindowClickEvent) {
-            // Client clicked window, so there should be a window opened.
+            // Player clicked a window, so there should be a window opened.
             if (!data.inventoryOpened) {
                 data.temporarilyBypass = true;
                 data.inventoryOpenTick = player.currentTick;
@@ -60,7 +60,7 @@ public class Inventory extends Module<InventoryData, InventoryNode> {
             data.inventoryOpened = true;
             data.legitLocation = player.position;
         } else if (event instanceof WindowCloseEvent) {
-            // Client closed window
+            // Player closed window
             data.inventoryOpened = false;
         } else if (event instanceof CloseWindowEvent) {
             // Server closed window

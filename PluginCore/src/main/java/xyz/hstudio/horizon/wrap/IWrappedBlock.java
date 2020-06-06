@@ -55,6 +55,8 @@ public interface IWrappedBlock {
 
     boolean isLiquid();
 
+    boolean isOccluding();
+
     Object getData();
 
     AABB[] getBoxes(final HoriPlayer player);

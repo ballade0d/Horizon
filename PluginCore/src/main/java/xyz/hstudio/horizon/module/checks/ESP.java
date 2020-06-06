@@ -61,7 +61,8 @@ public class ESP extends Module<ESPData, ESPNode> {
                 }
                 ESPData data = this.getData(observer);
                 if (player.position.distance(observer.position) > config.max_distance ||
-                        !isTargetPosInSight(observer, player.getHeadPosition(), config.check_angle)) {
+                        !isTargetPosInSight(observer, player.getHeadPosition(), config.check_angle) ||
+                        !isTargetPosInSight(observer, player.position.toVector(), config.check_angle)) {
                     // Hide
                     if (data.hiddenPlayers.contains(player.getPlayer().getUniqueId())) {
                         continue;
@@ -95,7 +96,7 @@ public class ESP extends Module<ESPData, ESPNode> {
         }
         ray.multiply(1 / checkTimes);
         for (; checkTimes > 0; checkTimes--) {
-            if (!eyePos.toLocation(observer.world).getBlock().getType().isTransparent()) {
+            if (eyePos.toLocation(observer.world).getBlock().isOccluding()) {
                 return false;
             }
             eyePos.add(ray);

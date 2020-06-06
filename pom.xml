@@ -11,6 +11,7 @@
     <modules>
         <module>KirinServer</module>
         <module>PluginCore</module>
+        <module>Interesting</module>
     </modules>
 
     <properties>

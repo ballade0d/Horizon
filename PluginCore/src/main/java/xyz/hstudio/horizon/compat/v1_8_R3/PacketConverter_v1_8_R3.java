@@ -340,7 +340,7 @@ public class PacketConverter_v1_8_R3 implements IPacketConverter {
         double x = serializer.readShort() / 8000D;
         double y = serializer.readShort() / 8000D;
         double z = serializer.readShort() / 8000D;
-        return new VelocityEvent(player, x, y, z);
+        return new VelocityEvent(player, x, y, z, false);
     }
 
     private Event convertVelocityEvent(final HoriPlayer player, final PacketPlayOutExplosion packet) {
@@ -354,7 +354,7 @@ public class PacketConverter_v1_8_R3 implements IPacketConverter {
         float x = serializer.readFloat();
         float y = serializer.readFloat();
         float z = serializer.readFloat();
-        return new VelocityEvent(player, x, y, z);
+        return new VelocityEvent(player, x, y, z, true);
     }
 
     private Event convertMetaEvent(final HoriPlayer player, final PacketPlayOutEntityMetadata packet) {

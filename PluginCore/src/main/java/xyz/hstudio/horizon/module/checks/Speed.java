@@ -14,6 +14,7 @@ import xyz.hstudio.horizon.events.outbound.AttributeEvent;
 import xyz.hstudio.horizon.file.node.SpeedNode;
 import xyz.hstudio.horizon.module.Module;
 import xyz.hstudio.horizon.thread.Sync;
+import xyz.hstudio.horizon.util.BlockUtils;
 import xyz.hstudio.horizon.util.MathUtils;
 import xyz.hstudio.horizon.util.enums.MatUtils;
 import xyz.hstudio.horizon.util.wrap.Vector3D;
@@ -388,7 +389,8 @@ public class Speed extends Module<SpeedData, SpeedNode> {
             MoveEvent e = (MoveEvent) event;
 
             if (player.isFlying() || e.onGround || player.onGround || e.isTeleport || e.knockBack != null || !e.touchingFaces.isEmpty() ||
-                    e.piston || !player.touchingFaces.isEmpty() || player.getVehicle() != null || e.isInLiquidStrict) {
+                    e.piston || player.getVehicle() != null || e.isInLiquidStrict || BlockUtils.blockNearbyIsSolid(e.to) ||
+                    BlockUtils.blockNearbyIsSolid(e.to.add(0, 1, 0))) {
                 return;
             }
 

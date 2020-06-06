@@ -80,6 +80,27 @@ public final class BlockUtils {
         return type.isSolid() || SOLID.contains(type);
     }
 
+    public static boolean blockNearbyIsSolid(final Location loc) {
+        Set<IWrappedBlock> sample = new HashSet<>();
+        sample.add(loc.add(0, 0, 1).getBlock());
+        sample.add(loc.add(1, 0, 0).getBlock());
+        sample.add(loc.add(0, 0, -1).getBlock());
+        sample.add(loc.add(0, 0, -1).getBlock());
+        sample.add(loc.add(-1, 0, 0).getBlock());
+        sample.add(loc.add(-1, 0, 0).getBlock());
+        sample.add(loc.add(0, 0, 1).getBlock());
+        sample.add(loc.add(0, 0, 1).getBlock());
+        for (IWrappedBlock b : sample) {
+            if (b == null) {
+                continue;
+            }
+            if (b.isSolid()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static Set<IWrappedBlock> getBlocksInLocation(final Location loc) {
         Set<IWrappedBlock> blocks = new HashSet<>();
         blocks.add(loc.add(0.3, 0, 0).getBlock());
