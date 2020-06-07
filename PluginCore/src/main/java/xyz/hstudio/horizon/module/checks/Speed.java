@@ -308,6 +308,14 @@ public class Speed extends Module<SpeedData, SpeedNode> {
         return value;
     }
 
+    /**
+     * A Sprint check.
+     * <p>
+     * Accuracy: 9/10 - It may have some rare false positives.
+     * Efficiency: 10/10 - Detects Sprint hacks instantly.
+     *
+     * @author MrCraftGoo
+     */
     private void typeB(final Event event, final HoriPlayer player, final SpeedData data, final SpeedNode config) {
         if (event instanceof MoveEvent) {
             MoveEvent e = (MoveEvent) event;
@@ -369,7 +377,7 @@ public class Speed extends Module<SpeedData, SpeedNode> {
     private void typeC(final Event event, final HoriPlayer player, final SpeedData data, final SpeedNode config) {
         if (event instanceof MoveEvent) {
             MoveEvent e = (MoveEvent) event;
-            if (e.isTeleport || e.knockBack != null) {
+            if (e.isTeleport || e.knockBack != null || e.piston) {
                 return;
             }
             if (e.strafeNormally) {
@@ -402,13 +410,17 @@ public class Speed extends Module<SpeedData, SpeedNode> {
             double magnitude = e.oldFriction * prevSpeed - 0.026001;
 
             if (move.lengthSquared() > 0.05 && deltaAngle > 0.2) {
-                // Punish
-                this.punish(event, player, data, 5, 2);
+                if (++data.typeDFails > 1) {
+                    // Punish
+                    this.punish(event, player, data, 5, 1, "t:a");
+                }
             } else if (prevMove.lengthSquared() > 0.01 && move.length() < magnitude) {
                 // Punish
-                this.punish(event, player, data, 5, 2);
+                this.punish(event, player, data, 5, 1, "t:b");
+            } else if (data.typeDFails > 0) {
+                data.typeDFails--;
             } else {
-                reward(5, data, 0.995);
+                reward(5, data, 0.999);
             }
         }
     }

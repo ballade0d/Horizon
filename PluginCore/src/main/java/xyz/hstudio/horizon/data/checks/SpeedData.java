@@ -20,4 +20,5 @@ public class SpeedData extends Data {
     public int sprintFails;
     // Strafe
     public int typeCFails;
+    public int typeDFails;
 }

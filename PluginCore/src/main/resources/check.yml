@@ -124,7 +124,7 @@ invalidmotion:
   allowed_client_blocks: 2
   predict:
     enabled: true
-    tolerance: 0.001
+    tolerance: 0.01
   step:
     enabled: true
   packet:

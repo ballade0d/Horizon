@@ -13,7 +13,7 @@ public class InvalidMotionNode extends CheckNode {
     @Load(path = "predict.enabled")
     public boolean predict_enabled = true;
     @Load(path = "predict.tolerance")
-    public double predict_tolerance = 0.001;
+    public double predict_tolerance = 0.01;
     // TypeB
     @Load(path = "step.enabled")
     public boolean step_enabled = true;

@@ -38,6 +38,9 @@ public class LangFile extends AbstractFile {
     @Load(path = "cmd_bot_wrong_usage")
     public String cmd_bot_wrong_usage = "Usage: /horizon bot <player> <time>";
 
+    @Load(path = "cmd_reload")
+    public String cmd_reload = "Reloaded successfully.";
+
     @Load(path = "cmd_player_not_found")
     public String cmd_player_not_found = "The player is not online.";
     @Load(path = "cmd_unknown")

@@ -182,7 +182,7 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
                     if (Math.abs(discrepancy) > config.predict_tolerance && (deltaY < Math.min(estimatedVelocity, 0) || deltaY > Math.max(estimatedVelocity, 0)) && player.currentTick > 20) {
                         // Punish
                         this.punish(event, player, data, 0, Math.abs(discrepancy) * 5F,
-                                "d:" + deltaY, "e:" + estimatedVelocity, "r:" + player.velocity.y, "t:l");
+                                "d:" + deltaY, "e:" + estimatedVelocity, "p:" + player.velocity.y, "t:l");
                     } else {
                         reward(0, data, 0.999);
                     }

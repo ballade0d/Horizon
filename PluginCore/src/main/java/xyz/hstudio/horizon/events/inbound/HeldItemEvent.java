@@ -13,11 +13,10 @@ public class HeldItemEvent extends Event {
     }
 
     @Override
-    public boolean pre() {
+    public void post() {
         player.heldSlot = this.slot;
         player.isEating = false;
         player.isPullingBow = false;
         player.isBlocking = false;
-        return true;
     }
 }

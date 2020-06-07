@@ -22,6 +22,8 @@ permissions:
     default: op
   horizon.cmd.kick:
     default: op
+  horizon.cmd.reload:
+    default: op
   horizon.notify:
     default: op
   horizon.verbose:

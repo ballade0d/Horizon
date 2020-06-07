@@ -12,10 +12,10 @@ import java.util.Arrays;
 
 public class PlayerViolateEvent extends Event implements Cancellable {
 
-    private static final HandlerList HANDLERS = new HandlerList();
+    private static final HandlerList HANDLER_LIST = new HandlerList();
 
     public static HandlerList getHandlerList() {
-        return HANDLERS;
+        return HANDLER_LIST;
     }
 
     @Getter
@@ -43,7 +43,7 @@ public class PlayerViolateEvent extends Event implements Cancellable {
         this.player = player;
         this.type = type;
         this.module = module;
-        this.debug = Arrays.toString(debug);
+        this.debug = debug.length == 0 ? "" : Arrays.toString(debug);
         this.nowViolation = nowViolation;
         this.oldViolation = oldViolation;
         this.cancelled = false;
@@ -51,6 +51,6 @@ public class PlayerViolateEvent extends Event implements Cancellable {
 
     @Override
     public HandlerList getHandlers() {
-        return HANDLERS;
+        return HANDLER_LIST;
     }
 }

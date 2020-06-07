@@ -219,7 +219,7 @@ public class MoveEvent extends Event {
     }
 
     private Vector3D checkKnockBack() {
-        final List<Pair<Vector3D, Long>> velocities = player.velocities;
+        final List<Pair<Vector3D, Long[]>> velocities = player.velocities;
         if (velocities.size() <= 0) {
             return null;
         }
@@ -236,12 +236,13 @@ public class MoveEvent extends Event {
         double baseMultiplier = flying ? (10 * player.getPlayer().getFlySpeed()) : (5 * player.getPlayer().getWalkSpeed() * (1 + player.getPotionEffectAmplifier("SPEED") * 0.2));
         double maxDiscrepancy = weirdConstant * baseMultiplier * sprintMultiplier + 0.003;
 
-        Pair<Vector3D, Long> kb;
+        Pair<Vector3D, Long[]> kb;
         for (int kbIndex = 0, size = velocities.size(); kbIndex < size; kbIndex++) {
             kb = velocities.get(kbIndex);
 
-            int timeDiff = (int) (time - kb.value);
-            if (timeDiff > ping + 300) {
+            long timeDiff = time - kb.value[0];
+            long tickDiff = player.currentTick - kb.value[1];
+            if (timeDiff > ping + 300 && tickDiff > (ping + 300) / 50) {
                 failedKnockBack = true;
                 expiredKbs++;
                 continue;

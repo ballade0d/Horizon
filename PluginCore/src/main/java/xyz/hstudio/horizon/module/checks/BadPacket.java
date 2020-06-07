@@ -59,7 +59,7 @@ public class BadPacket extends Module<BadPacketData, BadPacketNode> {
     /**
      * A FreeCam/Freeze check. It can detect players from not sending movement packet.
      * <p>
-     * Accuracy: 10/10 - Should not have any false positive.
+     * Accuracy: 10/10 - No flags
      * Efficiency: 8/10 - Detects related hacks fast.
      *
      * @author MrCraftGoo
@@ -74,10 +74,8 @@ public class BadPacket extends Module<BadPacketData, BadPacketNode> {
             // If player didn't send move packets in 2 sec (KeepAlive Interval)
             // but send KeepAlive packets, the player is definitely cheating.
             if (player.currentTick == data.lastTick) {
-                // Punish
-                this.punish(event, player, data, 0, 5);
-            } else {
-                reward(0, data, 0.99);
+                // Only teleports player, don't flag
+                Sync.teleport(player, player.position);
             }
             data.lastTick = player.currentTick;
         }
@@ -195,11 +193,14 @@ public class BadPacket extends Module<BadPacketData, BadPacketNode> {
         // Inspired by Cipher
         if (event instanceof ActionEvent) {
             ActionEvent e = (ActionEvent) event;
-            if (e.action != ActionEvent.Action.STOP_SNEAKING) {
-                return;
-            }
-            if (!player.isSneaking && !player.getPlayer().isSneaking()) {
-                this.punish(event, player, data, 5, 4);
+            if (e.action == ActionEvent.Action.START_SNEAKING) {
+                if (player.isSneaking && player.getPlayer().isSneaking()) {
+                    this.punish(event, player, data, 5, 4);
+                }
+            } else if (e.action == ActionEvent.Action.STOP_SNEAKING) {
+                if (!player.isSneaking && !player.getPlayer().isSneaking()) {
+                    this.punish(event, player, data, 5, 4);
+                }
             }
         }
     }

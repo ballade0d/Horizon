@@ -28,7 +28,7 @@ public class VelocityEvent extends Event {
         if (additive) {
             return;
         }
-        player.velocities.add(new Pair<>(new Vector3D(x, y, z), System.currentTimeMillis()));
+        player.velocities.add(new Pair<>(new Vector3D(x, y, z), new Long[]{System.currentTimeMillis(), player.currentTick}));
         if (useExplosionPacket) {
             this.setCancelled(true);
             player.sendPacket(McAccessor.INSTANCE.createExplosionPacket(this.x, this.y, this.z));

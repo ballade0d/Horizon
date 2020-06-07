@@ -1,6 +1,7 @@
 package xyz.hstudio.horizon.thread;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import org.apache.commons.io.IOUtils;
 import xyz.hstudio.horizon.Horizon;
 import xyz.hstudio.horizon.module.Module;
 import xyz.hstudio.horizon.util.DateUtils;
@@ -56,12 +57,7 @@ public class Async implements Runnable {
             if (oldLog.exists()) {
                 FileInputStream input = new FileInputStream(oldLog);
                 GZIPOutputStream output = new GZIPOutputStream(new FileOutputStream(new File(logs, date + "-" + count + ".log.gz")));
-                byte[] buf = new byte[1024];
-                int len;
-                while ((len = input.read(buf)) > 0) {
-                    output.write(buf, 0, len);
-                }
-                output.finish();
+                IOUtils.copy(input, output);
                 output.close();
                 input.close();
                 oldLog.delete();

@@ -120,8 +120,7 @@ public final class BlockUtils {
      *
      * @author Islandscout, MrCraftGoo
      */
-    public static Set<BlockFace> checkTouchingBlock(final HoriPlayer player, final AABB box,
-                                                    final World world, final double borderSize) {
+    public static Set<BlockFace> checkTouchingBlock(final HoriPlayer player, final AABB box, final World world, final double borderSize) {
         Vector3D min = new Vector3D(box.minX - borderSize, box.minY - borderSize, box.minZ - borderSize);
         Vector3D max = new Vector3D(box.maxX + borderSize, box.maxY + borderSize, box.maxZ + borderSize);
         Set<BlockFace> directions = EnumSet.noneOf(BlockFace.class);

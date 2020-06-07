@@ -1,8 +1,10 @@
 package xyz.hstudio.horizon.util.wrap;
 
+import org.bukkit.Effect;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.util.NumberConversions;
+import org.bukkit.util.Vector;
 import xyz.hstudio.horizon.wrap.IWrappedBlock;
 
 import java.util.ArrayList;
@@ -235,6 +237,18 @@ public class AABB {
 
     public Vector3D getMax() {
         return new Vector3D(maxX, maxY, maxZ);
+    }
+
+    public void highlight(World world, double accuracy) {
+        for (double x = minX; x <= maxX; x += accuracy) {
+            for (double y = minY; y <= maxY; y += accuracy) {
+                for (double z = minZ; z <= maxZ; z += accuracy) {
+                    Vector position = new Vector(x, y, z);
+                    world.playEffect(position.toLocation(world), Effect.COLOURED_DUST, 1);
+                    world.playEffect(position.toLocation(world), Effect.COLOURED_DUST, 1);
+                }
+            }
+        }
     }
 
     @Override

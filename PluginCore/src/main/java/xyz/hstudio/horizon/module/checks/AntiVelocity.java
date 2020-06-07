@@ -41,7 +41,7 @@ public class AntiVelocity extends Module<AntiVelocityData, AntiVelocityNode> {
     private void typeA(final Event event, final HoriPlayer player, final AntiVelocityData data, final AntiVelocityNode config) {
         if (event instanceof MoveEvent) {
             MoveEvent e = (MoveEvent) event;
-            if (e.failedKnockBack && !e.isTeleport) {
+            if (e.failedKnockBack && !e.isTeleport && player.getVehicle() == null) {
                 // Punish
                 this.punish(event, player, data, 0, 4);
             } else {

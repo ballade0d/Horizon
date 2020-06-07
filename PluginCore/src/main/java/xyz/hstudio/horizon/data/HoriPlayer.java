@@ -59,7 +59,7 @@ public class HoriPlayer {
     public float friction;
     public double prevPrevDeltaY;
     public Vector3D velocity = new Vector3D(0, 0, 0);
-    public final List<Pair<Vector3D, Long>> velocities = new LinkedList<>();
+    public final List<Pair<Vector3D, Long[]>> velocities = new LinkedList<>();
     public Location teleportLoc;
     public long teleportTime;
     public final Map<Location, ClientBlock> clientBlocks = new ConcurrentHashMap<>();
