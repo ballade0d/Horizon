@@ -65,6 +65,7 @@ public class HoriPlayer {
     public final Map<Location, ClientBlock> clientBlocks = new ConcurrentHashMap<>();
     public List<AttributeEvent.AttributeModifier> moveModifiers = new ArrayList<>();
     public Set<AABB> piston = new ConcurrentSet<>();
+    public Set<Material> collidingBlocks = EnumSet.noneOf(Material.class);
     public Set<BlockFace> touchingFaces = EnumSet.noneOf(BlockFace.class);
     public Location prevClientBlock;
     public int clientBlockCount;

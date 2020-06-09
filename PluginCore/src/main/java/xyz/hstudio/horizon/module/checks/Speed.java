@@ -90,14 +90,13 @@ public class Speed extends Module<SpeedData, SpeedNode> {
                 return;
             }
             InteractItemEvent e = (InteractItemEvent) event;
-            if (e.interactType != InteractItemEvent.InteractType.START_USE_ITEM &&
-                    e.interactType != InteractItemEvent.InteractType.RELEASE_USE_ITEM) {
-                return;
+            if (e.interactType == InteractItemEvent.InteractType.RELEASE_USE_ITEM ||
+                    (e.interactType == InteractItemEvent.InteractType.START_USE_ITEM && e.useItem)) {
+                if (player.currentTick == data.lastUseTick) {
+                    this.punish(event, player, data, 1, config.noslow_packet_vl, config.noslow_always_cancel, "t:p1");
+                }
+                data.lastUseTick = player.currentTick;
             }
-            if (player.currentTick == data.lastUseTick) {
-                this.punish(event, player, data, 1, config.noslow_packet_vl, config.noslow_always_cancel, "t:p1");
-            }
-            data.lastUseTick = player.currentTick;
         } else if (event instanceof ActionEvent && noSlowEnabled) {
             if (player.protocol != 47) {
                 return;
@@ -172,7 +171,7 @@ public class Speed extends Module<SpeedData, SpeedNode> {
                 float friction = e.oldFriction;
                 float maxForce = this.computeMaxInputForce(player, e.newFriction, usingItem);
 
-                Set<Material> touchedBlocks = e.cube.add(-e.velocity.x, -e.velocity.y, -e.velocity.z).getMaterials(e.to.world);
+                Set<Material> touchedBlocks = player.collidingBlocks;
 
                 double multipliers = 1;
                 if (e.hitSlowdown) {
@@ -387,7 +386,7 @@ public class Speed extends Module<SpeedData, SpeedNode> {
             }
             if (++data.typeCFails > config.strafe_threshold) {
                 // Punish
-                this.punish(event, player, data, 4, 2, "t:a");
+                this.punish(event, player, data, 4, 2);
             }
         }
     }
@@ -397,8 +396,8 @@ public class Speed extends Module<SpeedData, SpeedNode> {
             MoveEvent e = (MoveEvent) event;
 
             if (player.isFlying() || e.onGround || player.onGround || e.isTeleport || e.knockBack != null || !e.touchingFaces.isEmpty() ||
-                    e.piston || player.getVehicle() != null || e.isInLiquidStrict || BlockUtils.blockNearbyIsSolid(e.to) ||
-                    BlockUtils.blockNearbyIsSolid(e.to.add(0, 1, 0))) {
+                    e.piston || player.getVehicle() != null || e.isInLiquidStrict || !e.collidingBlocks.isEmpty() ||
+                    BlockUtils.blockNearbyIsSolid(e.to) || BlockUtils.blockNearbyIsSolid(e.to.add(0, 1, 0))) {
                 return;
             }
 

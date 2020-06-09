@@ -5,7 +5,6 @@ import xyz.hstudio.horizon.data.HoriPlayer;
 import xyz.hstudio.horizon.data.checks.NoSwingData;
 import xyz.hstudio.horizon.events.Event;
 import xyz.hstudio.horizon.events.inbound.BlockBreakEvent;
-import xyz.hstudio.horizon.events.inbound.BlockPlaceEvent;
 import xyz.hstudio.horizon.events.inbound.InteractEntityEvent;
 import xyz.hstudio.horizon.events.inbound.SwingEvent;
 import xyz.hstudio.horizon.file.node.NoSwingNode;
@@ -61,17 +60,6 @@ public class NoSwing extends Module<NoSwingData, NoSwingNode> {
         } else if (event instanceof BlockBreakEvent) {
             BlockBreakEvent e = (BlockBreakEvent) event;
             if (e.digType != BlockBreakEvent.DigType.COMPLETE) {
-                return;
-            }
-            if (data.interactSwingExpected) {
-                this.punish(event, player, data, 1, 5);
-            } else {
-                reward(1, data, 0.999);
-            }
-            data.interactSwingExpected = true;
-        } else if (event instanceof BlockPlaceEvent) {
-            BlockPlaceEvent e = (BlockPlaceEvent) event;
-            if (e.placeType != BlockPlaceEvent.PlaceType.PLACE_BLOCK) {
                 return;
             }
             if (data.interactSwingExpected) {

@@ -387,7 +387,7 @@ public class MoveEvent extends Event {
 
         long now = System.currentTimeMillis();
         if (player.teleportLoc != null) {
-            if (player.teleportLoc.world.equals(this.to.world) && this.to.distanceSquared(player.teleportLoc) < 0.01) {
+            if (player.teleportLoc.world.equals(this.to.world) && this.to.distanceSquared(player.teleportLoc) < 0.001) {
                 if (now - player.teleportTime > McAccessor.INSTANCE.getPing(player.getPlayer()) - 50) {
                     player.position = player.teleportLoc;
                     player.lastTeleportAcceptTick = player.currentTick;
@@ -418,6 +418,7 @@ public class MoveEvent extends Event {
         player.friction = this.newFriction;
         player.prevPrevDeltaY = player.velocity.y;
         player.velocity = this.velocity;
+        player.collidingBlocks = this.collidingBlocks;
         player.touchingFaces = this.touchingFaces;
         player.isInLiquidStrict = this.isInLiquidStrict;
         player.isInLiquid = this.isInLiquid;

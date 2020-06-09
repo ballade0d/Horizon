@@ -119,9 +119,9 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
                 } else if (levitation > 0) {
                     // Handle levitation potion effect
                     estimatedVelocity = prevEstimatedVelocity + (0.05F * levitation - prevEstimatedVelocity) * 0.2F;
-                } else if (e.collidingBlocks.contains(MatUtils.COBWEB.parse())) {
+                } else if (player.collidingBlocks.contains(MatUtils.COBWEB.parse())) {
                     // Handle Cobweb
-                    estimatedVelocity = (prevEstimatedVelocity * 0.98F - 0.0784F) * 0.05F;
+                    estimatedVelocity = (prevEstimatedVelocity - 0.08F) * 0.98F * 0.05F;
                 } else if (inLadder(e.collidingBlocks) || (feetBlock != null &&
                         (feetBlock.getType() == Material.LADDER ||
                                 feetBlock.getType() == Material.VINE))) {

@@ -14,17 +14,20 @@ public class InteractItemEvent extends Event {
     public final Hand hand;
     public final InteractType interactType;
 
+    public final boolean useItem;
+
     public InteractItemEvent(final HoriPlayer player, final ItemStack itemStack, final Hand hand, final InteractType interactType) {
         super(player);
         this.itemStack = itemStack;
         this.hand = hand;
         this.interactType = interactType;
+
+        this.useItem = checkUseItem();
     }
 
-    @Override
-    public void post() {
+    private boolean checkUseItem() {
         if (this.itemStack == null) {
-            return;
+            return false;
         }
         Player bPlayer = player.getPlayer();
         Material mat = this.itemStack.getType();
@@ -34,18 +37,22 @@ public class InteractItemEvent extends Event {
             // Player can still eat golden apple even if they're full.
             if (mat.isEdible() && (bPlayer.getFoodLevel() < 20 || mat == Material.GOLDEN_APPLE || mat == MatUtils.ENCHANTED_GOLDEN_APPLE.parse())) {
                 player.isEating = true;
+                return true;
             }
             if (mat == Material.BOW && bPlayer.getInventory().contains(Material.ARROW)) {
                 player.isPullingBow = true;
+                return true;
             }
             if (MatUtils.BLOCKABLE.contains(mat)) {
                 player.isBlocking = true;
+                return true;
             }
         } else {
             player.isEating = false;
             player.isPullingBow = false;
             player.isBlocking = false;
         }
+        return false;
     }
 
     public enum Hand {

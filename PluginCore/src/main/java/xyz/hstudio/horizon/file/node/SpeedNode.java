@@ -28,7 +28,7 @@ public class SpeedNode extends CheckNode {
     @Load(path = "strafe.enabled")
     public boolean strafe_enabled = true;
     @Load(path = "strafe.threshold")
-    public int strafe_threshold = 1;
+    public int strafe_threshold = 2;
 
     public SpeedNode load(final String pathPrefix, final YamlLoader loader) {
         return AbstractFile.load(pathPrefix, this, loader);
