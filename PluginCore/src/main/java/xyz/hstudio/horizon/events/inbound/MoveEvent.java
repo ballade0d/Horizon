@@ -51,6 +51,7 @@ public class MoveEvent extends Event {
     public final float oldFriction;
     public final float newFriction;
     public final boolean piston;
+    public final Set<Material> touchedBlocks;
     public final Set<Material> collidingBlocks;
     public final Set<BlockFace> touchingFaces;
     public final boolean stepLegitly;
@@ -69,7 +70,8 @@ public class MoveEvent extends Event {
         this.onGround = onGround;
         this.velocity = new Vector3D(to.x - from.x, to.y - from.y, to.z - from.z);
         // Get player's bounding box and move it to the update position.
-        this.cube = McAccessor.INSTANCE.getCube(player.getPlayer()).add(this.velocity);
+        AABB originCube = McAccessor.INSTANCE.getCube(player.getPlayer());
+        this.cube = originCube.add(this.velocity);
         this.updatePos = updatePos;
         this.updateRot = updateRot;
         this.moveType = moveType;
@@ -99,6 +101,7 @@ public class MoveEvent extends Event {
 
         this.piston = this.checkBlock();
 
+        this.touchedBlocks = originCube.add(from.toVector().subtract(player.getPlayer().getLocation().toVector())).getMaterials(to.world);
         // This will only get the blocks that are colliding horizontally.
         this.collidingBlocks = this.cube.add(-0.0001, 0.0001, -0.0001, 0.0001, 0, 0.0001).getMaterials(to.world);
 
@@ -418,7 +421,6 @@ public class MoveEvent extends Event {
         player.friction = this.newFriction;
         player.prevPrevDeltaY = player.velocity.y;
         player.velocity = this.velocity;
-        player.collidingBlocks = this.collidingBlocks;
         player.touchingFaces = this.touchingFaces;
         player.isInLiquidStrict = this.isInLiquidStrict;
         player.isInLiquid = this.isInLiquid;

@@ -3,7 +3,6 @@ import xyz.hstudio.horizon.module.checks.*;
 public class Shit {
 
     public Shit() {
-        new AntiBot();
         new AntiVelocity();
         new AutoClicker();
         new BadPacket();

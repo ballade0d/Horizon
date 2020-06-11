@@ -171,7 +171,7 @@ public class Speed extends Module<SpeedData, SpeedNode> {
                 float friction = e.oldFriction;
                 float maxForce = this.computeMaxInputForce(player, e.newFriction, usingItem);
 
-                Set<Material> touchedBlocks = player.collidingBlocks;
+                Set<Material> touchedBlocks = e.touchedBlocks;
 
                 double multipliers = 1;
                 if (e.hitSlowdown) {
@@ -395,8 +395,8 @@ public class Speed extends Module<SpeedData, SpeedNode> {
         if (event instanceof MoveEvent) {
             MoveEvent e = (MoveEvent) event;
 
-            if (player.isFlying() || e.onGround || player.onGround || e.isTeleport || e.knockBack != null || !e.touchingFaces.isEmpty() ||
-                    e.piston || player.getVehicle() != null || e.isInLiquidStrict || !e.collidingBlocks.isEmpty() ||
+            if (player.isFlying() || e.onGround || player.onGround || e.isTeleport || e.knockBack != null ||
+                    !e.touchingFaces.isEmpty() || e.piston || player.getVehicle() != null || e.isInLiquidStrict ||
                     BlockUtils.blockNearbyIsSolid(e.to) || BlockUtils.blockNearbyIsSolid(e.to.add(0, 1, 0))) {
                 return;
             }
@@ -414,8 +414,10 @@ public class Speed extends Module<SpeedData, SpeedNode> {
                     this.punish(event, player, data, 5, 1, "t:a");
                 }
             } else if (prevMove.lengthSquared() > 0.01 && move.length() < magnitude) {
-                // Punish
-                this.punish(event, player, data, 5, 1, "t:b");
+                if (++data.typeDFails > 1) {
+                    // Punish
+                    this.punish(event, player, data, 5, 1, "t:b");
+                }
             } else if (data.typeDFails > 0) {
                 data.typeDFails--;
             } else {

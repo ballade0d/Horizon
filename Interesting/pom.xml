@@ -15,7 +15,7 @@
         <dependency>
             <artifactId>PluginCore</artifactId>
             <groupId>xyz.hstudio</groupId>
-            <version>BETA10</version>
+            <version>BETA11</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

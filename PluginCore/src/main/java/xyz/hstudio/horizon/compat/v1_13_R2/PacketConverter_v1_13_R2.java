@@ -304,8 +304,6 @@ public class PacketConverter_v1_13_R2 implements IPacketConverter {
             return convertCloseWindowEvent(player, (PacketPlayOutCloseWindow) packet);
         } else if (packet instanceof PacketPlayOutUpdateAttributes) {
             return convertAttributeEvent(player, (PacketPlayOutUpdateAttributes) packet);
-        } else if (packet instanceof PacketPlayOutEntity) {
-            return convertUpdatePosEvent(player, (PacketPlayOutEntity) packet);
         } else if (packet instanceof PacketPlayOutUpdateHealth) {
             return convertUpdateHealthEvent(player, (PacketPlayOutUpdateHealth) packet);
         } else if (packet instanceof PacketPlayOutEntityDestroy) {
@@ -422,21 +420,6 @@ public class PacketConverter_v1_13_R2 implements IPacketConverter {
         } catch (Exception e) {
             return null;
         }
-    }
-
-    private Event convertUpdatePosEvent(final HoriPlayer player, final PacketPlayOutEntity packet) {
-        PacketDataSerializer serializer = new PacketDataSerializer(Unpooled.buffer(16));
-        try {
-            packet.b(serializer);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        int id = serializer.g();
-        Entity nmsEntity = ((CraftWorld) player.position.world).getHandle().getEntity(id);
-        if (!(nmsEntity instanceof EntityPlayer)) {
-            return null;
-        }
-        return new UpdatePosEvent(player, packet);
     }
 
     private Event convertUpdateHealthEvent(final HoriPlayer player, final PacketPlayOutUpdateHealth packet) {

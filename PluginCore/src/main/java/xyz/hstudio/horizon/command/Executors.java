@@ -219,7 +219,7 @@ public class Executors {
         @Cmd(name = "reload", perm = "horizon.cmd.reload", onlyPlayer = false)
         public void reload(final CommandSender sender, final String[] args, final String prefix, final LangFile lang) {
             Horizon.getInst().reload();
-            sender.sendMessage(lang.cmd_reload);
+            sender.sendMessage(prefix + lang.cmd_reload);
         }
     }
 
