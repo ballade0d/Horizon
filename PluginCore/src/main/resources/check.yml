@@ -42,16 +42,6 @@ badpacket:
     15:
       - 'horizon notify %player% is kicked for sending bad packets'
       - 'horizon kick %player% Invalid packets.'
-esp:
-  enabled: true
-  # Unused in this check
-  cancel_vl: 0
-  disable_worlds: []
-  update_interval: 2
-  check_angle: false
-  max_distance: 80.0
-  # Unused in this check
-  action: {}
 groundspoof:
   enabled: true
   cancel_vl: 0

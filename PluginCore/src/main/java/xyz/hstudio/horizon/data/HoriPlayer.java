@@ -37,7 +37,6 @@ public class HoriPlayer {
     public final AntiVelocityData antiVelocityData = new AntiVelocityData();
     public final AutoClickerData autoClickerData = new AutoClickerData();
     public final BadPacketData badPacketData = new BadPacketData();
-    public final ESPData espData = new ESPData();
     public final GroundSpoofData groundSpoofData = new GroundSpoofData();
     public final HitBoxData hitBoxData = new HitBoxData();
     public final InvalidMotionData invalidMotionData = new InvalidMotionData();

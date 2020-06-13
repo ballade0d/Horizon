@@ -36,7 +36,7 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
     @Override
     public void cancel(final Event event, final int type, final HoriPlayer player, final InvalidMotionData data, final InvalidMotionNode config) {
         event.setCancelled(true);
-        Sync.teleport(player, type == 1 ? data.safeLoc : player.position);
+        Sync.teleport(player, type == 1 && data.safeLoc != null ? data.safeLoc : player.position);
     }
 
     @Override
@@ -244,10 +244,6 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
             }
             double deltaY = e.velocity.y;
 
-            if (deltaY == 0) {
-                data.safeLoc = e.to;
-            }
-
             if ((deltaY > 0.6 || deltaY < -0.0784) && e.onGround && player.onGround) {
                 // Punish
                 this.punish(event, player, data, 1, 4, "d:" + deltaY, "t:a");
@@ -257,6 +253,10 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
                 this.punish(event, player, data, 1, 3, "d:" + deltaY, "t:b");
             } else {
                 reward(1, data, 0.99);
+            }
+
+            if (deltaY == 0) {
+                data.safeLoc = e.to;
             }
         }
     }
