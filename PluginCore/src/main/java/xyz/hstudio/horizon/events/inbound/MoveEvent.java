@@ -316,7 +316,7 @@ public class MoveEvent extends Event {
                 this.touchingFaces.contains(BlockFace.NORTH) || this.touchingFaces.contains(BlockFace.SOUTH) ||
                 this.touchingFaces.contains(BlockFace.WEST) || this.touchingFaces.contains(BlockFace.EAST) ||
                 this.collidingBlocks.contains(Material.LADDER) || this.collidingBlocks.contains(Material.VINE) ||
-                this.isCollidingEntities) {
+                this.isCollidingEntities || player.isGliding || player.invalidMotionData.prevGliding) {
             return true;
         }
         IWrappedBlock footBlock = player.position.add(0, -1, 0).getBlock();

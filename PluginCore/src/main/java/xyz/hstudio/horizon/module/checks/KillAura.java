@@ -353,7 +353,7 @@ public class KillAura extends Module<KillAuraData, KillAuraNode> {
     /**
      * A KeepSprint check.
      * <p>
-     * Accuracy: 8/10 - May have some falses.
+     * Accuracy: 10/10 - Haven't found any false positives.
      * Efficiency: 9/10 - Detects on second hit.
      *
      * @author FrozenAnarchy

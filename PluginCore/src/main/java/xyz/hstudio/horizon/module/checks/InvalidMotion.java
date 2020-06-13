@@ -131,7 +131,7 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
                     // Normal Air function
                     estimatedVelocity = (prevEstimatedVelocity - gravity) * 0.98F;
                 }
-                if (Math.abs(estimatedVelocity) < 0.005 && estimatedVelocity != 0) {
+                if (Math.abs(estimatedVelocity) < 0.005 && estimatedVelocity != 0 && deltaY <= 0) {
                     estimatedVelocity = deltaY;
                 }
                 if (player.currentTick - player.lastTeleportAcceptTick < 2) {
@@ -173,7 +173,7 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
                 }
 
                 // Fix a weird bug in 1.9+
-                if (deltaY < 0 && player.prevPrevDeltaY >= 0 && MathUtils.distance2d(e.to.x - e.from.x, e.to.z - e.from.z) < 0.1) {
+                if (deltaY < 0 && player.prevPrevDeltaY >= 0 && MathUtils.distance2d(e.to.x - e.from.x, e.to.z - e.from.z) < 0.001) {
                     estimatedVelocity = deltaY;
                 }
 
