@@ -43,6 +43,7 @@ public class Scaffold extends Module<ScaffoldData, ScaffoldNode> {
         if (config.direction_enabled) {
             typeB(event, player, data, config);
         }
+        // TODO: More checks
     }
 
     /**

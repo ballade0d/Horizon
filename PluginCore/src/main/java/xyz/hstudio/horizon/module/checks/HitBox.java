@@ -11,8 +11,8 @@ import xyz.hstudio.horizon.events.inbound.InteractEntityEvent;
 import xyz.hstudio.horizon.events.inbound.MoveEvent;
 import xyz.hstudio.horizon.file.node.HitBoxNode;
 import xyz.hstudio.horizon.module.Module;
+import xyz.hstudio.horizon.thread.Sync;
 import xyz.hstudio.horizon.util.MathUtils;
-import xyz.hstudio.horizon.util.collect.Pair;
 import xyz.hstudio.horizon.util.wrap.AABB;
 import xyz.hstudio.horizon.util.wrap.Location;
 import xyz.hstudio.horizon.util.wrap.Vector3D;
@@ -35,13 +35,6 @@ public class HitBox extends Module<HitBoxData, HitBoxNode> {
 
     @Override
     public void doCheck(final Event event, final HoriPlayer player, final HitBoxData data, final HitBoxNode config) {
-        if (event instanceof MoveEvent) {
-            MoveEvent e = (MoveEvent) event;
-            data.history.add(new Pair<>(e.to, System.currentTimeMillis()));
-            if (data.history.size() > 30) {
-                data.history.remove(0);
-            }
-        }
         if (config.reach_enabled) {
             typeA(event, player, data, config);
         }
@@ -72,11 +65,9 @@ public class HitBox extends Module<HitBoxData, HitBoxNode> {
                 return;
             }
 
-            Location targetPos = target.position;
-            if (this.getData(target).history.size() != 0) {
-                // Get the history position to avoid false positives.
-                targetPos = this.getData(target).getHistoryLocation(McAccessor.INSTANCE.getPing(player.getPlayer()), true);
-            }
+            // Get the history position to avoid false positives.
+            Location targetPos = Sync.getHistoryLocation(McAccessor.INSTANCE.getPing(player.getPlayer()), target.getPlayer());
+
             Vector3D move = targetPos.toVector().subtract(target.position.toVector());
             AABB targetCube = McAccessor.INSTANCE.getCube(e.entity).add(move);
 
@@ -118,11 +109,9 @@ public class HitBox extends Module<HitBoxData, HitBoxNode> {
             Vector3D dir = player.position.getDirection();
             Vector3D extraDir = MathUtils.getDirection(player.position.yaw + data.deltaYaw, player.position.pitch + data.deltaPitch);
 
-            Location targetPos = target.position;
-            if (this.getData(target).history.size() != 0) {
-                // Get the history position to avoid false positives.
-                targetPos = this.getData(target).getHistoryLocation(McAccessor.INSTANCE.getPing(player.getPlayer()), true);
-            }
+            // Get the history position to avoid false positives.
+            Location targetPos = Sync.getHistoryLocation(McAccessor.INSTANCE.getPing(player.getPlayer()), target.getPlayer());
+
             Vector3D move = targetPos.toVector().subtract(target.position.toVector());
             AABB targetCube = McAccessor.INSTANCE.getCube(e.entity).add(move);
             targetCube = targetCube.expand(config.direction_box_expansion, config.direction_box_expansion, config.direction_box_expansion);

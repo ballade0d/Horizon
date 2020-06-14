@@ -255,7 +255,7 @@ public class MoveEvent extends Event {
                 double y = kbVelocity.y;
 
                 if (!((touchingFaces.contains(BlockFace.UP) && y > 0) || (touchingFaces.contains(BlockFace.DOWN) && y < 0)) &&
-                        Math.abs(y - velocity.y) > 0.1 &&
+                        Math.abs(y - velocity.y) > 0.01 &&
                         !jump && !player.isInLiquid && !this.stepLegitly) {
                     continue;
                 }

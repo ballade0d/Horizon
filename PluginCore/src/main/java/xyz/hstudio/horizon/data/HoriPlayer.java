@@ -203,7 +203,7 @@ public class HoriPlayer {
             return;
         }
         for (Map.Entry<Runnable, Long> entry : this.simulatedCmds.entrySet()) {
-            if (currTime - entry.getValue() < McAccessor.INSTANCE.getPing(player)) {
+            if (currTime - entry.getValue() < McAccessor.INSTANCE.getPing(player) + 100) {
                 continue;
             }
             entry.getKey().run();
