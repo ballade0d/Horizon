@@ -5,7 +5,7 @@
     <parent>
         <artifactId>Horizon</artifactId>
         <groupId>xyz.hstudio</groupId>
-        <version>BETA12</version>
+        <version>BETA13</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -15,7 +15,7 @@
         <dependency>
             <artifactId>PluginCore</artifactId>
             <groupId>xyz.hstudio</groupId>
-            <version>BETA12</version>
+            <version>BETA13</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
