@@ -126,6 +126,7 @@ public class Horizon extends JavaPlugin {
         new KillAura();
         new KillAuraBot();
         new NoSwing();
+        new Scaffold();
         new Interact();
         new Speed();
         new Timer();

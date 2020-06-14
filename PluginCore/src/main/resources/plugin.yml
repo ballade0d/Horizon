@@ -63,6 +63,8 @@ permissions:
         default: false
       horizon.bypass.noswing:
         default: false
+      horizon.bypass.scaffold:
+        default: false
       horizon.bypass.speed:
         default: false
       horizon.bypass.timer:

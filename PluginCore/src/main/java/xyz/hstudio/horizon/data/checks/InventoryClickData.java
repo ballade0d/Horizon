@@ -1,58 +1,18 @@
 package xyz.hstudio.horizon.data.checks;
 
-import lombok.RequiredArgsConstructor;
 import org.bukkit.Material;
-import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryType;
-import org.bukkit.inventory.Inventory;
 import xyz.hstudio.horizon.data.Data;
-import xyz.hstudio.horizon.events.inbound.SyncWindowClickEvent;
-
-import java.util.ArrayDeque;
-import java.util.Deque;
-import java.util.function.BiConsumer;
 
 public class InventoryClickData extends Data {
 
     // TypeA
-    public int averageHeuristicMisclicks;
-    public Deque<ClickData> deque = new ArrayDeque<>(15);
-    // TypeB
     public long lastClickTime;
     public int lastRawSlot;
     public Material lastMaterial;
-    // TypeC
+    // TypeB
     public long lastClickOnItem;
-    public int typeCFails;
-
-    public boolean bufferObject(final ClickData object) {
-        this.deque.push(object);
-        return this.deque.size() >= 15;
-    }
-
-    public void clearLastTwoObjectsIteration(final BiConsumer<ClickData, ClickData> lastObjectsConsumer) {
-        if (!this.deque.isEmpty()) {
-            ClickData last = this.deque.pop();
-            ClickData current;
-            while (!this.deque.isEmpty()) {
-                current = this.deque.pop();
-                lastObjectsConsumer.accept(last, current);
-                last = current;
-            }
-        }
-    }
-
-    @RequiredArgsConstructor
-    public static class ClickData {
-        public final long timeStamp = System.currentTimeMillis();
-        public final Inventory inventory;
-        public final double[] slotLocation;
-        public final ClickType clickType;
-
-        public static ClickData fromClickEvent(final SyncWindowClickEvent e) {
-            return new ClickData(e.clickedInventory, locateSlot(e.rawSlot, e.clickedInventory.getType()), e.click);
-        }
-    }
+    public int typeBFails;
 
     public static double distanceBetweenSlots(final int rawSlotOne, final int rawSlotTwo, final InventoryType inventoryType) {
         double[] locationOfFirstClick = locateSlot(rawSlotOne, inventoryType);

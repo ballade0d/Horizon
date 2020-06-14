@@ -2,7 +2,6 @@ package xyz.hstudio.horizon.module.checks;
 
 import org.bukkit.GameMode;
 import org.bukkit.Material;
-import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 import xyz.hstudio.horizon.api.ModuleType;
 import xyz.hstudio.horizon.data.HoriPlayer;
@@ -12,9 +11,6 @@ import xyz.hstudio.horizon.events.inbound.SyncWindowClickEvent;
 import xyz.hstudio.horizon.events.inbound.WindowCloseEvent;
 import xyz.hstudio.horizon.file.node.InventoryClickNode;
 import xyz.hstudio.horizon.module.Module;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class InventoryClick extends Module<InventoryClickData, InventoryClickNode> {
 
@@ -40,9 +36,6 @@ public class InventoryClick extends Module<InventoryClickData, InventoryClickNod
         if (config.typeB_enabled) {
             typeB(event, player, data, config);
         }
-        if (config.typeC_enabled) {
-            typeC(event, player, data, config);
-        }
         if (event instanceof SyncWindowClickEvent) {
             SyncWindowClickEvent e = (SyncWindowClickEvent) event;
             data.lastClickTime = System.currentTimeMillis();
@@ -55,66 +48,6 @@ public class InventoryClick extends Module<InventoryClickData, InventoryClickNod
     }
 
     private void typeA(final Event event, final HoriPlayer player, final InventoryClickData data, final InventoryClickNode config) {
-        if (event instanceof SyncWindowClickEvent) {
-            SyncWindowClickEvent e = (SyncWindowClickEvent) event;
-            if (e.click != ClickType.DROP && e.click != ClickType.RIGHT && e.click != ClickType.LEFT &&
-                    e.click != ClickType.SHIFT_LEFT && e.click != ClickType.SHIFT_RIGHT) {
-                return;
-            }
-            if (player.getPlayer().getGameMode() != GameMode.SURVIVAL &&
-                    player.getPlayer().getGameMode() != GameMode.ADVENTURE) {
-                return;
-            }
-            if (e.getCurrentItem() == null || e.getCurrentItem().getType() == Material.AIR) {
-                data.averageHeuristicMisclicks++;
-            } else if (data.lastMaterial != e.getCurrentItem().getType() &&
-                    data.bufferObject(InventoryClickData.ClickData.fromClickEvent(e))) {
-                List<Long> betweenClicks = new ArrayList<>();
-                data.clearLastTwoObjectsIteration((youngElement, oldElement) -> {
-                    if (oldElement.inventory.equals(youngElement.inventory)) {
-                        betweenClicks.add(youngElement.timeStamp - oldElement.timeStamp);
-                    }
-                });
-
-                if (betweenClicks.size() < 8) {
-                    data.averageHeuristicMisclicks = 0;
-                    return;
-                }
-
-                double sum = 0;
-                for (long betweenClick : betweenClicks) {
-                    sum += betweenClick;
-                }
-
-                double average = sum / betweenClicks.size();
-                double squaredErrorsSum = 0;
-                for (long betweenClick : betweenClicks) {
-                    squaredErrorsSum += squaredError(average, betweenClick);
-                }
-
-                double vl = 40000 / (squaredErrorsSum + 1);
-
-                double ticks = average / 50;
-                double averageMultiplier = 1.65 + ticks * (-0.171127 + (0.00709709 - 0.000102881 * ticks) * ticks);
-                vl *= Math.max(averageMultiplier, 0.5);
-                vl /= (data.averageHeuristicMisclicks + 1);
-                vl = vl < 6 ? 0 : (int) Math.min(vl, 30);
-
-                if (vl > 0) {
-                    this.punish(e, player, data, 0, (float) vl, "se:" + squaredErrorsSum, "a:" + average, "mc:" + data.averageHeuristicMisclicks);
-                }
-
-                data.averageHeuristicMisclicks = 0;
-            }
-        }
-    }
-
-    private double squaredError(final double reference, final double value) {
-        double error = value - reference;
-        return error * error;
-    }
-
-    private void typeB(final Event event, final HoriPlayer player, final InventoryClickData data, final InventoryClickNode config) {
         if (event instanceof SyncWindowClickEvent) {
             SyncWindowClickEvent e = (SyncWindowClickEvent) event;
             if (player.getPlayer().getGameMode() != GameMode.SURVIVAL &&
@@ -190,7 +123,7 @@ public class InventoryClick extends Module<InventoryClickData, InventoryClickNod
         }
     }
 
-    private void typeC(final Event event, final HoriPlayer player, final InventoryClickData data, final InventoryClickNode config) {
+    private void typeB(final Event event, final HoriPlayer player, final InventoryClickData data, final InventoryClickNode config) {
         if (event instanceof WindowCloseEvent) {
             WindowCloseEvent e = (WindowCloseEvent) event;
             if (player.getPlayer().getGameMode() != GameMode.SURVIVAL &&
@@ -202,11 +135,11 @@ public class InventoryClick extends Module<InventoryClickData, InventoryClickNod
             }
             long passedTime = System.currentTimeMillis() - data.lastClickOnItem;
             if (passedTime <= 70) {
-                if (++data.typeCFails > 4) {
+                if (++data.typeBFails > 4) {
                     this.punish(e, player, data, 2, 5, "t:" + passedTime);
                 }
-            } else if (data.typeCFails > 0) {
-                data.typeCFails--;
+            } else if (data.typeBFails > 0) {
+                data.typeBFails--;
             }
         }
     }

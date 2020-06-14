@@ -5,16 +5,16 @@ import xyz.hstudio.horizon.file.CheckNode;
 import xyz.hstudio.horizon.file.Load;
 import xyz.hstudio.horizon.util.wrap.YamlLoader;
 
-public class InventoryClickNode extends CheckNode {
+public class ScaffoldNode extends CheckNode {
 
     // TypeA
-    @Load(path = "typeA.enabled")
-    public boolean typeA_enabled = true;
+    @Load(path = "order.enabled")
+    public boolean order_enabled = true;
     // TypeB
-    @Load(path = "typeB.enabled")
-    public boolean typeB_enabled = true;
+    @Load(path = "direction.enabled")
+    public boolean direction_enabled = true;
 
-    public InventoryClickNode load(final String pathPrefix, final YamlLoader loader) {
+    public ScaffoldNode load(final String pathPrefix, final YamlLoader loader) {
         return AbstractFile.load(pathPrefix, this, loader);
     }
 }

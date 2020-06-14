@@ -7,6 +7,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPistonExtendEvent;
+import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.*;
 import xyz.hstudio.horizon.Horizon;
@@ -100,6 +101,22 @@ public class Listeners implements Listener {
         AABB aabb = new AABB(-0.1, -0.1, -0.1, 1.1, 1.1, 1.1)
                 .add(0, 0, 0, length * face.getModX(), length * face.getModY(), length * face.getModZ())
                 .add(pos);
+        Horizon.PLAYERS
+                .values()
+                .stream()
+                .filter(p -> p.world.equals(e.getBlock().getWorld()))
+                .forEach(p -> p.piston.add(aabb));
+    }
+
+    @EventHandler
+    public void onPistonRetract(final BlockPistonRetractEvent e) {
+        int length = e.getBlocks().size() + 1;
+        BlockFace face = e.getDirection();
+        Vector3D pos = new Vector3D(e.getBlock().getX(), e.getBlock().getY(), e.getBlock().getZ());
+        AABB aabb = new AABB(-0.1, -0.1, -0.1, 1.1, 1.1, 1.1)
+                .add(0, 0, 0, length * face.getModX(), length * face.getModY(), length * face.getModZ())
+                .add(pos);
+        aabb.highlight(e.getBlock().getWorld(), 0.3);
         Horizon.PLAYERS
                 .values()
                 .stream()

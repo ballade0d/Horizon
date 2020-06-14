@@ -131,7 +131,7 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
                     // Normal Air function
                     estimatedVelocity = (prevEstimatedVelocity - gravity) * 0.98F;
                 }
-                if (Math.abs(estimatedVelocity) < 0.005 && estimatedVelocity != 0 && deltaY <= 0) {
+                if (Math.abs(estimatedVelocity) < 0.005 && estimatedVelocity != 0 && deltaY <= 0 && !e.touchedBlocks.contains(MatUtils.COBWEB.parse())) {
                     estimatedVelocity = deltaY;
                 }
                 if (player.currentTick - player.lastTeleportAcceptTick < 2) {
@@ -195,7 +195,7 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
                     } else {
                         reward(0, data, 0.999);
                     }
-                    data.estimatedVelocity = e.collidingBlocks.contains(MatUtils.COBWEB.parse()) ?
+                    data.estimatedVelocity = e.touchedBlocks.contains(MatUtils.COBWEB.parse()) ?
                             0 : estimatedVelocity;
                 }
             } else {

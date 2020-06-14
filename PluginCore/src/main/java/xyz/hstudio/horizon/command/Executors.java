@@ -221,7 +221,7 @@ public class Executors {
                 return cmds
                         .stream()
                         .map(pair -> pair.key.name())
-                        .filter(name -> name.startsWith(args[0]))
+                        .filter(name -> name.startsWith(args[0].toLowerCase()))
                         .sorted()
                         .collect(Collectors.toList());
             } else {

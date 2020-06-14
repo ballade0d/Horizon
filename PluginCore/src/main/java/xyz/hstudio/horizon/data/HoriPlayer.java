@@ -44,6 +44,7 @@ public class HoriPlayer {
     public final KillAuraBotData killAuraBotData = new KillAuraBotData();
     public final KillAuraData killAuraData = new KillAuraData();
     public final NoSwingData noSwingData = new NoSwingData();
+    public final ScaffoldData scaffoldData = new ScaffoldData();
     public final InteractData interactData = new InteractData();
     public final SpeedData speedData = new SpeedData();
     public final TimerData timerData = new TimerData();

@@ -126,8 +126,6 @@ inventoryclick:
     enabled: true
   typeB:
     enabled: true
-  typeC:
-    enabled: true
   action:
     8:
       - 'horizon notify %player% might be clicking inventory too fast'
@@ -223,6 +221,20 @@ noswing:
     10:
       - 'horizon notify %player% is kicked for using NoSwing'
       - 'horizon kick %player% Did not swing arm.'
+scaffold:
+  enabled: true
+  cancel_vl: 0
+  disable_worlds: []
+  order:
+    enabled: true
+  direction:
+    enabled: true
+  action:
+    10:
+      - 'horizon notify %player% might be using Scaffold'
+    16:
+      - 'horizon notify %player% is kicked for using Scaffold'
+      - 'horizon kick %player% Scaffold.'
 speed:
   enabled: true
   cancel_vl: 1
