@@ -1,5 +1,6 @@
 package xyz.hstudio.horizon.events.inbound;
 
+import xyz.hstudio.horizon.compat.McAccessor;
 import xyz.hstudio.horizon.data.HoriPlayer;
 import xyz.hstudio.horizon.events.Event;
 import xyz.hstudio.horizon.events.outbound.AttributeEvent;
@@ -25,6 +26,15 @@ public class ActionEvent extends Event {
             case START_SPRINTING:
                 player.isSprinting = true;
                 player.moveModifiers.add(new AttributeEvent.AttributeModifier(AttributeEvent.SPRINT_UUID, 0.3, 2));
+
+                // God damn mojang
+                if (player.isEating || player.isPullingBow || player.isBlocking) {
+                    McAccessor.INSTANCE.ensureMainThread(() -> {
+                        McAccessor.INSTANCE.releaseItem(player.getPlayer());
+                        player.getPlayer().updateInventory();
+                    });
+                    player.isEating = player.isPullingBow = player.isBlocking = false;
+                }
                 break;
             case STOP_SPRINTING:
                 player.isSprinting = false;

@@ -38,8 +38,10 @@ public class Speed extends Module<SpeedData, SpeedNode> {
     @Override
     public void cancel(final Event event, final int type, final HoriPlayer player, final SpeedData data, final SpeedNode config) {
         if (type == 2 && (player.isEating || player.isPullingBow || player.isBlocking)) {
-            McAccessor.INSTANCE.releaseItem(player.getPlayer());
-            player.getPlayer().updateInventory();
+            McAccessor.INSTANCE.ensureMainThread(() -> {
+                McAccessor.INSTANCE.releaseItem(player.getPlayer());
+                player.getPlayer().updateInventory();
+            });
         } else if (type == 1) {
             event.setCancelled(true);
             if (event instanceof MoveEvent) {

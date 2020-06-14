@@ -29,8 +29,10 @@ public class BadPacket extends Module<BadPacketData, BadPacketNode> {
             event.setCancelled(true);
             Sync.teleport(player, data.legitLocation);
         } else if (type == 4) {
-            McAccessor.INSTANCE.releaseItem(player.getPlayer());
-            player.getPlayer().updateInventory();
+            McAccessor.INSTANCE.ensureMainThread(() -> {
+                McAccessor.INSTANCE.releaseItem(player.getPlayer());
+                player.getPlayer().updateInventory();
+            });
         }
     }
 

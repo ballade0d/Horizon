@@ -17,7 +17,6 @@ import xyz.hstudio.horizon.compat.McAccessor;
 import xyz.hstudio.horizon.data.checks.*;
 import xyz.hstudio.horizon.events.outbound.AttributeEvent;
 import xyz.hstudio.horizon.file.LangFile;
-import xyz.hstudio.horizon.menu.AbstractMenu;
 import xyz.hstudio.horizon.network.ChannelHandler;
 import xyz.hstudio.horizon.util.collect.Pair;
 import xyz.hstudio.horizon.util.enums.Version;
@@ -83,7 +82,6 @@ public class HoriPlayer {
     public int vehicle = -1;
     public long leaveVehicleTick = -1;
     public ChannelPipeline pipeline;
-    public AbstractMenu prevMenu;
 
     public HoriPlayer(final Player player) {
         Version viaVer = Horizon.getInst().useViaVer ?
