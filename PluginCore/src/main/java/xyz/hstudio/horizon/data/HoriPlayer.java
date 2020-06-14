@@ -39,6 +39,7 @@ public class HoriPlayer {
     public final GroundSpoofData groundSpoofData = new GroundSpoofData();
     public final HitBoxData hitBoxData = new HitBoxData();
     public final InvalidMotionData invalidMotionData = new InvalidMotionData();
+    public final InventoryClickData inventoryClickData = new InventoryClickData();
     public final InventoryData inventoryData = new InventoryData();
     public final KillAuraBotData killAuraBotData = new KillAuraBotData();
     public final KillAuraData killAuraData = new KillAuraData();

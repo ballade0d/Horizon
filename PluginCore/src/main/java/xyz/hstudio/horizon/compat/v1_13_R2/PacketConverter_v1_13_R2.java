@@ -4,8 +4,10 @@ import io.netty.buffer.Unpooled;
 import net.minecraft.server.v1_13_R2.*;
 import org.apache.commons.lang3.ArrayUtils;
 import org.bukkit.craftbukkit.v1_13_R2.CraftWorld;
+import org.bukkit.craftbukkit.v1_13_R2.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_13_R2.inventory.CraftInventoryPlayer;
 import org.bukkit.craftbukkit.v1_13_R2.inventory.CraftItemStack;
+import org.bukkit.inventory.Inventory;
 import xyz.hstudio.horizon.compat.IPacketConverter;
 import xyz.hstudio.horizon.data.HoriPlayer;
 import xyz.hstudio.horizon.events.Event;
@@ -273,7 +275,9 @@ public class PacketConverter_v1_13_R2 implements IPacketConverter {
     }
 
     private Event convertWindowCloseEvent(final HoriPlayer player, final PacketPlayInCloseWindow packet) {
-        return new WindowCloseEvent(player);
+        Inventory inventory = ((CraftPlayer) player.getPlayer()).getHandle().activeContainer
+                .getBukkitView().getTopInventory();
+        return new WindowCloseEvent(player, inventory);
     }
 
     private Event convertClientCommandEvent(final HoriPlayer player, final PacketPlayInClientCommand packet) {

@@ -7,11 +7,14 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPistonExtendEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.*;
 import xyz.hstudio.horizon.Horizon;
 import xyz.hstudio.horizon.compat.McAccessor;
 import xyz.hstudio.horizon.data.HoriPlayer;
+import xyz.hstudio.horizon.events.inbound.SyncWindowClickEvent;
 import xyz.hstudio.horizon.kirin.module.CControl;
+import xyz.hstudio.horizon.module.Module;
 import xyz.hstudio.horizon.util.wrap.AABB;
 import xyz.hstudio.horizon.util.wrap.Location;
 import xyz.hstudio.horizon.util.wrap.Vector3D;
@@ -102,5 +105,19 @@ public class Listeners implements Listener {
                 .stream()
                 .filter(p -> p.world.equals(e.getBlock().getWorld()))
                 .forEach(p -> p.piston.add(aabb));
+    }
+
+    // TODO: Make this async?
+    @EventHandler
+    public void onInventoryClick(final InventoryClickEvent e) {
+        if (!(e.getWhoClicked() instanceof Player)) {
+            return;
+        }
+        HoriPlayer player = Horizon.PLAYERS.get(e.getWhoClicked().getUniqueId());
+        if (player == null) {
+            return;
+        }
+        SyncWindowClickEvent event = new SyncWindowClickEvent(player, e.getView(), e.getSlotType(), e.getRawSlot(), e.getClick(), e.getAction(), e.getHotbarButton());
+        Module.doCheck(event, player);
     }
 }

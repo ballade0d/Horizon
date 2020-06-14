@@ -53,6 +53,8 @@ permissions:
         default: false
       horizon.bypass.invalidmotion:
         default: false
+      horizon.bypass.inventoryclick:
+        default: false
       horizon.bypass.inventory:
         default: false
       horizon.bypass.killaura:

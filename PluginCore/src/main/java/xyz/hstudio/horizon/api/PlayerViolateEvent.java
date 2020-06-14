@@ -2,6 +2,7 @@ package xyz.hstudio.horizon.api;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
@@ -35,7 +36,7 @@ public class PlayerViolateEvent extends Event implements Cancellable {
     private boolean cancelled;
 
     public PlayerViolateEvent(final Player player, final ModuleType type, final String module, final String[] debug, final float nowViolation, final float oldViolation) {
-        super(true);
+        super(!Bukkit.isPrimaryThread());
         if (Arrays.stream(Thread.currentThread().getStackTrace())
                 .noneMatch(element -> element.getClassName().equals(Module.class.getName()))) {
             throw new IllegalStateException("This event should not be instantiated here.");

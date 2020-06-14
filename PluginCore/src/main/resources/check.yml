@@ -118,6 +118,22 @@ invalidmotion:
     40:
       - 'horizon notify %player% is kicked for moving unexpectedly'
       - 'horizon kick %player% Moving unexpectedly.'
+inventoryclick:
+  enabled: true
+  cancel_vl: 0
+  disable_worlds: []
+  typeA:
+    enabled: true
+  typeB:
+    enabled: true
+  typeC:
+    enabled: true
+  action:
+    8:
+      - 'horizon notify %player% might be clicking inventory too fast'
+    16:
+      - 'horizon notify %player% is kicked for clicking inventory too fast'
+      - 'horizon kick %player% Inventory click'
 inventory:
   enabled: true
   cancel_vl: 0

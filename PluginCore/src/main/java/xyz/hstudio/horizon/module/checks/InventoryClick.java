@@ -1,0 +1,222 @@
+package xyz.hstudio.horizon.module.checks;
+
+import org.bukkit.GameMode;
+import org.bukkit.Material;
+import org.bukkit.event.inventory.ClickType;
+import org.bukkit.inventory.ItemStack;
+import xyz.hstudio.horizon.api.ModuleType;
+import xyz.hstudio.horizon.data.HoriPlayer;
+import xyz.hstudio.horizon.data.checks.InventoryClickData;
+import xyz.hstudio.horizon.events.Event;
+import xyz.hstudio.horizon.events.inbound.SyncWindowClickEvent;
+import xyz.hstudio.horizon.events.inbound.WindowCloseEvent;
+import xyz.hstudio.horizon.file.node.InventoryClickNode;
+import xyz.hstudio.horizon.module.Module;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class InventoryClick extends Module<InventoryClickData, InventoryClickNode> {
+
+    public InventoryClick() {
+        super(ModuleType.InventoryClick, new InventoryClickNode(), "TypeA", "TypeB");
+    }
+
+    @Override
+    public InventoryClickData getData(final HoriPlayer player) {
+        return player.inventoryClickData;
+    }
+
+    @Override
+    public void cancel(final Event event, final int type, final HoriPlayer player, final InventoryClickData data, final InventoryClickNode config) {
+        event.setCancelled(true);
+    }
+
+    @Override
+    public void doCheck(final Event event, final HoriPlayer player, final InventoryClickData data, final InventoryClickNode config) {
+        if (config.typeA_enabled) {
+            typeA(event, player, data, config);
+        }
+        if (config.typeB_enabled) {
+            typeB(event, player, data, config);
+        }
+        if (config.typeC_enabled) {
+            typeC(event, player, data, config);
+        }
+        if (event instanceof SyncWindowClickEvent) {
+            SyncWindowClickEvent e = (SyncWindowClickEvent) event;
+            data.lastClickTime = System.currentTimeMillis();
+            data.lastRawSlot = e.rawSlot;
+            data.lastMaterial = e.getCurrentItem() == null ? Material.AIR : e.getCurrentItem().getType();
+            if (e.getCurrentItem() != null) {
+                data.lastClickOnItem = System.currentTimeMillis();
+            }
+        }
+    }
+
+    private void typeA(final Event event, final HoriPlayer player, final InventoryClickData data, final InventoryClickNode config) {
+        if (event instanceof SyncWindowClickEvent) {
+            SyncWindowClickEvent e = (SyncWindowClickEvent) event;
+            if (e.click != ClickType.DROP && e.click != ClickType.RIGHT && e.click != ClickType.LEFT &&
+                    e.click != ClickType.SHIFT_LEFT && e.click != ClickType.SHIFT_RIGHT) {
+                return;
+            }
+            if (player.getPlayer().getGameMode() != GameMode.SURVIVAL &&
+                    player.getPlayer().getGameMode() != GameMode.ADVENTURE) {
+                return;
+            }
+            if (e.getCurrentItem() == null || e.getCurrentItem().getType() == Material.AIR) {
+                data.averageHeuristicMisclicks++;
+            } else if (data.lastMaterial != e.getCurrentItem().getType() &&
+                    data.bufferObject(InventoryClickData.ClickData.fromClickEvent(e))) {
+                List<Long> betweenClicks = new ArrayList<>();
+                data.clearLastTwoObjectsIteration((youngElement, oldElement) -> {
+                    if (oldElement.inventory.equals(youngElement.inventory)) {
+                        betweenClicks.add(youngElement.timeStamp - oldElement.timeStamp);
+                    }
+                });
+
+                if (betweenClicks.size() < 8) {
+                    data.averageHeuristicMisclicks = 0;
+                    return;
+                }
+
+                double sum = 0;
+                for (long betweenClick : betweenClicks) {
+                    sum += betweenClick;
+                }
+
+                double average = sum / betweenClicks.size();
+                double squaredErrorsSum = 0;
+                for (long betweenClick : betweenClicks) {
+                    squaredErrorsSum += squaredError(average, betweenClick);
+                }
+
+                double vl = 40000 / (squaredErrorsSum + 1);
+
+                double ticks = average / 50;
+                double averageMultiplier = 1.65 + ticks * (-0.171127 + (0.00709709 - 0.000102881 * ticks) * ticks);
+                vl *= Math.max(averageMultiplier, 0.5);
+                vl /= (data.averageHeuristicMisclicks + 1);
+                vl = vl < 6 ? 0 : (int) Math.min(vl, 30);
+
+                if (vl > 0) {
+                    this.punish(e, player, data, 0, (float) vl, "se:" + squaredErrorsSum, "a:" + average, "mc:" + data.averageHeuristicMisclicks);
+                }
+
+                data.averageHeuristicMisclicks = 0;
+            }
+        }
+    }
+
+    private double squaredError(final double reference, final double value) {
+        double error = value - reference;
+        return error * error;
+    }
+
+    private void typeB(final Event event, final HoriPlayer player, final InventoryClickData data, final InventoryClickNode config) {
+        if (event instanceof SyncWindowClickEvent) {
+            SyncWindowClickEvent e = (SyncWindowClickEvent) event;
+            if (player.getPlayer().getGameMode() != GameMode.SURVIVAL &&
+                    player.getPlayer().getGameMode() != GameMode.ADVENTURE) {
+                return;
+            }
+            if (e.rawSlot == data.lastRawSlot) {
+                return;
+            }
+            int addedVl = 3;
+            int enforcedTicks = 0;
+            switch (e.action) {
+                case NOTHING:
+                case UNKNOWN:
+                case COLLECT_TO_CURSOR:
+                    return;
+                case HOTBAR_SWAP:
+                case HOTBAR_MOVE_AND_READD:
+                    addedVl = 1;
+                    enforcedTicks = 1;
+                    if (InventoryClickData.distanceBetweenSlots(e.rawSlot, data.lastRawSlot, e.clickedInventory.getType()) >= 3) {
+                        return;
+                    }
+                    break;
+
+                case DROP_ALL_SLOT:
+                case DROP_ONE_SLOT:
+                    enforcedTicks = 1;
+                    break;
+                case PICKUP_ALL:
+                case PICKUP_SOME:
+                case PICKUP_HALF:
+                case PICKUP_ONE:
+                case PLACE_ALL:
+                case PLACE_SOME:
+                case PLACE_ONE:
+                    addedVl = 3;
+                    enforcedTicks = (InventoryClickData.distanceBetweenSlots(e.rawSlot, data.lastRawSlot, e.clickedInventory.getType()) < 4) ?
+                            1 :
+                            5;
+                    break;
+                case DROP_ALL_CURSOR:
+                case DROP_ONE_CURSOR:
+                case CLONE_STACK:
+                    enforcedTicks = 2;
+                    break;
+                case MOVE_TO_OTHER_INVENTORY:
+                    if (data.lastMaterial == e.getCurrentItem().getType()) {
+                        return;
+                    }
+                    enforcedTicks = (InventoryClickData.distanceBetweenSlots(e.rawSlot, data.lastRawSlot, e.clickedInventory.getType()) < 4) ?
+                            1 :
+                            2;
+                    break;
+                case SWAP_WITH_CURSOR:
+                    switch (e.slotType) {
+                        case FUEL:
+                        case RESULT:
+                            enforcedTicks = 4;
+                            break;
+                        default:
+                            enforcedTicks = 2;
+                            break;
+                    }
+                    break;
+            }
+
+            int expect = 25 + enforcedTicks * 50;
+            long delta = System.currentTimeMillis() - data.lastClickTime;
+            if (delta < expect) {
+                this.punish(e, player, data, 1, addedVl, "d:" + delta, "e:" + expect);
+            }
+        }
+    }
+
+    private void typeC(final Event event, final HoriPlayer player, final InventoryClickData data, final InventoryClickNode config) {
+        if (event instanceof WindowCloseEvent) {
+            WindowCloseEvent e = (WindowCloseEvent) event;
+            if (player.getPlayer().getGameMode() != GameMode.SURVIVAL &&
+                    player.getPlayer().getGameMode() != GameMode.ADVENTURE) {
+                return;
+            }
+            if (!isInventoryEmpty(e.inventory)) {
+                return;
+            }
+            long passedTime = System.currentTimeMillis() - data.lastClickOnItem;
+            if (passedTime <= 70) {
+                if (++data.typeCFails > 4) {
+                    this.punish(e, player, data, 2, 5, "t:" + passedTime);
+                }
+            } else if (data.typeCFails > 0) {
+                data.typeCFails--;
+            }
+        }
+    }
+
+    private boolean isInventoryEmpty(final org.bukkit.inventory.Inventory inventory) {
+        for (ItemStack content : inventory.getContents()) {
+            if (content != null) {
+                return false;
+            }
+        }
+        return true;
+    }
+}

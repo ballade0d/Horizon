@@ -121,6 +121,7 @@ public class Horizon extends JavaPlugin {
         new HealthTag();
         new HitBox();
         new InvalidMotion();
+        new InventoryClick();
         new Inventory();
         new KillAura();
         new KillAuraBot();
