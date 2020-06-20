@@ -3,8 +3,6 @@ package xyz.hstudio.horizon.data.checks;
 import xyz.hstudio.horizon.data.Data;
 import xyz.hstudio.horizon.util.wrap.Vector3D;
 
-import java.util.UUID;
-
 public class KillAuraData extends Data {
 
     public long lastHitTick = -10000;
@@ -27,10 +25,7 @@ public class KillAuraData extends Data {
     public boolean interactEntity;
     public long lastIntersectTick = -10000;
     // Multi
-    public UUID prevHit;
+    public int prevHit;
     // KeepSprint
     public long failKeepSprintTick;
-    //
-    public long lastHitTime;
-    public int lastDelay;
 }

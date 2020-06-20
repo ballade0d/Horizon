@@ -78,7 +78,7 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
             if (!player.isFlying() && (!e.onGround || !player.onGround) && !e.isTeleport &&
                     !e.jumpLegitly && !e.stepLegitly && e.knockBack == null && !e.piston &&
                     player.currentTick - player.leaveVehicleTick > 1 && player.getVehicle() == null &&
-                    !player.getPlayer().isDead() && !e.isOnSlime && !e.isOnBed && !e.isInLiquid &&
+                    !player.getPlayer().isDead() && !e.isOnBed && !e.isInLiquid &&
                     !player.isInLiquid && !inSpecialBlock(e.collidingBlocks)) {
 
                 int levitation = player.getPotionEffectAmplifier("LEVITATION");
@@ -121,6 +121,7 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
                     estimatedVelocity = prevEstimatedVelocity + (0.05F * levitation - prevEstimatedVelocity) * 0.2F;
                 } else if (e.touchedBlocks.contains(MatUtils.COBWEB.parse())) {
                     // Handle Cobweb
+                    // TODO: Fix this
                     estimatedVelocity = (prevEstimatedVelocity - 0.08F) * 0.98F * 0.05F;
                 } else if (inLadder(e.collidingBlocks) || (feetBlock != null &&
                         (feetBlock.getType() == Material.LADDER ||
@@ -131,7 +132,7 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
                     // Normal Air function
                     estimatedVelocity = (prevEstimatedVelocity - gravity) * 0.98F;
                 }
-                if (Math.abs(estimatedVelocity) < 0.005 && estimatedVelocity != 0 && deltaY <= 0 && !e.touchedBlocks.contains(MatUtils.COBWEB.parse())) {
+                if (Math.abs(estimatedVelocity) < 0.005 && estimatedVelocity != 0 && deltaY <= 0) {
                     estimatedVelocity = deltaY;
                 }
                 if (player.currentTick - player.lastTeleportAcceptTick < 2) {
@@ -164,8 +165,8 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
                 }
 
                 // Idk why but client considers player is not on ground when walking on slime, client bug?
-                if (e.onGroundReally && !e.onGround && deltaY == 0 && BlockUtils
-                        .getBlocksInLocation(e.to.add(0, -0.2, 0))
+                if (deltaY == 0 && BlockUtils
+                        .getBlocksInLocation(e.to.add(0, -0.1, 0))
                         .stream()
                         .filter(Objects::nonNull)
                         .anyMatch(b -> b.getType() == Material.SLIME_BLOCK)) {
@@ -186,7 +187,11 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
                     } else {
                         reward(0, data, 0.999);
                     }
-                    data.estimatedVelocity = 0;
+                    if (e.isOnSlimeNext) {
+                        data.estimatedVelocity = -estimatedVelocity;
+                    } else {
+                        data.estimatedVelocity = 0;
+                    }
                 } else if (e.updatePos && e.velocity.lengthSquared() > 0) {
                     if (Math.abs(discrepancy) > config.predict_tolerance && player.currentTick > 20) {
                         // Punish

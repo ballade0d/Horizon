@@ -10,16 +10,6 @@ antivelocity:
     8:
       - 'horizon notify %player% is kicked for using AntiVelocity'
       - 'horizon kick %player% Did not take knock back.'
-autoclicker:
-  enabled: true
-  cancel_vl: 1
-  disable_worlds: []
-  action:
-    8:
-      - 'horizon notify %player% might be using AutoClicker'
-    12:
-      - 'horizon notify %player% is kicked for using AutoClicker'
-      - 'horizon kick %player% Auto clicker?'
 badpacket:
   enabled: true
   cancel_vl: 0

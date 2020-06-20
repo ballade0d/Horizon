@@ -49,7 +49,6 @@ public class Inventory extends Module<InventoryData, InventoryNode> {
             if (e.command == ClientCommandEvent.ClientCommand.OPEN_INVENTORY_ACHIEVEMENT) {
                 data.inventoryOpened = data.temporarilyBypass = true;
                 data.inventoryOpenTick = player.currentTick;
-                data.legitLocation = player.position;
             }
         } else if (event instanceof WindowClickEvent) {
             // Player clicked a window, so there should be a window opened.
@@ -58,7 +57,6 @@ public class Inventory extends Module<InventoryData, InventoryNode> {
                 data.inventoryOpenTick = player.currentTick;
             }
             data.inventoryOpened = true;
-            data.legitLocation = player.position;
         } else if (event instanceof WindowCloseEvent) {
             // Player closed window
             data.inventoryOpened = false;

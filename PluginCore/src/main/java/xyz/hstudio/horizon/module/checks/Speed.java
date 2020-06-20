@@ -145,7 +145,7 @@ public class Speed extends Module<SpeedData, SpeedNode> {
                 return;
             }
 
-            boolean swimming = player.isInLiquidStrict;
+            boolean swimming = player.isInLiquid;
             boolean usingItem = player.isEating || player.isPullingBow || player.isBlocking;
 
             double estimatedSpeed;
@@ -207,10 +207,13 @@ public class Speed extends Module<SpeedData, SpeedNode> {
                             player.touchingFaces.size() > 0 && e.touchingFaces.size() == 0)) {
                         if (usingItem) {
                             if (noSlowEnabled) {
-                                // Punish
-                                this.punish(event, player, data, 2,
-                                        config.noslow_move_vl == -1 ? (float) (totalDiscrepancy * 10F) : config.noslow_move_vl, config.noslow_always_cancel,
-                                        "s:" + speed, "e:" + estimatedSpeed, "p:" + prevSpeed, "d:" + discrepancy, "s:" + swimming);
+                                if (data.flagNextTick) {
+                                    // Punish
+                                    this.punish(event, player, data, 2,
+                                            config.noslow_move_vl == -1 ? (float) (totalDiscrepancy * 10F) : config.noslow_move_vl, config.noslow_always_cancel,
+                                            "s:" + speed, "e:" + estimatedSpeed, "p:" + prevSpeed, "d:" + discrepancy, "s:" + swimming);
+                                }
+                                data.flagNextTick = true;
                             }
                         } else {
                             // Punish

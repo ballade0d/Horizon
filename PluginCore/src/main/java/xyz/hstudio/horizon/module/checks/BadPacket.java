@@ -27,7 +27,7 @@ public class BadPacket extends Module<BadPacketData, BadPacketNode> {
             event.setCancelled(true);
         } else if (type == 3) {
             event.setCancelled(true);
-            Sync.teleport(player, data.legitLocation);
+            Sync.teleport(player, player.position);
         } else if (type == 4) {
             McAccessor.INSTANCE.ensureMainThread(() -> {
                 McAccessor.INSTANCE.releaseItem(player.getPlayer());
@@ -154,7 +154,6 @@ public class BadPacket extends Module<BadPacketData, BadPacketNode> {
                 this.punish(event, player, data, 3, 6);
             } else {
                 reward(3, data, 0.999);
-                data.legitLocation = e.to;
             }
         }
     }

@@ -14,9 +14,12 @@ public class HeldItemEvent extends Event {
 
     @Override
     public void post() {
-        player.heldSlot = this.slot;
-        player.isEating = false;
-        player.isPullingBow = false;
-        player.isBlocking = false;
+        if (this.slot != player.heldSlot) {
+            player.heldSlot = this.slot;
+            player.isEating = false;
+            player.isPullingBow = false;
+            player.isBlocking = false;
+            player.speedData.flagNextTick = false;
+        }
     }
 }

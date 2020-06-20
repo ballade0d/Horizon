@@ -342,13 +342,13 @@ public class KillAura extends Module<KillAuraData, KillAuraNode> {
             if (player.protocol != 47 || e.action != InteractEntityEvent.InteractType.ATTACK) {
                 return;
             }
-            if (data.lastHitTick == player.currentTick && !e.entity.getUniqueId().equals(data.prevHit)) {
+            if (data.lastHitTick == player.currentTick && e.entity.getEntityId() != data.prevHit) {
                 // Punish
                 this.punish(event, player, data, 6, 5);
             } else {
                 reward(6, data, 0.99);
             }
-            data.prevHit = e.entity.getUniqueId();
+            data.prevHit = e.entity.getEntityId();
         }
     }
 

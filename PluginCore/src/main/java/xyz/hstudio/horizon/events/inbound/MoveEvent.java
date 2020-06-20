@@ -24,7 +24,7 @@ import java.util.Set;
 
 public class MoveEvent extends Event {
 
-    private static final double STRAFE_THRESHOLD = Math.toRadians(0.6);
+    private static final double STRAFE_THRESHOLD = Math.toRadians(0.5);
     private static final String[] ARGS = new String[]{
             "%y_speed%",
             "%xz_speed%",
@@ -44,6 +44,7 @@ public class MoveEvent extends Event {
     public final boolean onGroundReally;
     public final boolean isCollidingEntities;
     public final boolean isOnSlime;
+    public final boolean isOnSlimeNext;
     public final boolean isOnBed;
     public final Vector3D waterFlowForce;
     public final boolean isInLiquidStrict;
@@ -83,6 +84,7 @@ public class MoveEvent extends Event {
         this.isCollidingEntities = McAccessor.INSTANCE.isCollidingEntities(to.world, player.getPlayer(), cube);
 
         this.isOnSlime = this.checkSlime();
+        this.isOnSlimeNext = this.checkSlimeNext();
         this.isOnBed = this.checkBed();
 
         Pair<Vector3D, Boolean> pair = this.computeWaterFlowForce();
@@ -94,7 +96,6 @@ public class MoveEvent extends Event {
                 .getMaterials(to.world)
                 .stream()
                 .anyMatch(MatUtils.LIQUID::contains);
-
 
         this.oldFriction = player.friction;
         this.newFriction = this.computeFriction();
@@ -126,16 +127,22 @@ public class MoveEvent extends Event {
      * @author Islandscout
      */
     private boolean checkSlime() {
-        IWrappedBlock standingOn = this.from.add(0, -0.01, 0).getBlock();
-        IWrappedBlock standingDown = from.add(0, -1, 0).getBlock();
-        if (standingOn == null || standingDown == null ||
-                (standingOn.getType() != Material.SLIME_BLOCK && !((standingOn.getType().name().contains("CARPET") || standingOn.getType().name().contains("TRAPDOOR") || standingOn.getType().name().contains("TRAP_DOOR")) && standingDown.getType() == Material.SLIME_BLOCK))) {
+        IWrappedBlock standingOn = this.from.add(0, -0.2, 0).getBlock();
+        if (standingOn == null || standingOn.getType() != Material.SLIME_BLOCK) {
             return false;
         }
         float deltaY = (float) this.velocity.y;
-        float slimeExpect = (float) (-0.96F * player.prevPrevDeltaY);
-        return !player.isSneaking &&
-                player.velocity.y <= 0 && deltaY > 0 && (deltaY <= slimeExpect || deltaY < 0.2);
+        float slimeExpect = (float) ((-((player.prevPrevDeltaY - 0.08F) * 0.98F) - 0.08F) * 0.98F);
+        return !player.isSneaking && player.onGround && !onGround && deltaY >= 0 && Math.abs(slimeExpect - deltaY) < 0.00001;
+    }
+
+    private boolean checkSlimeNext() {
+        IWrappedBlock standingOn = this.to.add(0, -0.2, 0).getBlock();
+        if (standingOn == null || standingOn.getType() != Material.SLIME_BLOCK) {
+            return false;
+        }
+        float prevDeltaY = (float) player.velocity.y;
+        return !player.isSneaking && onGround && !player.onGround && prevDeltaY < 0;
     }
 
     /**
@@ -328,7 +335,7 @@ public class MoveEvent extends Event {
         if (this.hitSlowdown) {
             prevVelocity.multiply(0.6);
         }
-        if (this.collidingBlocks.contains(Material.SOUL_SAND)) {
+        if (this.touchedBlocks.contains(Material.SOUL_SAND)) {
             prevVelocity.multiply(0.4);
         }
         if (Math.abs(prevVelocity.x * this.oldFriction) < 0.005) {
