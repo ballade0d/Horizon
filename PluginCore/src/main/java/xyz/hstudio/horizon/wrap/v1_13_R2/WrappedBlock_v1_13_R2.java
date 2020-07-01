@@ -97,6 +97,44 @@ public class WrappedBlock_v1_13_R2 implements IWrappedBlock {
                 boxArr[0] = new AABB(x + 0.0625, y, z + 0.0625, x + 0.9375, y + 0.09375, z + 0.9375);
                 return boxArr;
             }
+        } else if (b instanceof BlockLadder) {
+            if (player.protocol == 47) {
+                AABB[] boxArr = new AABB[1];
+                switch (data.get(BlockLadder.FACING)) {
+                    case NORTH:
+                        boxArr[0] = new AABB(0, 0, 0.875, 1, 1, 1);
+                        break;
+                    case SOUTH:
+                        boxArr[0] = new AABB(0, 0, 0, 1, 1, 0.125);
+                        break;
+                    case WEST:
+                        boxArr[0] = new AABB(0.875, 0, 0, 1, 1, 1);
+                        break;
+                    case EAST:
+                    default:
+                        boxArr[0] = new AABB(0, 0, 0, 0.125, 1, 1);
+                        break;
+                }
+                return boxArr;
+            } else {
+                AABB[] boxArr = new AABB[1];
+                switch (data.get(BlockLadder.FACING)) {
+                    case NORTH:
+                        boxArr[0] = new AABB(0, 0, 0.8125, 1, 1, 1);
+                        break;
+                    case SOUTH:
+                        boxArr[0] = new AABB(0, 0, 0, 1, 1, 0.1875);
+                        break;
+                    case WEST:
+                        boxArr[0] = new AABB(0.8125, 0, 0, 1, 1, 1);
+                        break;
+                    case EAST:
+                    default:
+                        boxArr[0] = new AABB(0, 0, 0, 0.1875, 1, 1);
+                        break;
+                }
+                return boxArr;
+            }
         }
 
         VoxelShape voxelShape = data.getCollisionShape(world, bPos);

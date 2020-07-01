@@ -252,7 +252,7 @@ public class MoveEvent extends Event {
 
             long timeDiff = time - kb.value[0];
             long tickDiff = player.currentTick - kb.value[1];
-            if (timeDiff > ping + 300 && tickDiff > (ping + 300) / 50) {
+            if (timeDiff > ping + 200 && tickDiff > (ping + 200) / 50) {
                 failedKnockBack = true;
                 expiredKbs++;
                 continue;
@@ -323,7 +323,8 @@ public class MoveEvent extends Event {
                 this.touchingFaces.contains(BlockFace.NORTH) || this.touchingFaces.contains(BlockFace.SOUTH) ||
                 this.touchingFaces.contains(BlockFace.WEST) || this.touchingFaces.contains(BlockFace.EAST) ||
                 this.collidingBlocks.contains(Material.LADDER) || this.collidingBlocks.contains(Material.VINE) ||
-                this.isCollidingEntities || player.isGliding || player.invalidMotionData.prevGliding) {
+                this.isCollidingEntities || player.isGliding || player.invalidMotionData.prevGliding ||
+                player.currentTick - player.speedData.lastIdleTick <= 2) {
             return true;
         }
         IWrappedBlock footBlock = player.position.add(0, -1, 0).getBlock();
@@ -397,7 +398,8 @@ public class MoveEvent extends Event {
 
         long now = System.currentTimeMillis();
         if (player.teleportLoc != null) {
-            if (player.teleportLoc.world.equals(this.to.world) && this.to.distanceSquared(player.teleportLoc) < 0.001) {
+            if (!onGround && player.teleportLoc.world.equals(this.to.world) &&
+                    this.to.distanceSquared(player.teleportLoc) < 0.001) {
                 if (now - player.teleportTime > McAccessor.INSTANCE.getPing(player.getPlayer()) - 50) {
                     player.position = player.teleportLoc;
                     player.lastTeleportAcceptTick = player.currentTick;
@@ -435,6 +437,10 @@ public class MoveEvent extends Event {
         if (onGroundReally) {
             player.clientBlockCount = 0;
             player.prevClientBlock = null;
+        }
+
+        if (!updatePos) {
+            player.speedData.lastIdleTick = player.currentTick;
         }
     }
 

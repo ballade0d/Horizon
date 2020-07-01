@@ -1,8 +1,6 @@
 package xyz.hstudio.horizon.thread;
 
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
+import xyz.hstudio.horizon.Horizon;
 import xyz.hstudio.horizon.data.HoriPlayer;
 import xyz.hstudio.horizon.util.collect.Pair;
 import xyz.hstudio.horizon.util.wrap.Location;
@@ -16,7 +14,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class Sync implements Runnable {
 
     private static final Map<HoriPlayer, Location> pendingTeleports = new ConcurrentHashMap<>();
-    private static final Map<Entity, List<Pair<Location, Long>>> trackedEntities = new ConcurrentHashMap<>();
+    private static final Map<HoriPlayer, List<Pair<Location, Long>>> trackedEntities = new ConcurrentHashMap<>();
 
     public static void teleport(final HoriPlayer player, final Location to) {
         if (player == null || to == null) {
@@ -32,10 +30,10 @@ public class Sync implements Runnable {
         }
         pendingTeleports.clear();
 
-        for (Player p : Bukkit.getOnlinePlayers()) {
+        for (HoriPlayer p : Horizon.PLAYERS.values()) {
             List<Pair<Location, Long>> times = trackedEntities.getOrDefault(p, new CopyOnWriteArrayList<>());
             long currTime = System.currentTimeMillis();
-            times.add(new Pair<>(new Location(p.getLocation()), currTime));
+            times.add(new Pair<>(p.position, currTime));
             if (times.size() > 20) {
                 times.remove(0);
             }
@@ -43,10 +41,10 @@ public class Sync implements Runnable {
         }
     }
 
-    public static Location getHistoryLocation(final int time, final Entity entity) {
-        List<Pair<Location, Long>> times = trackedEntities.get(entity);
+    public static Location getHistoryLocation(final int time, final HoriPlayer player) {
+        List<Pair<Location, Long>> times = trackedEntities.get(player);
         if (times == null || times.size() == 0) {
-            return new Location(entity.getLocation());
+            return player.position;
         }
         long currentTime = System.currentTimeMillis();
         int rewindTime = time + 175;

@@ -18,6 +18,7 @@ public class Ray implements Cloneable {
         return origin.add(direction.multiply(distance));
     }
 
+    @Override
     public Ray clone() {
         Ray clone;
         try {

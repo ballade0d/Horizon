@@ -22,4 +22,5 @@ public class SpeedData extends Data {
     // Strafe
     public int typeCFails;
     public int typeDFails;
+    public long lastIdleTick;
 }

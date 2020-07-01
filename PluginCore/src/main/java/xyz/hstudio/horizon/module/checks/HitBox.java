@@ -66,7 +66,7 @@ public class HitBox extends Module<HitBoxData, HitBoxNode> {
             }
 
             // Get the history position to avoid false positives.
-            Location targetPos = Sync.getHistoryLocation(McAccessor.INSTANCE.getPing(player.getPlayer()), target.getPlayer());
+            Location targetPos = Sync.getHistoryLocation(McAccessor.INSTANCE.getPing(player.getPlayer()), target);
 
             Vector3D move = targetPos.toVector().subtract(target.position.toVector());
             AABB targetCube = McAccessor.INSTANCE.getCube(e.entity).add(move);
@@ -110,7 +110,7 @@ public class HitBox extends Module<HitBoxData, HitBoxNode> {
             Vector3D extraDir = MathUtils.getDirection(player.position.yaw + data.deltaYaw, player.position.pitch + data.deltaPitch);
 
             // Get the history position to avoid false positives.
-            Location targetPos = Sync.getHistoryLocation(McAccessor.INSTANCE.getPing(player.getPlayer()), target.getPlayer());
+            Location targetPos = Sync.getHistoryLocation(McAccessor.INSTANCE.getPing(player.getPlayer()), target);
 
             Vector3D move = targetPos.toVector().subtract(target.position.toVector());
             AABB targetCube = McAccessor.INSTANCE.getCube(e.entity).add(move);

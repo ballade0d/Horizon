@@ -4,6 +4,7 @@ import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import xyz.hstudio.horizon.api.ModuleType;
+import xyz.hstudio.horizon.compat.McAccessor;
 import xyz.hstudio.horizon.data.HoriPlayer;
 import xyz.hstudio.horizon.data.checks.InventoryClickData;
 import xyz.hstudio.horizon.events.Event;
@@ -52,6 +53,9 @@ public class InventoryClick extends Module<InventoryClickData, InventoryClickNod
             SyncWindowClickEvent e = (SyncWindowClickEvent) event;
             if (player.getPlayer().getGameMode() != GameMode.SURVIVAL &&
                     player.getPlayer().getGameMode() != GameMode.ADVENTURE) {
+                return;
+            }
+            if (McAccessor.INSTANCE.getPing(player.getPlayer()) > 300) {
                 return;
             }
             if (e.rawSlot == data.lastRawSlot) {
@@ -128,6 +132,9 @@ public class InventoryClick extends Module<InventoryClickData, InventoryClickNod
             WindowCloseEvent e = (WindowCloseEvent) event;
             if (player.getPlayer().getGameMode() != GameMode.SURVIVAL &&
                     player.getPlayer().getGameMode() != GameMode.ADVENTURE) {
+                return;
+            }
+            if (McAccessor.INSTANCE.getPing(player.getPlayer()) > 300) {
                 return;
             }
             if (!isInventoryEmpty(e.inventory)) {
