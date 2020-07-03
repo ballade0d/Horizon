@@ -1,6 +1,7 @@
 package xyz.hstudio.horizon.data.checks;
 
 import org.bukkit.Material;
+import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryType;
 import xyz.hstudio.horizon.data.Data;
 
@@ -13,6 +14,8 @@ public class InventoryClickData extends Data {
     // TypeB
     public long lastClickOnItem;
     public int typeBFails;
+    public Integer buttonClicked;
+    public InventoryAction inventoryAction;
 
     public static double distanceBetweenSlots(final int rawSlotOne, final int rawSlotTwo, final InventoryType inventoryType) {
         double[] locationOfFirstClick = locateSlot(rawSlotOne, inventoryType);
