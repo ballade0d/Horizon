@@ -173,14 +173,14 @@ public class InventoryClick extends Module<InventoryClickData, InventoryClickNod
             data.inventoryAction = ((SyncWindowClickEvent) event).action;
         }
 
-        if (data.inventoryAction == null || data.buttonClicked == null) {
+        if (data.inventoryAction == null || data.buttonClicked == -1) {
             return;
         }
 
         if ((data.inventoryAction.equals(InventoryAction.UNKNOWN) || isActionDrop(data.inventoryAction)) && data.buttonClicked > 2) {
             //can't drop item using button > 2
             //LiquidBounce uses UNKNOWN to drop items
-            data.buttonClicked = null;
+            data.buttonClicked = -1;
             data.inventoryAction = null;
             this.punish(event, player, data, 2, 5);
         }

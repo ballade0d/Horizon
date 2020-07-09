@@ -154,15 +154,11 @@ public class Speed extends Module<SpeedData, SpeedNode> {
             if (swimming) {
                 // Water function
                 Vector3D move = e.velocity.clone().setY(0);
-                Vector3D waterForce = e.waterFlowForce.clone().setY(0).normalize().multiply(0.014);
+                Vector3D waterForce = e.waterFlowForce.clone().setY(0);
                 double waterForceLength = waterForce.length();
-                double computedForce = McAccessor.INSTANCE.cos(move.angle(waterForce)) * waterForceLength + 0.003;
-                if (Double.isNaN(computedForce)) {
-                    computedForce = waterForceLength;
-                    if (Double.isNaN(computedForce)) {
-                        computedForce = 0;
-                    }
-                }
+                double moveLength = move.length();
+                double computedForce = moveLength == 0 ? waterForceLength : (move.dot(waterForce) / moveLength);
+                computedForce += 0.003;
 
                 estimatedSpeed = this.waterMapping(prevSpeed, computedForce,
                         player.getEnchantmentEffectAmplifier("DEPTH_STRIDER"), player.isSprinting, e.onGround);

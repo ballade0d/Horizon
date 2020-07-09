@@ -147,11 +147,11 @@ public class Executors {
             Logger.msg("Notify", msg);
             sender.sendMessage(prefix + lang.cmd_notify_sent);
         }
-        
-        /*
-        * Made by Anthony M.
-        * idk if it's actually correct :(
-        */
+
+        /**
+         * Made by Anthony M.
+         * idk if it's actually correct :(
+         */
         @Cmd(name = "message", perm = "horizon.cmd.message")
         public void message(final CommandSender sender, final String[] args, final String prefix, final LangFile lang) {
             if (args.length < 2) {
@@ -161,16 +161,16 @@ public class Executors {
             Player player = Bukkit.getPlayer(args[0]);
             if (player == null || !player.isOnline()) {
                 sender.sendMessage(prefix + lang.cmd_player_not_found);
-            
                 return;
             }
+
             StringBuilder builder = new StringBuilder();
             for (int i = 1; i < args.length; i++) {
                 builder.append(args[i]).append(" ");
             }
-            sender.sendMessage(prefix + msg)
+            sender.sendMessage(prefix + builder.toString().trim());
         }
-        
+
         @Cmd(name = "kick", perm = "horizon.cmd.kick")
         public void kick(final CommandSender sender, final String[] args, final String prefix, final LangFile lang) {
             if (args.length < 2) {

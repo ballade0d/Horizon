@@ -20,6 +20,8 @@ permissions:
     default: op
   horizon.cmd.notify:
     default: op
+  horizon.cmd.message:
+    default: op
   horizon.cmd.kick:
     default: op
   horizon.cmd.reload:

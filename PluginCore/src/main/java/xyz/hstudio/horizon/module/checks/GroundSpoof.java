@@ -8,6 +8,8 @@ import xyz.hstudio.horizon.events.Event;
 import xyz.hstudio.horizon.events.inbound.MoveEvent;
 import xyz.hstudio.horizon.file.node.GroundSpoofNode;
 import xyz.hstudio.horizon.module.Module;
+import xyz.hstudio.horizon.util.enums.MatUtils;
+import xyz.hstudio.horizon.util.wrap.AABB;
 import xyz.hstudio.horizon.util.wrap.Location;
 
 public class GroundSpoof extends Module<GroundSpoofData, GroundSpoofNode> {
@@ -53,7 +55,9 @@ public class GroundSpoof extends Module<GroundSpoofData, GroundSpoofNode> {
                 // Do another check to make sure if player is really not on ground
                 // to avoid some false positives.
                 Location checkLoc = new Location(e.to.world, e.from.x, e.to.y, e.from.z);
-                if (checkLoc.isOnGround(player, false, 0.3)) {
+                AABB aabb = AABB.NORMAL_BOX.expand(0, -0.0001, 0).translate(e.to.toVector());
+                if (aabb.getBlockAABBs(player, player.world, MatUtils.COBWEB.parse()).isEmpty() &&
+                        checkLoc.isOnGround(player, false, 0.3)) {
                     return;
                 }
                 if (e.to.isOnGround(player, false, 0.3)) {

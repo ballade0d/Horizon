@@ -5,12 +5,10 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.util.NumberConversions;
 import org.bukkit.util.Vector;
+import xyz.hstudio.horizon.data.HoriPlayer;
 import xyz.hstudio.horizon.wrap.IWrappedBlock;
 
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class AABB {
 
@@ -71,8 +69,12 @@ public class AABB {
         return new AABB(this.minX + vec.x, this.minY + vec.y, this.minZ + vec.z, this.maxX + vec.x, this.maxY + vec.y, this.maxZ + vec.z);
     }
 
-    public AABB translateTo(final Vector3D vector) {
-        return new AABB(vector.x, vector.y, vector.z, vector.x + (maxX - minX), vector.y + (maxY - minY), vector.z + (maxZ - minZ));
+    public AABB translateTo(final Vector3D vec) {
+        return new AABB(vec.x, vec.y, vec.z, vec.x + (maxX - minX), vec.y + (maxY - minY), vec.z + (maxZ - minZ));
+    }
+
+    public AABB translate(final Vector3D vec) {
+        return new AABB(this.minX + vec.x, this.minY + vec.y, this.minZ + vec.z, this.maxX + vec.x, this.maxY + vec.y, this.maxZ + vec.z);
     }
 
     public boolean isColliding(final AABB other) {
@@ -249,6 +251,23 @@ public class AABB {
                 }
             }
         }
+    }
+
+    public List<AABB> getBlockAABBs(final HoriPlayer player, final World world, final Material... exemptedMats) {
+        Set<Material> exempt = new HashSet<>(Arrays.asList(exemptedMats));
+        List<AABB> aabbs = new ArrayList<>();
+        for (IWrappedBlock b : getBlocks(world)) {
+            if (exempt.contains(b.getType())) {
+                continue;
+            }
+            AABB[] bAABBs = b.getBoxes(player);
+            for (AABB aabb : bAABBs) {
+                if (this.isColliding(aabb)) {
+                    aabbs.add(aabb);
+                }
+            }
+        }
+        return aabbs;
     }
 
     @Override

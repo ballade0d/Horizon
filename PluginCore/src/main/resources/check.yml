@@ -116,6 +116,8 @@ inventoryclick:
     enabled: true
   typeB:
     enabled: true
+  typeC:
+    enabled: true
   action:
     8:
       - 'horizon notify %player% might be clicking inventory too fast'
