@@ -13,6 +13,9 @@ public class InventoryClickNode extends CheckNode {
     // TypeB
     @Load(path = "typeB.enabled")
     public boolean typeB_enabled = true;
+    // TypeC
+    @Load(path = "typeC.enabled")
+    public boolean typeC_enabled = true;
 
     public InventoryClickNode load(final String pathPrefix, final YamlLoader loader) {
         return AbstractFile.load(pathPrefix, this, loader);

@@ -2,6 +2,7 @@ package xyz.hstudio.horizon.module.checks;
 
 import org.bukkit.GameMode;
 import org.bukkit.Material;
+import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.inventory.ItemStack;
 import xyz.hstudio.horizon.api.ModuleType;
 import xyz.hstudio.horizon.compat.McAccessor;
@@ -9,6 +10,7 @@ import xyz.hstudio.horizon.data.HoriPlayer;
 import xyz.hstudio.horizon.data.checks.InventoryClickData;
 import xyz.hstudio.horizon.events.Event;
 import xyz.hstudio.horizon.events.inbound.SyncWindowClickEvent;
+import xyz.hstudio.horizon.events.inbound.WindowClickEvent;
 import xyz.hstudio.horizon.events.inbound.WindowCloseEvent;
 import xyz.hstudio.horizon.file.node.InventoryClickNode;
 import xyz.hstudio.horizon.module.Module;
@@ -16,7 +18,7 @@ import xyz.hstudio.horizon.module.Module;
 public class InventoryClick extends Module<InventoryClickData, InventoryClickNode> {
 
     public InventoryClick() {
-        super(ModuleType.InventoryClick, new InventoryClickNode(), "TypeA", "TypeB");
+        super(ModuleType.InventoryClick, new InventoryClickNode(), "TypeA", "TypeB", "TypeC");
     }
 
     @Override
@@ -36,6 +38,9 @@ public class InventoryClick extends Module<InventoryClickData, InventoryClickNod
         }
         if (config.typeB_enabled) {
             typeB(event, player, data, config);
+        }
+        if (config.typeC_enabled) {
+            typeC(event, player, data, config);
         }
         if (event instanceof SyncWindowClickEvent) {
             SyncWindowClickEvent e = (SyncWindowClickEvent) event;
@@ -151,6 +156,36 @@ public class InventoryClick extends Module<InventoryClickData, InventoryClickNod
         }
     }
 
+    /**
+     * A used button check.
+     * <p>
+     * Accuracy: 10/10 - Haven't found any false positives.
+     * Efficiency: 10/10 - Detects on first item drop.
+     *
+     * @author FrozenAnarchy
+     */
+    private void typeC(final Event event, final HoriPlayer player, final InventoryClickData data, final InventoryClickNode config) {
+        if (event instanceof WindowClickEvent) {
+            data.buttonClicked = ((WindowClickEvent) event).button;
+        }
+
+        if (event instanceof SyncWindowClickEvent) {
+            data.inventoryAction = ((SyncWindowClickEvent) event).action;
+        }
+
+        if (data.inventoryAction == null || data.buttonClicked == null) {
+            return;
+        }
+
+        if ((data.inventoryAction.equals(InventoryAction.UNKNOWN) || isActionDrop(data.inventoryAction)) && data.buttonClicked > 2) {
+            //can't drop item using button > 2
+            //LiquidBounce uses UNKNOWN to drop items
+            data.buttonClicked = null;
+            data.inventoryAction = null;
+            this.punish(event, player, data, 2, 5);
+        }
+    }
+
     private boolean isInventoryEmpty(final org.bukkit.inventory.Inventory inventory) {
         for (ItemStack content : inventory.getContents()) {
             if (content != null) {
@@ -158,5 +193,21 @@ public class InventoryClick extends Module<InventoryClickData, InventoryClickNod
             }
         }
         return true;
+    }
+
+    private boolean isActionDrop(final InventoryAction action) {
+        if (action == null) {
+            return false;
+        }
+
+        switch (action) {
+            case DROP_ALL_CURSOR:
+            case DROP_ALL_SLOT:
+            case DROP_ONE_CURSOR:
+            case DROP_ONE_SLOT:
+                return true;
+            default:
+                return false;
+        }
     }
 }
