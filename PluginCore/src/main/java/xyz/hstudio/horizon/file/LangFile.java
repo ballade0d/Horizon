@@ -10,6 +10,7 @@ public class LangFile extends AbstractFile {
 
     @Load(path = "cmd_only_player")
     public String cmd_only_player = "This command can only be executed by a player.";
+
     @Load(path = "cmd_no_permission")
     public String cmd_no_permission = "You don't have the permission to execute this command.";
 
