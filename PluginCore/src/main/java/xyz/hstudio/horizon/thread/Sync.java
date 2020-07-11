@@ -59,8 +59,7 @@ public class Sync implements Runnable {
                 Location after = times.get(i + 1).key;
                 Vector3D interpolate = after.toVector().subtract(before.toVector());
                 interpolate.multiply(nextMoveWeight);
-                before.add(interpolate);
-                return before;
+                return before.add(interpolate);
             }
         }
         return times.get(0).key;

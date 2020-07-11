@@ -409,7 +409,7 @@ public class MoveEvent extends Event {
                 } else {
                     return false;
                 }
-            } else if (!player.getPlayer().isSleeping() && now - player.teleportTime > McAccessor.INSTANCE.getPing(player.getPlayer()) + 250) {
+            } else if (!player.getPlayer().isSleeping() && now - player.teleportTime > McAccessor.INSTANCE.getPing(player.getPlayer()) + 300) {
                 Sync.teleport(player, player.teleportLoc);
                 return false;
             }

@@ -135,9 +135,6 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
                 if (Math.abs(estimatedVelocity) < 0.005 && estimatedVelocity != 0 && deltaY <= 0) {
                     estimatedVelocity = deltaY;
                 }
-                if (player.currentTick - player.lastTeleportAcceptTick < 2) {
-                    estimatedVelocity = 0;
-                }
 
                 // Fix the false positives when there're blocks above
                 boolean hitHead = e.touchingFaces.contains(BlockFace.UP);
@@ -176,6 +173,10 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
                 // Fix a weird bug in 1.9+
                 if (deltaY < 0 && player.prevPrevDeltaY >= 0 && MathUtils.distance2d(e.to.x - e.from.x, e.to.z - e.from.z) < 0.001) {
                     estimatedVelocity = deltaY;
+                }
+
+                if (player.currentTick - player.lastTeleportAcceptTick < 2) {
+                    estimatedVelocity = 0;
                 }
 
                 float discrepancy = deltaY - estimatedVelocity;

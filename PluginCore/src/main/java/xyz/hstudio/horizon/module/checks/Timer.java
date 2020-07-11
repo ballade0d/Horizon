@@ -86,9 +86,9 @@ public class Timer extends Module<TimerData, TimerNode> {
             // Reduce drift
             // Inspired by Islandscout, I'll credit him.
             if (drift < 0) {
-                drift = (long) Math.min(0, drift + (50 - (50 / 1.02)) * MULTIPLIER);
+                drift = (long) Math.min(0, drift + (50 - (50 / 1.005)) * MULTIPLIER);
             } else {
-                drift = (long) Math.max(0, drift + (50 - (50 / 0.98)) * MULTIPLIER);
+                drift = (long) Math.max(0, drift + (50 - (50 / 0.999)) * MULTIPLIER);
             }
 
             data.drift = drift;

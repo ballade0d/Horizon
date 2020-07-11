@@ -14,7 +14,7 @@ public class InventoryClickData extends Data {
     // TypeB
     public long lastClickOnItem;
     public int typeBFails;
-    public int buttonClicked = -1;
+    public int buttonClicked = Integer.MAX_VALUE;
     public InventoryAction inventoryAction;
 
     public static double distanceBetweenSlots(final int rawSlotOne, final int rawSlotTwo, final InventoryType inventoryType) {
