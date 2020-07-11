@@ -1,34 +1,64 @@
+#####################################################################################
+#                             _    _             ______                             #
+#                            | |  | |           |___  /                             #
+#                            | |__| |              / /                              #
+#                            |  __  |             / /                               #
+#                            | |  | |            / /__                              #
+#                            |_|  |_|           /_____|                             #
+#                                                                                   #
+#####################################################################################
+#                                    AUTHORS                                        #
+#                                Founder: MrCraftGoo                                #
+#          Managers: Anthony M., Cipher, ExclusiveFurryYT, Juli_0 | Julian          #
+#                         Developers: FrozenAnarchy, xAbode_                        #
+#####################################################################################
+#                         Thank You For Downloading Horizon                         #
+#####################################################################################
+
+                       ########################################
+                       #             PLACEHOLDERS             #
+                       #    NOTE: All PAPI PlaceHolders are   #
+                       #       available on this version      #
+                       #   Additional: %player%, %prefix%,    #
+                       #               %reason%               #
+                       ########################################
+
+# Only Usable by: Players.
 cmd_only_player: 'This command can only be executed by a player.'
+
+# Player does not have permission to execute a command.
 cmd_no_permission: 'You don''t have the permission to execute this command.'
 
-cmd_verbose_enabled: 'Verbose is enabled now.'
-cmd_verbose_disabled: 'Verbose is disabled now.'
+# Verbose Notification.
+cmd_verbose_enabled: 'Verbose has been §aenabled.'
+cmd_verbose_disabled: 'Verbose has been §cdisabled.'
 verbose: 'Player %player% failed check %check% (%type%), VL: %vl_total% (+%vl_addition%), Ping: %ping%, %args%'
 
-cmd_analysis_enabled: 'Analysis is enabled now.'
-cmd_analysis_disabled: 'Analysis is disabled now.'
+# Analysis Notification.
+cmd_analysis_enabled: 'Analysis has been §aenabled.'
+cmd_analysis_disabled: 'Analysis has been §aenabled.'
 analysis: 'Y Speed: %y_speed%, XZ Speed: %xz_speed%, tick: %tick%, cGround: %c_ground%, sGround: %s_ground%'
 
-cmd_notify_sent: 'Notification is sent.'
+# Sends a message when notified ( allows player or OP to know when they send a notification to a cheater ).
+cmd_notify_sent: 'Notification has been sent.'
 
-cmd_kick_wrong_usage: 'Usage: /horizon kick <player> <reason>'
+# Incorrect usage of /horizon kick
+cmd_kick_wrong_usage: 'Usage: §f/horizon kick <player> <reason>'
 
-cmd_message_wrong_usage: 'Usage: /horizon message <player> <message>'
-
+# Bot Check ( checks mainly for users using combat hacks ).
 cmd_bot: 'Start checking the player.'
-cmd_bot_wrong_usage: 'Usage: /horizon bot <player> <time>'
+cmd_bot_wrong_usage: 'Usage: §f/horizon bot <player> <time>'
 
-cmd_reload: 'Reloaded successfully.'
+# Reloading horizon
+cmd_reload: 'Reloaded Horizon Anti-Cheat Successfully || Made by: MrCraftGoo'
 
+# Player not found, possibly player not being online anymore.
 cmd_player_not_found: 'The player is not online.'
+# Unknown Command, bruh what are you even trying to do.
 cmd_unknown: 'Unknown command!'
 
-# A list of ban messages to send in the chat when a player gets kicked.
+# A list of kick messages to send in the chat when a player gets kicked.
 # If you want to disable it, set it to [] (example: kick_broadcast: [])
-# Available placeholders:
-# - %prefix%
-# - %player%
-# - %reason%
-# - All placeholders in PAPI plugin
 kick_broadcast:
   - '%prefix% §c%player% §9has been kicked from the network for cheating!'
+  - '%prefix& §c%player% §9was kicked by §cCONSOLE §9reason: §f%reason%'

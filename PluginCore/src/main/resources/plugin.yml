@@ -9,11 +9,14 @@ authors:
   - ExclusiveFurryYT
   - FrozenAnarchy
   - Juli_0 | Julian
+  - xAbode_
 softdepend:
   - PlaceholderAPI
   - ViaVersion
   - ProtocolSupport
 permissions:
+  horizon.cmd.help:
+    default: op
   horizon.cmd.verbose:
     default: op
   horizon.cmd.analysis:
