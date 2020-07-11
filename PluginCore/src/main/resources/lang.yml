@@ -23,7 +23,7 @@
                        #               %reason%               #
                        ########################################
 
-# Only Usable by: Players.
+# Only usable by players.
 cmd_only_player: 'This command can only be executed by a player.'
 
 # Player does not have permission to execute a command.

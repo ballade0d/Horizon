@@ -123,14 +123,13 @@ public class Executors {
         public void help(final CommandSender sender, final String prefix, final LangFile lang){
             String version = Horizon.getInst().getDescription().getVersion();
             sender.sendMessage(prefix + "Horizon(" + version + ") by MrCraftGoo");
-            sender.sendMessage(prefix + "/hrozion reload/rl - reloads horizon");
+            sender.sendMessage(prefix + "/hrozion reload - reloads horizon");
             sender.sendMessage(prefix + "/horizon verbose - enable or disables verbose");
             sender.sendMessage(prefix + "/horizon analysis <player> - analyses the player selected");
             sender.sendMessage(prefix + "/horizon notify <reason> - sends a custom notification system");
             sender.sendMessage(prefix + "/horizon message <player> <reason> - messages a player using horizon");
             sender.sendMessage(prefix + "/hrozion kick <player> <reason> - kicks a player and broadcasts a message.");
             sender.sendMessage(prefix + "/hrozion bot <player> <time> - checks if the player is using a combat hacks ( mostly killaura )");
-            return true;
         }
 
         @Cmd(name = "verbose", perm = "horizon.cmd.verbose", onlyPlayer = true)
@@ -250,13 +249,6 @@ public class Executors {
             Horizon.getInst().reload();
             sender.sendMessage(prefix + lang.cmd_reload);
         }
-
-        @Cmd(name = "rl", perm = "horizon.cmd.reload", onlyPlayer = false)
-        public void reload(final CommandSender sender, final String[] args, final String prefix, final LangFile lang) {
-            Horizon.getInst().reload();
-            sender.sendMessage(prefix + lang.cmd_reload);
-        }
-
     }
 
     private class TabExecutor implements TabCompleter {

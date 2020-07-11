@@ -14,6 +14,7 @@ public class InventoryClickData extends Data {
     // TypeB
     public long lastClickOnItem;
     public int typeBFails;
+    // TypeC
     public int buttonClicked = Integer.MAX_VALUE;
     public InventoryAction inventoryAction;
 

@@ -228,7 +228,7 @@ public class Speed extends Module<SpeedData, SpeedNode> {
                 data.negativeDiscrepanciesCumulative = 0;
             } else {
                 data.negativeDiscrepancies = discrepancy;
-                data.negativeDiscrepanciesCumulative = data.negativeDiscrepanciesCumulative + speed;
+                data.negativeDiscrepanciesCumulative = Math.min(data.negativeDiscrepanciesCumulative + speed, 0.03 + speed);
             }
             data.prevSpeed = e.collidingBlocks.contains(MatUtils.COBWEB.parse()) ? 0 : speed;
         }
