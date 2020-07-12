@@ -309,7 +309,7 @@ public class Speed extends Module<SpeedData, SpeedNode> {
     }
 
     /**
-     * A Sprint check.
+     * Sprint check.
      * <p>
      * Accuracy: 9/10 - It may have some rare false positives.
      * Efficiency: 10/10 - Detects Sprint hacks instantly.
@@ -374,6 +374,14 @@ public class Speed extends Module<SpeedData, SpeedNode> {
         }
     }
 
+    /**
+     * Strafe check, mainly detects on-ground strafe
+     * <p>
+     * Accuracy: 9/10 - It may have some rare false positives.
+     * Efficiency: 9/10 - Detects almost instantly.
+     *
+     * @author MrCraftGoo
+     */
     private void typeC(final Event event, final HoriPlayer player, final SpeedData data, final SpeedNode config) {
         if (event instanceof MoveEvent) {
             MoveEvent e = (MoveEvent) event;
@@ -392,6 +400,14 @@ public class Speed extends Module<SpeedData, SpeedNode> {
         }
     }
 
+    /**
+     * Strafe check, mainly detects air strafe
+     * <p>
+     * Accuracy: 9/10 - It may have some rare false positives.
+     * Efficiency: 10/10 - Detects instantly.
+     *
+     * @author Islandscout, MrCraftGoo
+     */
     private void typeD(final Event event, final HoriPlayer player, final SpeedData data, final SpeedNode config) {
         if (event instanceof MoveEvent) {
             MoveEvent e = (MoveEvent) event;

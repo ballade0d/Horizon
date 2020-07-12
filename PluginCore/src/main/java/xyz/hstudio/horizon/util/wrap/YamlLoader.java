@@ -24,7 +24,7 @@ public class YamlLoader extends YamlConfiguration {
     public static YamlLoader loadConfiguration(final InputStream stream) {
         YamlLoader config = new YamlLoader();
         try {
-            config.load(new InputStreamReader(stream));
+            config.load(new InputStreamReader(stream, StandardCharsets.UTF_8));
         } catch (IOException | InvalidConfigurationException var3) {
             Bukkit.getLogger().log(Level.SEVERE, "Cannot load configuration from stream", var3);
         }

@@ -44,7 +44,7 @@ public class HitBox extends Module<HitBoxData, HitBoxNode> {
     }
 
     /**
-     * A simple Reach check.
+     * Reach check.
      * <p>
      * Accuracy: 8/10 - It may have some rare falses.
      * Efficiency: 10/10 - Detects reach instantly.
@@ -87,7 +87,7 @@ public class HitBox extends Module<HitBoxData, HitBoxNode> {
     }
 
     /**
-     * A Direction check.
+     * Direction check.
      * <p>
      * Accuracy: 8/10 - It may have some rare falses.
      * Efficiency: 10/10 - Detects hitbox instantly.

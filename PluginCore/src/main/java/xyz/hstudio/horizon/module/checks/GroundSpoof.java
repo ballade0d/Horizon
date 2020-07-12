@@ -36,7 +36,7 @@ public class GroundSpoof extends Module<GroundSpoofData, GroundSpoofNode> {
     }
 
     /**
-     * A simple GroundSpoof check.
+     * GroundSpoof check.
      * <p>
      * Accuracy: 9/10 - Only some really rare false positives.
      * Efficiency: 10/10 - Detects related hacks instantly.

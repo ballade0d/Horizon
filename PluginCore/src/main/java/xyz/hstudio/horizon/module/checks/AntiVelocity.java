@@ -31,7 +31,7 @@ public class AntiVelocity extends Module<AntiVelocityData, AntiVelocityNode> {
     }
 
     /**
-     * A simple AntiVelocity check.
+     * Simple Velocity check.
      * <p>
      * Accuracy: 8/10 - May have some false positives.
      * Efficiency: 10/10 - Detects related hacks really fast.

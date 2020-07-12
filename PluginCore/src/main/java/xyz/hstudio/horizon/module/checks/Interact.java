@@ -50,7 +50,7 @@ public class Interact extends Module<InteractData, InteractNode> {
     }
 
     /**
-     * An easy packet check. This will detect some poorly made Scaffold/Tower.
+     * Order check. This will detect some poorly made Scaffold/Tower.
      * <p>
      * Accuracy: 10/10 - It shouldn't have any false positive.
      * Efficiency: 7/10 - Detects some Block hacks instantly.
@@ -82,7 +82,7 @@ public class Interact extends Module<InteractData, InteractNode> {
     }
 
     /**
-     * An angle check.
+     * Angle check.
      * <p>
      * Accuracy: 10/10 - Haven't found any false positives.
      * Efficiency: 6/10 - Detects some poorly made Scaffold/Tower.

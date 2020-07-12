@@ -157,7 +157,7 @@ public class InventoryClick extends Module<InventoryClickData, InventoryClickNod
     }
 
     /**
-     * A used button check.
+     * Button check.
      * <p>
      * Accuracy: 10/10 - Haven't found any false positives.
      * Efficiency: 10/10 - Detects on first item drop.

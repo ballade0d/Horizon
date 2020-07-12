@@ -36,7 +36,7 @@ public class Timer extends Module<TimerData, TimerNode> {
     }
 
     /**
-     * A basic Timer check.
+     * Basic Timer check.
      * <p>
      * Accuracy: 8/10 - It may have some false positives.
      * Efficiency: 10/10 - Detects 1.01 timer almost instantly.

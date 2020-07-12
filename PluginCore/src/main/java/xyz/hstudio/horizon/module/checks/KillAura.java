@@ -22,7 +22,7 @@ public class KillAura extends Module<KillAuraData, KillAuraNode> {
     private static final double EXPANDER = Math.pow(2, 24);
 
     public KillAura() {
-        super(ModuleType.KillAura, new KillAuraNode(), "Order", "SuperKb", "GCD", "Direction", "InteractAutoBlock", "NormalAutoBlock", "Multi", "KeepSprint");
+        super(ModuleType.KillAura, new KillAuraNode(), "Order", "SuperKb", "GCD", "Direction", "InteractAutoBlock", "NormalAutoBlock", "Multi", "KeepSprint", "Aim");
     }
 
     @Override
@@ -68,6 +68,9 @@ public class KillAura extends Module<KillAuraData, KillAuraNode> {
         if (config.keepsprint_enabled) {
             typeH(event, player, data, config);
         }
+        if (config.aim_enabled) {
+            typeI(event, player, data, config);
+        }
         if (event instanceof InteractEntityEvent) {
             InteractEntityEvent e = (InteractEntityEvent) event;
             if (e.action != InteractEntityEvent.InteractType.ATTACK) {
@@ -79,7 +82,7 @@ public class KillAura extends Module<KillAuraData, KillAuraNode> {
     }
 
     /**
-     * A hit packet order check.
+     * Order check.
      * This will detect all post killaura,
      * Yes, it's like 10 lines.
      * <p>
@@ -117,7 +120,7 @@ public class KillAura extends Module<KillAuraData, KillAuraNode> {
     }
 
     /**
-     * A SuperKnockBack check.
+     * SuperKnockBack check.
      * It should detect all SuperKb.
      * <p>
      * Accuracy: 10/10 - Should not have any false positives
@@ -154,7 +157,7 @@ public class KillAura extends Module<KillAuraData, KillAuraNode> {
     }
 
     /**
-     * A GCD check.
+     * GCD check.
      * It detects a large amount of killaura.
      * <p>
      * Accuracy: 7/10 - It may have false positives, though it only works when player fails other aura check
@@ -208,7 +211,7 @@ public class KillAura extends Module<KillAuraData, KillAuraNode> {
     }
 
     /**
-     * A direction check. It can detect a large amount of aura.
+     * Direction check. It can detect a large amount of aura.
      * <p>
      * Accuracy: 7/10 - It has some false positives in some situation, will fix soon.
      * Efficiency: 9/10 - Detects all poorly made auras super fast
@@ -243,7 +246,7 @@ public class KillAura extends Module<KillAuraData, KillAuraNode> {
     }
 
     /**
-     * A Interact AutoBlock check. May also detect related hacks.
+     * InteractAutoBlock check. May also detect related hacks.
      * <p>
      * Accuracy: 10/10 - It shouldn't have any false positives
      * Efficiency: 10/10 - Super fast
@@ -283,7 +286,7 @@ public class KillAura extends Module<KillAuraData, KillAuraNode> {
     }
 
     /**
-     * A Normal AutoBlock check. May also detect related hacks.
+     * NormalAutoBlock check. May also detect related hacks.
      * <p>
      * Accuracy: 10/10 - It shouldn't have any false positives
      * Efficiency: 10/10 - Super fast
@@ -329,7 +332,7 @@ public class KillAura extends Module<KillAuraData, KillAuraNode> {
     }
 
     /**
-     * A MultiAura check.
+     * MultiAura check.
      * <p>
      * Accuracy: 10/10 - It shouldn't have any false positives
      * Efficiency: 10/10 - Super fast
@@ -353,7 +356,7 @@ public class KillAura extends Module<KillAuraData, KillAuraNode> {
     }
 
     /**
-     * A KeepSprint check.
+     * KeepSprint check.
      * <p>
      * Accuracy: 10/10 - Haven't found any false positives.
      * Efficiency: 9/10 - Detects on second hit.
@@ -364,6 +367,43 @@ public class KillAura extends Module<KillAuraData, KillAuraNode> {
         if (event instanceof InteractEntityEvent) {
             if (player.currentTick - data.failKeepSprintTick == 2) {
                 this.punish(event, player, data, 7, 2);
+            }
+        }
+    }
+
+    /**
+     * Aim check.
+     * <p>
+     * Accuracy: 9/10 - It shouldn't have any false positives
+     * Efficiency: 9/10 - Kinda fast
+     */
+    private void typeI(final Event event, final HoriPlayer player, final KillAuraData data, final KillAuraNode config) {
+        if (event instanceof MoveEvent) {
+            MoveEvent e = (MoveEvent) event;
+            if (!e.updatePos || !e.updateRot) {
+                return;
+            }
+            float deltaYaw = Math.abs(e.to.yaw - e.from.yaw);
+            float deltaPitch = Math.abs(e.to.pitch - e.from.pitch);
+
+            int roundedYaw = Math.round(deltaYaw);
+            int roundedPitch = Math.round(deltaPitch);
+            int roundedDelta = Math.abs(roundedPitch - data.lastRoundedPitch);
+
+            if (roundedYaw == data.lastRoundedYaw && roundedDelta < 5 && deltaYaw < 20.f && deltaPitch < 20.f) {
+                if (++data.streakA > 7) {
+                    data.failedTick = player.currentTick;
+                }
+            } else {
+                data.streakA = 0;
+            }
+        } else if (event instanceof InteractEntityEvent) {
+            InteractEntityEvent e = (InteractEntityEvent) event;
+            if (e.action != InteractEntityEvent.InteractType.ATTACK) {
+                return;
+            }
+            if (player.currentTick - data.failedTick < 10) {
+                this.punish(event, player, data, 8, 2);
             }
         }
     }

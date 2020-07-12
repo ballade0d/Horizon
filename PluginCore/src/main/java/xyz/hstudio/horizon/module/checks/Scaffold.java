@@ -82,7 +82,7 @@ public class Scaffold extends Module<ScaffoldData, ScaffoldNode> {
     }
 
     /**
-     * A direction check. It can detect a large amount of Scaffold.
+     * Direction check. It can detect a large amount of Scaffold.
      * <p>
      * Accuracy: 9/10 - It may have some false positives
      * Efficiency: 10/10 - Super fast

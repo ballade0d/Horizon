@@ -15,16 +15,16 @@ public class LangFile extends AbstractFile {
     public String cmd_no_permission = "You don't have the permission to execute this command.";
 
     @Load(path = "cmd_verbose_enabled")
-    public String cmd_verbose_enabled = "Verbose is enabled now.";
+    public String cmd_verbose_enabled = "Verbose has been §aenabled.";
     @Load(path = "cmd_verbose_disabled")
-    public String cmd_verbose_disabled = "Verbose is disabled now.";
+    public String cmd_verbose_disabled = "Verbose has been §cdisabled.";
     @Load(path = "verbose")
     public String verbose = "Player %player% failed check %check% (%type%), VL: %vl_total% (+%vl_addition%), Ping: %ping%, %args%";
 
     @Load(path = "cmd_analysis_enabled")
-    public String cmd_analysis_enabled = "Analysis is enabled now.";
+    public String cmd_analysis_enabled = "Analysis has been §aenabled.";
     @Load(path = "cmd_analysis_disabled")
-    public String cmd_analysis_disabled = "Analysis is disabled now.";
+    public String cmd_analysis_disabled = "Analysis has been §aenabled.";
     @Load(path = "analysis")
     public String analysis = "Y Speed: %y_speed%, XZ Speed: %xz_speed%, tick: %tick%, cGround: %c_ground%, sGround: %s_ground%";
 

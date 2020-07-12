@@ -235,10 +235,10 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
     }
 
     /**
-     * A simple Step check
+     * Step check
      * <p>
      * Accuracy: 10/10 - Should not have any false positives.
-     * Efficiency: 8/10 - Detects a lot of types of step instantly.
+     * Efficiency: 9/10 - Detects a lot of types of step instantly.
      *
      * @author MrCraftGoo
      */
@@ -268,7 +268,7 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
     }
 
     /**
-     * An ability packet check.
+     * Ability packet check.
      * <p>
      * Accuracy: 10/10 - Should not have any false positives.
      * Efficiency: 10/10 - Detects instantly.

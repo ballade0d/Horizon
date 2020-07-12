@@ -131,9 +131,9 @@ public class KillAuraBot extends Module<KillAuraBotData, KillAuraBotNode> {
     }
 
     private Location getBotLocation(final Location position, final double xz_distance, final double y_distance) {
-        double yaw = Math.toRadians(position.yaw);
+        float yaw = (float) Math.toRadians(position.yaw);
         return position.clone()
-                .add(Math.sin(yaw) * xz_distance, y_distance, Math.cos(yaw) * -xz_distance);
+                .add(McAccessor.INSTANCE.sin(yaw) * xz_distance, y_distance, McAccessor.INSTANCE.cos(yaw) * -xz_distance);
     }
 
     private void run(final Runnable runnable, final boolean async) {

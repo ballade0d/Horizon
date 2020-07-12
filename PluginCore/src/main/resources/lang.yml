@@ -61,4 +61,3 @@ cmd_unknown: 'Unknown command!'
 # If you want to disable it, set it to [] (example: kick_broadcast: [])
 kick_broadcast:
   - '%prefix% §c%player% §9has been kicked from the network for cheating!'
-  - '%prefix& §c%player% §9was kicked by §cCONSOLE §9reason: §f%reason%'

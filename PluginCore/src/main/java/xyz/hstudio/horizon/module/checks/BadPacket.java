@@ -59,7 +59,7 @@ public class BadPacket extends Module<BadPacketData, BadPacketNode> {
     }
 
     /**
-     * A FreeCam/Freeze check. It can detect players from not sending movement packet.
+     * FreeCam/Freeze check. It can detect players from not sending movement packet.
      * <p>
      * Accuracy: 10/10 - No flags
      * Efficiency: 8/10 - Detects related hacks fast.
@@ -84,7 +84,10 @@ public class BadPacket extends Module<BadPacketData, BadPacketNode> {
     }
 
     /**
-     * A Paralyze/MoveExploit check.
+     * Paralyze/MoveExploit check.
+     * <p>
+     * Player can't send more than 20 flying packet in a row
+     * without updating position
      * <p>
      * Accuracy: 10/10 - Should not have any false positive.
      * Efficiency: 9/10 - Detects related hacks really fast.
@@ -110,7 +113,7 @@ public class BadPacket extends Module<BadPacketData, BadPacketNode> {
     }
 
     /**
-     * A CustomPayload ServerCrasher check.
+     * CustomPayload packet check.
      * <p>
      * Accuracy: 10/10 - Should not have any false positive.
      * Efficiency: 10/10 - Detects related hacks really fast.
@@ -139,10 +142,10 @@ public class BadPacket extends Module<BadPacketData, BadPacketNode> {
     }
 
     /**
-     * A Derp/HeadLess check.
+     * Derp/HeadLess check.
      * <p>
      * Accuracy: 10/10 - Should not have any false positive.
-     * Efficiency: 10/10 - Detects related hacks really fast.
+     * Efficiency: 10/10 - Detects instantly
      *
      * @author MrCraftGoo
      */
@@ -159,7 +162,7 @@ public class BadPacket extends Module<BadPacketData, BadPacketNode> {
     }
 
     /**
-     * An interact check.
+     * Interact check.
      * <p>
      * Accuracy: 9/10 - Has very few false positives, testing required.
      * Efficiency: 9/10 - Has rare occurrences when it stumbles.
