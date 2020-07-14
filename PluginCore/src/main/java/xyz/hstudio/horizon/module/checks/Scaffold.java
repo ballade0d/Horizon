@@ -72,7 +72,7 @@ public class Scaffold extends Module<ScaffoldData, ScaffoldNode> {
             }
             if (++data.typeAFails > 4) {
                 // Punish
-                this.punish(event, player, data, 2, 4);
+                this.punish(event, player, data, 0, 4);
             }
         } else if (event instanceof MoveEvent) {
             long now = System.currentTimeMillis();
@@ -106,7 +106,7 @@ public class Scaffold extends Module<ScaffoldData, ScaffoldNode> {
             if (player.currentTick - data.lastStrafeTick <= 3) {
                 if (++data.typeBFails > 2) {
                     // Punish
-                    this.punish(event, player, data, 3, 3);
+                    this.punish(event, player, data, 1, 3);
                 }
             } else if (data.typeBFails > 0) {
                 data.typeBFails--;
