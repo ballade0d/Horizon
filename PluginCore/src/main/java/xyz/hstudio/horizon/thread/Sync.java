@@ -32,9 +32,8 @@ public class Sync implements Runnable {
 
         for (HoriPlayer p : Horizon.PLAYERS.values()) {
             List<Pair<Location, Long>> times = trackedEntities.getOrDefault(p, new CopyOnWriteArrayList<>());
-            long currTime = System.currentTimeMillis();
-            times.add(new Pair<>(p.position, currTime));
-            if (times.size() > 20) {
+            times.add(new Pair<>(p.position, System.currentTimeMillis()));
+            if (times.size() > 40) {
                 times.remove(0);
             }
             trackedEntities.put(p, times);
