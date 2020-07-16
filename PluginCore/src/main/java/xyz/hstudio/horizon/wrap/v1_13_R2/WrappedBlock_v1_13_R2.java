@@ -102,17 +102,17 @@ public class WrappedBlock_v1_13_R2 implements IWrappedBlock {
                 AABB[] boxArr = new AABB[1];
                 switch (data.get(BlockLadder.FACING)) {
                     case NORTH:
-                        boxArr[0] = new AABB(0, 0, 0.875, 1, 1, 1);
+                        boxArr[0] = new AABB(x, y, z + 0.875, x + 1, y + 1, z + 1);
                         break;
                     case SOUTH:
-                        boxArr[0] = new AABB(0, 0, 0, 1, 1, 0.125);
+                        boxArr[0] = new AABB(x, y, z, x + 1, y + 1, z + 0.125);
                         break;
                     case WEST:
-                        boxArr[0] = new AABB(0.875, 0, 0, 1, 1, 1);
+                        boxArr[0] = new AABB(x + 0.875, y, z, x + 1, y + 1, z + 1);
                         break;
                     case EAST:
                     default:
-                        boxArr[0] = new AABB(0, 0, 0, 0.125, 1, 1);
+                        boxArr[0] = new AABB(x, y, z, x + 0.125, y + 1, z + 1);
                         break;
                 }
                 return boxArr;
@@ -120,17 +120,17 @@ public class WrappedBlock_v1_13_R2 implements IWrappedBlock {
                 AABB[] boxArr = new AABB[1];
                 switch (data.get(BlockLadder.FACING)) {
                     case NORTH:
-                        boxArr[0] = new AABB(0, 0, 0.8125, 1, 1, 1);
+                        boxArr[0] = new AABB(x, y, z + 0.8125, x + 1, y + 1, z + 1);
                         break;
                     case SOUTH:
-                        boxArr[0] = new AABB(0, 0, 0, 1, 1, 0.1875);
+                        boxArr[0] = new AABB(x, y, z, x + 1, y + 1, z + 0.1875);
                         break;
                     case WEST:
-                        boxArr[0] = new AABB(0.8125, 0, 0, 1, 1, 1);
+                        boxArr[0] = new AABB(x + 0.8125, y, z, x + 1, y + 1, z + 1);
                         break;
                     case EAST:
                     default:
-                        boxArr[0] = new AABB(0, 0, 0, 0.1875, 1, 1);
+                        boxArr[0] = new AABB(x, y, z, x + 0.1875, y + 1, z + 1);
                         break;
                 }
                 return boxArr;
@@ -141,7 +141,7 @@ public class WrappedBlock_v1_13_R2 implements IWrappedBlock {
         List<AxisAlignedBB> bbs = new ArrayList<>(voxelShape.d());
 
         AxisAlignedBB[] raw = bbs.toArray(new AxisAlignedBB[0]);
-        AABB[] boxes = new AABB[bbs.size()];
+        AABB[] boxes = new AABB[raw.length];
 
         for (int i = 0; i < bbs.size(); i++) {
             boxes[i] = new AABB(raw[i].minX + x, raw[i].minY + y, raw[i].minZ + z, raw[i].maxX + x, raw[i].maxY + y, raw[i].maxZ + z);

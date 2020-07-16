@@ -397,6 +397,8 @@ public class KillAura extends Module<KillAuraData, KillAuraNode> {
             } else {
                 data.streakA = 0;
             }
+            data.lastRoundedYaw = roundedYaw;
+            data.lastRoundedPitch = roundedPitch;
         } else if (event instanceof InteractEntityEvent) {
             InteractEntityEvent e = (InteractEntityEvent) event;
             if (e.action != InteractEntityEvent.InteractType.ATTACK) {
@@ -404,6 +406,7 @@ public class KillAura extends Module<KillAuraData, KillAuraNode> {
             }
             if (player.currentTick - data.failedTick < 10) {
                 this.punish(event, player, data, 8, 2);
+                data.failedTick = -10000;
             }
         }
     }
