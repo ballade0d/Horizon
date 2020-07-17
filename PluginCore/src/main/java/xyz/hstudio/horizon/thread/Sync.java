@@ -23,23 +23,6 @@ public class Sync implements Runnable {
         pendingTeleports.put(player, to);
     }
 
-    @Override
-    public void run() {
-        for (Map.Entry<HoriPlayer, Location> entry : pendingTeleports.entrySet()) {
-            entry.getKey().teleport(entry.getValue());
-        }
-        pendingTeleports.clear();
-
-        for (HoriPlayer p : Horizon.PLAYERS.values()) {
-            List<Pair<Location, Long>> times = trackedEntities.getOrDefault(p, new CopyOnWriteArrayList<>());
-            times.add(new Pair<>(p.position, System.currentTimeMillis()));
-            if (times.size() > 40) {
-                times.remove(0);
-            }
-            trackedEntities.put(p, times);
-        }
-    }
-
     public static Location getHistoryLocation(final int time, final HoriPlayer player) {
         List<Pair<Location, Long>> times = trackedEntities.get(player);
         if (times == null || times.size() == 0) {
@@ -62,5 +45,22 @@ public class Sync implements Runnable {
             }
         }
         return times.get(0).key;
+    }
+
+    @Override
+    public void run() {
+        for (Map.Entry<HoriPlayer, Location> entry : pendingTeleports.entrySet()) {
+            entry.getKey().teleport(entry.getValue());
+        }
+        pendingTeleports.clear();
+
+        for (HoriPlayer p : Horizon.PLAYERS.values()) {
+            List<Pair<Location, Long>> times = trackedEntities.getOrDefault(p, new CopyOnWriteArrayList<>());
+            times.add(new Pair<>(p.position, System.currentTimeMillis()));
+            if (times.size() > 40) {
+                times.remove(0);
+            }
+            trackedEntities.put(p, times);
+        }
     }
 }

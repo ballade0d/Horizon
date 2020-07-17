@@ -45,11 +45,10 @@ public class Horizon extends JavaPlugin {
     public final Map<String, LangFile> langMap = new ConcurrentHashMap<>();
     public YamlLoader checkLoader;
     public ConfigFile config;
-    private boolean usePapi;
     public boolean useViaVer;
     public boolean usePSupport;
     public Kirin kirin;
-
+    private boolean usePapi;
     private BukkitTask syncTask;
     private Async asyncTask;
 

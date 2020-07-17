@@ -8,6 +8,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import protocolsupport.api.ProtocolSupportAPI;
@@ -27,12 +28,10 @@ import xyz.hstudio.horizon.util.wrap.Vector3D;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class HoriPlayer {
 
-    public String lang;
-    public boolean verbose;
-    public boolean analysis;
     public final AntiVelocityData antiVelocityData = new AntiVelocityData();
     public final BadPacketData badPacketData = new BadPacketData();
     public final GroundSpoofData groundSpoofData = new GroundSpoofData();
@@ -47,9 +46,15 @@ public class HoriPlayer {
     public final InteractData interactData = new InteractData();
     public final SpeedData speedData = new SpeedData();
     public final TimerData timerData = new TimerData();
-    private final Map<Runnable, Long> simulatedCmds = new ConcurrentHashMap<>();
     public final int protocol;
+    public final List<Pair<Vector3D, Long[]>> velocities = new CopyOnWriteArrayList<>();
+    public final List<Pair<Location, Long>> teleports = new CopyOnWriteArrayList<>();
+    public final Map<Location, ClientBlock> clientBlocks = new ConcurrentHashMap<>();
+    private final Map<Runnable, Long> simulatedCmds = new ConcurrentHashMap<>();
     private final Player player;
+    public String lang;
+    public boolean verbose;
+    public boolean analysis;
     public long currentTick;
     public World world;
     public Location position;
@@ -58,10 +63,6 @@ public class HoriPlayer {
     public float friction;
     public double prevPrevDeltaY;
     public Vector3D velocity = new Vector3D(0, 0, 0);
-    public final List<Pair<Vector3D, Long[]>> velocities = new LinkedList<>();
-    public Location teleportLoc;
-    public long teleportTime;
-    public final Map<Location, ClientBlock> clientBlocks = new ConcurrentHashMap<>();
     public List<AttributeEvent.AttributeModifier> moveModifiers = new ArrayList<>();
     public Set<AABB> piston = new ConcurrentSet<>();
     public Set<BlockFace> touchingFaces = EnumSet.noneOf(BlockFace.class);
@@ -77,7 +78,8 @@ public class HoriPlayer {
     public boolean isGliding;
     public boolean isInLiquidStrict;
     public boolean isInLiquid;
-    public long lastTeleportAcceptTick = -1;
+    public boolean isTeleporting;
+    public long teleportAcceptTick = -1;
     public long toggleFlyTick;
     public long hitSlowdownTick = -1;
     public int vehicle = -1;
@@ -109,11 +111,72 @@ public class HoriPlayer {
         return player;
     }
 
+    public void tick(final long ping) {
+        executeTasks(ping);
+        manageClientBlocks(ping);
+        manageTeleports(ping);
+    }
+
+    public void sendSimulatedAction(final Runnable action) {
+        this.simulatedCmds.put(action, System.currentTimeMillis());
+    }
+
+    public void executeTasks(final long ping) {
+        if (this.simulatedCmds.size() == 0) {
+            return;
+        }
+        for (Map.Entry<Runnable, Long> entry : this.simulatedCmds.entrySet()) {
+            if (System.currentTimeMillis() - entry.getValue() < ping + 100) {
+                continue;
+            }
+            entry.getKey().run();
+            this.simulatedCmds.remove(entry.getKey());
+        }
+    }
+
     public void addClientBlock(final Location location, final ClientBlock clientBlock) {
         if (clientBlocks.size() >= 12) {
             return;
         }
         clientBlocks.put(location, clientBlock);
+    }
+
+    public void manageClientBlocks(final long ping) {
+        clientBlocks.entrySet().removeIf(next -> currentTick - next.getValue().initTick > 6);
+    }
+
+    public void addTeleport(final Location loc) {
+        teleports.add(new Pair<>(loc, currentTick));
+        if (teleports.size() > 200) {
+            teleports.remove(0);
+        }
+    }
+
+    private void manageTeleports(final long ping) {
+        while (teleports.size() > 0 && currentTick - teleports.get(0).value > (ping + 2000) / 50) {
+            teleports.remove(0);
+        }
+    }
+
+    public float getMoveFactor() {
+        return getMoveFactor(this.moveModifiers);
+    }
+
+    public float getMoveFactor(final List<AttributeEvent.AttributeModifier> modifiers) {
+        float value = 0.1F;
+        for (AttributeEvent.AttributeModifier modifier : modifiers) {
+            switch (modifier.operation) {
+                case 0:
+                    value += modifier.value;
+                    continue;
+                case 1:
+                case 2:
+                    value += value * modifier.value;
+                    continue;
+                default:
+            }
+        }
+        return value;
     }
 
     /**
@@ -147,7 +210,7 @@ public class HoriPlayer {
     }
 
     public void teleport(final Location location) {
-        getPlayer().teleport(new org.bukkit.Location(location.world, location.x, location.y, location.z, location.yaw, location.pitch));
+        getPlayer().teleport(new org.bukkit.Location(location.world, location.x, location.y, location.z, location.yaw, location.pitch), PlayerTeleportEvent.TeleportCause.PLUGIN);
     }
 
     public void sendMessage(final String msg) {
@@ -191,23 +254,6 @@ public class HoriPlayer {
             }
         }
         return 0;
-    }
-
-    public void sendSimulatedAction(final Runnable action) {
-        this.simulatedCmds.put(action, System.currentTimeMillis());
-    }
-
-    public void tick(final long currentTick, final long currTime) {
-        if (this.simulatedCmds.size() == 0) {
-            return;
-        }
-        for (Map.Entry<Runnable, Long> entry : this.simulatedCmds.entrySet()) {
-            if (currTime - entry.getValue() < McAccessor.INSTANCE.getPing(player) + 100) {
-                continue;
-            }
-            entry.getKey().run();
-            this.simulatedCmds.remove(entry.getKey());
-        }
     }
 
     /**

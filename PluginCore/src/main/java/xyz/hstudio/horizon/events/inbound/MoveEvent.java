@@ -394,29 +394,42 @@ public class MoveEvent extends Event {
             player.sendMessage(Horizon.getInst().config.prefix + Horizon.getInst().applyPAPI(player.getPlayer(), analysis));
         }
 
-        player.clientBlocks.entrySet().removeIf(next -> player.currentTick - next.getValue().initTick > 6);
+        int ping = McAccessor.INSTANCE.getPing(player.getPlayer());
 
-        long now = System.currentTimeMillis();
-        if (player.teleportLoc != null) {
-            if (!onGround && player.teleportLoc.world.equals(this.to.world) &&
-                    this.to.distanceSquared(player.teleportLoc) < 0.001) {
-                if (now - player.teleportTime > McAccessor.INSTANCE.getPing(player.getPlayer()) - 50) {
-                    player.position = player.teleportLoc;
-                    player.lastTeleportAcceptTick = player.currentTick;
-                    this.isTeleport = true;
+        player.tick(ping);
 
-                    player.teleportLoc = null;
+        if (player.isTeleporting && player.teleports.size() > 0) {
+            Pair<Location, Long> tpPair = player.teleports.get(0);
+            Location tpLoc = tpPair.key;
+
+            int elapsedTicks = (int) (player.currentTick - tpPair.value);
+
+            if (!onGround && updatePos && updateRot && tpLoc.equals(to)) {
+                player.position = tpLoc;
+                player.velocity = new Vector3D(0, 0, 0);
+
+                player.teleports.remove(0);
+
+                player.teleportAcceptTick = player.currentTick;
+
+                this.isTeleport = true;
+
+                if (player.teleports.size() == 0) {
+                    player.isTeleporting = false;
                 } else {
                     return false;
                 }
-            } else if (!player.getPlayer().isSleeping() && now - player.teleportTime > McAccessor.INSTANCE.getPing(player.getPlayer()) + 300) {
-                Sync.teleport(player, player.teleportLoc);
-                return false;
+            } else if (!player.getPlayer().isSleeping()) {
+                if (elapsedTicks > (ping / 50) + 5) {
+                    Location tp = player.teleports.get(player.teleports.size() - 1).key;
+                    player.teleports.clear();
+                    Sync.teleport(player, tp);
+                }
             }
         }
 
         if (!isTeleport && Math.abs(velocity.y - -0.098) < 0.0000001 && (knockBack == null || Math.abs(knockBack.y - -0.098) > 0.0000001)) {
-            player.teleportLoc = new Location(player.getPlayer().getLocation());
+            player.position = to;
             return false;
         }
         return true;

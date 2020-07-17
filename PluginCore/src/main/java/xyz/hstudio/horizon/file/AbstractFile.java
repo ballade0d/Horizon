@@ -11,8 +11,6 @@ import java.util.Set;
 
 public abstract class AbstractFile {
 
-    public abstract Object getValue(String path, YamlLoader loader, Class<?> type);
-
     public static <T extends AbstractFile> T load(final String pathPrefix, final T instance, final YamlLoader loader) {
         Field[] fields = instance.getClass().getFields();
         for (int i = 0; i < fields.length; i++) {
@@ -47,4 +45,6 @@ public abstract class AbstractFile {
         }
         return instance;
     }
+
+    public abstract Object getValue(String path, YamlLoader loader, Class<?> type);
 }

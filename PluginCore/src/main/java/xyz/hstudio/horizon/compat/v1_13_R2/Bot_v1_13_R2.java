@@ -23,9 +23,9 @@ import java.util.stream.Collectors;
 
 public class Bot_v1_13_R2 implements IBot {
 
-    private EntityPlayer nms;
     private final boolean realName;
     private final long spawnTime;
+    private EntityPlayer nms;
 
     public Bot_v1_13_R2(final Player player, final boolean realisticName) {
         MinecraftServer minecraftServer = ((CraftServer) Bukkit.getServer()).getServer();

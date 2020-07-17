@@ -14,11 +14,6 @@ import java.util.Arrays;
 public class PlayerViolateEvent extends Event implements Cancellable {
 
     private static final HandlerList HANDLER_LIST = new HandlerList();
-
-    public static HandlerList getHandlerList() {
-        return HANDLER_LIST;
-    }
-
     @Getter
     private final Player player;
     @Getter
@@ -34,7 +29,6 @@ public class PlayerViolateEvent extends Event implements Cancellable {
     @Getter
     @Setter
     private boolean cancelled;
-
     public PlayerViolateEvent(final Player player, final ModuleType type, final String module, final String[] debug, final float nowViolation, final float oldViolation) {
         super(!Bukkit.isPrimaryThread());
         if (Arrays.stream(Thread.currentThread().getStackTrace())
@@ -48,6 +42,10 @@ public class PlayerViolateEvent extends Event implements Cancellable {
         this.nowViolation = nowViolation;
         this.oldViolation = oldViolation;
         this.cancelled = false;
+    }
+
+    public static HandlerList getHandlerList() {
+        return HANDLER_LIST;
     }
 
     @Override

@@ -52,6 +52,13 @@ public class Location implements Cloneable {
         this.pitch = pitch;
     }
 
+    private static Block getBlock(final Location loc) {
+        if (loc.world.isChunkLoaded(loc.getBlockX() >> 4, loc.getBlockZ() >> 4)) {
+            return loc.world.getBlockAt(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
+        }
+        return null;
+    }
+
     public IWrappedBlock getBlock() {
         return IWrappedBlock.create(Location.getBlock(this));
     }
@@ -193,12 +200,5 @@ public class Location implements Cloneable {
         } catch (CloneNotSupportedException e) {
             throw new IllegalStateException(e);
         }
-    }
-
-    private static Block getBlock(final Location loc) {
-        if (loc.world.isChunkLoaded(loc.getBlockX() >> 4, loc.getBlockZ() >> 4)) {
-            return loc.world.getBlockAt(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
-        }
-        return null;
     }
 }

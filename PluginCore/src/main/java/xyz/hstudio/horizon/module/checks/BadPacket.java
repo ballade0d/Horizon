@@ -98,7 +98,7 @@ public class BadPacket extends Module<BadPacketData, BadPacketNode> {
         if (event instanceof MoveEvent) {
             MoveEvent e = (MoveEvent) event;
             if (e.moveType != MoveEvent.MoveType.FLYING || e.isTeleport ||
-                    System.currentTimeMillis() - player.lastTeleportAcceptTick < 1000L) {
+                    player.currentTick - player.teleportAcceptTick < 3) {
                 data.flyingCount = 0;
                 return;
             }

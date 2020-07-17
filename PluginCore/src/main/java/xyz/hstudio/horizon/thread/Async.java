@@ -28,10 +28,10 @@ public class Async implements Runnable {
                     .build());
 
     public static final Deque<String> LOG = new ConcurrentLinkedDeque<>();
-
+    public static long currentTick;
     private final FileOutputStream logOutput;
     private final byte[] lineSeparator;
-
+    public volatile boolean running = true;
     public Async() {
         try {
             File logs = new File(Horizon.getInst().getDataFolder(), "logs");
@@ -76,9 +76,6 @@ public class Async implements Runnable {
         Async.THREAD_POOL.scheduleAtFixedRate(this, 50L, 50L, TimeUnit.MILLISECONDS);
     }
 
-    public static long currentTick;
-    public volatile boolean running = true;
-
     @Override
     public void run() {
         try {
@@ -88,9 +85,6 @@ public class Async implements Runnable {
                 }
                 module.tickAsync(currentTick, module.getConfig());
             }
-
-            long currTime = System.currentTimeMillis();
-            Horizon.PLAYERS.values().forEach(player -> player.tick(currentTick, currTime));
 
             String time = "[" + DateUtils.now() + "] ";
             for (String message : Async.LOG) {

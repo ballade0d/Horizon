@@ -17,11 +17,8 @@ import java.util.Set;
 
 public final class BlockUtils {
 
-    private BlockUtils() {
-    }
-
-    private static final Set<Material> SOLID = EnumSet.noneOf(Material.class);
     public static final Set<Material> SHULKER_BOX = EnumSet.noneOf(Material.class);
+    private static final Set<Material> SOLID = EnumSet.noneOf(Material.class);
 
     static {
         Set<Material> solid = new HashSet<>();
@@ -70,6 +67,9 @@ public final class BlockUtils {
         solid.removeIf(Objects::isNull);
 
         BlockUtils.SOLID.addAll(solid);
+    }
+
+    private BlockUtils() {
     }
 
     public static boolean isSolid(final IWrappedBlock block) {

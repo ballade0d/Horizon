@@ -175,7 +175,7 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
                     estimatedVelocity = deltaY;
                 }
 
-                if (player.currentTick - player.lastTeleportAcceptTick < 2) {
+                if (player.currentTick - player.teleportAcceptTick < 2) {
                     estimatedVelocity = 0;
                 }
 

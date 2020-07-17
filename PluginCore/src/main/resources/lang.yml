@@ -15,13 +15,13 @@
 #                         Thank You For Downloading Horizon                         #
 #####################################################################################
 
-                       ########################################
-                       #             PLACEHOLDERS             #
-                       #    NOTE: All PAPI PlaceHolders are   #
-                       #       available on this version      #
-                       #   Additional: %player%, %prefix%,    #
-                       #               %reason%               #
-                       ########################################
+########################################
+#             PLACEHOLDERS             #
+#    NOTE: All PAPI PlaceHolders are   #
+#       available on this version      #
+#   Additional: %player%, %prefix%,    #
+#               %reason%               #
+########################################
 
 # Only usable by players.
 cmd_only_player: 'This command can only be executed by a player.'

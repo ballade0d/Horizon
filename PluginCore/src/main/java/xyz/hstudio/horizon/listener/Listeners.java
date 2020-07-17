@@ -55,9 +55,9 @@ public class Listeners implements Listener {
         if (player == null) {
             return;
         }
-        player.teleportLoc = new Location(e.getTo());
-        player.teleportTime = System.currentTimeMillis();
+        player.isTeleporting = true;
         player.world = e.getTo().getWorld();
+        player.addTeleport(new Location(e.getTo()));
 
         if (e.getCause() == PlayerTeleportEvent.TeleportCause.UNKNOWN &&
                 Horizon.getInst().config.ghost_block_fix) {
@@ -76,9 +76,9 @@ public class Listeners implements Listener {
         if (player == null) {
             return;
         }
-        player.teleportLoc = new Location(e.getRespawnLocation());
-        player.teleportTime = System.currentTimeMillis();
+        player.isTeleporting = true;
         player.world = e.getRespawnLocation().getWorld();
+        player.addTeleport(new Location(e.getRespawnLocation()));
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -88,9 +88,9 @@ public class Listeners implements Listener {
         if (player == null) {
             return;
         }
-        player.teleportLoc = new Location(p.getLocation());
-        player.teleportTime = System.currentTimeMillis();
+        player.isTeleporting = true;
         player.world = p.getWorld();
+        player.addTeleport(new Location(p.getLocation()));
     }
 
     @EventHandler

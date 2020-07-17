@@ -33,7 +33,7 @@ public class LangFile extends AbstractFile {
 
     @Load(path = "cmd_kick_wrong_usage")
     public String cmd_kick_wrong_usage = "Usage: /horizon kick <player> <reason>";
-    
+
     @Load(path = "cmd_message_wrong_usage")
     public String cmd_message_wrong_usage = "Usage: /horizon message <player> <message>";
 

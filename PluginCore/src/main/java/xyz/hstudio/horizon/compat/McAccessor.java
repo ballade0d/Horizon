@@ -7,9 +7,6 @@ import xyz.hstudio.horizon.util.enums.Version;
 
 public final class McAccessor {
 
-    private McAccessor() {
-    }
-
     public static final IMcAccessor INSTANCE;
 
     static {
@@ -27,5 +24,8 @@ public final class McAccessor {
                 INSTANCE = null;
                 break;
         }
+    }
+
+    private McAccessor() {
     }
 }

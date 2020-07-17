@@ -26,35 +26,6 @@ import java.util.zip.GZIPOutputStream;
 public class Verification {
 
     private static Verification server;
-
-    public static void main(final String[] args) throws Exception {
-        server = new Verification();
-    }
-
-    private static void genKeyAndSave() throws Exception {
-        KeyPairGenerator keyPairGen = KeyPairGenerator.getInstance("RSA");
-        keyPairGen.initialize(1024, new SecureRandom());
-        KeyPair keyPair = keyPairGen.generateKeyPair();
-        RSAPrivateKey privateKey = (RSAPrivateKey) keyPair.getPrivate();
-        RSAPublicKey publicKey = (RSAPublicKey) keyPair.getPublic();
-
-        {
-            File priKey = new File("priKey.key");
-            OutputStream stream = new FileOutputStream(priKey);
-            stream.write(privateKey.getEncoded());
-            stream.flush();
-            stream.close();
-        }
-
-        {
-            File pubKey = new File("pubKey.key");
-            OutputStream stream = new FileOutputStream(pubKey);
-            stream.write(publicKey.getEncoded());
-            stream.flush();
-            stream.close();
-        }
-    }
-
     private final PrivateKey privateKey;
     private final Map<User, File> userMap = new ConcurrentHashMap<>();
 
@@ -89,6 +60,34 @@ public class Verification {
                 e.printStackTrace();
             }
         }).start();
+    }
+
+    public static void main(final String[] args) throws Exception {
+        server = new Verification();
+    }
+
+    private static void genKeyAndSave() throws Exception {
+        KeyPairGenerator keyPairGen = KeyPairGenerator.getInstance("RSA");
+        keyPairGen.initialize(1024, new SecureRandom());
+        KeyPair keyPair = keyPairGen.generateKeyPair();
+        RSAPrivateKey privateKey = (RSAPrivateKey) keyPair.getPrivate();
+        RSAPublicKey publicKey = (RSAPublicKey) keyPair.getPublic();
+
+        {
+            File priKey = new File("priKey.key");
+            OutputStream stream = new FileOutputStream(priKey);
+            stream.write(privateKey.getEncoded());
+            stream.flush();
+            stream.close();
+        }
+
+        {
+            File pubKey = new File("pubKey.key");
+            OutputStream stream = new FileOutputStream(pubKey);
+            stream.write(publicKey.getEncoded());
+            stream.flush();
+            stream.close();
+        }
     }
 
     @RequiredArgsConstructor

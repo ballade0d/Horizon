@@ -34,7 +34,11 @@ public class AttributeEvent extends Event {
                 break;
             }
             snapshot.modifiers.sort(Comparator.comparingInt(o -> o.operation));
-            player.moveModifiers = snapshot.modifiers;
+            if (player.getMoveFactor() > player.getMoveFactor(snapshot.modifiers)) {
+                player.sendSimulatedAction(() -> player.moveModifiers = snapshot.modifiers);
+            } else {
+                player.moveModifiers = snapshot.modifiers;
+            }
         }
     }
 

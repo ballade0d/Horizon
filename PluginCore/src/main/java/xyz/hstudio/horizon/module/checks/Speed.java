@@ -10,7 +10,6 @@ import xyz.hstudio.horizon.events.Event;
 import xyz.hstudio.horizon.events.inbound.ActionEvent;
 import xyz.hstudio.horizon.events.inbound.InteractItemEvent;
 import xyz.hstudio.horizon.events.inbound.MoveEvent;
-import xyz.hstudio.horizon.events.outbound.AttributeEvent;
 import xyz.hstudio.horizon.file.node.SpeedNode;
 import xyz.hstudio.horizon.module.Module;
 import xyz.hstudio.horizon.thread.Sync;
@@ -19,7 +18,6 @@ import xyz.hstudio.horizon.util.MathUtils;
 import xyz.hstudio.horizon.util.enums.MatUtils;
 import xyz.hstudio.horizon.util.wrap.Vector3D;
 
-import java.util.List;
 import java.util.Set;
 
 public class Speed extends Module<SpeedData, SpeedNode> {
@@ -267,7 +265,7 @@ public class Speed extends Module<SpeedData, SpeedNode> {
 
         float multiplier;
         if (player.onGround) {
-            multiplier = getMoveFactor(player.moveModifiers) * 0.16277136F / (newFriction * newFriction * newFriction);
+            multiplier = player.getMoveFactor() * 0.16277136F / (newFriction * newFriction * newFriction);
             float groundMultiplier = 5 * player.getPlayer().getWalkSpeed();
             multiplier *= groundMultiplier;
 
@@ -291,23 +289,6 @@ public class Speed extends Module<SpeedData, SpeedNode> {
         }
     }
 
-    private float getMoveFactor(final List<AttributeEvent.AttributeModifier> modifiers) {
-        float value = 0.1F;
-        for (AttributeEvent.AttributeModifier modifier : modifiers) {
-            switch (modifier.operation) {
-                case 0:
-                    value += modifier.value;
-                    continue;
-                case 1:
-                case 2:
-                    value += value * modifier.value;
-                    continue;
-                default:
-            }
-        }
-        return value;
-    }
-
     /**
      * Sprint check.
      * <p>
@@ -327,7 +308,7 @@ public class Speed extends Module<SpeedData, SpeedNode> {
                 data.lastSprintTick = player.currentTick;
             }
 
-            if (e.isInLiquid || player.currentTick - player.lastTeleportAcceptTick < 3 || e.knockBack != null ||
+            if (e.isInLiquid || player.currentTick - player.teleportAcceptTick < 3 || e.knockBack != null ||
                     e.collidingBlocks.contains(Material.LADDER) || e.collidingBlocks.contains(Material.VINE) ||
                     (collisionHorizontal && !data.collisionHorizontal) || player.isFlying() ||
                     player.currentTick - data.lastSprintTick < 2 || player.getVehicle() != null ||

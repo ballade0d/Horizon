@@ -120,7 +120,7 @@ public class Executors {
          * idk if it's actually correct :(
          */
         @Cmd(name = "help", perm = "horizon.cmd.help")
-        public void help(final CommandSender sender, final String prefix, final LangFile lang){
+        public void help(final CommandSender sender, final String prefix, final LangFile lang) {
             String version = Horizon.getInst().getDescription().getVersion();
             sender.sendMessage(prefix + "Horizon(" + version + ") by MrCraftGoo");
             sender.sendMessage(prefix + "/hrozion reload - reloads horizon");

@@ -5,10 +5,10 @@ import org.bukkit.command.ConsoleCommandSender;
 
 public final class Logger {
 
+    private static final ConsoleCommandSender SENDER = Bukkit.getConsoleSender();
+
     private Logger() {
     }
-
-    private static final ConsoleCommandSender SENDER = Bukkit.getConsoleSender();
 
     public static void msg(final String prefix, final Object object) {
         Logger.SENDER.sendMessage("(H|" + prefix + ") " + object);
