@@ -30,5 +30,4 @@ public class KillAuraData extends Data {
     public long failKeepSprintTick;
     // Aim
     public int lastRoundedYaw, lastRoundedPitch, streakA;
-    public long failedTick = -10000;
 }

@@ -374,13 +374,14 @@ public class KillAura extends Module<KillAuraData, KillAuraNode> {
     /**
      * Aim check.
      * <p>
-     * Accuracy: 9/10 - It shouldn't have any false positives
-     * Efficiency: 9/10 - Kinda fast
+     * Accuracy: 7/10 - It has some false positives
+     * Efficiency: 8/10 - Kinda fast
      */
     private void typeI(final Event event, final HoriPlayer player, final KillAuraData data, final KillAuraNode config) {
         if (event instanceof MoveEvent) {
             MoveEvent e = (MoveEvent) event;
             if (!e.updatePos || !e.updateRot) {
+                data.streakA = Math.max(data.streakA - 1, 0);
                 return;
             }
             float deltaYaw = Math.abs(e.to.yaw - e.from.yaw);
@@ -390,24 +391,16 @@ public class KillAura extends Module<KillAuraData, KillAuraNode> {
             int roundedPitch = Math.round(deltaPitch);
             int roundedDelta = Math.abs(roundedPitch - data.lastRoundedPitch);
 
-            if (roundedYaw == data.lastRoundedYaw && roundedDelta < 5 && deltaYaw < 20.f && deltaPitch < 20.f) {
-                if (++data.streakA > 7) {
-                    data.failedTick = player.currentTick;
+            if (roundedYaw == data.lastRoundedYaw && roundedDelta < 5 && deltaYaw < 20 && deltaPitch < 20 &&
+                    deltaYaw != 0 && player.currentTick - data.lastHitTick < 20) {
+                if (++data.streakA > 6) {
+                    this.punish(event, player, data, 8, 4, "yaw:" + deltaYaw);
                 }
             } else {
                 data.streakA = 0;
             }
             data.lastRoundedYaw = roundedYaw;
             data.lastRoundedPitch = roundedPitch;
-        } else if (event instanceof InteractEntityEvent) {
-            InteractEntityEvent e = (InteractEntityEvent) event;
-            if (e.action != InteractEntityEvent.InteractType.ATTACK) {
-                return;
-            }
-            if (player.currentTick - data.failedTick < 10) {
-                this.punish(event, player, data, 8, 2);
-                data.failedTick = -10000;
-            }
         }
     }
 }
