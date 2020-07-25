@@ -77,8 +77,8 @@ public class HoriPlayer {
     public boolean onGround;
     public boolean onGroundReally;
     public boolean isGliding;
-    public boolean isInLiquidStrict;
-    public boolean isInLiquid;
+    public boolean isInWater;
+    public boolean isInLava;
     public boolean isTeleporting;
     public long teleportAcceptTick = -1;
     public long toggleFlyTick;

@@ -47,7 +47,7 @@ public class MoveEvent extends Event {
     public final boolean isOnSlimeNext;
     public final boolean isOnBed;
     public final Vector3D waterFlowForce;
-    public final boolean isInLiquidStrict;
+    public final boolean isInWater;
     public final boolean isInLiquid;
     public final float oldFriction;
     public final float newFriction;
@@ -89,13 +89,13 @@ public class MoveEvent extends Event {
 
         Pair<Vector3D, Boolean> pair = this.computeWaterFlowForce();
         this.waterFlowForce = pair.key;
-        this.isInLiquidStrict = pair.value;
+        this.isInWater = pair.value;
 
         this.isInLiquid = AABB.NORMAL_BOX
                 .add(this.from.toVector())
                 .getMaterials(to.world)
                 .stream()
-                .anyMatch(MatUtils.LIQUID::contains);
+                .anyMatch(m -> MatUtils.WATER.contains(m) || MatUtils.LAVA.contains(m));
 
         this.oldFriction = player.friction;
         this.newFriction = this.computeFriction();
@@ -165,7 +165,7 @@ public class MoveEvent extends Event {
         Vector3D finalForce = new Vector3D();
         boolean inLiquid = false;
         for (IWrappedBlock block : AABB.WATER_BOX.add(this.to.toVector()).getBlocks(to.world)) {
-            if (!MatUtils.LIQUID.contains(block.getType())) {
+            if (!MatUtils.WATER.contains(block.getType())) {
                 continue;
             }
             finalForce.add(block.getFlowDirection());
@@ -179,14 +179,32 @@ public class MoveEvent extends Event {
     }
 
     private float computeFriction() {
-        float friction = 0.91F;
-        if (player.onGround) {
-            IWrappedBlock b = player.position.add(0, -1, 0).getBlock();
-            if (b != null) {
-                friction *= b.getFriction();
+        boolean flying = player.isFlying();
+        if (player.isInWater && flying) {
+            float friction = 0.8F;
+            float depthStrider = player.getEnchantmentEffectAmplifier("DEPTH_STRIDER");
+            if (depthStrider > 3) {
+                depthStrider = 3;
             }
+            if (!onGround) {
+                depthStrider *= 0.5F;
+            }
+            if (depthStrider > 0) {
+                friction += (0.54600006F - friction) * depthStrider / 3F;
+            }
+            return friction;
+        } else if (player.isInLava && !flying) {
+            return 0.5F;
+        } else {
+            float friction = 0.91F;
+            if (player.onGround) {
+                IWrappedBlock b = player.position.add(0, -1, 0).getBlock();
+                if (b != null) {
+                    friction *= b.getFriction();
+                }
+            }
+            return friction;
         }
-        return friction;
     }
 
     private long getClientBlock() {
@@ -242,7 +260,7 @@ public class MoveEvent extends Event {
         boolean flying = player.isFlying();
 
         double sprintMultiplier = flying ? (player.isSprinting ? 2 : 1) : (player.isSprinting ? 1.3 : 1);
-        double weirdConstant = (jump && player.isSprinting ? 0.2518462 : (player.isInLiquid ? 0.0196 : 0.098));
+        double weirdConstant = (jump && player.isSprinting ? 0.2518462 : (player.isInWater ? 0.0196 : 0.098));
         double baseMultiplier = flying ? (10 * player.getPlayer().getFlySpeed()) : (5 * player.getPlayer().getWalkSpeed() * (1 + player.getPotionEffectAmplifier("SPEED") * 0.2));
         double maxDiscrepancy = weirdConstant * baseMultiplier * sprintMultiplier + 0.003;
 
@@ -263,7 +281,7 @@ public class MoveEvent extends Event {
 
                 if (!((touchingFaces.contains(BlockFace.UP) && y > 0) || (touchingFaces.contains(BlockFace.DOWN) && y < 0)) &&
                         Math.abs(y - velocity.y) > 0.01 &&
-                        !jump && !player.isInLiquid && !this.stepLegitly) {
+                        !jump && !player.isInWater && !this.stepLegitly) {
                     continue;
                 }
 
@@ -444,8 +462,8 @@ public class MoveEvent extends Event {
         player.prevPrevDeltaY = player.velocity.y;
         player.velocity = this.velocity;
         player.touchingFaces = this.touchingFaces;
-        player.isInLiquidStrict = this.isInLiquidStrict;
-        player.isInLiquid = this.isInLiquid;
+        player.isInWater = this.isInWater;
+        player.isInLava = this.checkLava();
 
         if (onGroundReally) {
             player.clientBlockCount = 0;
@@ -455,6 +473,18 @@ public class MoveEvent extends Event {
         if (!updatePos) {
             player.speedData.lastIdleTick = player.currentTick;
         }
+    }
+
+    private boolean checkLava() {
+        AABB lavaTest = AABB.LAVA_BOX;
+        lavaTest.translate(to.toVector());
+        List<IWrappedBlock> blocks = lavaTest.getBlocks(player.world);
+        for (IWrappedBlock b : blocks) {
+            if (MatUtils.LAVA.contains(b.getType())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public enum MoveType {

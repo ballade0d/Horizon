@@ -14,7 +14,7 @@ public class AABB {
 
     public static final AABB NORMAL_BOX = new AABB(new Vector3D(-0.3, 0, -0.3), new Vector3D(0.3, 1.8, 0.3));
     public static final AABB WATER_BOX = new AABB(new Vector3D(-0.299, 0.401, -0.299), new Vector3D(0.299, 1.399, 0.299));
-    public static final AABB SWIM_BOX = new AABB(new Vector3D(-0.3, 0, -0.3), new Vector3D(0.3, 0.6, 0.3));
+    public static final AABB LAVA_BOX = new AABB(new Vector3D(-0.2, 0.4, -0.2), new Vector3D(0.2, 1.4, 0.2));
 
     public final double minX, minY, minZ;
     public final double maxX, maxY, maxZ;

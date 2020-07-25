@@ -143,54 +143,47 @@ public class Speed extends Module<SpeedData, SpeedNode> {
                 return;
             }
 
-            boolean swimming = player.isInLiquid;
+            boolean swimming = player.isInWater;
             boolean usingItem = player.isEating || player.isPullingBow || player.isBlocking;
 
-            double estimatedSpeed;
-            double discrepancy;
+            boolean jump = e.jumpLegitly || (e.stepLegitly && player.onGround && player.isSprinting);
 
+            float friction = e.oldFriction;
+            float maxForce = computeMaxInputForce(player, e.newFriction, usingItem, e.onGround);
+
+            Set<Material> touchedBlocks = e.touchedBlocks;
+
+            double multipliers = 1;
+            if (e.hitSlowdown) {
+                multipliers *= 0.6;
+            }
+            if (touchedBlocks.contains(Material.SOUL_SAND)) {
+                multipliers *= 0.4;
+            }
+            if (touchedBlocks.contains(MatUtils.COBWEB.parse())) {
+                multipliers *= 0.25;
+            }
+            if (touchedBlocks.contains(Material.SLIME_BLOCK) && Math.abs(player.velocity.y) < 0.1 && !player.isSneaking) {
+                multipliers *= 0.4 + Math.abs(player.velocity.y) * 0.2;
+            }
+
+            double adders = 0;
+            if (player.isSprinting && jump) {
+                adders += 0.2;
+            }
             if (swimming) {
-                // Water function
+                // Swimming function
                 Vector3D move = e.velocity.clone().setY(0);
                 Vector3D waterForce = e.waterFlowForce.clone().setY(0);
-                double waterForceLength = waterForce.length();
+                double waterForceLength = waterForce.length() + 0.003;
                 double moveLength = move.length();
                 double computedForce = moveLength == 0 ? waterForceLength : (move.dot(waterForce) / moveLength);
-                computedForce += 0.003;
 
-                estimatedSpeed = this.waterMapping(prevSpeed, computedForce,
-                        player.getEnchantmentEffectAmplifier("DEPTH_STRIDER"), player.isSprinting, e.onGround);
-            } else {
-                // Normal function
-                boolean jump = e.jumpLegitly || (e.stepLegitly && player.onGround && player.isSprinting);
-
-                float friction = e.oldFriction;
-                float maxForce = this.computeMaxInputForce(player, e.newFriction, usingItem);
-
-                Set<Material> touchedBlocks = e.touchedBlocks;
-
-                double multipliers = 1;
-                if (e.hitSlowdown) {
-                    multipliers *= 0.6;
-                }
-                if (touchedBlocks.contains(Material.SOUL_SAND)) {
-                    multipliers *= 0.4;
-                }
-                if (touchedBlocks.contains(MatUtils.COBWEB.parse())) {
-                    multipliers *= 0.25;
-                }
-                if (touchedBlocks.contains(Material.SLIME_BLOCK) && Math.abs(player.velocity.y) < 0.1 && !player.isSneaking) {
-                    multipliers *= 0.4 + Math.abs(player.velocity.y) * 0.2;
-                }
-
-                double adders = 0;
-                if (player.isSprinting && jump) {
-                    adders += 0.2;
-                }
-
-                estimatedSpeed = friction * prevSpeed * multipliers + (maxForce + adders + 0.000001);
+                adders += computedForce;
             }
-            discrepancy = speed - estimatedSpeed;
+
+            double estimatedSpeed = friction * prevSpeed * multipliers + (maxForce + adders + 0.000001);
+            double discrepancy = speed - estimatedSpeed;
             if (e.updatePos) {
                 if (discrepancy < 0 || speed > data.negativeDiscrepanciesCumulative) {
                     data.discrepancies = Math.max(data.discrepancies + discrepancy, 0);
@@ -232,28 +225,12 @@ public class Speed extends Module<SpeedData, SpeedNode> {
         }
     }
 
-    private double waterMapping(final double lastSpeed, final double waterFlowForce, final int level, final boolean sprinting, final boolean onGround) {
-        float waterSlowDown = sprinting ? 0.9F : 0.8F;
-        float depthStriderLevel = level;
-        float acceleration = 0.02F;
-        if (depthStriderLevel > 3) {
-            depthStriderLevel = 3;
-        }
-        if (!onGround) {
-            depthStriderLevel *= 0.5F;
-        }
-        if (depthStriderLevel > 0) {
-            acceleration += (0.54600006F - acceleration) * depthStriderLevel / 3.0F;
-        }
-        return waterSlowDown * lastSpeed + acceleration + waterFlowForce;
-    }
-
     /**
      * Get the max input force.
      *
      * @author Islandscout, MrCraftGoo
      */
-    private float computeMaxInputForce(final HoriPlayer player, final float newFriction, final boolean usingItem) {
+    private float computeMaxInputForce(final HoriPlayer player, final float newFriction, final boolean usingItem, final boolean onGround) {
         float initForce = 0.98F;
         if (player.isSneaking) {
             initForce *= 0.3;
@@ -264,7 +241,22 @@ public class Speed extends Module<SpeedData, SpeedNode> {
         boolean sprinting = player.isSprinting && !player.isSneaking && player.getPotionEffectAmplifier("BLINDNESS") <= 0;
 
         float multiplier;
-        if (player.onGround) {
+        if (player.isInWater && !player.isFlying()) {
+            float force = 0.02F;
+            float depthStrider = player.getEnchantmentEffectAmplifier("DEPTH_STRIDER");
+            if (depthStrider > 3) {
+                depthStrider = 3;
+            }
+            if (!onGround) {
+                depthStrider *= 0.5F;
+            }
+            if (depthStrider > 0) {
+                force += (0.1F * 1.0F - force) * depthStrider / 3F;
+            }
+            return force;
+        } else if (player.isInLava && !player.isFlying()) {
+            return 0.02F;
+        } else if (player.onGround) {
             multiplier = player.getMoveFactor() * 0.16277136F / (newFriction * newFriction * newFriction);
             float groundMultiplier = 5 * player.getPlayer().getWalkSpeed();
             multiplier *= groundMultiplier;
@@ -308,7 +300,7 @@ public class Speed extends Module<SpeedData, SpeedNode> {
                 data.lastSprintTick = player.currentTick;
             }
 
-            if (e.isInLiquid || player.currentTick - player.teleportAcceptTick < 3 || e.knockBack != null ||
+            if (e.isInWater || player.currentTick - player.teleportAcceptTick < 3 || e.knockBack != null ||
                     e.collidingBlocks.contains(Material.LADDER) || e.collidingBlocks.contains(Material.VINE) ||
                     (collisionHorizontal && !data.collisionHorizontal) || player.isFlying() ||
                     player.currentTick - data.lastSprintTick < 2 || player.getVehicle() != null ||
@@ -394,7 +386,7 @@ public class Speed extends Module<SpeedData, SpeedNode> {
             MoveEvent e = (MoveEvent) event;
 
             if (player.isFlying() || e.onGround || player.onGround || e.isTeleport || e.knockBack != null ||
-                    !e.touchingFaces.isEmpty() || e.piston || player.getVehicle() != null || e.isInLiquidStrict ||
+                    !e.touchingFaces.isEmpty() || e.piston || player.getVehicle() != null || e.isInLiquid ||
                     BlockUtils.blockNearbyIsSolid(e.to) || BlockUtils.blockNearbyIsSolid(e.to.add(0, 1, 0))) {
                 return;
             }

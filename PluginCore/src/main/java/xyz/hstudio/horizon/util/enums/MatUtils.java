@@ -27,19 +27,20 @@ public enum MatUtils {
     COBWEB("WEB");
 
     public static final Set<Material> BLOCKABLE = EnumSet.noneOf(Material.class);
-    public static final Set<Material> LIQUID = EnumSet.noneOf(Material.class);
+    public static final Set<Material> WATER = EnumSet.noneOf(Material.class);
+    public static final Set<Material> LAVA = EnumSet.noneOf(Material.class);
 
     static {
-        LIQUID.add(Material.WATER);
-        LIQUID.add(Material.LAVA);
+        WATER.add(Material.WATER);
+        LAVA.add(Material.LAVA);
         if (Version.VERSION == Version.v1_8_R3) {
             BLOCKABLE.add(Material.WOOD_SWORD);
             BLOCKABLE.add(Material.STONE_SWORD);
             BLOCKABLE.add(Material.IRON_SWORD);
             BLOCKABLE.add(Material.GOLD_SWORD);
             BLOCKABLE.add(Material.DIAMOND_SWORD);
-            LIQUID.add(Material.getMaterial("STATIONARY_WATER"));
-            LIQUID.add(Material.getMaterial("STATIONARY_LAVA"));
+            WATER.add(Material.getMaterial("STATIONARY_WATER"));
+            LAVA.add(Material.getMaterial("STATIONARY_LAVA"));
         } else {
             BLOCKABLE.add(Material.getMaterial("SHIELD"));
         }

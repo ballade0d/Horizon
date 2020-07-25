@@ -69,7 +69,8 @@ public class KillAura extends Module<KillAuraData, KillAuraNode> {
             typeH(event, player, data, config);
         }
         if (config.aim_enabled) {
-            typeI(event, player, data, config);
+            // TODO: Recode this
+            // typeI(event, player, data, config);
         }
         if (event instanceof InteractEntityEvent) {
             InteractEntityEvent e = (InteractEntityEvent) event;
@@ -368,39 +369,6 @@ public class KillAura extends Module<KillAuraData, KillAuraNode> {
             if (player.currentTick - data.failKeepSprintTick == 2) {
                 this.punish(event, player, data, 7, 2);
             }
-        }
-    }
-
-    /**
-     * Aim check.
-     * <p>
-     * Accuracy: 7/10 - It has some false positives
-     * Efficiency: 8/10 - Kinda fast
-     */
-    private void typeI(final Event event, final HoriPlayer player, final KillAuraData data, final KillAuraNode config) {
-        if (event instanceof MoveEvent) {
-            MoveEvent e = (MoveEvent) event;
-            if (!e.updatePos || !e.updateRot) {
-                data.streakA = Math.max(data.streakA - 1, 0);
-                return;
-            }
-            float deltaYaw = Math.abs(e.to.yaw - e.from.yaw);
-            float deltaPitch = Math.abs(e.to.pitch - e.from.pitch);
-
-            int roundedYaw = Math.round(deltaYaw);
-            int roundedPitch = Math.round(deltaPitch);
-            int roundedDelta = Math.abs(roundedPitch - data.lastRoundedPitch);
-
-            if (roundedYaw == data.lastRoundedYaw && roundedDelta < 5 && deltaYaw < 20 && deltaPitch < 20 &&
-                    deltaYaw != 0 && player.currentTick - data.lastHitTick < 20) {
-                if (++data.streakA > 6) {
-                    this.punish(event, player, data, 8, 4, "yaw:" + deltaYaw);
-                }
-            } else {
-                data.streakA = 0;
-            }
-            data.lastRoundedYaw = roundedYaw;
-            data.lastRoundedPitch = roundedPitch;
         }
     }
 }

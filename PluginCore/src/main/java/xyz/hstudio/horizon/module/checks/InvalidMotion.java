@@ -79,7 +79,7 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
                     !e.jumpLegitly && !e.stepLegitly && e.knockBack == null && !e.piston &&
                     player.currentTick - player.leaveVehicleTick > 1 && player.getVehicle() == null &&
                     !player.getPlayer().isDead() && !e.isOnBed && !e.isInLiquid &&
-                    !player.isInLiquid && !inSpecialBlock(e.collidingBlocks)) {
+                    !inSpecialBlock(e.collidingBlocks)) {
 
                 int levitation = player.getPotionEffectAmplifier("LEVITATION");
                 // Supports SLOW_FALLING potion effect
@@ -162,8 +162,8 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
                 }
 
                 // Idk why but client considers player is not on ground when walking on slime, client bug?
-                if (deltaY == 0 && BlockUtils
-                        .getBlocksInLocation(e.to.add(0, -0.1, 0))
+                if (deltaY == 0 && e.onGroundReally && BlockUtils
+                        .getBlocksInLocation(e.to.add(0, -0.5, 0))
                         .stream()
                         .filter(Objects::nonNull)
                         .anyMatch(b -> b.getType() == Material.SLIME_BLOCK)) {
