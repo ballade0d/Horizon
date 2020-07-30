@@ -47,7 +47,8 @@ public class GroundSpoof extends Module<GroundSpoofData, GroundSpoofNode> {
         if (event instanceof MoveEvent) {
             MoveEvent e = (MoveEvent) event;
             // Only check if player is not on ground
-            if (e.onGroundReally || player.currentTick < 20 || e.stepLegitly || e.isTeleport || e.piston || e.isCollidingEntities || player.isFlying()) {
+            if (e.onGroundReally || player.currentTick < 20 || player.vehicleBypass || e.stepLegitly ||
+                    e.isTeleport || e.piston || !e.collidingEntities.isEmpty() || player.isFlying()) {
                 return;
             }
             // Player is not on ground but appears on ground.

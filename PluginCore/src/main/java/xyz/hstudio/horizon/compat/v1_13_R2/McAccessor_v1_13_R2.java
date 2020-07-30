@@ -8,6 +8,7 @@ import org.bukkit.craftbukkit.v1_13_R2.CraftServer;
 import org.bukkit.craftbukkit.v1_13_R2.CraftWorld;
 import org.bukkit.craftbukkit.v1_13_R2.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_13_R2.entity.CraftPlayer;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import xyz.hstudio.horizon.compat.IMcAccessor;
 import xyz.hstudio.horizon.data.HoriPlayer;
@@ -16,6 +17,9 @@ import xyz.hstudio.horizon.util.wrap.AABB;
 import xyz.hstudio.horizon.util.wrap.Location;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class McAccessor_v1_13_R2 implements IMcAccessor {
 
@@ -69,10 +73,18 @@ public class McAccessor_v1_13_R2 implements IMcAccessor {
     }
 
     @Override
-    public boolean isCollidingEntities(final org.bukkit.World world, final Player player, final AABB aabb) {
+    public Set<EntityType> getEntities(final org.bukkit.World world, final Player player, final AABB aabb) {
         World w = ((CraftWorld) world).getHandle();
-        return w.getEntities(((CraftPlayer) player).getHandle(), new AxisAlignedBB(aabb.minX + 0.1, aabb.minY + 0.1, aabb.minZ + 0.1, aabb.maxX + 0.1, aabb.maxY + 0.1, aabb.maxZ + 0.1))
-                .size() > 0;
+        List<Entity> entities = w.getEntities(((CraftPlayer) player).getHandle(), new AxisAlignedBB(aabb.minX - 0.1, aabb.minY - 0.1, aabb.minZ - 0.1, aabb.maxX + 0.1, aabb.maxY + 0.1, aabb.maxZ + 0.1));
+        return entities.stream().map(entity -> {
+            if (entity instanceof EntityBoat) {
+                return EntityType.BOAT;
+            } else if (entity instanceof EntityMinecartAbstract) {
+                return EntityType.MINECART;
+            } else {
+                return EntityType.UNKNOWN;
+            }
+        }).collect(Collectors.toSet());
     }
 
     @Override

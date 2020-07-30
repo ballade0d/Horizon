@@ -92,7 +92,7 @@ public class Inventory extends Module<InventoryData, InventoryNode> {
                 return;
             }
             if (config.typeA_checkPosition && e.hasDeltaPos() && e.velocity.length() > 0.1 &&
-                    !e.isInLiquid && !data.temporarilyBypass && !e.isCollidingEntities) {
+                    !e.isInLiquid && !data.temporarilyBypass && e.collidingEntities.isEmpty()) {
                 // Block Inventory Position
 
                 // Punish

@@ -32,6 +32,7 @@ public class Async implements Runnable {
     private final FileOutputStream logOutput;
     private final byte[] lineSeparator;
     public volatile boolean running = true;
+
     public Async() {
         try {
             File logs = new File(Horizon.getInst().getDataFolder(), "logs");

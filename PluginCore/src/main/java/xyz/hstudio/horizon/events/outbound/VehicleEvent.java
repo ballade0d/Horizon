@@ -16,8 +16,8 @@ public class VehicleEvent extends Event {
     public void post() {
         player.vehicle = vehicle;
         if (vehicle == -1) {
-            player.leaveVehicleTick = player.currentTick;
-            player.sendSimulatedAction(() -> player.leaveVehicleTick = player.currentTick);
+            player.vehicleBypass = true;
+            player.sendSimulatedAction(() -> player.vehicleBypass = false);
         }
     }
 }

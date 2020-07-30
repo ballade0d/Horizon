@@ -449,8 +449,8 @@ public class PacketConverter_v1_12_R1 implements IPacketConverter {
         }
         if (ArrayUtils.contains(ids, player.vehicle)) {
             player.vehicle = -1;
-            player.leaveVehicleTick = player.currentTick;
-            player.sendSimulatedAction(() -> player.leaveVehicleTick = player.currentTick);
+            player.vehicleBypass = true;
+            player.sendSimulatedAction(() -> player.vehicleBypass = false);
         }
         return null;
     }

@@ -138,8 +138,7 @@ public class Speed extends Module<SpeedData, SpeedNode> {
                 data.prevSpeed = speed;
                 return;
             }
-            if (e.isTeleport || player.getVehicle() != null ||
-                    player.currentTick - player.leaveVehicleTick <= 1) {
+            if (e.isTeleport || player.getVehicle() != null || player.vehicleBypass) {
                 return;
             }
 
@@ -304,8 +303,8 @@ public class Speed extends Module<SpeedData, SpeedNode> {
                     e.collidingBlocks.contains(Material.LADDER) || e.collidingBlocks.contains(Material.VINE) ||
                     (collisionHorizontal && !data.collisionHorizontal) || player.isFlying() ||
                     player.currentTick - data.lastSprintTick < 2 || player.getVehicle() != null ||
-                    player.currentTick - player.leaveVehicleTick < 1 || e.velocity.clone().setY(0).lengthSquared() < 0.04 ||
-                    e.piston || e.isCollidingEntities || data.collisionHorizontal) {
+                    player.vehicleBypass || e.velocity.clone().setY(0).lengthSquared() < 0.04 ||
+                    e.piston || !e.collidingEntities.isEmpty() || data.collisionHorizontal) {
                 return;
             }
 

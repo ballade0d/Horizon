@@ -3,6 +3,7 @@ package xyz.hstudio.horizon.events.inbound;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
+import org.bukkit.entity.EntityType;
 import xyz.hstudio.horizon.Horizon;
 import xyz.hstudio.horizon.compat.McAccessor;
 import xyz.hstudio.horizon.data.HoriPlayer;
@@ -42,7 +43,6 @@ public class MoveEvent extends Event {
     public final MoveType moveType;
     public final boolean hitSlowdown;
     public final boolean onGroundReally;
-    public final boolean isCollidingEntities;
     public final boolean isOnSlime;
     public final boolean isOnSlimeNext;
     public final boolean isOnBed;
@@ -52,11 +52,13 @@ public class MoveEvent extends Event {
     public final float oldFriction;
     public final float newFriction;
     public final boolean piston;
+    public final Set<EntityType> collidingEntities;
     public final Set<Material> touchedBlocks;
     public final Set<Material> collidingBlocks;
     public final Set<BlockFace> touchingFaces;
     public final boolean stepLegitly;
     public final Vector3D knockBack;
+    public final boolean touchCeiling;
     public final boolean jumpLegitly;
     public final boolean strafeNormally;
     public final long clientBlock;
@@ -81,7 +83,7 @@ public class MoveEvent extends Event {
 
         this.onGroundReally = this.to.isOnGround(player, false, 0.001);
 
-        this.isCollidingEntities = McAccessor.INSTANCE.isCollidingEntities(to.world, player.getPlayer(), cube);
+        this.collidingEntities = McAccessor.INSTANCE.getEntities(to.world, player.getPlayer(), cube);
 
         this.isOnSlime = this.checkSlime();
         this.isOnSlimeNext = this.checkSlimeNext();
@@ -100,7 +102,7 @@ public class MoveEvent extends Event {
         this.oldFriction = player.friction;
         this.newFriction = this.computeFriction();
 
-        this.piston = this.checkBlock();
+        this.piston = this.checkPiston();
 
         this.touchedBlocks = originCube.add(from.toVector().subtract(player.getPlayer().getLocation().toVector())).getMaterials(to.world);
         // This will only get the blocks that are colliding horizontally.
@@ -109,12 +111,13 @@ public class MoveEvent extends Event {
         this.touchingFaces = BlockUtils.checkTouchingBlock(player, new AABB(to.x - 0.299999, to.y + 0.000001, to.z - 0.299999, to.x + 0.299999, to.y + 1.799999, to.z + 0.299999), to.world, 0.0001);
         this.stepLegitly = this.checkStep();
         this.knockBack = this.checkKnockBack();
+        this.touchCeiling = this.checkTouchCeiling();
         this.jumpLegitly = this.checkJump();
         this.strafeNormally = this.checkStrafe();
         this.clientBlock = this.getClientBlock();
     }
 
-    private boolean checkBlock() {
+    private boolean checkPiston() {
         Set<AABB> piston = player.piston;
         AABB cube = this.cube.add(-velocity.x, -velocity.y, -velocity.z).expand(0.1, 0.1, 0.1);
         piston.removeIf(aabb -> !cube.isColliding(aabb));
@@ -229,21 +232,51 @@ public class MoveEvent extends Event {
         return -1;
     }
 
-    /**
-     * Check if player is stepping up stair/block.
-     *
-     * @author Islandscout, MrCraftGoo
-     */
     private boolean checkStep() {
-        Vector3D extraVelocity = player.velocity.clone();
-        if (player.onGroundReally) {
-            extraVelocity.setY(-0.0784);
-        } else {
-            extraVelocity.setY((extraVelocity.y - 0.08) * 0.98);
+        Vector3D prevPos = from.toVector();
+        Vector3D extrapolate = from.toVector();
+        //when on ground, Y velocity is inherently 0; no need to do pointless math.
+        extrapolate.setY(extrapolate.y + (player.onGroundReally ? -0.0784 : ((player.velocity.y - 0.08) * 0.98)));
+
+        AABB box = AABB.NORMAL_BOX.translate(extrapolate);
+        List<AABB> verticalCollision = box.getBlockAABBs(player, player.world, MatUtils.COBWEB.parse());
+
+        if (verticalCollision.isEmpty() && !player.onGround) {
+            return false;
         }
-        Location extraPos = player.position.add(extraVelocity);
-        float deltaY = (float) this.velocity.y;
-        return extraPos.isOnGround(player, false, 0.001) && onGroundReally && deltaY > 0.002F && deltaY <= 0.6F;
+
+        double highestVertical = extrapolate.y;
+        for (AABB blockAABB : verticalCollision) {
+            double aabbMaxY = blockAABB.maxY;
+            if (aabbMaxY > highestVertical) {
+                highestVertical = aabbMaxY;
+            }
+        }
+
+        box = AABB.NORMAL_BOX.translate(to.toVector().setY(highestVertical)).expand(0, -0.00000000001, 0);
+
+        List<AABB> horizontalCollision = box.getBlockAABBs(player, player.world, MatUtils.COBWEB.parse());
+
+        if (horizontalCollision.isEmpty()) {
+            return false;
+        }
+
+        double expectedY = prevPos.y;
+        double highestPointOnAABB = -1;
+        for (AABB blockAABB : horizontalCollision) {
+            double blockAABBY = blockAABB.maxY;
+            if (blockAABBY - prevPos.y > 0.6) {
+                return false;
+            }
+            if (blockAABBY > expectedY) {
+                expectedY = blockAABBY;
+            }
+            if (blockAABBY > highestPointOnAABB) {
+                highestPointOnAABB = blockAABBY;
+            }
+        }
+
+        return (onGround || onGroundReally) && Math.abs(prevPos.y - highestPointOnAABB) > 0.0001 && Math.abs(to.y - expectedY) < 0.0001;
     }
 
     private Vector3D checkKnockBack() {
@@ -311,21 +344,44 @@ public class MoveEvent extends Event {
         return null;
     }
 
-    /**
-     * Check if player is jumping.
-     *
-     * @author Islandscout, MrCraftGoo
-     */
+    private boolean checkTouchCeiling() {
+        Vector3D pos = from.toVector().setY(to.y);
+        AABB collisionBox = AABB.NORMAL_BOX.expand(-0.000001, -0.000001, -0.000001).translate(pos);
+        return BlockUtils.checkTouchingBlock(player, collisionBox, to.world, 0.0001).contains(BlockFace.UP);
+    }
+
     private boolean checkJump() {
-        float initJumpVelocity = 0.42F + player.getPotionEffectAmplifier("JUMP") * 0.1F;
+        float expectedDY = Math.max(0.42F + player.getPotionEffectAmplifier("JUMP") * 0.1F, 0F);
         float deltaY = (float) this.velocity.y;
-
-        AABB collisionBox = new AABB(from.x - 0.299999, to.y + 0.000001, from.z - 0.299999, from.x + 0.299999, to.y + 1.799999, from.z + 0.299999);
-        boolean hitCeiling = BlockUtils.checkTouchingBlock(player, collisionBox, to.world, 0.0001).contains(BlockFace.UP);
-
-        boolean kbSimilarToJump = this.knockBack != null && (Math.abs(knockBack.y - initJumpVelocity) < 0.001 || hitCeiling);
         boolean leftGround = player.onGround && !this.onGround;
-        return !kbSimilarToJump && ((initJumpVelocity == 0 && player.onGround) || leftGround) && (deltaY == initJumpVelocity || hitCeiling);
+
+        {
+            AABB box = AABB.NORMAL_BOX
+                    .expand(-0.000001, -0.000001, -0.000001)
+                    .translate(to.toVector().add(new Vector3D(0, expectedDY, 0)));
+            boolean collidedNow = !box.getBlockAABBs(player, to.world).isEmpty();
+
+            box = AABB.NORMAL_BOX
+                    .expand(-0.000001, -0.000001, -0.000001)
+                    .translate(from.toVector().add(new Vector3D(0, expectedDY, 0)));
+            boolean collidedBefore = !box.getBlockAABBs(player, to.world).isEmpty();
+
+            if (collidedNow && !collidedBefore && leftGround && deltaY == 0) {
+                expectedDY = 0;
+            }
+        }
+
+        if (touchedBlocks.contains(Material.WEB)) {
+            if (updatePos) {
+                expectedDY *= 0.05;
+            } else {
+                expectedDY = 0;
+            }
+        }
+
+        boolean kbSimilarToJump = knockBack != null &&
+                (Math.abs(knockBack.y - expectedDY) < 0.001 || touchCeiling);
+        return !kbSimilarToJump && ((expectedDY == 0 && player.onGround) || leftGround) && (deltaY == expectedDY || touchCeiling);
     }
 
     /**
@@ -341,7 +397,7 @@ public class MoveEvent extends Event {
                 this.touchingFaces.contains(BlockFace.NORTH) || this.touchingFaces.contains(BlockFace.SOUTH) ||
                 this.touchingFaces.contains(BlockFace.WEST) || this.touchingFaces.contains(BlockFace.EAST) ||
                 this.collidingBlocks.contains(Material.LADDER) || this.collidingBlocks.contains(Material.VINE) ||
-                this.isCollidingEntities || player.isGliding || player.invalidMotionData.prevGliding ||
+                !this.collidingEntities.isEmpty() || player.isGliding || player.invalidMotionData.prevGliding ||
                 player.currentTick - player.speedData.lastIdleTick <= 2) {
             return true;
         }

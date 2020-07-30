@@ -2,6 +2,7 @@ package xyz.hstudio.horizon.module.checks;
 
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
+import org.bukkit.entity.EntityType;
 import xyz.hstudio.horizon.api.ModuleType;
 import xyz.hstudio.horizon.compat.McAccessor;
 import xyz.hstudio.horizon.data.HoriPlayer;
@@ -77,9 +78,8 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
 
             if (!player.isFlying() && (!e.onGround || !player.onGround) && !e.isTeleport &&
                     !e.jumpLegitly && !e.stepLegitly && e.knockBack == null && !e.piston &&
-                    player.currentTick - player.leaveVehicleTick > 1 && player.getVehicle() == null &&
-                    !player.getPlayer().isDead() && !e.isOnBed && !e.isInLiquid &&
-                    !inSpecialBlock(e.collidingBlocks)) {
+                    !e.isInLiquid && !player.vehicleBypass && player.getVehicle() == null &&
+                    !player.getPlayer().isDead() && !e.isOnBed && !inSpecialBlock(e.collidingBlocks)) {
 
                 int levitation = player.getPotionEffectAmplifier("LEVITATION");
                 // Supports SLOW_FALLING potion effect
@@ -146,11 +146,6 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
                         (Math.abs(player.velocity.y - 0.2) < 0.001 || Math.abs(player.velocity.y - 0.325) < 0.001 || Math.abs(player.velocity.y - 0.0125) < 0.001)) {
                     estimatedVelocity = deltaY;
                 }
-                if ((estimatedVelocity == -0.0784F || estimatedVelocity == 0F) && player.velocity.y == 0 && player.onGround && !e.onGround && deltaY == 0 &&
-                        !e.cube.add(-0.1, 1.6, -0.1, 0.1, 1.8, 0.1).getMaterials(e.to.world).isEmpty()) {
-                    estimatedVelocity = deltaY;
-                    data.magic = true;
-                }
                 // Fix the false positives when there's trapdoor above and there's slime under
                 if (deltaY == 0 && estimatedVelocity == -0.0784F && (Math.abs(player.velocity.y - 0.0125) < 0.001 || player.velocity.y == 0F) && !e.onGround && !player.onGround && feetBlock.getType() == Material.SLIME_BLOCK) {
                     estimatedVelocity = deltaY;
@@ -162,8 +157,8 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
                 }
 
                 // Idk why but client considers player is not on ground when walking on slime, client bug?
-                if (deltaY == 0 && e.onGroundReally && BlockUtils
-                        .getBlocksInLocation(e.to.add(0, -0.5, 0))
+                if (Math.abs(deltaY) < 0.1 && e.onGroundReally && BlockUtils
+                        .getBlocksInLocation(e.to.add(0, -0.1, 0))
                         .stream()
                         .filter(Objects::nonNull)
                         .anyMatch(b -> b.getType() == Material.SLIME_BLOCK)) {
@@ -226,7 +221,6 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
                 collidingBlocks.contains(MatUtils.KELP_PLANT.parse()) ||
                 collidingBlocks.contains(MatUtils.BUBBLE_COLUMN.parse()) ||
                 collidingBlocks.contains(MatUtils.SWEET_BERRY_BUSH.parse()) ||
-                collidingBlocks.contains(Material.CACTUS) ||
                 collidingBlocks.stream().anyMatch(BlockUtils.SHULKER_BOX::contains);
     }
 
@@ -245,7 +239,7 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
     private void typeB(final Event event, final HoriPlayer player, final InvalidMotionData data, final InvalidMotionNode config) {
         if (event instanceof MoveEvent) {
             MoveEvent e = (MoveEvent) event;
-            if (e.stepLegitly || e.isTeleport || e.knockBack != null || inLadder(e.collidingBlocks) || e.isOnSlime) {
+            if (e.stepLegitly || e.isTeleport || e.knockBack != null || inLadder(e.collidingBlocks) || e.isOnSlime || e.collidingEntities.contains(EntityType.BOAT)) {
                 return;
             }
             double deltaY = e.velocity.y;

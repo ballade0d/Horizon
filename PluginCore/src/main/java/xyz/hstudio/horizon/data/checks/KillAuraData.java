@@ -29,5 +29,4 @@ public class KillAuraData extends Data {
     // KeepSprint
     public long failKeepSprintTick;
     // Aim
-    public int lastRoundedYaw, lastRoundedPitch, streakA;
 }

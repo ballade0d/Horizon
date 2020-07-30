@@ -80,11 +80,11 @@ public class HoriPlayer {
     public boolean isInWater;
     public boolean isInLava;
     public boolean isTeleporting;
+    public boolean vehicleBypass;
     public long teleportAcceptTick = -1;
     public long toggleFlyTick;
     public long hitSlowdownTick = -1;
     public int vehicle = -1;
-    public long leaveVehicleTick = -1;
     public ChannelPipeline pipeline;
 
     public HoriPlayer(final Player player) {

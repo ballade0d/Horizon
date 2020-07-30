@@ -3,11 +3,14 @@ package xyz.hstudio.horizon.compat;
 import io.netty.channel.ChannelPipeline;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import xyz.hstudio.horizon.data.HoriPlayer;
 import xyz.hstudio.horizon.events.inbound.MoveEvent;
 import xyz.hstudio.horizon.util.wrap.AABB;
 import xyz.hstudio.horizon.util.wrap.Location;
+
+import java.util.Set;
 
 public interface IMcAccessor {
 
@@ -51,7 +54,7 @@ public interface IMcAccessor {
     /**
      * Check if player is colliding entities
      */
-    boolean isCollidingEntities(World world, Player player, AABB aabb);
+    Set<EntityType> getEntities(World world, Player player, AABB aabb);
 
     /**
      * Set onGround statue of a move packet.

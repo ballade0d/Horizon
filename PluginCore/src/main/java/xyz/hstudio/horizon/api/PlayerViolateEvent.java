@@ -29,6 +29,7 @@ public class PlayerViolateEvent extends Event implements Cancellable {
     @Getter
     @Setter
     private boolean cancelled;
+
     public PlayerViolateEvent(final Player player, final ModuleType type, final String module, final String[] debug, final float nowViolation, final float oldViolation) {
         super(!Bukkit.isPrimaryThread());
         if (Arrays.stream(Thread.currentThread().getStackTrace())
