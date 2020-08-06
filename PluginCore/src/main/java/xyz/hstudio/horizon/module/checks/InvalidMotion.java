@@ -7,10 +7,10 @@ import xyz.hstudio.horizon.api.ModuleType;
 import xyz.hstudio.horizon.compat.McAccessor;
 import xyz.hstudio.horizon.data.HoriPlayer;
 import xyz.hstudio.horizon.data.checks.InvalidMotionData;
-import xyz.hstudio.horizon.events.Event;
-import xyz.hstudio.horizon.events.inbound.AbilitiesEvent;
-import xyz.hstudio.horizon.events.inbound.ActionEvent;
-import xyz.hstudio.horizon.events.inbound.MoveEvent;
+import xyz.hstudio.horizon.event.Event;
+import xyz.hstudio.horizon.event.inbound.AbilitiesEvent;
+import xyz.hstudio.horizon.event.inbound.ActionEvent;
+import xyz.hstudio.horizon.event.inbound.MoveEvent;
 import xyz.hstudio.horizon.file.node.InvalidMotionNode;
 import xyz.hstudio.horizon.module.Module;
 import xyz.hstudio.horizon.thread.Sync;
@@ -147,7 +147,7 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
                     estimatedVelocity = deltaY;
                 }
                 // Fix the false positives when there's trapdoor above and there's slime under
-                if (deltaY == 0 && estimatedVelocity == -0.0784F && (Math.abs(player.velocity.y - 0.0125) < 0.001 || player.velocity.y == 0F) && !e.onGround && !player.onGround && feetBlock.getType() == Material.SLIME_BLOCK) {
+                if (deltaY == 0 && estimatedVelocity == -0.0784F && (Math.abs(player.velocity.y - 0.0125) < 0.001 || player.velocity.y == 0F) && !e.onGround && !player.onGround && feetBlock != null && feetBlock.getType() == Material.SLIME_BLOCK) {
                     estimatedVelocity = deltaY;
                 }
 
@@ -158,7 +158,7 @@ public class InvalidMotion extends Module<InvalidMotionData, InvalidMotionNode> 
 
                 // Idk why but client considers player is not on ground when walking on slime, client bug?
                 if (Math.abs(deltaY) < 0.1 && e.onGroundReally && BlockUtils
-                        .getBlocksInLocation(e.to.add(0, -0.1, 0))
+                        .getBlocksInLocation(e.to.add(0, -0.2, 0))
                         .stream()
                         .filter(Objects::nonNull)
                         .anyMatch(b -> b.getType() == Material.SLIME_BLOCK)) {

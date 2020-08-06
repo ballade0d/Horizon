@@ -9,11 +9,13 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.player.*;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import xyz.hstudio.horizon.Horizon;
 import xyz.hstudio.horizon.compat.McAccessor;
 import xyz.hstudio.horizon.data.HoriPlayer;
-import xyz.hstudio.horizon.events.inbound.SyncWindowClickEvent;
+import xyz.hstudio.horizon.event.inbound.SyncWindowClickEvent;
 import xyz.hstudio.horizon.kirin.module.CControl;
 import xyz.hstudio.horizon.module.Module;
 import xyz.hstudio.horizon.util.wrap.AABB;
@@ -48,16 +50,13 @@ public class Listeners implements Listener {
         Horizon.PLAYERS.remove(event.getPlayer().getUniqueId());
     }
 
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onTeleport(final PlayerTeleportEvent e) {
         Player p = e.getPlayer();
         HoriPlayer player = Horizon.PLAYERS.get(p.getUniqueId());
         if (player == null) {
             return;
         }
-        player.isTeleporting = true;
-        player.world = e.getTo().getWorld();
-        player.addTeleport(new Location(e.getTo()));
 
         if (e.getCause() == PlayerTeleportEvent.TeleportCause.UNKNOWN &&
                 Horizon.getInst().config.ghost_block_fix) {
@@ -67,30 +66,6 @@ public class Listeners implements Listener {
                 McAccessor.INSTANCE.updateBlock(player, b.getPos());
             }
         }
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onRespawn(final PlayerRespawnEvent e) {
-        Player p = e.getPlayer();
-        HoriPlayer player = Horizon.PLAYERS.get(p.getUniqueId());
-        if (player == null) {
-            return;
-        }
-        player.isTeleporting = true;
-        player.world = e.getRespawnLocation().getWorld();
-        player.addTeleport(new Location(e.getRespawnLocation()));
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onChangedWorld(final PlayerChangedWorldEvent e) {
-        Player p = e.getPlayer();
-        HoriPlayer player = Horizon.PLAYERS.get(p.getUniqueId());
-        if (player == null) {
-            return;
-        }
-        player.isTeleporting = true;
-        player.world = p.getWorld();
-        player.addTeleport(new Location(p.getLocation()));
     }
 
     @EventHandler
@@ -104,7 +79,7 @@ public class Listeners implements Listener {
         Horizon.PLAYERS
                 .values()
                 .stream()
-                .filter(p -> p.world.equals(e.getBlock().getWorld()))
+                .filter(p -> p.getWorld().equals(e.getBlock().getWorld()))
                 .forEach(p -> p.piston.add(aabb));
     }
 
@@ -120,7 +95,7 @@ public class Listeners implements Listener {
         Horizon.PLAYERS
                 .values()
                 .stream()
-                .filter(p -> p.world.equals(e.getBlock().getWorld()))
+                .filter(p -> p.getWorld().equals(e.getBlock().getWorld()))
                 .forEach(p -> p.piston.add(aabb));
     }
 

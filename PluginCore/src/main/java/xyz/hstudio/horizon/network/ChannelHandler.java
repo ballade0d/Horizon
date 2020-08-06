@@ -7,7 +7,7 @@ import io.netty.channel.ChannelPromise;
 import lombok.RequiredArgsConstructor;
 import xyz.hstudio.horizon.compat.PacketConverter;
 import xyz.hstudio.horizon.data.HoriPlayer;
-import xyz.hstudio.horizon.events.Event;
+import xyz.hstudio.horizon.event.Event;
 import xyz.hstudio.horizon.module.Module;
 
 @RequiredArgsConstructor

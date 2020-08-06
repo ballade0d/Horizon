@@ -1,4 +1,4 @@
-package xyz.hstudio.horizon.events.inbound;
+package xyz.hstudio.horizon.event.inbound;
 
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Material;
@@ -7,7 +7,7 @@ import org.bukkit.entity.EntityType;
 import xyz.hstudio.horizon.Horizon;
 import xyz.hstudio.horizon.compat.McAccessor;
 import xyz.hstudio.horizon.data.HoriPlayer;
-import xyz.hstudio.horizon.events.Event;
+import xyz.hstudio.horizon.event.Event;
 import xyz.hstudio.horizon.file.LangFile;
 import xyz.hstudio.horizon.thread.Sync;
 import xyz.hstudio.horizon.util.BlockUtils;
@@ -239,7 +239,7 @@ public class MoveEvent extends Event {
         extrapolate.setY(extrapolate.y + (player.onGroundReally ? -0.0784 : ((player.velocity.y - 0.08) * 0.98)));
 
         AABB box = AABB.NORMAL_BOX.translate(extrapolate);
-        List<AABB> verticalCollision = box.getBlockAABBs(player, player.world, MatUtils.COBWEB.parse());
+        List<AABB> verticalCollision = box.getBlockAABBs(player, player.getWorld(), MatUtils.COBWEB.parse());
 
         if (verticalCollision.isEmpty() && !player.onGround) {
             return false;
@@ -255,7 +255,7 @@ public class MoveEvent extends Event {
 
         box = AABB.NORMAL_BOX.translate(to.toVector().setY(highestVertical)).expand(0, -0.00000000001, 0);
 
-        List<AABB> horizontalCollision = box.getBlockAABBs(player, player.world, MatUtils.COBWEB.parse());
+        List<AABB> horizontalCollision = box.getBlockAABBs(player, player.getWorld(), MatUtils.COBWEB.parse());
 
         if (horizontalCollision.isEmpty()) {
             return false;
@@ -280,8 +280,8 @@ public class MoveEvent extends Event {
     }
 
     private Vector3D checkKnockBack() {
-        final List<Pair<Vector3D, Long[]>> velocities = player.velocities;
-        if (velocities.size() <= 0) {
+        List<Pair<Vector3D, Long>> velocities = player.velocities;
+        if (velocities.size() == 0) {
             return null;
         }
         long time = System.currentTimeMillis();
@@ -297,13 +297,12 @@ public class MoveEvent extends Event {
         double baseMultiplier = flying ? (10 * player.getPlayer().getFlySpeed()) : (5 * player.getPlayer().getWalkSpeed() * (1 + player.getPotionEffectAmplifier("SPEED") * 0.2));
         double maxDiscrepancy = weirdConstant * baseMultiplier * sprintMultiplier + 0.003;
 
-        Pair<Vector3D, Long[]> kb;
+        Pair<Vector3D, Long> kb;
         for (int kbIndex = 0, size = velocities.size(); kbIndex < size; kbIndex++) {
             kb = velocities.get(kbIndex);
 
-            long timeDiff = time - kb.value[0];
-            long tickDiff = player.currentTick - kb.value[1];
-            if (timeDiff > ping + 200 && tickDiff > (ping + 200) / 50) {
+            long timeDiff = time - kb.value;
+            if (timeDiff > ping + 300) {
                 failedKnockBack = true;
                 expiredKbs++;
                 continue;
@@ -333,12 +332,9 @@ public class MoveEvent extends Event {
                         !(velocity.z <= maxThresZ && velocity.z >= minThresZ)) {
                     continue;
                 }
-                velocities.subList(0, kbIndex + 1).clear();
-                return kbVelocity;
-            } else {
-                velocities.subList(0, kbIndex + 1).clear();
-                return kbVelocity;
             }
+            velocities.subList(0, kbIndex + 1).clear();
+            return kbVelocity;
         }
         velocities.subList(0, expiredKbs).clear();
         return null;
@@ -381,7 +377,14 @@ public class MoveEvent extends Event {
 
         boolean kbSimilarToJump = knockBack != null &&
                 (Math.abs(knockBack.y - expectedDY) < 0.001 || touchCeiling);
-        return !kbSimilarToJump && ((expectedDY == 0 && player.onGround) || leftGround) && (deltaY == expectedDY || touchCeiling);
+        boolean cactus = collidingBlocks.contains(Material.CACTUS) && deltaY < expectedDY;
+        if (!kbSimilarToJump && ((expectedDY == 0 && player.onGround) || leftGround) && (deltaY == expectedDY || touchCeiling || cactus)) {
+            if (cactus) {
+                velocity.setY(expectedDY);
+            }
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -412,6 +415,9 @@ public class MoveEvent extends Event {
         }
         if (this.touchedBlocks.contains(Material.SOUL_SAND)) {
             prevVelocity.multiply(0.4);
+        }
+        if (this.touchedBlocks.contains(Material.WEB)) {
+            prevVelocity.multiply(0);
         }
         if (Math.abs(prevVelocity.x * this.oldFriction) < 0.005) {
             prevVelocity.setX(0);
@@ -472,13 +478,20 @@ public class MoveEvent extends Event {
 
         player.tick(ping);
 
-        if (player.isTeleporting && player.teleports.size() > 0) {
-            Pair<Location, Long> tpPair = player.teleports.get(0);
-            Location tpLoc = tpPair.key;
+        if (player.isTeleporting) {
+            Location tpLoc;
+            int elapsedTicks;
+            if (player.teleports.size() == 0) {
+                tpLoc = null;
+                elapsedTicks = 0;
+            } else {
+                Pair<Location, Long> tpPair = player.teleports.get(0);
+                tpLoc = tpPair.key;
+                elapsedTicks = (int) (player.currentTick - tpPair.value);
+            }
 
-            int elapsedTicks = (int) (player.currentTick - tpPair.value);
-
-            if (!onGround && updatePos && updateRot && tpLoc.equals(to)) {
+            boolean matches = tpLoc != null && tpLoc.toVector().equals(to.toVector()) && tpLoc.yaw == to.yaw && tpLoc.pitch == to.pitch;
+            if (!onGround && updatePos && updateRot && matches) {
                 player.position = tpLoc;
                 player.velocity = new Vector3D(0, 0, 0);
 
@@ -487,14 +500,13 @@ public class MoveEvent extends Event {
                 player.teleportAcceptTick = player.currentTick;
 
                 this.isTeleport = true;
-
                 if (player.teleports.size() == 0) {
                     player.isTeleporting = false;
                 } else {
                     return false;
                 }
             } else if (!player.getPlayer().isSleeping()) {
-                if (elapsedTicks > (ping / 50) + 5) {
+                if (player.teleports.size() > 0 && elapsedTicks > (ping / 50) + 5) {
                     Location tp = player.teleports.get(player.teleports.size() - 1).key;
                     player.teleports.clear();
                     Sync.teleport(player, tp);
@@ -534,7 +546,7 @@ public class MoveEvent extends Event {
     private boolean checkLava() {
         AABB lavaTest = AABB.LAVA_BOX;
         lavaTest.translate(to.toVector());
-        List<IWrappedBlock> blocks = lavaTest.getBlocks(player.world);
+        List<IWrappedBlock> blocks = lavaTest.getBlocks(player.getWorld());
         for (IWrappedBlock b : blocks) {
             if (MatUtils.LAVA.contains(b.getType())) {
                 return true;

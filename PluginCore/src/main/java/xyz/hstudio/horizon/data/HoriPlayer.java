@@ -16,7 +16,7 @@ import us.myles.ViaVersion.api.Via;
 import xyz.hstudio.horizon.Horizon;
 import xyz.hstudio.horizon.compat.McAccessor;
 import xyz.hstudio.horizon.data.checks.*;
-import xyz.hstudio.horizon.events.outbound.AttributeEvent;
+import xyz.hstudio.horizon.event.outbound.AttributeEvent;
 import xyz.hstudio.horizon.file.LangFile;
 import xyz.hstudio.horizon.network.ChannelHandler;
 import xyz.hstudio.horizon.util.collect.Pair;
@@ -48,7 +48,7 @@ public class HoriPlayer {
     public final SpeedData speedData = new SpeedData();
     public final TimerData timerData = new TimerData();
     public final int protocol;
-    public final List<Pair<Vector3D, Long[]>> velocities = new CopyOnWriteArrayList<>();
+    public final List<Pair<Vector3D, Long>> velocities = new CopyOnWriteArrayList<>();
     public final List<Pair<Location, Long>> teleports = new CopyOnWriteArrayList<>();
     public final Map<Location, ClientBlock> clientBlocks = new ConcurrentHashMap<>();
     private final Map<Runnable, Long> simulatedCmds = new ConcurrentHashMap<>();
@@ -57,7 +57,6 @@ public class HoriPlayer {
     public boolean verbose;
     public boolean analysis;
     public long currentTick;
-    public World world;
     public Location position;
     public int heldSlot;
     public int foodLevel;
@@ -98,7 +97,6 @@ public class HoriPlayer {
 
         this.lang = Horizon.getInst().config.default_lang;
 
-        this.world = player.getWorld();
         this.position = new Location(player.getLocation());
         this.heldSlot = player.getInventory().getHeldItemSlot();
         this.foodLevel = player.getFoodLevel();
@@ -225,7 +223,7 @@ public class HoriPlayer {
         if (this.vehicle == -1) {
             return null;
         }
-        return McAccessor.INSTANCE.getEntity(this.world, this.vehicle);
+        return McAccessor.INSTANCE.getEntity(getWorld(), this.vehicle);
     }
 
     /**
@@ -262,6 +260,10 @@ public class HoriPlayer {
      */
     public void sendPacket(final Object packet) {
         McAccessor.INSTANCE.ensureMainThread(() -> this.pipeline.writeAndFlush(packet));
+    }
+
+    public World getWorld() {
+        return player.getWorld();
     }
 
     public LangFile getLang() {

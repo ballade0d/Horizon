@@ -1,8 +1,8 @@
-package xyz.hstudio.horizon.events.inbound;
+package xyz.hstudio.horizon.event.inbound;
 
 import xyz.hstudio.horizon.data.HoriPlayer;
-import xyz.hstudio.horizon.events.Event;
-import xyz.hstudio.horizon.events.outbound.AttributeEvent;
+import xyz.hstudio.horizon.event.Event;
+import xyz.hstudio.horizon.event.outbound.AttributeEvent;
 
 public class ActionEvent extends Event {
 

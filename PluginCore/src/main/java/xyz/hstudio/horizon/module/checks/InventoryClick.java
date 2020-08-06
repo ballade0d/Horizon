@@ -8,10 +8,10 @@ import xyz.hstudio.horizon.api.ModuleType;
 import xyz.hstudio.horizon.compat.McAccessor;
 import xyz.hstudio.horizon.data.HoriPlayer;
 import xyz.hstudio.horizon.data.checks.InventoryClickData;
-import xyz.hstudio.horizon.events.Event;
-import xyz.hstudio.horizon.events.inbound.SyncWindowClickEvent;
-import xyz.hstudio.horizon.events.inbound.WindowClickEvent;
-import xyz.hstudio.horizon.events.inbound.WindowCloseEvent;
+import xyz.hstudio.horizon.event.Event;
+import xyz.hstudio.horizon.event.inbound.SyncWindowClickEvent;
+import xyz.hstudio.horizon.event.inbound.WindowClickEvent;
+import xyz.hstudio.horizon.event.inbound.WindowCloseEvent;
 import xyz.hstudio.horizon.file.node.InventoryClickNode;
 import xyz.hstudio.horizon.module.Module;
 

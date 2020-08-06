@@ -1,4 +1,4 @@
-package xyz.hstudio.horizon.events.inbound;
+package xyz.hstudio.horizon.event.inbound;
 
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryAction;
@@ -7,7 +7,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import xyz.hstudio.horizon.data.HoriPlayer;
-import xyz.hstudio.horizon.events.Event;
+import xyz.hstudio.horizon.event.Event;
 
 public class SyncWindowClickEvent extends Event {
 

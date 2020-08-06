@@ -4,9 +4,9 @@ import xyz.hstudio.horizon.api.ModuleType;
 import xyz.hstudio.horizon.compat.McAccessor;
 import xyz.hstudio.horizon.data.HoriPlayer;
 import xyz.hstudio.horizon.data.checks.InventoryData;
-import xyz.hstudio.horizon.events.Event;
-import xyz.hstudio.horizon.events.inbound.*;
-import xyz.hstudio.horizon.events.outbound.CloseWindowEvent;
+import xyz.hstudio.horizon.event.Event;
+import xyz.hstudio.horizon.event.inbound.*;
+import xyz.hstudio.horizon.event.outbound.CloseWindowEvent;
 import xyz.hstudio.horizon.file.node.InventoryNode;
 import xyz.hstudio.horizon.module.Module;
 

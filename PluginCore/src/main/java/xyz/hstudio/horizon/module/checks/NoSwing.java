@@ -3,10 +3,10 @@ package xyz.hstudio.horizon.module.checks;
 import xyz.hstudio.horizon.api.ModuleType;
 import xyz.hstudio.horizon.data.HoriPlayer;
 import xyz.hstudio.horizon.data.checks.NoSwingData;
-import xyz.hstudio.horizon.events.Event;
-import xyz.hstudio.horizon.events.inbound.BlockBreakEvent;
-import xyz.hstudio.horizon.events.inbound.InteractEntityEvent;
-import xyz.hstudio.horizon.events.inbound.SwingEvent;
+import xyz.hstudio.horizon.event.Event;
+import xyz.hstudio.horizon.event.inbound.BlockBreakEvent;
+import xyz.hstudio.horizon.event.inbound.InteractEntityEvent;
+import xyz.hstudio.horizon.event.inbound.SwingEvent;
 import xyz.hstudio.horizon.file.node.NoSwingNode;
 import xyz.hstudio.horizon.module.Module;
 

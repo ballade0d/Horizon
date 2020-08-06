@@ -3,7 +3,7 @@ package xyz.hstudio.horizon.module.checks;
 import xyz.hstudio.horizon.api.ModuleType;
 import xyz.hstudio.horizon.data.HoriPlayer;
 import xyz.hstudio.horizon.data.checks.AutoClickerData;
-import xyz.hstudio.horizon.events.Event;
+import xyz.hstudio.horizon.event.Event;
 import xyz.hstudio.horizon.file.node.AutoClickerNode;
 import xyz.hstudio.horizon.module.Module;
 

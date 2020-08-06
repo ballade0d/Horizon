@@ -1,17 +1,18 @@
 package xyz.hstudio.horizon.module.checks;
 
-import org.bukkit.entity.LivingEntity;
+import xyz.hstudio.horizon.Horizon;
 import xyz.hstudio.horizon.api.ModuleType;
 import xyz.hstudio.horizon.compat.McAccessor;
 import xyz.hstudio.horizon.data.HoriPlayer;
 import xyz.hstudio.horizon.data.checks.KillAuraData;
-import xyz.hstudio.horizon.events.Event;
-import xyz.hstudio.horizon.events.inbound.ActionEvent;
-import xyz.hstudio.horizon.events.inbound.InteractEntityEvent;
-import xyz.hstudio.horizon.events.inbound.InteractItemEvent;
-import xyz.hstudio.horizon.events.inbound.MoveEvent;
+import xyz.hstudio.horizon.event.Event;
+import xyz.hstudio.horizon.event.inbound.ActionEvent;
+import xyz.hstudio.horizon.event.inbound.InteractEntityEvent;
+import xyz.hstudio.horizon.event.inbound.InteractItemEvent;
+import xyz.hstudio.horizon.event.inbound.MoveEvent;
 import xyz.hstudio.horizon.file.node.KillAuraNode;
 import xyz.hstudio.horizon.module.Module;
+import xyz.hstudio.horizon.thread.Sync;
 import xyz.hstudio.horizon.util.MathUtils;
 import xyz.hstudio.horizon.util.wrap.AABB;
 import xyz.hstudio.horizon.util.wrap.Ray;
@@ -260,10 +261,11 @@ public class KillAura extends Module<KillAuraData, KillAuraNode> {
             if (e.action != InteractEntityEvent.InteractType.INTERACT || e.intersection == null) {
                 return;
             }
-            if (!(e.entity instanceof LivingEntity)) {
+            HoriPlayer victim = Horizon.PLAYERS.get(e.entity.getUniqueId());
+            if (victim == null) {
                 return;
             }
-            data.intersection = e.intersection.clone().add(e.entity.getLocation().toVector());
+            data.intersection = e.intersection.clone().add(Sync.getHistoryLocation(McAccessor.INSTANCE.getPing(player.getPlayer()), victim).toVector());
         } else if (event instanceof MoveEvent) {
             MoveEvent e = (MoveEvent) event;
             if (data.intersection == null || player.getVehicle() != null || e.isTeleport || player.currentTick - data.lastHitTick > 2) {
@@ -275,9 +277,10 @@ public class KillAura extends Module<KillAuraData, KillAuraNode> {
             Vector3D dirA = MathUtils.getDirection(e.from.yaw, e.to.pitch);
             Vector3D dirB = data.intersection.subtract(headPos).normalize();
 
-            if (dirA.dot(dirB) < 0) {
+            double val = dirA.dot(dirB);
+            if (val < 0) {
                 // Punish
-                this.punish(event, player, data, 4, 3);
+                this.punish(event, player, data, 4, 2, "v:" + val);
             } else {
                 reward(4, data, 0.99);
             }

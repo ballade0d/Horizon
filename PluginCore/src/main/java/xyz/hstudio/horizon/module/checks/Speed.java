@@ -6,10 +6,10 @@ import xyz.hstudio.horizon.api.ModuleType;
 import xyz.hstudio.horizon.compat.McAccessor;
 import xyz.hstudio.horizon.data.HoriPlayer;
 import xyz.hstudio.horizon.data.checks.SpeedData;
-import xyz.hstudio.horizon.events.Event;
-import xyz.hstudio.horizon.events.inbound.ActionEvent;
-import xyz.hstudio.horizon.events.inbound.InteractItemEvent;
-import xyz.hstudio.horizon.events.inbound.MoveEvent;
+import xyz.hstudio.horizon.event.Event;
+import xyz.hstudio.horizon.event.inbound.ActionEvent;
+import xyz.hstudio.horizon.event.inbound.InteractItemEvent;
+import xyz.hstudio.horizon.event.inbound.MoveEvent;
 import xyz.hstudio.horizon.file.node.SpeedNode;
 import xyz.hstudio.horizon.module.Module;
 import xyz.hstudio.horizon.thread.Sync;
@@ -310,6 +310,12 @@ public class Speed extends Module<SpeedData, SpeedNode> {
 
             float yaw = e.to.yaw;
             Vector3D prevVelocity = player.velocity.clone();
+            if (e.touchedBlocks.contains(Material.SOUL_SAND)) {
+                prevVelocity.multiply(0.4);
+            }
+            if (e.touchedBlocks.contains(Material.WEB)) {
+                prevVelocity.multiply(0);
+            }
             if (e.hitSlowdown) {
                 prevVelocity.multiply(0.6);
             }

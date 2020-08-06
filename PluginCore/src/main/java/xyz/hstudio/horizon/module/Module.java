@@ -10,7 +10,7 @@ import xyz.hstudio.horizon.api.PlayerViolateEvent;
 import xyz.hstudio.horizon.compat.McAccessor;
 import xyz.hstudio.horizon.data.Data;
 import xyz.hstudio.horizon.data.HoriPlayer;
-import xyz.hstudio.horizon.events.Event;
+import xyz.hstudio.horizon.event.Event;
 import xyz.hstudio.horizon.file.AbstractFile;
 import xyz.hstudio.horizon.file.CheckNode;
 import xyz.hstudio.horizon.thread.Async;
@@ -62,7 +62,7 @@ public abstract class Module<K extends Data, V extends CheckNode> {
             if (!module.config.enabled || module.canBypass(player)) {
                 continue;
             }
-            if (module.config.disable_worlds.contains(player.world.getName())) {
+            if (module.config.disable_worlds.contains(player.getWorld().getName())) {
                 continue;
             }
             if (event.isCancelled()) {

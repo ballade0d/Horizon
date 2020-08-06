@@ -1,8 +1,8 @@
-package xyz.hstudio.horizon.events.outbound;
+package xyz.hstudio.horizon.event.outbound;
 
 import lombok.RequiredArgsConstructor;
 import xyz.hstudio.horizon.data.HoriPlayer;
-import xyz.hstudio.horizon.events.Event;
+import xyz.hstudio.horizon.event.Event;
 import xyz.hstudio.horizon.util.enums.Version;
 
 import java.util.List;

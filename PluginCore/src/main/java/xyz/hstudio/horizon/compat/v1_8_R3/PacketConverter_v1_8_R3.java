@@ -9,9 +9,9 @@ import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
 import org.bukkit.inventory.Inventory;
 import xyz.hstudio.horizon.compat.IPacketConverter;
 import xyz.hstudio.horizon.data.HoriPlayer;
-import xyz.hstudio.horizon.events.Event;
-import xyz.hstudio.horizon.events.inbound.*;
-import xyz.hstudio.horizon.events.outbound.*;
+import xyz.hstudio.horizon.event.Event;
+import xyz.hstudio.horizon.event.inbound.*;
+import xyz.hstudio.horizon.event.outbound.*;
 import xyz.hstudio.horizon.util.enums.BlockFace;
 import xyz.hstudio.horizon.util.enums.Hand;
 import xyz.hstudio.horizon.util.wrap.Location;
@@ -20,6 +20,7 @@ import xyz.hstudio.horizon.wrap.IWrappedBlock;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 public class PacketConverter_v1_8_R3 implements IPacketConverter {
@@ -136,7 +137,7 @@ public class PacketConverter_v1_8_R3 implements IPacketConverter {
         }
         if (interactType == null) {
             BlockPosition pos = packet.a();
-            Location loc = new Location(player.world, pos.getX(), pos.getY(), pos.getZ());
+            Location loc = new Location(player.getWorld(), pos.getX(), pos.getY(), pos.getZ());
             IWrappedBlock b = loc.getBlock();
             if (b == null) {
                 return null;
@@ -212,7 +213,7 @@ public class PacketConverter_v1_8_R3 implements IPacketConverter {
                 break;
         }
         Vector3D interaction = new Vector3D(packet.d(), packet.e(), packet.f());
-        Location placed = new Location(player.world, x, y, z);
+        Location placed = new Location(player.getWorld(), x, y, z);
         if (!targetedPosition.equals(new Vector3D(-1, -1, -1))) {
             BlockPlaceEvent.PlaceType placeType = itemStack != null && itemStack.getItem() instanceof ItemBlock ? BlockPlaceEvent.PlaceType.PLACE_BLOCK : BlockPlaceEvent.PlaceType.INTERACT_BLOCK;
             return new BlockPlaceEvent(player, placed, face, CraftItemStack.asBukkitCopy(itemStack).getType(), interaction, placeType);
@@ -225,7 +226,7 @@ public class PacketConverter_v1_8_R3 implements IPacketConverter {
     }
 
     private Event convertInteractEntityEvent(final HoriPlayer player, final PacketPlayInUseEntity packet) {
-        Entity entity = packet.a(((CraftWorld) player.world).getHandle());
+        Entity entity = packet.a(((CraftWorld) player.getWorld()).getHandle());
         Vec3D vec3D = packet.b();
         Vector3D intersection;
         if (vec3D == null) {
@@ -305,6 +306,8 @@ public class PacketConverter_v1_8_R3 implements IPacketConverter {
             return convertEntityDestroyEvent(player, (PacketPlayOutEntityDestroy) packet);
         } else if (packet instanceof PacketPlayOutBlockChange) {
             return convertBlockUpdateEvent(player, (PacketPlayOutBlockChange) packet);
+        } else if (packet instanceof PacketPlayOutPosition) {
+            return convertPlayerTeleportEvent(player, (PacketPlayOutPosition) packet);
         }
         return null;
     }
@@ -455,6 +458,22 @@ public class PacketConverter_v1_8_R3 implements IPacketConverter {
         }
         BlockPosition pos = serializer.c();
         IBlockData data = Block.d.a(serializer.e());
-        return new BlockUpdateEvent(player, IWrappedBlock.create(player.world, pos, data));
+        return new BlockUpdateEvent(player, IWrappedBlock.create(player.getWorld(), pos, data));
+    }
+
+    private Event convertPlayerTeleportEvent(final HoriPlayer player, final PacketPlayOutPosition packet) {
+        PacketDataSerializer serializer = new PacketDataSerializer(Unpooled.buffer());
+        try {
+            packet.b(serializer);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        double x = serializer.readDouble();
+        double y = serializer.readDouble();
+        double z = serializer.readDouble();
+        float yaw = serializer.readFloat();
+        float pitch = serializer.readFloat();
+        Set<PacketPlayOutPosition.EnumPlayerTeleportFlags> relMoveFlags = PacketPlayOutPosition.EnumPlayerTeleportFlags.a(serializer.readUnsignedByte());
+        return new PlayerTeleportEvent(player, x, y, z, yaw, pitch);
     }
 }

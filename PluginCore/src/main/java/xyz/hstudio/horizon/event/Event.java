@@ -1,4 +1,4 @@
-package xyz.hstudio.horizon.events;
+package xyz.hstudio.horizon.event;
 
 import lombok.Getter;
 import lombok.Setter;

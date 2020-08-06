@@ -1,9 +1,9 @@
-package xyz.hstudio.horizon.events.inbound;
+package xyz.hstudio.horizon.event.inbound;
 
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import xyz.hstudio.horizon.data.HoriPlayer;
-import xyz.hstudio.horizon.events.Event;
+import xyz.hstudio.horizon.event.Event;
 import xyz.hstudio.horizon.util.enums.BlockFace;
 import xyz.hstudio.horizon.util.wrap.ClientBlock;
 import xyz.hstudio.horizon.util.wrap.Vector3D;

@@ -1,8 +1,8 @@
-package xyz.hstudio.horizon.events.inbound;
+package xyz.hstudio.horizon.event.inbound;
 
 import org.bukkit.inventory.Inventory;
 import xyz.hstudio.horizon.data.HoriPlayer;
-import xyz.hstudio.horizon.events.Event;
+import xyz.hstudio.horizon.event.Event;
 
 public class WindowCloseEvent extends Event {
 

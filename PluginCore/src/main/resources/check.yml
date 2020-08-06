@@ -134,7 +134,7 @@ interact:
       - 'horizon kick %player% Unfair advantages.'
 invalidmotion:
   enabled: true
-  cancel_vl: 1
+  cancel_vl: 3
   disable_worlds: []
   # How many client blocks are allowed?
   # This will block infinite wall-jump but not cancelling legit players.

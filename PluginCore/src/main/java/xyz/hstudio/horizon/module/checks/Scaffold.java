@@ -4,10 +4,10 @@ import xyz.hstudio.horizon.api.ModuleType;
 import xyz.hstudio.horizon.compat.McAccessor;
 import xyz.hstudio.horizon.data.HoriPlayer;
 import xyz.hstudio.horizon.data.checks.ScaffoldData;
-import xyz.hstudio.horizon.events.Event;
-import xyz.hstudio.horizon.events.inbound.BlockBreakEvent;
-import xyz.hstudio.horizon.events.inbound.BlockPlaceEvent;
-import xyz.hstudio.horizon.events.inbound.MoveEvent;
+import xyz.hstudio.horizon.event.Event;
+import xyz.hstudio.horizon.event.inbound.BlockBreakEvent;
+import xyz.hstudio.horizon.event.inbound.BlockPlaceEvent;
+import xyz.hstudio.horizon.event.inbound.MoveEvent;
 import xyz.hstudio.horizon.file.node.ScaffoldNode;
 import xyz.hstudio.horizon.module.Module;
 
