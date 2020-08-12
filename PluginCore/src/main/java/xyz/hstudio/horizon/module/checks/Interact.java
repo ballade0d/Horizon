@@ -1,6 +1,7 @@
 package xyz.hstudio.horizon.module.checks;
 
 import org.bukkit.GameMode;
+import org.bukkit.Material;
 import xyz.hstudio.horizon.api.ModuleType;
 import xyz.hstudio.horizon.compat.McAccessor;
 import xyz.hstudio.horizon.data.HoriPlayer;
@@ -12,6 +13,7 @@ import xyz.hstudio.horizon.file.node.InteractNode;
 import xyz.hstudio.horizon.module.Module;
 import xyz.hstudio.horizon.util.enums.BlockFace;
 import xyz.hstudio.horizon.util.wrap.Vector3D;
+import xyz.hstudio.horizon.wrap.IWrappedBlock;
 
 import java.util.stream.DoubleStream;
 
@@ -93,6 +95,10 @@ public class Interact extends Module<InteractData, InteractNode> {
         if (event instanceof BlockPlaceEvent) {
             BlockPlaceEvent e = (BlockPlaceEvent) event;
             if (e.placeType != BlockPlaceEvent.PlaceType.PLACE_BLOCK) {
+                return;
+            }
+            IWrappedBlock block = e.placed.getBlock();
+            if (block == null || block.getType() != Material.AIR) {
                 return;
             }
             float angle = player.position.getDirection().angle(e.getPlaceBlockFace());
