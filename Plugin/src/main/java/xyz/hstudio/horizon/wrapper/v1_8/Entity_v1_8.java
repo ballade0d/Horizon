@@ -1,29 +1,29 @@
-package xyz.hstudio.horizon.wrapper.v1_12_R1;
+package xyz.hstudio.horizon.wrapper.v1_8;
 
-import net.minecraft.server.v1_12_R1.Entity;
-import org.bukkit.craftbukkit.v1_12_R1.entity.CraftEntity;
+import net.minecraft.server.v1_8_R3.Entity;
+import org.bukkit.craftbukkit.v1_8_R3.entity.CraftEntity;
 import xyz.hstudio.horizon.util.Location;
 import xyz.hstudio.horizon.wrapper.EntityBase;
 import xyz.hstudio.horizon.wrapper.WorldBase;
 
-public class Entity_v1_12_R1 extends EntityBase {
+public class Entity_v1_8 extends EntityBase {
 
     private final WorldBase world;
     private final Entity entity;
 
-    public Entity_v1_12_R1(WorldBase world, org.bukkit.entity.Entity entity) {
+    public Entity_v1_8(WorldBase world, org.bukkit.entity.Entity entity) {
         this.world = world;
         this.entity = ((CraftEntity) entity).getHandle();
     }
 
-    public Entity_v1_12_R1(org.bukkit.entity.Entity entity) {
+    public Entity_v1_8(org.bukkit.entity.Entity entity) {
         this.world = WorldBase.getWorld(entity.getWorld());
         this.entity = ((CraftEntity) entity).getHandle();
     }
 
-    protected Entity_v1_12_R1(Entity entity) {
+    protected Entity_v1_8(Entity entity) {
         this.entity = entity;
-        this.world = new World_v1_12_R1(entity.world);
+        this.world = new World_v1_8(entity.world);
     }
 
     @Override

@@ -1,6 +1,6 @@
 package xyz.hstudio.horizon.api;
 
-public enum EnumCheck {
+public enum EnumCheckType {
 
     VERTICAL_MOVEMENT,
 }

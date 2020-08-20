@@ -24,6 +24,6 @@ public class PlayerTeleportEvent extends Event {
     @Override
     public void post() {
         player.isTeleporting = true;
-        player.addTeleport(new Location(player.getWorld(), x, y, z, yaw, pitch));
+        player.addTeleport(new Location(player.getWorld(), x, y, z, yaw % 360F, pitch % 360F));
     }
 }

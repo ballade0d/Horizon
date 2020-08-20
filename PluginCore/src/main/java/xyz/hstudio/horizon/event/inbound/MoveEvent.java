@@ -193,7 +193,7 @@ public class MoveEvent extends Event {
                 depthStrider *= 0.5F;
             }
             if (depthStrider > 0) {
-                friction += (0.54600006F - friction) * depthStrider / 3F;
+                friction += (0.546F - friction) * depthStrider / 3F;
             }
             return friction;
         } else if (player.isInLava && !flying) {
@@ -506,9 +506,14 @@ public class MoveEvent extends Event {
                     return false;
                 }
             } else if (!player.getPlayer().isSleeping()) {
-                if (player.teleports.size() > 0 && elapsedTicks > (ping / 50) + 5) {
-                    Location tp = player.teleports.get(player.teleports.size() - 1).key;
-                    player.teleports.clear();
+                if (elapsedTicks > (ping / 50) + 40) {
+                    Location tp;
+                    if (player.teleports.size() > 0) {
+                        tp = player.teleports.get(player.teleports.size() - 1).key;
+                        player.teleports.clear();
+                    } else {
+                        tp = new Location(player.getPlayer().getLocation());
+                    }
                     Sync.teleport(player, tp);
                 }
             }

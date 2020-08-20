@@ -34,6 +34,8 @@ public class Horizon extends JavaPlugin {
         asyncThread.start();
 
         Bukkit.getScheduler().runTaskTimer(this, sync, 1L, 1L);
+
+        Bukkit.getOnlinePlayers().forEach(HPlayer::new);
     }
 
     @Override

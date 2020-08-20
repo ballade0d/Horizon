@@ -7,43 +7,38 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Vehicle;
 import xyz.hstudio.horizon.HPlayer;
 import xyz.hstudio.horizon.Horizon;
-import xyz.hstudio.horizon.module.ModuleBase;
 import xyz.hstudio.horizon.util.Location;
+import xyz.hstudio.horizon.util.MathUtils;
 import xyz.hstudio.horizon.util.Pair;
-import xyz.hstudio.horizon.util.Vec3D;
 import xyz.hstudio.horizon.wrapper.EntityBase;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 @RequiredArgsConstructor
 public class Async implements Runnable {
 
     private final Horizon horizon;
-    private final Map<EntityBase, List<Pair<Location, Long>>> trackedEntities = new ConcurrentHashMap<>();
+    private final Map<EntityBase, List<Pair<Location, Integer>>> trackedEntities = new ConcurrentHashMap<>();
     @Getter
-    private long tick;
+    private int tick;
 
     @Override
     public void run() {
         if (tick % 20 == 0) {
             Set<EntityBase> collectedEntities = new HashSet<>();
 
-            for (HPlayer player : horizon.getPlayers().values()) {
-                List<EntityBase> nearbyEntities = player.getWorld().getNearbyEntities(player.position, 40, 20, 40);
-                for (EntityBase entity : nearbyEntities) {
+            for (HPlayer p : horizon.getPlayers().values()) {
+                for (EntityBase entity : p.getWorld().getNearbyEntities(p.getPhysics().getPos(), 10, 10, 10)) {
                     if (entity instanceof LivingEntity || entity instanceof Vehicle || entity instanceof Fireball) {
                         collectedEntities.add(entity);
                     }
                 }
+                collectedEntities.add(p.getBase());
             }
 
             for (EntityBase entity : collectedEntities) {
-                trackedEntities.put(entity, trackedEntities.getOrDefault(entity, new CopyOnWriteArrayList<>()));
+                trackedEntities.put(entity, trackedEntities.getOrDefault(entity, new ArrayList<>()));
             }
 
             Set<EntityBase> expiredEntities = new HashSet<>(trackedEntities.keySet());
@@ -52,48 +47,36 @@ public class Async implements Runnable {
             for (EntityBase expired : expiredEntities) {
                 trackedEntities.remove(expired);
             }
+        } else {
+            for (HPlayer p : horizon.getPlayers().values()) {
+                trackedEntities.put(p.getBase(), trackedEntities.getOrDefault(p.getBase(), new ArrayList<>()));
+            }
         }
-        for (HPlayer player : horizon.getPlayers().values()) {
-            trackedEntities.put(player.getBase(), trackedEntities.getOrDefault(player.getBase(), new CopyOnWriteArrayList<>()));
-        }
+
         for (EntityBase entity : trackedEntities.keySet()) {
-            List<Pair<Location, Long>> times = trackedEntities.getOrDefault(entity, new CopyOnWriteArrayList<>());
-            long currTime = System.currentTimeMillis();
-            times.add(new Pair<>(entity.getPosition(), currTime));
-            if (times.size() > 20) {
+            List<Pair<Location, Integer>> times = trackedEntities.getOrDefault(entity, new ArrayList<>());
+            times.add(new Pair<>(entity.getPosition(), tick));
+            if (times.size() > 30) {
                 times.remove(0);
             }
             trackedEntities.put(entity, times);
         }
 
-        for (ModuleBase moduleBase : ModuleBase.MODULES.values()) {
-            moduleBase.decay(tick);
-        }
         tick++;
     }
 
-    public Location getHistoryLocation(int ping, EntityBase entity) {
-        List<Pair<Location, Long>> times = trackedEntities.get(entity);
+    public List<Location> getHistoryLocation(EntityBase entity, int ping) {
+        List<Pair<Location, Integer>> times = trackedEntities.get(entity);
         if (times == null || times.size() == 0) {
-            return entity.getPosition();
+            return Collections.emptyList();
         }
-        long currentTime = System.currentTimeMillis();
-        int rewindTime = ping + 175;
+        List<Location> locations = new ArrayList<>();
+        int rewindTick = MathUtils.getPingInTicks(ping) + 3;
         for (int i = times.size() - 1; i >= 0; i--) {
-            int elapsedTime = (int) (currentTime - times.get(i).getValue());
-            if (elapsedTime >= rewindTime) {
-                if (i == times.size() - 1) {
-                    return times.get(i).getKey();
-                }
-                double nextMoveWeight = (elapsedTime - rewindTime) / (double) (elapsedTime - (currentTime - times.get(i + 1).getValue()));
-                Location before = times.get(i).getKey().clone();
-                Location after = times.get(i + 1).getKey().clone();
-                Vec3D interpolate = after.subtract(before);
-                interpolate.multiply(nextMoveWeight);
-                before.add(interpolate);
-                return before;
+            if (Math.abs(tick - times.get(i).getValue() - rewindTick) < 2) {
+                locations.add(times.get(i).getKey());
             }
         }
-        return times.get(0).getKey().clone();
+        return locations;
     }
 }

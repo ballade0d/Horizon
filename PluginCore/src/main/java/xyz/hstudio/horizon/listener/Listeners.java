@@ -91,7 +91,6 @@ public class Listeners implements Listener {
         AABB aabb = new AABB(-0.1, -0.1, -0.1, 1.1, 1.1, 1.1)
                 .add(0, 0, 0, length * face.getModX(), length * face.getModY(), length * face.getModZ())
                 .add(pos);
-        aabb.highlight(e.getBlock().getWorld(), 0.3);
         Horizon.PLAYERS
                 .values()
                 .stream()

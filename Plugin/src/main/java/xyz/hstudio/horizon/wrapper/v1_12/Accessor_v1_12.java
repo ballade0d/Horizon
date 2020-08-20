@@ -1,9 +1,9 @@
-package xyz.hstudio.horizon.wrapper.v1_12_R1;
+package xyz.hstudio.horizon.wrapper.v1_12;
 
 import net.minecraft.server.v1_12_R1.MathHelper;
 import xyz.hstudio.horizon.wrapper.AccessorBase;
 
-public class Accessor_v1_12_R1 extends AccessorBase {
+public class Accessor_v1_12 extends AccessorBase {
     @Override
     public float sin(float v) {
         return MathHelper.sin(v);

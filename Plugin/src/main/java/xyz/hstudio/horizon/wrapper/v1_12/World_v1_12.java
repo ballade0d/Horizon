@@ -1,4 +1,4 @@
-package xyz.hstudio.horizon.wrapper.v1_12_R1;
+package xyz.hstudio.horizon.wrapper.v1_12;
 
 import lombok.val;
 import net.minecraft.server.v1_12_R1.*;
@@ -11,15 +11,15 @@ import xyz.hstudio.horizon.wrapper.WorldBase;
 import java.util.ArrayList;
 import java.util.List;
 
-public class World_v1_12_R1 extends WorldBase {
+public class World_v1_12 extends WorldBase {
 
     protected final WorldServer worldServer;
 
-    public World_v1_12_R1(org.bukkit.World bukkitWorld) {
+    public World_v1_12(org.bukkit.World bukkitWorld) {
         this.worldServer = ((CraftWorld) bukkitWorld).getHandle();
     }
 
-    public World_v1_12_R1(World world) {
+    public World_v1_12(World world) {
         this.worldServer = world.getWorld().getHandle();
     }
 
@@ -42,7 +42,7 @@ public class World_v1_12_R1 extends WorldBase {
         if (chunk == null) {
             return null;
         }
-        return new Block_v1_12_R1(this, chunk.a(x, y, z));
+        return new Block_v1_12(this, chunk.a(x, y, z));
     }
 
     @Override
@@ -51,7 +51,7 @@ public class World_v1_12_R1 extends WorldBase {
         List<Entity> entityList = worldServer.getEntities(null, bb, null);
         List<EntityBase> entityBaseList = new ArrayList<>(entityList.size());
         for (Entity entity : entityList) {
-            entityBaseList.add(new Entity_v1_12_R1(entity));
+            entityBaseList.add(new Entity_v1_12(entity));
         }
         return entityBaseList;
     }
