@@ -81,7 +81,7 @@ public class Executors {
             String prefix = Horizon.getInst().config.prefix;
             if (args.length == 0) {
                 String version = Horizon.getInst().getDescription().getVersion();
-                sender.sendMessage(prefix + "Horizon(" + version + ") by MrCraftGoo");
+                sender.sendMessage(prefix + "Horizon version " + version + " made by MrCraftGoo");
                 return true;
             }
             LangFile lang = Horizon.getInst().getLang(sender instanceof Player ?
@@ -123,13 +123,13 @@ public class Executors {
         public void help(final CommandSender sender, final String prefix, final LangFile lang) {
             String version = Horizon.getInst().getDescription().getVersion();
             sender.sendMessage(prefix + "Horizon(" + version + ") by MrCraftGoo");
-            sender.sendMessage(prefix + "/hrozion reload - reloads horizon");
+            sender.sendMessage(prefix + "/horizon reload - reloads horizon");
             sender.sendMessage(prefix + "/horizon verbose - enable or disables verbose");
             sender.sendMessage(prefix + "/horizon analysis <player> - analyses the player selected");
             sender.sendMessage(prefix + "/horizon notify <reason> - sends a custom notification system");
             sender.sendMessage(prefix + "/horizon message <player> <reason> - messages a player using horizon");
-            sender.sendMessage(prefix + "/hrozion kick <player> <reason> - kicks a player and broadcasts a message.");
-            sender.sendMessage(prefix + "/hrozion bot <player> <time> - checks if the player is using a combat hacks ( mostly killaura )");
+            sender.sendMessage(prefix + "/horizon kick <player> <reason> - kicks a player and broadcasts a message.");
+            sender.sendMessage(prefix + "/horizon bot <player> <time> - checks if the player is using a combat hacks ( mostly killaura )");
         }
 
         @Cmd(name = "verbose", perm = "horizon.cmd.verbose", onlyPlayer = true)
