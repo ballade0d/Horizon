@@ -9,11 +9,11 @@ import java.util.Objects;
 public class AABB {
 
     @Getter
-    private Vec3D min;
+    private Vector3D min;
     @Getter
-    private Vec3D max;
+    private Vector3D max;
 
-    public AABB translate(Vec3D vec) {
+    public AABB translate(Vector3D vec) {
         min.add(vec);
         max.add(vec);
         return this;

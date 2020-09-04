@@ -9,7 +9,7 @@ import xyz.hstudio.horizon.HPlayer;
 @RequiredArgsConstructor
 public class PacketHandler extends ChannelDuplexHandler {
 
-    private static final String HANDLER_NAME = "horizon_packet_handler";
+    private static final String HANDLER_NAME = "horizon_client";
     private final HPlayer player;
 
     @Override

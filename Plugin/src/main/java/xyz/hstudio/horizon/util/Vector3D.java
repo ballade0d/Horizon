@@ -8,7 +8,7 @@ import org.bukkit.util.NumberConversions;
 
 @AllArgsConstructor
 @NoArgsConstructor
-public class Vec3D implements Cloneable {
+public class Vector3D implements Cloneable {
 
     private static final double epsilon = 0.000001;
 
@@ -16,35 +16,35 @@ public class Vec3D implements Cloneable {
     @Setter
     protected double x, y, z;
 
-    public Vec3D add(Vec3D vec) {
+    public Vector3D add(Vector3D vec) {
         x += vec.x;
         y += vec.y;
         z += vec.z;
         return this;
     }
 
-    public Vec3D subtract(Vec3D vec) {
+    public Vector3D subtract(Vector3D vec) {
         x -= vec.x;
         y -= vec.y;
         z -= vec.z;
         return this;
     }
 
-    public Vec3D multiply(Vec3D vec) {
+    public Vector3D multiply(Vector3D vec) {
         x *= vec.x;
         y *= vec.y;
         z *= vec.z;
         return this;
     }
 
-    public Vec3D divide(Vec3D vec) {
+    public Vector3D divide(Vector3D vec) {
         x /= vec.x;
         y /= vec.y;
         z /= vec.z;
         return this;
     }
 
-    public Vec3D multiply(double m) {
+    public Vector3D multiply(double m) {
         x *= m;
         y *= m;
         z *= m;
@@ -59,19 +59,19 @@ public class Vec3D implements Cloneable {
         return NumberConversions.square(x) + NumberConversions.square(y) + NumberConversions.square(z);
     }
 
-    public double distance(Vec3D vec) {
+    public double distance(Vector3D vec) {
         return Math.sqrt(distanceSquared(vec));
     }
 
-    public double distanceSquared(Vec3D vec) {
+    public double distanceSquared(Vector3D vec) {
         return NumberConversions.square(x - vec.x) + NumberConversions.square(y - vec.y) + NumberConversions.square(z - vec.z);
     }
 
-    public double dot(Vec3D vec) {
+    public double dot(Vector3D vec) {
         return x * vec.x + y * vec.y + z * vec.z;
     }
 
-    public double angle(Vec3D vec) {
+    public double angle(Vector3D vec) {
         double dot = Math.min(Math.max(dot(vec) / (length() * vec.length()), -1), 1);
         return Math.acos(dot);
     }
@@ -96,7 +96,7 @@ public class Vec3D implements Cloneable {
         if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
-        Vec3D other = (Vec3D) obj;
+        Vector3D other = (Vector3D) obj;
         return Math.abs(x - other.x) < epsilon && Math.abs(y - other.y) < epsilon && Math.abs(z - other.z) < epsilon;
     }
 
@@ -110,9 +110,9 @@ public class Vec3D implements Cloneable {
     }
 
     @Override
-    public Vec3D clone() {
+    public Vector3D clone() {
         try {
-            return (Vec3D) super.clone();
+            return (Vector3D) super.clone();
         } catch (CloneNotSupportedException e) {
             e.printStackTrace();
         }

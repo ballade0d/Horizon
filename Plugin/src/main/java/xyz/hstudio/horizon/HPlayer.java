@@ -1,9 +1,11 @@
 package xyz.hstudio.horizon;
 
+import lombok.Data;
 import lombok.Getter;
 import org.bukkit.entity.Player;
-import xyz.hstudio.horizon.data.Physics;
+import org.bukkit.inventory.ItemStack;
 import xyz.hstudio.horizon.module.check.CheckBase;
+import xyz.hstudio.horizon.util.Location;
 import xyz.hstudio.horizon.wrapper.EntityBase;
 import xyz.hstudio.horizon.wrapper.WorldBase;
 
@@ -22,6 +24,8 @@ public class HPlayer {
 
     @Getter
     private final Physics physics;
+    @Getter
+    private final Inventory inventory;
 
     public HPlayer(Player bPlayer) {
         this.bPlayer = bPlayer;
@@ -29,11 +33,36 @@ public class HPlayer {
         this.checks = new ArrayList<>();
 
         this.physics = new Physics(this);
+        this.inventory = new Inventory();
 
         inst.getPlayers().put(bPlayer.getUniqueId(), this);
     }
 
     public WorldBase getWorld() {
         return WorldBase.getWorld(bPlayer.getWorld());
+    }
+
+    @Data
+    public class Inventory {
+
+        private int heldItemSlot;
+
+        public Inventory() {
+            this.heldItemSlot = bPlayer.getInventory().getHeldItemSlot();
+        }
+
+        public ItemStack getItemInHand() {
+            return bPlayer.getInventory().getItem(heldItemSlot);
+        }
+    }
+
+    @Data
+    public class Physics {
+
+        private Location pos;
+
+        public Physics(HPlayer p) {
+            this.pos = getBase().getPosition();
+        }
     }
 }

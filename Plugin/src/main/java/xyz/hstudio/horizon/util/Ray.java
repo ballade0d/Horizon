@@ -7,11 +7,11 @@ import lombok.Getter;
 public class Ray implements Cloneable {
 
     @Getter
-    private Vec3D origin, direction;
+    private Vector3D origin, direction;
 
-    public Vec3D getPointAtDistance(double distance) {
-        Vec3D dir = new Vec3D(direction.getX(), direction.getY(), direction.getZ());
-        Vec3D orig = new Vec3D(origin.getX(), origin.getY(), origin.getZ());
+    public Vector3D getPointAtDistance(double distance) {
+        Vector3D dir = new Vector3D(direction.getX(), direction.getY(), direction.getZ());
+        Vector3D orig = new Vector3D(origin.getX(), origin.getY(), origin.getZ());
         return orig.add(dir.multiply(distance));
     }
 

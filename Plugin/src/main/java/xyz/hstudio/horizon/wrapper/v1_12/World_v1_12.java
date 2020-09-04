@@ -3,7 +3,7 @@ package xyz.hstudio.horizon.wrapper.v1_12;
 import lombok.val;
 import net.minecraft.server.v1_12_R1.*;
 import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
-import xyz.hstudio.horizon.util.Vec3D;
+import xyz.hstudio.horizon.util.Vector3D;
 import xyz.hstudio.horizon.wrapper.BlockBase;
 import xyz.hstudio.horizon.wrapper.EntityBase;
 import xyz.hstudio.horizon.wrapper.WorldBase;
@@ -29,12 +29,12 @@ public class World_v1_12 extends WorldBase {
     }
 
     @Override
-    public boolean isChunkLoaded(Vec3D vec) {
+    public boolean isChunkLoaded(Vector3D vec) {
         return worldServer.getChunkProviderServer().isLoaded(vec.getBlockX() >> 4, vec.getBlockZ() >> 4);
     }
 
     @Override
-    public BlockBase getBlock(Vec3D vec) {
+    public BlockBase getBlock(Vector3D vec) {
         val x = vec.getBlockX();
         val y = vec.getBlockY();
         val z = vec.getBlockZ();
@@ -46,7 +46,7 @@ public class World_v1_12 extends WorldBase {
     }
 
     @Override
-    public List<EntityBase> getNearbyEntities(Vec3D vec, double x, double y, double z) {
+    public List<EntityBase> getNearbyEntities(Vector3D vec, double x, double y, double z) {
         AxisAlignedBB bb = new AxisAlignedBB(vec.getX() - x, vec.getY() - y, vec.getZ() - z, vec.getX() + x, vec.getY() + y, vec.getZ() + z);
         List<Entity> entityList = worldServer.getEntities(null, bb, null);
         List<EntityBase> entityBaseList = new ArrayList<>(entityList.size());

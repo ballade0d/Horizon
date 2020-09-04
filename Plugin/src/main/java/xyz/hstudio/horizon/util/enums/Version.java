@@ -1,4 +1,4 @@
-package xyz.hstudio.horizon.util;
+package xyz.hstudio.horizon.util.enums;
 
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -19,7 +19,7 @@ import xyz.hstudio.horizon.wrapper.v1_8.World_v1_8;
 
 import java.util.stream.Stream;
 
-public enum EnumVersion {
+public enum Version {
 
     v1_8_R3("v1_8_R3") {
         @Override
@@ -85,19 +85,19 @@ public enum EnumVersion {
         }
     };
 
-    public static final EnumVersion VERSION;
+    public static final Version VERSION;
 
     static {
         String version = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
-        VERSION = Stream.of(EnumVersion.values())
+        VERSION = Stream.of(Version.values())
                 .filter(v -> v.getName().equals(version))
-                .findFirst().orElse(EnumVersion.UNKNOWN);
+                .findFirst().orElse(Version.UNKNOWN);
     }
 
     @Getter
     private final String name;
 
-    EnumVersion(String name) {
+    Version(String name) {
         this.name = name;
     }
 

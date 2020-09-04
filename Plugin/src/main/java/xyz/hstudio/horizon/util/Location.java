@@ -7,7 +7,7 @@ import xyz.hstudio.horizon.wrapper.WorldBase;
 
 import java.util.Objects;
 
-public class Location extends Vec3D implements Cloneable {
+public class Location extends Vector3D implements Cloneable {
 
     @Getter
     private final WorldBase world;
@@ -40,8 +40,8 @@ public class Location extends Vec3D implements Cloneable {
         return this;
     }
 
-    public Vec3D getDirection() {
-        Vec3D vector = new Vec3D();
+    public Vector3D getDirection() {
+        Vector3D vector = new Vector3D();
         float rotX = (float) Math.toRadians(yaw);
         float rotY = (float) Math.toRadians(pitch);
         vector.setY(-AccessorBase.getInst().sin(rotY));

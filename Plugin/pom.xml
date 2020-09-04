@@ -53,13 +53,6 @@
             <scope>system</scope>
         </dependency>
         <dependency>
-            <groupId>org.spigotmc</groupId>
-            <artifactId>spigot1.13.2</artifactId>
-            <version>1.13.2</version>
-            <systemPath>D:/Minecraft/Plugin/Cores/Spigot1.13.2.jar</systemPath>
-            <scope>system</scope>
-        </dependency>
-        <dependency>
             <groupId>me.clip</groupId>
             <artifactId>placeholderapi</artifactId>
             <version>2.10.4</version>
@@ -69,6 +62,13 @@
             <groupId>com.comphenix.protocol</groupId>
             <artifactId>ProtocolLib</artifactId>
             <version>4.5.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-all</artifactId>
+            <version>4.1.49.Final</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 

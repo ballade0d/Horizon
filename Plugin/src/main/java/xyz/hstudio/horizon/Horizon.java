@@ -5,7 +5,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import xyz.hstudio.horizon.task.Async;
 import xyz.hstudio.horizon.task.Sync;
-import xyz.hstudio.horizon.util.EnumVersion;
+import xyz.hstudio.horizon.util.enums.Version;
 
 import java.net.URLClassLoader;
 import java.util.Map;
@@ -22,7 +22,7 @@ public class Horizon extends JavaPlugin {
     private final Sync sync = new Sync(this);
 
     public Horizon() {
-        if (EnumVersion.VERSION == EnumVersion.UNKNOWN) {
+        if (Version.VERSION == Version.UNKNOWN) {
             throw new IllegalStateException("Unsupported version!");
         }
     }
@@ -40,6 +40,7 @@ public class Horizon extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        players.clear();
         try {
             ((URLClassLoader) this.getClassLoader()).close();
         } catch (Exception e) {
