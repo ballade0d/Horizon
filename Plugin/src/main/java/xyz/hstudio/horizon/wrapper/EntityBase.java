@@ -11,4 +11,6 @@ public abstract class EntityBase {
     }
 
     public abstract Location getPosition();
+
+    public abstract Entity getBukkitEntity();
 }

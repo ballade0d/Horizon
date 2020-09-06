@@ -1,10 +1,12 @@
 package xyz.hstudio.horizon.module.check;
 
 import lombok.val;
+import org.bukkit.util.NumberConversions;
 import xyz.hstudio.horizon.HPlayer;
 import xyz.hstudio.horizon.Horizon;
 import xyz.hstudio.horizon.api.EnumCheckType;
-import xyz.hstudio.horizon.event.Event;
+import xyz.hstudio.horizon.event.InEvent;
+import xyz.hstudio.horizon.event.OutEvent;
 
 public abstract class CheckBase {
 
@@ -36,8 +38,8 @@ public abstract class CheckBase {
         this.violation = Math.max(violation - decayAmount, 0);
     }
 
-    protected void punish(Event event, String type, float adder, String... info) {
-        val violation = this.violation + Math.max(1, Math.round(adder));
+    protected void punish(InEvent event, String type, float adder, String... info) {
+        val violation = this.violation + Math.max(1, NumberConversions.round(adder));
 
         this.violation = violation;
         this.failedTick = inst.getAsync().getTick();
@@ -45,5 +47,9 @@ public abstract class CheckBase {
 
     public abstract EnumCheckType getType();
 
-    protected abstract void check(Event event);
+    public void received(InEvent event) {
+    }
+
+    public void sent(OutEvent event) {
+    }
 }

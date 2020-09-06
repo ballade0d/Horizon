@@ -77,15 +77,15 @@ public class Vector3D implements Cloneable {
     }
 
     public int getBlockX() {
-        return (int) Math.floor(x);
+        return NumberConversions.floor(x);
     }
 
     public int getBlockY() {
-        return (int) Math.floor(y);
+        return NumberConversions.floor(y);
     }
 
     public int getBlockZ() {
-        return (int) Math.floor(z);
+        return NumberConversions.floor(z);
     }
 
     @Override

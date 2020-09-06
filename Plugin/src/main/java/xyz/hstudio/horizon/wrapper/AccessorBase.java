@@ -1,6 +1,8 @@
 package xyz.hstudio.horizon.wrapper;
 
+import io.netty.channel.ChannelPipeline;
 import lombok.Getter;
+import xyz.hstudio.horizon.HPlayer;
 import xyz.hstudio.horizon.util.enums.Version;
 
 public abstract class AccessorBase {
@@ -11,4 +13,6 @@ public abstract class AccessorBase {
     public abstract float sin(float v);
 
     public abstract float cos(float v);
+
+    public abstract ChannelPipeline getPipeline(HPlayer p);
 }

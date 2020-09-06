@@ -2,13 +2,14 @@ package xyz.hstudio.horizon.task;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Vehicle;
+import org.bukkit.util.NumberConversions;
 import xyz.hstudio.horizon.HPlayer;
 import xyz.hstudio.horizon.Horizon;
 import xyz.hstudio.horizon.util.Location;
-import xyz.hstudio.horizon.util.MathUtils;
 import xyz.hstudio.horizon.util.Pair;
 import xyz.hstudio.horizon.wrapper.EntityBase;
 
@@ -30,7 +31,8 @@ public class Async implements Runnable {
 
             for (HPlayer p : horizon.getPlayers().values()) {
                 for (EntityBase entity : p.getWorld().getNearbyEntities(p.getPhysics().getPos(), 10, 10, 10)) {
-                    if (entity instanceof LivingEntity || entity instanceof Vehicle || entity instanceof Fireball) {
+                    Entity bkEntity = entity.getBukkitEntity();
+                    if (bkEntity instanceof LivingEntity || bkEntity instanceof Vehicle || bkEntity instanceof Fireball) {
                         collectedEntities.add(entity);
                     }
                 }
@@ -71,11 +73,12 @@ public class Async implements Runnable {
             return Collections.emptyList();
         }
         List<Location> locations = new ArrayList<>();
-        int rewindTick = MathUtils.getPingInTicks(ping) + 3;
+        int rewindTicks = NumberConversions.floor(ping / 50D);
         for (int i = times.size() - 1; i >= 0; i--) {
-            if (Math.abs(tick - times.get(i).getValue() - rewindTick) < 2) {
-                locations.add(times.get(i).getKey());
+            if (Math.abs(tick - times.get(i).getValue() - rewindTicks) > 1) {
+                continue;
             }
+            locations.add(times.get(i).getKey());
         }
         return locations;
     }

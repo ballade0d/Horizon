@@ -2,7 +2,7 @@ package xyz.hstudio.horizon.module.check;
 
 import xyz.hstudio.horizon.HPlayer;
 import xyz.hstudio.horizon.api.EnumCheckType;
-import xyz.hstudio.horizon.event.Event;
+import xyz.hstudio.horizon.event.InEvent;
 
 public class VerticalMovement extends CheckBase {
 
@@ -16,6 +16,6 @@ public class VerticalMovement extends CheckBase {
     }
 
     @Override
-    protected void check(Event event) {
+    public void received(InEvent event) {
     }
 }
