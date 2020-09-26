@@ -3,6 +3,7 @@ package xyz.hstudio.horizon.wrapper;
 import lombok.Getter;
 import xyz.hstudio.horizon.HPlayer;
 import xyz.hstudio.horizon.event.InEvent;
+import xyz.hstudio.horizon.event.OutEvent;
 import xyz.hstudio.horizon.util.Vector3D;
 import xyz.hstudio.horizon.util.enums.Version;
 
@@ -12,7 +13,9 @@ public abstract class PackerBase {
     protected static final Vector3D INVALID_8 = new Vector3D(-1, -1, -1);
 
     @Getter
-    private static final PackerBase inst = Version.VERSION.getPacker();
+    private static final PackerBase inst = Version.getInst().getPacker();
 
     public abstract InEvent received(HPlayer p, Object packet);
+
+    public abstract OutEvent sent(HPlayer p, Object packet);
 }

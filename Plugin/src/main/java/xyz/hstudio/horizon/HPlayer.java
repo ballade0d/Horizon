@@ -5,26 +5,28 @@ import lombok.Data;
 import lombok.Getter;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import xyz.hstudio.horizon.module.check.CheckBase;
+import xyz.hstudio.horizon.api.enums.Detection;
+import xyz.hstudio.horizon.module.CheckBase;
+import xyz.hstudio.horizon.module.VerticalMovement;
 import xyz.hstudio.horizon.network.PacketHandler;
 import xyz.hstudio.horizon.util.Location;
 import xyz.hstudio.horizon.wrapper.AccessorBase;
 import xyz.hstudio.horizon.wrapper.EntityBase;
 import xyz.hstudio.horizon.wrapper.WorldBase;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.EnumMap;
+import java.util.Map;
+
+import static xyz.hstudio.horizon.api.enums.Detection.VERTICAL_MOVEMENT;
 
 public class HPlayer {
 
     private static final Horizon inst = Horizon.getPlugin(Horizon.class);
 
-    @Getter
-    private final Player bPlayer;
-    @Getter
+    private final Player bukkit;
     private final EntityBase base;
     @Getter
-    private final List<CheckBase> checks;
+    private final Map<Detection, CheckBase> checks;
 
     @Getter
     private final ChannelPipeline pipeline;
@@ -36,10 +38,14 @@ public class HPlayer {
     @Getter
     private final Inventory inventory;
 
-    public HPlayer(Player bPlayer) {
-        this.bPlayer = bPlayer;
-        this.base = EntityBase.getEntity(bPlayer);
-        this.checks = new ArrayList<>();
+    public HPlayer(Player bukkit) {
+        this.bukkit = bukkit;
+        this.base = EntityBase.getEntity(bukkit);
+        this.checks = new EnumMap<Detection, CheckBase>(Detection.class) {
+            {
+                put(VERTICAL_MOVEMENT, new VerticalMovement(HPlayer.this));
+            }
+        };
 
         this.pipeline = AccessorBase.getInst().getPipeline(this);
         this.packetHandler = new PacketHandler(this);
@@ -47,11 +53,19 @@ public class HPlayer {
         this.physics = new Physics();
         this.inventory = new Inventory();
 
-        inst.getPlayers().put(bPlayer.getUniqueId(), this);
+        inst.getPlayers().put(bukkit.getUniqueId(), this);
+    }
+
+    public Player bukkit() {
+        return bukkit;
+    }
+
+    public EntityBase base() {
+        return base;
     }
 
     public WorldBase getWorld() {
-        return WorldBase.getWorld(bPlayer.getWorld());
+        return WorldBase.getWorld(bukkit.getWorld());
     }
 
     @Data
@@ -60,21 +74,21 @@ public class HPlayer {
         private int heldItemSlot;
 
         public Inventory() {
-            this.heldItemSlot = bPlayer.getInventory().getHeldItemSlot();
+            this.heldItemSlot = bukkit.getInventory().getHeldItemSlot();
         }
 
-        public ItemStack getItemInHand() {
-            return bPlayer.getInventory().getItem(heldItemSlot);
+        public ItemStack main() {
+            return bukkit.getInventory().getItem(heldItemSlot);
         }
     }
 
     @Data
     public class Physics {
 
-        private Location pos;
+        private Location position;
 
         public Physics() {
-            this.pos = getBase().getPosition();
+            this.position = base.position();
         }
     }
 }

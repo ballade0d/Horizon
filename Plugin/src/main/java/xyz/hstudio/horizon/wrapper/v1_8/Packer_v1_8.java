@@ -6,6 +6,7 @@ import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_8_R3.util.CraftMagicNumbers;
 import xyz.hstudio.horizon.HPlayer;
 import xyz.hstudio.horizon.event.InEvent;
+import xyz.hstudio.horizon.event.OutEvent;
 import xyz.hstudio.horizon.event.inbound.*;
 import xyz.hstudio.horizon.util.Location;
 import xyz.hstudio.horizon.util.Vector3D;
@@ -135,7 +136,7 @@ public class Packer_v1_8 extends PackerBase {
 
             return new BlockDigEvent(pos, dir, digType, block);
         }
-        org.bukkit.inventory.ItemStack itemStack = p.getInventory().getItemInHand();
+        org.bukkit.inventory.ItemStack itemStack = p.getInventory().main();
         if (itemStack == null) {
             return null;
         }
@@ -276,7 +277,7 @@ public class Packer_v1_8 extends PackerBase {
             e.printStackTrace();
         }
 
-        Location pos = p.getPhysics().getPos();
+        Location pos = p.getPhysics().getPosition();
         float yaw = serializer.readFloat();
         float pitch = serializer.readFloat();
         boolean onGround = serializer.readUnsignedByte() != 0;
@@ -292,7 +293,7 @@ public class Packer_v1_8 extends PackerBase {
             e.printStackTrace();
         }
 
-        Location pos = p.getPhysics().getPos();
+        Location pos = p.getPhysics().getPosition();
         double x = serializer.readDouble();
         double y = serializer.readDouble();
         double z = serializer.readDouble();
@@ -357,5 +358,10 @@ public class Packer_v1_8 extends PackerBase {
         EntityBase entity = nmsEntity == null ? null : new Entity_v1_8(nmsEntity);
 
         return new EntityInteractEvent(entityId, type, cursorPos, entity);
+    }
+
+    @Override
+    public OutEvent sent(HPlayer p, Object packet) {
+        return null;
     }
 }

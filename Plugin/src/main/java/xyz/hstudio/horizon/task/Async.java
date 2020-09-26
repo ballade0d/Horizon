@@ -1,7 +1,7 @@
 package xyz.hstudio.horizon.task;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.LivingEntity;
@@ -15,28 +15,49 @@ import xyz.hstudio.horizon.wrapper.EntityBase;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
-@RequiredArgsConstructor
 public class Async implements Runnable {
 
-    private final Horizon horizon;
-    private final Map<EntityBase, List<Pair<Location, Integer>>> trackedEntities = new ConcurrentHashMap<>();
+    private static final Horizon inst = Horizon.getPlugin(Horizon.class);
+
+    private final ScheduledExecutorService threadPool;
+    private final Map<EntityBase, List<Pair<Location, Integer>>> trackedEntities;
     @Getter
     private int tick;
+
+    public Async() {
+        threadPool = Executors.newSingleThreadScheduledExecutor(new ThreadFactoryBuilder()
+                .setDaemon(true)
+                .setNameFormat("Horizon Processing Thread")
+                .build());
+
+        trackedEntities = new ConcurrentHashMap<>();
+    }
+
+    public void start() {
+        threadPool.scheduleAtFixedRate(this, 50L, 50L, TimeUnit.MILLISECONDS);
+    }
+
+    public void cancel() {
+        threadPool.shutdown();
+    }
 
     @Override
     public void run() {
         if (tick % 20 == 0) {
             Set<EntityBase> collectedEntities = new HashSet<>();
 
-            for (HPlayer p : horizon.getPlayers().values()) {
-                for (EntityBase entity : p.getWorld().getNearbyEntities(p.getPhysics().getPos(), 10, 10, 10)) {
-                    Entity bkEntity = entity.getBukkitEntity();
+            for (HPlayer p : inst.getPlayers().values()) {
+                for (EntityBase entity : p.getWorld().getNearbyEntities(p.getPhysics().getPosition(), 10, 10, 10)) {
+                    Entity bkEntity = entity.bukkit();
                     if (bkEntity instanceof LivingEntity || bkEntity instanceof Vehicle || bkEntity instanceof Fireball) {
                         collectedEntities.add(entity);
                     }
                 }
-                collectedEntities.add(p.getBase());
+                collectedEntities.add(p.base());
             }
 
             for (EntityBase entity : collectedEntities) {
@@ -50,14 +71,14 @@ public class Async implements Runnable {
                 trackedEntities.remove(expired);
             }
         } else {
-            for (HPlayer p : horizon.getPlayers().values()) {
-                trackedEntities.put(p.getBase(), trackedEntities.getOrDefault(p.getBase(), new ArrayList<>()));
+            for (HPlayer p : inst.getPlayers().values()) {
+                trackedEntities.put(p.base(), trackedEntities.getOrDefault(p.base(), new ArrayList<>()));
             }
         }
 
         for (EntityBase entity : trackedEntities.keySet()) {
             List<Pair<Location, Integer>> times = trackedEntities.getOrDefault(entity, new ArrayList<>());
-            times.add(new Pair<>(entity.getPosition(), tick));
+            times.add(new Pair<>(entity.position(), tick));
             if (times.size() > 30) {
                 times.remove(0);
             }
@@ -67,15 +88,15 @@ public class Async implements Runnable {
         tick++;
     }
 
-    public List<Location> getHistoryLocation(EntityBase entity, int ping) {
+    public List<Location> getHistory(EntityBase entity, int ping, int range) {
         List<Pair<Location, Integer>> times = trackedEntities.get(entity);
         if (times == null || times.size() == 0) {
             return Collections.emptyList();
         }
         List<Location> locations = new ArrayList<>();
-        int rewindTicks = NumberConversions.floor(ping / 50D);
+        int ticks = tick - NumberConversions.floor(ping / 50D);
         for (int i = times.size() - 1; i >= 0; i--) {
-            if (Math.abs(tick - times.get(i).getValue() - rewindTicks) > 1) {
+            if (Math.abs(ticks - times.get(i).getValue()) > range) {
                 continue;
             }
             locations.add(times.get(i).getKey());

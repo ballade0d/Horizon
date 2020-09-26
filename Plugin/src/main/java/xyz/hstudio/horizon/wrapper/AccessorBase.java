@@ -8,7 +8,7 @@ import xyz.hstudio.horizon.util.enums.Version;
 public abstract class AccessorBase {
 
     @Getter
-    private static final AccessorBase inst = Version.VERSION.getAccessor();
+    private static final AccessorBase inst = Version.getInst().getAccessor();
 
     public abstract float sin(float v);
 

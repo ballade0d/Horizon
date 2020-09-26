@@ -10,8 +10,6 @@ import org.bukkit.util.NumberConversions;
 @NoArgsConstructor
 public class Vector3D implements Cloneable {
 
-    private static final double epsilon = 0.000001;
-
     @Getter
     @Setter
     protected double x, y, z;
@@ -93,20 +91,23 @@ public class Vector3D implements Cloneable {
         if (this == obj) {
             return true;
         }
-        if (obj == null || getClass() != obj.getClass()) {
+        if (!(obj instanceof Vector3D)) {
             return false;
         }
         Vector3D other = (Vector3D) obj;
-        return Math.abs(x - other.x) < epsilon && Math.abs(y - other.y) < epsilon && Math.abs(z - other.z) < epsilon;
+        if (Double.doubleToRawLongBits(x) != Double.doubleToRawLongBits(other.x)) {
+            return false;
+        } else if (Double.doubleToRawLongBits(y) != Double.doubleToRawLongBits(other.y)) {
+            return false;
+        } else return Double.doubleToRawLongBits(z) == Double.doubleToRawLongBits(other.z);
     }
 
     @Override
     public int hashCode() {
-        int hash = 7;
-        hash = 79 * hash + (int) (Double.doubleToLongBits(x) ^ Double.doubleToLongBits(x) >>> 32);
-        hash = 79 * hash + (int) (Double.doubleToLongBits(y) ^ Double.doubleToLongBits(y) >>> 32);
-        hash = 79 * hash + (int) (Double.doubleToLongBits(z) ^ Double.doubleToLongBits(z) >>> 32);
-        return hash;
+        int result = Double.hashCode(x);
+        result = 31 * result + Double.hashCode(y);
+        result = 31 * result + Double.hashCode(z);
+        return result;
     }
 
     @Override

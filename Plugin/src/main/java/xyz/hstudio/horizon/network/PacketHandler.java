@@ -5,18 +5,19 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
 import xyz.hstudio.horizon.HPlayer;
 import xyz.hstudio.horizon.event.InEvent;
-import xyz.hstudio.horizon.module.check.CheckBase;
+import xyz.hstudio.horizon.event.OutEvent;
+import xyz.hstudio.horizon.module.CheckBase;
 import xyz.hstudio.horizon.wrapper.PackerBase;
 
 public class PacketHandler extends ChannelDuplexHandler {
 
-    private static final String HANDLER_NAME = "horizon_client";
+    private static final String handlerName = "horizon_client";
 
     private final HPlayer p;
 
     public PacketHandler(HPlayer p) {
         this.p = p;
-        p.getPipeline().addBefore("packet_handler", HANDLER_NAME, this);
+        p.getPipeline().addBefore("packet_handler", handlerName, this);
     }
 
     @Override
@@ -25,7 +26,7 @@ public class PacketHandler extends ChannelDuplexHandler {
         try {
             InEvent event = PackerBase.getInst().received(p, packet);
             if (event != null) {
-                for (CheckBase check : p.getChecks()) {
+                for (CheckBase check : p.getChecks().values()) {
                     check.received(event);
                 }
                 cancelled = event.isCancelled();
@@ -41,10 +42,25 @@ public class PacketHandler extends ChannelDuplexHandler {
 
     @Override
     public void write(ChannelHandlerContext context, Object packet, ChannelPromise promise) throws Exception {
-        super.write(context, packet, promise);
+        boolean cancelled = false;
+        try {
+            OutEvent event = PackerBase.getInst().sent(p, packet);
+            if (event != null) {
+                for (CheckBase check : p.getChecks().values()) {
+                    check.sent(event);
+                }
+                cancelled = event.isCancelled();
+            }
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+        } finally {
+            if (!cancelled) {
+                super.write(context, packet, promise);
+            }
+        }
     }
 
     public void unregister() {
-        p.getPipeline().remove(HANDLER_NAME);
+        p.getPipeline().remove(handlerName);
     }
 }

@@ -40,7 +40,7 @@ public class BlockUtils {
     }
 
     public static boolean isSolid(BlockBase block) {
-        return block.isSolid() || SOLID.contains(block.getType());
+        return block.isSolid() || SOLID.contains(block.type());
     }
 
     public static boolean isSolid(Material type) {

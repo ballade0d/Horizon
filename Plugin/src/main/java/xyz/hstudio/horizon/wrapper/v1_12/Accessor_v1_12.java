@@ -20,6 +20,6 @@ public class Accessor_v1_12 extends AccessorBase {
 
     @Override
     public ChannelPipeline getPipeline(HPlayer p) {
-        return ((CraftPlayer) p.getBPlayer()).getHandle().playerConnection.networkManager.channel.pipeline();
+        return ((CraftPlayer) p.bukkit()).getHandle().playerConnection.networkManager.channel.pipeline();
     }
 }

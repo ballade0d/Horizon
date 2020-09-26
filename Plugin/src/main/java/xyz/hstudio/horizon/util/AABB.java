@@ -2,6 +2,7 @@ package xyz.hstudio.horizon.util;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Objects;
 
@@ -9,9 +10,12 @@ import java.util.Objects;
 public class AABB {
 
     @Getter
-    private Vector3D min;
-    @Getter
-    private Vector3D max;
+    @Setter
+    protected Vector3D min, max;
+
+    public AABB(double minX, double minY, double minZ, double maxX, double maxY, double maxZ) {
+        this(new Vector3D(minX, minY, minZ), new Vector3D(maxX, maxY, maxZ));
+    }
 
     public AABB translate(Vector3D vec) {
         min.add(vec);
@@ -34,16 +38,18 @@ public class AABB {
         if (this == obj) {
             return true;
         }
-        if (obj == null || getClass() != obj.getClass()) {
+        if (!(obj instanceof AABB)) {
             return false;
         }
-        AABB aabb = (AABB) obj;
-        return Objects.equals(min, aabb.min) && Objects.equals(max, aabb.max);
+        AABB other = (AABB) obj;
+        return Objects.equals(min, other.min) && Objects.equals(max, other.max);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(min, max);
+        int result = min.hashCode();
+        result = 31 * result + max.hashCode();
+        return result;
     }
 
     @Override

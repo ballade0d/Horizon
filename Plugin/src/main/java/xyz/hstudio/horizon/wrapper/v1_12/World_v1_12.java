@@ -42,7 +42,7 @@ public class World_v1_12 extends WorldBase {
         if (chunk == null) {
             return null;
         }
-        return new Block_v1_12(this, chunk.a(x, y, z));
+        return new Block_v1_12(this, chunk.a(x, y, z), x, y, z);
     }
 
     @Override

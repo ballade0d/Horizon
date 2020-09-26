@@ -18,12 +18,21 @@ public class Pair<K, V> {
 
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof Pair && ((Pair<?, ?>) obj).key.equals(key) && ((Pair<?, ?>) obj).value.equals(value);
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof Pair)) {
+            return false;
+        }
+        Pair<?, ?> other = (Pair<?, ?>) obj;
+        return Objects.equals(other.key, key) && Objects.equals(other.value, value);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(key, value);
+        int result = key.hashCode();
+        result = 31 * result + value.hashCode();
+        return result;
     }
 
     @Override

@@ -1,7 +1,6 @@
 package xyz.hstudio.horizon.util.enums;
 
 import lombok.Getter;
-import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import xyz.hstudio.horizon.wrapper.AccessorBase;
@@ -21,7 +20,17 @@ import java.util.stream.Stream;
 
 public enum Version {
 
-    v1_8_R3("v1_8_R3") {
+    v1_8_R3 {
+        @Override
+        public boolean validate() {
+            try {
+                Class.forName("net.minecraft.server.v1_8_R3.MinecraftServer");
+                return true;
+            } catch (ClassNotFoundException ignore) {
+            }
+            return false;
+        }
+
         @Override
         public AccessorBase getAccessor() {
             return new Accessor_v1_8();
@@ -42,7 +51,17 @@ public enum Version {
             return new World_v1_8(world);
         }
     },
-    v1_12_R1("v1_12_R1") {
+    v1_12_R1 {
+        @Override
+        public boolean validate() {
+            try {
+                Class.forName("net.minecraft.server.v1_12_R1.MinecraftServer");
+                return true;
+            } catch (ClassNotFoundException ignore) {
+            }
+            return false;
+        }
+
         @Override
         public AccessorBase getAccessor() {
             return new Accessor_v1_12();
@@ -63,7 +82,12 @@ public enum Version {
             return new World_v1_12(world);
         }
     },
-    UNKNOWN("UNKNOWN") {
+    UNKNOWN {
+        @Override
+        public boolean validate() {
+            return false;
+        }
+
         @Override
         public AccessorBase getAccessor() {
             return null;
@@ -85,21 +109,15 @@ public enum Version {
         }
     };
 
-    public static final Version VERSION;
+    @Getter
+    public static final Version inst;
 
     static {
-        String version = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
-        VERSION = Stream.of(Version.values())
-                .filter(v -> v.getName().equals(version))
-                .findFirst().orElse(Version.UNKNOWN);
+        inst = Stream.of(Version.values())
+                .filter(Version::validate).findFirst().orElse(UNKNOWN);
     }
 
-    @Getter
-    private final String name;
-
-    Version(String name) {
-        this.name = name;
-    }
+    public abstract boolean validate();
 
     public abstract AccessorBase getAccessor();
 

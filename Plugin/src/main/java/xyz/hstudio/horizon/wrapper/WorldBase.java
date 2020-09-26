@@ -9,7 +9,7 @@ import java.util.List;
 public abstract class WorldBase {
 
     public static WorldBase getWorld(World world) {
-        return Version.VERSION.getWorld(world);
+        return Version.getInst().getWorld(world);
     }
 
     public abstract boolean isChunkLoaded(int x, int z);

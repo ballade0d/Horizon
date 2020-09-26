@@ -10,10 +10,10 @@ import java.util.Objects;
 public class Location extends Vector3D implements Cloneable {
 
     @Getter
-    private final WorldBase world;
+    protected final WorldBase world;
     @Getter
     @Setter
-    private float yaw, pitch;
+    protected float yaw, pitch;
 
     public Location(WorldBase world, double x, double y, double z, float yaw, float pitch) {
         super(x, y, z);
@@ -44,47 +44,44 @@ public class Location extends Vector3D implements Cloneable {
         Vector3D vector = new Vector3D();
         float rotX = (float) Math.toRadians(yaw);
         float rotY = (float) Math.toRadians(pitch);
-        vector.setY(-AccessorBase.getInst().sin(rotY));
+        vector.y = -AccessorBase.getInst().sin(rotY);
         double xz = AccessorBase.getInst().cos(rotY);
-        vector.setX(-xz * AccessorBase.getInst().sin(rotX));
-        vector.setZ(xz * AccessorBase.getInst().cos(rotX));
+        vector.x = -xz * AccessorBase.getInst().sin(rotX);
+        vector.z = xz * AccessorBase.getInst().cos(rotX);
         return vector;
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
-        } else if (this.getClass() != obj.getClass()) {
-            return false;
-        } else {
-            Location other = (Location) obj;
-            if (!Objects.equals(world, other.world)) {
-                return false;
-            } else if (Double.doubleToLongBits(x) != Double.doubleToLongBits(other.x)) {
-                return false;
-            } else if (Double.doubleToLongBits(y) != Double.doubleToLongBits(other.y)) {
-                return false;
-            } else if (Double.doubleToLongBits(z) != Double.doubleToLongBits(other.z)) {
-                return false;
-            } else if (Float.floatToIntBits(pitch) != Float.floatToIntBits(other.pitch)) {
-                return false;
-            } else {
-                return Float.floatToIntBits(yaw) == Float.floatToIntBits(other.yaw);
-            }
+        if (this == obj) {
+            return true;
         }
+        if (!(obj instanceof Location)) {
+            return false;
+        }
+        Location other = (Location) obj;
+        if (!Objects.equals(world, other.world)) {
+            return false;
+        } else if (Double.doubleToRawLongBits(x) != Double.doubleToRawLongBits(other.x)) {
+            return false;
+        } else if (Double.doubleToRawLongBits(y) != Double.doubleToRawLongBits(other.y)) {
+            return false;
+        } else if (Double.doubleToRawLongBits(z) != Double.doubleToRawLongBits(other.z)) {
+            return false;
+        } else if (Float.floatToRawIntBits(pitch) != Float.floatToRawIntBits(other.pitch)) {
+            return false;
+        } else return Float.floatToRawIntBits(yaw) == Float.floatToRawIntBits(other.yaw);
     }
 
     @Override
     public int hashCode() {
-        int hash = 3;
-        hash = 19 * hash + (world != null ? world.hashCode() : 0);
-        hash = 19 * hash + (int) (Double.doubleToLongBits(x) ^ Double.doubleToLongBits(x) >>> 32);
-        hash = 19 * hash + (int) (Double.doubleToLongBits(y) ^ Double.doubleToLongBits(y) >>> 32);
-        hash = 19 * hash + (int) (Double.doubleToLongBits(z) ^ Double.doubleToLongBits(z) >>> 32);
-        hash = 19 * hash + Float.floatToIntBits(pitch);
-        hash = 19 * hash + Float.floatToIntBits(yaw);
-        return hash;
+        int result = world.hashCode();
+        result = 31 * result + Double.hashCode(x);
+        result = 31 * result + Double.hashCode(y);
+        result = 31 * result + Double.hashCode(z);
+        result = 31 * result + Float.hashCode(yaw);
+        result = 31 * result + Float.hashCode(pitch);
+        return result;
     }
 
     @Override

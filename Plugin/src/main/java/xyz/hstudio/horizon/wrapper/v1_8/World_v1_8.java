@@ -42,7 +42,7 @@ public class World_v1_8 extends WorldBase {
         if (chunk == null) {
             return null;
         }
-        return new Block_v1_8(this, chunk.getTypeAbs(x, y, z).getBlockData());
+        return new Block_v1_8(this, chunk.getTypeAbs(x, y, z).getBlockData(), x, y, z);
     }
 
     @Override

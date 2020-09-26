@@ -9,23 +9,24 @@ import xyz.hstudio.horizon.task.Sync;
 import xyz.hstudio.horizon.util.BlockUtils;
 import xyz.hstudio.horizon.util.enums.Version;
 
+import java.io.File;
 import java.net.URLClassLoader;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class Horizon extends JavaPlugin {
+public final class Horizon extends JavaPlugin {
 
     @Getter
     private final Map<UUID, HPlayer> players = new ConcurrentHashMap<>();
     @Getter
-    private final Async async = new Async(this);
+    private Async async;
     @Getter
-    private final Sync sync = new Sync(this);
+    private Sync sync;
 
     public Horizon() {
         // Check the server version first
-        if (Version.VERSION == Version.UNKNOWN) {
+        if (Version.getInst() == Version.UNKNOWN) {
             throw new IllegalStateException("Unsupported version!");
         }
     }
@@ -33,15 +34,19 @@ public class Horizon extends JavaPlugin {
     @Override
     public void onEnable() {
         // Async task
-        Thread asyncThread = new Thread(async, "Horizon Async Processing Thread");
-        asyncThread.setDaemon(true);
-        asyncThread.start();
+        (async = new Async()).start();
 
         // Sync task
-        Bukkit.getScheduler().runTaskTimer(this, sync, 1L, 1L);
+        (sync = new Sync()).start();
 
-        // Load static code block
+        // LoadInfo static code block
         BlockUtils.isSolid(Material.AIR);
+
+        // LoadInfo the config file
+        File folder = getDataFolder(), configFile = new File(folder, "config.yml");
+        if (!folder.isDirectory() || !configFile.isFile()) {
+            saveResource("config.yml", true);
+        }
 
         Bukkit.getOnlinePlayers().forEach(HPlayer::new);
     }
@@ -52,6 +57,11 @@ public class Horizon extends JavaPlugin {
         players.values().forEach(p -> p.getPacketHandler().unregister());
         players.clear();
 
+        // Stop the tasks
+        async.cancel();
+        sync.cancel();
+
+        // Release the jar
         try {
             ((URLClassLoader) this.getClassLoader()).close();
         } catch (Exception e) {
