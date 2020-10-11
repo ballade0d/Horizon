@@ -2,5 +2,5 @@ package xyz.hstudio.horizon.api.enums;
 
 public enum Detection {
 
-    VERTICAL_MOVEMENT,
+    HIT_BOX, VERTICAL_MOVEMENT,
 }

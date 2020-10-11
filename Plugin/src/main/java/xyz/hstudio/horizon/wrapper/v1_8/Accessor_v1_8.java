@@ -1,6 +1,7 @@
 package xyz.hstudio.horizon.wrapper.v1_8;
 
 import io.netty.channel.ChannelPipeline;
+import net.minecraft.server.v1_8_R3.EntityPlayer;
 import net.minecraft.server.v1_8_R3.MathHelper;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import xyz.hstudio.horizon.HPlayer;
@@ -16,6 +17,11 @@ public class Accessor_v1_8 extends AccessorBase {
     @Override
     public float cos(float v) {
         return MathHelper.cos(v);
+    }
+
+    @Override
+    public int getPing(HPlayer p) {
+        return ((EntityPlayer) ((Entity_v1_8) p.base()).entity).ping;
     }
 
     @Override

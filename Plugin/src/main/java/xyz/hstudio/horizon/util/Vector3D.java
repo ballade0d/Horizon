@@ -2,51 +2,52 @@ package xyz.hstudio.horizon.util;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.bukkit.util.NumberConversions;
 
 @AllArgsConstructor
-@NoArgsConstructor
-public class Vector3D implements Cloneable {
+public class Vector3D {
 
     @Getter
-    @Setter
-    protected double x, y, z;
+    protected final double x, y, z;
 
-    public Vector3D add(Vector3D vec) {
-        x += vec.x;
-        y += vec.y;
-        z += vec.z;
-        return this;
+    public Vector3D plus(Vector3D vec) {
+        return new Vector3D(x + vec.x, y + vec.y, z + vec.z);
     }
 
-    public Vector3D subtract(Vector3D vec) {
-        x -= vec.x;
-        y -= vec.y;
-        z -= vec.z;
-        return this;
+    public Vector3D plus(double x, double y, double z) {
+        return new Vector3D(this.x + x, this.y + y, this.z + z);
+    }
+
+    public Vector3D minus(Vector3D vec) {
+        return new Vector3D(x - vec.x, y - vec.y, z - vec.z);
+    }
+
+    public Vector3D minus(double x, double y, double z) {
+        return new Vector3D(this.x - x, this.y - y, this.z - z);
     }
 
     public Vector3D multiply(Vector3D vec) {
-        x *= vec.x;
-        y *= vec.y;
-        z *= vec.z;
-        return this;
+        return new Vector3D(x * vec.x, y * vec.y, z * vec.z);
     }
 
     public Vector3D divide(Vector3D vec) {
-        x /= vec.x;
-        y /= vec.y;
-        z /= vec.z;
-        return this;
+        return new Vector3D(x / vec.x, y / vec.y, z / vec.z);
     }
 
     public Vector3D multiply(double m) {
-        x *= m;
-        y *= m;
-        z *= m;
-        return this;
+        return new Vector3D(x * m, y * m, z * m);
+    }
+
+    public Vector3D setX(double x) {
+        return new Vector3D(x, y, z);
+    }
+
+    public Vector3D setY(double y) {
+        return new Vector3D(x, y, z);
+    }
+
+    public Vector3D setZ(double z) {
+        return new Vector3D(x, y, z);
     }
 
     public double length() {
@@ -63,6 +64,14 @@ public class Vector3D implements Cloneable {
 
     public double distanceSquared(Vector3D vec) {
         return NumberConversions.square(x - vec.x) + NumberConversions.square(y - vec.y) + NumberConversions.square(z - vec.z);
+    }
+
+    public double distance2d(Vector3D vec) {
+        return Math.sqrt(distance2dSquared(vec));
+    }
+
+    public double distance2dSquared(Vector3D vec) {
+        return NumberConversions.square(x - vec.x) + NumberConversions.square(z - vec.z);
     }
 
     public double dot(Vector3D vec) {
@@ -84,6 +93,11 @@ public class Vector3D implements Cloneable {
 
     public int getBlockZ() {
         return NumberConversions.floor(z);
+    }
+
+    public AABB toAABB(double length, double width) {
+        width /= 2;
+        return new AABB(x - width, y, z - width, x + width, y + length, z + width);
     }
 
     @Override
@@ -108,15 +122,5 @@ public class Vector3D implements Cloneable {
         result = 31 * result + Double.hashCode(y);
         result = 31 * result + Double.hashCode(z);
         return result;
-    }
-
-    @Override
-    public Vector3D clone() {
-        try {
-            return (Vector3D) super.clone();
-        } catch (CloneNotSupportedException e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 }

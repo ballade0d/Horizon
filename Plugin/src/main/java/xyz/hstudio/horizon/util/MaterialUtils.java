@@ -3,9 +3,6 @@ package xyz.hstudio.horizon.util;
 import lombok.var;
 import org.bukkit.Material;
 
-import java.util.EnumSet;
-import java.util.Set;
-
 public enum MaterialUtils {
 
     CHORUS_FLOWER(),
@@ -13,9 +10,6 @@ public enum MaterialUtils {
     END_ROD(),
     FARMLAND("SOIL"),
     SEA_PICKLE();
-
-    public static final Set<Material> WATER = EnumSet.of(Material.WATER, Material.STATIONARY_WATER);
-    public static final Set<Material> LAVA = EnumSet.of(Material.LAVA, Material.STATIONARY_LAVA);
 
     private final String[] legacy;
 

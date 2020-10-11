@@ -31,17 +31,17 @@ public abstract class CheckBase {
         if (tick % decayInterval != 0) {
             return;
         }
-        if (inst.getAsync().getTick() - failedTick < decayDelay) {
+        if (inst.getAsync().getTick().get() - failedTick < decayDelay) {
             return;
         }
         this.violation = Math.max(violation - decayAmount, 0);
     }
 
     protected void punish(InEvent event, String type, float adder, String... info) {
-        int violation = this.violation + NumberConversions.ceil(adder);
+        int violation = this.violation + Math.max(1, NumberConversions.round(adder));
 
         this.violation = violation;
-        this.failedTick = inst.getAsync().getTick();
+        this.failedTick = inst.getAsync().getTick().get();
     }
 
     public void received(InEvent event) {

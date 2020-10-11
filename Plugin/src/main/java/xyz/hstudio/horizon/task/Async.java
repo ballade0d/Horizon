@@ -18,6 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Async implements Runnable {
 
@@ -26,7 +27,7 @@ public class Async implements Runnable {
     private final ScheduledExecutorService threadPool;
     private final Map<EntityBase, List<Pair<Location, Integer>>> trackedEntities;
     @Getter
-    private int tick;
+    private final AtomicInteger tick;
 
     public Async() {
         threadPool = Executors.newSingleThreadScheduledExecutor(new ThreadFactoryBuilder()
@@ -35,6 +36,8 @@ public class Async implements Runnable {
                 .build());
 
         trackedEntities = new ConcurrentHashMap<>();
+
+        tick = new AtomicInteger();
     }
 
     public void start() {
@@ -47,11 +50,11 @@ public class Async implements Runnable {
 
     @Override
     public void run() {
-        if (tick % 20 == 0) {
+        if (tick.get() % 20 == 0) {
             Set<EntityBase> collectedEntities = new HashSet<>();
 
             for (HPlayer p : inst.getPlayers().values()) {
-                for (EntityBase entity : p.getWorld().getNearbyEntities(p.getPhysics().getPosition(), 10, 10, 10)) {
+                for (EntityBase entity : p.getWorld().getNearbyEntities(p.physics().position, 10, 10, 10)) {
                     Entity bkEntity = entity.bukkit();
                     if (bkEntity instanceof LivingEntity || bkEntity instanceof Vehicle || bkEntity instanceof Fireball) {
                         collectedEntities.add(entity);
@@ -78,29 +81,30 @@ public class Async implements Runnable {
 
         for (EntityBase entity : trackedEntities.keySet()) {
             List<Pair<Location, Integer>> times = trackedEntities.getOrDefault(entity, new ArrayList<>());
-            times.add(new Pair<>(entity.position(), tick));
+            times.add(new Pair<>(entity.position(), tick.get()));
             if (times.size() > 30) {
                 times.remove(0);
             }
             trackedEntities.put(entity, times);
         }
 
-        tick++;
+        tick.incrementAndGet();
     }
 
     public List<Location> getHistory(EntityBase entity, int ping, int range) {
         List<Pair<Location, Integer>> times = trackedEntities.get(entity);
-        if (times == null || times.size() == 0) {
+        if (times == null || times.isEmpty()) {
             return Collections.emptyList();
         }
-        List<Location> locations = new ArrayList<>();
-        int ticks = tick - NumberConversions.floor(ping / 50D);
+        List<Location> history = new ArrayList<>();
+        int ticks = tick.get() - NumberConversions.floor(ping / 50D);
+        // Loop backwards
         for (int i = times.size() - 1; i >= 0; i--) {
             if (Math.abs(ticks - times.get(i).getValue()) > range) {
                 continue;
             }
-            locations.add(times.get(i).getKey());
+            history.add(times.get(i).getKey());
         }
-        return locations;
+        return history;
     }
 }

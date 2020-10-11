@@ -14,5 +14,7 @@ public abstract class AccessorBase {
 
     public abstract float cos(float v);
 
+    public abstract int getPing(HPlayer p);
+
     public abstract ChannelPipeline getPipeline(HPlayer p);
 }

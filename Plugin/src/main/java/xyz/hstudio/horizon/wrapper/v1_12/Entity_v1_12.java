@@ -10,9 +10,9 @@ import xyz.hstudio.horizon.wrapper.WorldBase;
 
 public class Entity_v1_12 extends EntityBase {
 
-    private final WorldBase world;
-    private final Entity entity;
-    private final org.bukkit.entity.Entity bukkitEntity;
+    protected final WorldBase world;
+    protected final Entity entity;
+    protected final org.bukkit.entity.Entity bukkitEntity;
 
     public Entity_v1_12(org.bukkit.entity.Entity entity) {
         this.world = WorldBase.getWorld(entity.getWorld());

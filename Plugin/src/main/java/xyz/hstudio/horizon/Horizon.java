@@ -3,6 +3,9 @@ package xyz.hstudio.horizon;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import xyz.hstudio.horizon.task.Async;
 import xyz.hstudio.horizon.task.Sync;
@@ -39,16 +42,25 @@ public final class Horizon extends JavaPlugin {
         // Sync task
         (sync = new Sync()).start();
 
-        // LoadInfo static code block
+        // Load static code block
         BlockUtils.isSolid(Material.AIR);
 
-        // LoadInfo the config file
+        // Load the config file
         File folder = getDataFolder(), configFile = new File(folder, "config.yml");
         if (!folder.isDirectory() || !configFile.isFile()) {
             saveResource("config.yml", true);
         }
 
+        // Register for joined players
         Bukkit.getOnlinePlayers().forEach(HPlayer::new);
+
+        // Register when player joins
+        Bukkit.getPluginManager().registerEvents(new Listener() {
+            @EventHandler
+            public void onJoin(PlayerJoinEvent e) {
+                new HPlayer(e.getPlayer());
+            }
+        }, this);
     }
 
     @Override

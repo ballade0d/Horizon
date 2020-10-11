@@ -1,19 +1,21 @@
 package xyz.hstudio.horizon.util;
 
 import lombok.Getter;
-import lombok.Setter;
-import xyz.hstudio.horizon.wrapper.AccessorBase;
+import xyz.hstudio.horizon.HPlayer;
+import xyz.hstudio.horizon.wrapper.BlockBase;
 import xyz.hstudio.horizon.wrapper.WorldBase;
 
+import javax.annotation.Nullable;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
-public class Location extends Vector3D implements Cloneable {
+public class Location extends Vector3D {
 
     @Getter
     protected final WorldBase world;
     @Getter
-    @Setter
-    protected float yaw, pitch;
+    protected final float yaw, pitch;
 
     public Location(WorldBase world, double x, double y, double z, float yaw, float pitch) {
         super(x, y, z);
@@ -22,33 +24,76 @@ public class Location extends Vector3D implements Cloneable {
         this.pitch = pitch;
     }
 
-    public Location add(Location loc) {
-        x += loc.x;
-        y += loc.y;
-        z += loc.z;
-        yaw += loc.yaw;
-        pitch += loc.pitch;
-        return this;
+    @Override
+    public Location plus(Vector3D loc) {
+        return new Location(world, x + loc.x, y + loc.y, z + loc.z, yaw, pitch);
     }
 
-    public Location subtract(Location loc) {
-        x -= loc.x;
-        y -= loc.y;
-        z -= loc.z;
-        yaw -= loc.yaw;
-        pitch -= loc.pitch;
-        return this;
+    @Override
+    public Location plus(double x, double y, double z) {
+        return new Location(world, this.x + x, this.y + y, this.z + z, yaw, pitch);
+    }
+
+    public Location setX(double x) {
+        return new Location(world, x, y, z, yaw, pitch);
+    }
+
+    public Location setY(double y) {
+        return new Location(world, x, y, z, yaw, pitch);
+    }
+
+    public Location setZ(double z) {
+        return new Location(world, x, y, z, yaw, pitch);
+    }
+
+    public Location setYaw(float yaw) {
+        return new Location(world, x, y, z, yaw, pitch);
+    }
+
+    public Location setPitch(float pitch) {
+        return new Location(world, x, y, z, yaw, pitch);
     }
 
     public Vector3D getDirection() {
-        Vector3D vector = new Vector3D();
-        float rotX = (float) Math.toRadians(yaw);
-        float rotY = (float) Math.toRadians(pitch);
-        vector.y = -AccessorBase.getInst().sin(rotY);
-        double xz = AccessorBase.getInst().cos(rotY);
-        vector.x = -xz * AccessorBase.getInst().sin(rotX);
-        vector.z = xz * AccessorBase.getInst().cos(rotX);
-        return vector;
+        return MathUtils.getDirection(yaw, pitch);
+    }
+
+    public boolean isOnGround(HPlayer p, boolean ignoreOnGround, double depth) {
+        Set<BlockBase> blocks = new HashSet<>();
+        blocks.addAll(BlockUtils.getBlocksInLocation(this));
+        blocks.addAll(BlockUtils.getBlocksInLocation(this.plus(0, -1, 0)));
+        AABB underFeet = new AABB(this.x - 0.3, this.y - depth, this.z - 0.3, this.x + 0.3, this.y, this.z + 0.3);
+        AABB topFeet = underFeet.plus(0, depth + 0.00001, 0, 0, 0, 0);
+        Set<BlockBase> aboveBlocks = !ignoreOnGround ? null : BlockUtils.getBlocksInLocation(this);
+        for (BlockBase block : blocks) {
+            if (block.isLiquid() || !BlockUtils.isSolid(block)) {
+                continue;
+            }
+            for (AABB bBox : block.boxes(p)) {
+                if (!bBox.collides(underFeet)) {
+                    continue;
+                }
+                if (!ignoreOnGround) {
+                    return true;
+                }
+                for (BlockBase above : aboveBlocks) {
+                    if (above.isLiquid() || !BlockUtils.isSolid(above)) {
+                        continue;
+                    }
+                    for (AABB aboveBox : above.boxes(p)) {
+                        if (aboveBox.collides(topFeet)) {
+                            return false;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    @Nullable
+    public BlockBase getBlock() {
+        return world.getBlock(this);
     }
 
     @Override
@@ -82,10 +127,5 @@ public class Location extends Vector3D implements Cloneable {
         result = 31 * result + Float.hashCode(yaw);
         result = 31 * result + Float.hashCode(pitch);
         return result;
-    }
-
-    @Override
-    public Location clone() {
-        return (Location) super.clone();
     }
 }

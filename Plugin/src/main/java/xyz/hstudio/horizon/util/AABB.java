@@ -2,7 +2,6 @@ package xyz.hstudio.horizon.util;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.util.Objects;
 
@@ -10,20 +9,29 @@ import java.util.Objects;
 public class AABB {
 
     @Getter
-    @Setter
-    protected Vector3D min, max;
+    protected final Vector3D min, max;
 
     public AABB(double minX, double minY, double minZ, double maxX, double maxY, double maxZ) {
         this(new Vector3D(minX, minY, minZ), new Vector3D(maxX, maxY, maxZ));
     }
 
-    public AABB translate(Vector3D vec) {
-        min.add(vec);
-        max.add(vec);
-        return this;
+    public AABB plus(Vector3D vec) {
+        return new AABB(min.plus(vec), max.plus(vec));
     }
 
-    public boolean isColliding(AABB other) {
+    public AABB plus(double x, double y, double z) {
+        return new AABB(min.plus(x, y, z), max.plus(x, y, z));
+    }
+
+    public AABB plus(double minX, double minY, double minZ, double maxX, double maxY, double maxZ) {
+        return new AABB(min.plus(minX, minY, minZ), max.plus(maxX, maxY, maxZ));
+    }
+
+    public AABB expand(double x, double y, double z) {
+        return new AABB(min.minus(x, y, z), max.plus(x, y, z));
+    }
+
+    public boolean collides(AABB other) {
         if (max.x < other.min.x || min.x > other.max.x) {
             return false;
         }
@@ -31,6 +39,61 @@ public class AABB {
             return false;
         }
         return !(max.z < other.min.z) && !(min.z > other.max.z);
+    }
+
+    /**
+     * Calculates intersection with the given ray between a certain distance interval.
+     *
+     * @param ray     incident ray
+     * @param minDist minimum distance
+     * @param maxDist maximum distance
+     * @return intersection point on the bounding box (only the first is
+     * returned) or null if no intersection
+     */
+    public Vector3D intersectsRay(Ray3D ray, float minDist, float maxDist) {
+        Vector3D invDir = new Vector3D(1f / ray.direction.getX(), 1f / ray.direction.getY(), 1f / ray.direction.getZ());
+
+        boolean signDirX = invDir.x < 0;
+        boolean signDirY = invDir.y < 0;
+        boolean signDirZ = invDir.z < 0;
+
+        Vector3D bbox = signDirX ? max : min;
+        double tMin = (bbox.x - ray.origin.x) * invDir.x;
+        bbox = signDirX ? min : max;
+        double tMax = (bbox.x - ray.origin.x) * invDir.x;
+        bbox = signDirY ? max : min;
+        double tyMin = (bbox.y - ray.origin.y) * invDir.y;
+        bbox = signDirY ? min : max;
+        double tyMax = (bbox.y - ray.origin.y) * invDir.y;
+
+        if (tMin > tyMax || tyMin > tMax) {
+            return null;
+        }
+        if (tyMin > tMin) {
+            tMin = tyMin;
+        }
+        if (tyMax < tMax) {
+            tMax = tyMax;
+        }
+
+        bbox = signDirZ ? max : min;
+        double tzMin = (bbox.z - ray.origin.z) * invDir.z;
+        bbox = signDirZ ? min : max;
+        double tzMax = (bbox.z - ray.origin.z) * invDir.z;
+
+        if (tMin > tzMax || tzMin > tMax) {
+            return null;
+        }
+        if (tzMin > tMin) {
+            tMin = tzMin;
+        }
+        if (tzMax < tMax) {
+            tMax = tzMax;
+        }
+        if (tMin < maxDist && tMax > minDist) {
+            return ray.getPointAtDistance(tMin);
+        }
+        return null;
     }
 
     @Override
@@ -50,18 +113,5 @@ public class AABB {
         int result = min.hashCode();
         result = 31 * result + max.hashCode();
         return result;
-    }
-
-    @Override
-    public AABB clone() {
-        try {
-            AABB clone = (AABB) super.clone();
-            clone.min = min.clone();
-            clone.max = max.clone();
-            return clone;
-        } catch (CloneNotSupportedException e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 }

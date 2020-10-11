@@ -136,7 +136,7 @@ public class Packer_v1_8 extends PackerBase {
 
             return new BlockDigEvent(pos, dir, digType, block);
         }
-        org.bukkit.inventory.ItemStack itemStack = p.getInventory().main();
+        org.bukkit.inventory.ItemStack itemStack = p.inventory().mainHand();
         if (itemStack == null) {
             return null;
         }
@@ -277,12 +277,12 @@ public class Packer_v1_8 extends PackerBase {
             e.printStackTrace();
         }
 
-        Location pos = p.getPhysics().getPosition();
+        Location pos = p.physics().position;
         float yaw = serializer.readFloat();
         float pitch = serializer.readFloat();
         boolean onGround = serializer.readUnsignedByte() != 0;
 
-        return new MoveEvent(pos.getX(), pos.getY(), pos.getZ(), yaw, pitch, onGround, true, false);
+        return new MoveEvent(new Location(p.getWorld(), pos.getX(), pos.getY(), pos.getZ(), yaw, pitch), onGround, true, false);
     }
 
     private InEvent toEvent(HPlayer p, PacketPlayInFlying.PacketPlayInPosition packet) {
@@ -293,13 +293,13 @@ public class Packer_v1_8 extends PackerBase {
             e.printStackTrace();
         }
 
-        Location pos = p.getPhysics().getPosition();
+        Location pos = p.physics().position;
         double x = serializer.readDouble();
         double y = serializer.readDouble();
         double z = serializer.readDouble();
         boolean onGround = serializer.readUnsignedByte() != 0;
 
-        return new MoveEvent(x, y, z, pos.getYaw(), pos.getPitch(), onGround, false, true);
+        return new MoveEvent(new Location(p.getWorld(), x, y, z, pos.getYaw(), pos.getPitch()), onGround, false, true);
     }
 
     private InEvent toEvent(HPlayer p, PacketPlayInFlying.PacketPlayInPositionLook packet) {
@@ -317,7 +317,7 @@ public class Packer_v1_8 extends PackerBase {
         float pitch = serializer.readFloat();
         boolean onGround = serializer.readUnsignedByte() != 0;
 
-        return new MoveEvent(x, y, z, yaw, pitch, onGround, true, true);
+        return new MoveEvent(new Location(p.getWorld(), x, y, z, yaw, pitch), onGround, true, true);
     }
 
     private InEvent toEvent(HPlayer p, PacketPlayInHeldItemSlot packet) {

@@ -46,4 +46,18 @@ public class BlockUtils {
     public static boolean isSolid(Material type) {
         return type.isSolid() || SOLID.contains(type);
     }
+
+    public static Set<BlockBase> getBlocksInLocation(Location loc) {
+        Set<BlockBase> blocks = new HashSet<>();
+        blocks.add(loc.plus(0.3, 0, 0).getBlock());
+        blocks.add(loc.plus(0, 0, 0.3).getBlock());
+        blocks.add(loc.plus(-0.3, 0, 0).getBlock());
+        blocks.add(loc.plus(0, 0, -0.3).getBlock());
+        blocks.add(loc.plus(0.3, 0, 0.3).getBlock());
+        blocks.add(loc.plus(-0.3, 0, -0.3).getBlock());
+        blocks.add(loc.plus(0.3, 0, -0.3).getBlock());
+        blocks.add(loc.plus(-0.3, 0, 0.3).getBlock());
+        blocks.remove(null);
+        return blocks;
+    }
 }

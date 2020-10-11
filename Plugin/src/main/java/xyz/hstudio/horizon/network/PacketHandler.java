@@ -2,6 +2,7 @@ package xyz.hstudio.horizon.network;
 
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelPipeline;
 import io.netty.channel.ChannelPromise;
 import xyz.hstudio.horizon.HPlayer;
 import xyz.hstudio.horizon.event.InEvent;
@@ -11,13 +12,13 @@ import xyz.hstudio.horizon.wrapper.PackerBase;
 
 public class PacketHandler extends ChannelDuplexHandler {
 
-    private static final String handlerName = "horizon_client";
+    private static final String HANDLER_NAME = "horizon_client";
 
     private final HPlayer p;
 
     public PacketHandler(HPlayer p) {
         this.p = p;
-        p.getPipeline().addBefore("packet_handler", handlerName, this);
+        p.getPipeline().addBefore("packet_handler", HANDLER_NAME, this);
     }
 
     @Override
@@ -26,9 +27,11 @@ public class PacketHandler extends ChannelDuplexHandler {
         try {
             InEvent event = PackerBase.getInst().received(p, packet);
             if (event != null) {
+                event.pre(p);
                 for (CheckBase check : p.getChecks().values()) {
                     check.received(event);
                 }
+                event.post(p);
                 cancelled = event.isCancelled();
             }
         } catch (Throwable throwable) {
@@ -61,6 +64,9 @@ public class PacketHandler extends ChannelDuplexHandler {
     }
 
     public void unregister() {
-        p.getPipeline().remove(handlerName);
+        ChannelPipeline pipeline = p.getPipeline();
+        if (pipeline.get(HANDLER_NAME) != null) {
+            pipeline.remove(HANDLER_NAME);
+        }
     }
 }
