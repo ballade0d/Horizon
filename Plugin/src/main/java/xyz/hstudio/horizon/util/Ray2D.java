@@ -31,8 +31,7 @@ public class Ray2D {
     }
 
     public class Tracer {
-        @Getter
-        private double x, y, total;
+        public double x, y, total;
 
         public Tracer() {
             x = origin.x;

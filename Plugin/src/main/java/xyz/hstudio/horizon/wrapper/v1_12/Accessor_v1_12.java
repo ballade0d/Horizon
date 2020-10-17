@@ -21,11 +21,11 @@ public class Accessor_v1_12 extends AccessorBase {
 
     @Override
     public int getPing(HPlayer p) {
-        return ((EntityPlayer) ((Entity_v1_12) p.base()).entity).ping;
+        return ((EntityPlayer) ((Entity_v1_12) p.base).entity).ping;
     }
 
     @Override
     public ChannelPipeline getPipeline(HPlayer p) {
-        return ((CraftPlayer) p.bukkit()).getHandle().playerConnection.networkManager.channel.pipeline();
+        return ((CraftPlayer) p.bukkit).getHandle().playerConnection.networkManager.channel.pipeline();
     }
 }

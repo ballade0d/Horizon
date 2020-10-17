@@ -7,9 +7,11 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
+import xyz.hstudio.horizon.configuration.Config;
 import xyz.hstudio.horizon.task.Async;
 import xyz.hstudio.horizon.task.Sync;
 import xyz.hstudio.horizon.util.BlockUtils;
+import xyz.hstudio.horizon.util.Yaml;
 import xyz.hstudio.horizon.util.enums.Version;
 
 import java.io.File;
@@ -50,6 +52,7 @@ public final class Horizon extends JavaPlugin {
         if (!folder.isDirectory() || !configFile.isFile()) {
             saveResource("config.yml", true);
         }
+        Config.load(Yaml.loadConfiguration(configFile));
 
         // Register for joined players
         Bukkit.getOnlinePlayers().forEach(HPlayer::new);
@@ -66,7 +69,7 @@ public final class Horizon extends JavaPlugin {
     @Override
     public void onDisable() {
         // Unregister packet handlers
-        players.values().forEach(p -> p.getPacketHandler().unregister());
+        players.values().forEach(p -> p.packetHandler.unregister());
         players.clear();
 
         // Stop the tasks

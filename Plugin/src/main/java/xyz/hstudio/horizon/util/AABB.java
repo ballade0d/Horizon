@@ -15,20 +15,16 @@ public class AABB {
         this(new Vector3D(minX, minY, minZ), new Vector3D(maxX, maxY, maxZ));
     }
 
-    public AABB plus(Vector3D vec) {
-        return new AABB(min.plus(vec), max.plus(vec));
-    }
-
-    public AABB plus(double x, double y, double z) {
-        return new AABB(min.plus(x, y, z), max.plus(x, y, z));
-    }
-
-    public AABB plus(double minX, double minY, double minZ, double maxX, double maxY, double maxZ) {
-        return new AABB(min.plus(minX, minY, minZ), max.plus(maxX, maxY, maxZ));
+    public AABB add(double minX, double minY, double minZ, double maxX, double maxY, double maxZ) {
+        min.add(minX, minY, minZ);
+        max.add(maxX, maxY, maxZ);
+        return this;
     }
 
     public AABB expand(double x, double y, double z) {
-        return new AABB(min.minus(x, y, z), max.plus(x, y, z));
+        min.subtract(x, y, z);
+        max.add(x, y, z);
+        return this;
     }
 
     public boolean collides(AABB other) {
@@ -51,7 +47,7 @@ public class AABB {
      * returned) or null if no intersection
      */
     public Vector3D intersectsRay(Ray3D ray, float minDist, float maxDist) {
-        Vector3D invDir = new Vector3D(1f / ray.direction.getX(), 1f / ray.direction.getY(), 1f / ray.direction.getZ());
+        Vector3D invDir = new Vector3D(1f / ray.direction.x, 1f / ray.direction.y, 1f / ray.direction.z);
 
         boolean signDirX = invDir.x < 0;
         boolean signDirY = invDir.y < 0;

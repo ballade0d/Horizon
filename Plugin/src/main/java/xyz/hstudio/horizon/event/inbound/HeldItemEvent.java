@@ -1,12 +1,14 @@
 package xyz.hstudio.horizon.event.inbound;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import xyz.hstudio.horizon.HPlayer;
 import xyz.hstudio.horizon.event.InEvent;
 
-@RequiredArgsConstructor
-@Getter
 public class HeldItemEvent extends InEvent {
 
-    private final int heldItemSlot;
+    public final int heldItemSlot;
+
+    public HeldItemEvent(HPlayer p, int heldItemSlot) {
+        super(p);
+        this.heldItemSlot = heldItemSlot;
+    }
 }

@@ -1,28 +1,36 @@
 package xyz.hstudio.horizon.event.inbound;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import xyz.hstudio.horizon.HPlayer;
 import xyz.hstudio.horizon.event.InEvent;
 
-@RequiredArgsConstructor
-@Getter
 public class EntityActionEvent extends InEvent {
 
-    private final ActionType type;
-    private final int jumpBoost;
+    public final ActionType type;
+    public final int jumpBoost;
+
+    public EntityActionEvent(HPlayer p, ActionType type, int jumpBoost) {
+        super(p);
+        this.type = type;
+        this.jumpBoost = jumpBoost;
+    }
 
     @Override
-    public void post(HPlayer p) {
+    public void post() {
         switch (type) {
             case START_SNEAKING:
-                p.status().isSneaking = true;
+                p.status.isSneaking = true;
                 break;
             case STOP_SNEAKING:
-                p.status().isSneaking = false;
+                p.status.isSneaking = false;
+                break;
+            case START_SPRINTING:
+                p.status.isSprinting = true;
+                break;
+            case STOP_SPRINTING:
+                p.status.isSprinting = false;
                 break;
         }
-        super.post(p);
+        super.post();
     }
 
     public enum ActionType {

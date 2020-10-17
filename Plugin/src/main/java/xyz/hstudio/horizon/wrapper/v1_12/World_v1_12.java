@@ -24,6 +24,11 @@ public class World_v1_12 extends WorldBase {
     }
 
     @Override
+    public org.bukkit.World bukkit() {
+        return worldServer.getWorld();
+    }
+
+    @Override
     public boolean isChunkLoaded(int x, int z) {
         return worldServer.getChunkProviderServer().isLoaded(x >> 4, z >> 4);
     }
@@ -47,7 +52,7 @@ public class World_v1_12 extends WorldBase {
 
     @Override
     public List<EntityBase> getNearbyEntities(Vector3D vec, double x, double y, double z) {
-        AxisAlignedBB bb = new AxisAlignedBB(vec.getX() - x, vec.getY() - y, vec.getZ() - z, vec.getX() + x, vec.getY() + y, vec.getZ() + z);
+        AxisAlignedBB bb = new AxisAlignedBB(vec.x - x, vec.y - y, vec.z - z, vec.x + x, vec.y + y, vec.z + z);
         List<Entity> entityList = worldServer.getEntities(null, bb, null);
         List<EntityBase> entityBaseList = new ArrayList<>(entityList.size());
         for (Entity entity : entityList) {

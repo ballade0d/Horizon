@@ -1,17 +1,55 @@
 package xyz.hstudio.horizon.util;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
 import org.bukkit.util.NumberConversions;
 
 @AllArgsConstructor
 public class Vector2D {
 
-    @Getter
-    protected final double x, y;
+    public double x, y;
+
+    // Plus
+
+    public Vector2D plus(double x, double y) {
+        return new Vector2D(this.x + x, this.y + y);
+    }
+
+    public Vector2D plus(Vector2D vec) {
+        return plus(vec.x, vec.y);
+    }
+
+    // Add
+
+    public Vector2D add(double x, double y) {
+        this.x += x;
+        this.y += y;
+        return this;
+    }
+
+    public Vector2D add(Vector2D vec) {
+        return add(vec.x, vec.y);
+    }
+
+    // Minus
+
+    public Vector2D minus(double x, double y) {
+        return new Vector2D(this.x - x, this.y - y);
+    }
 
     public Vector2D minus(Vector2D vec) {
-        return new Vector2D(x - vec.x, y - vec.y);
+        return minus(vec.x, vec.y);
+    }
+
+    // Subtract
+
+    public Vector2D subtract(double x, double y) {
+        this.x -= x;
+        this.y -= y;
+        return this;
+    }
+
+    public Vector2D subtract(Vector2D vec) {
+        return subtract(vec.x, vec.y);
     }
 
     public double distance(Vector2D vec) {

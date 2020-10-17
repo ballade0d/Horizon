@@ -63,7 +63,7 @@ public class Block_v1_12 extends BlockBase {
             return boxes;
         } else if (b instanceof BlockSoil) {
             AABB[] boxes = new AABB[1];
-            if (p.getProtocol() == 47) {
+            if (p.protocol == 47) {
                 boxes[0] = new AABB(x, y, z, x + 1, y + 1, z + 1);
             } else {
                 boxes[0] = new AABB(x, y, z, x + 1, y + 0.9375, z + 1);
@@ -71,7 +71,7 @@ public class Block_v1_12 extends BlockBase {
             return boxes;
         } else if (b instanceof BlockWaterLily) {
             AABB[] boxes = new AABB[1];
-            if (p.getProtocol() == 47) {
+            if (p.protocol == 47) {
                 boxes[0] = new AABB(x, y, z, x + 1, y + 0.015625, z + 1);
             } else {
                 boxes[0] = new AABB(x + 0.0625, y, z + 0.0625, x + 0.9375, y + 0.09375, z + 0.9375);
@@ -79,7 +79,7 @@ public class Block_v1_12 extends BlockBase {
             return boxes;
         } else if (b instanceof BlockLadder) {
             AABB[] boxes = new AABB[1];
-            if (p.getProtocol() == 47) {
+            if (p.protocol == 47) {
                 switch (data.get(BlockLadder.FACING)) {
                     case NORTH:
                         boxes[0] = new AABB(x, y, z + 0.875, x + 1, y + 1, z + 1);

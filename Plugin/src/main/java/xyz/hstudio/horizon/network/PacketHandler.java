@@ -2,7 +2,6 @@ package xyz.hstudio.horizon.network;
 
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelPipeline;
 import io.netty.channel.ChannelPromise;
 import xyz.hstudio.horizon.HPlayer;
 import xyz.hstudio.horizon.event.InEvent;
@@ -18,7 +17,7 @@ public class PacketHandler extends ChannelDuplexHandler {
 
     public PacketHandler(HPlayer p) {
         this.p = p;
-        p.getPipeline().addBefore("packet_handler", HANDLER_NAME, this);
+        p.pipeline.addBefore("packet_handler", HANDLER_NAME, this);
     }
 
     @Override
@@ -27,12 +26,15 @@ public class PacketHandler extends ChannelDuplexHandler {
         try {
             InEvent event = PackerBase.getInst().received(p, packet);
             if (event != null) {
-                event.pre(p);
-                for (CheckBase check : p.getChecks().values()) {
-                    check.received(event);
+                if (!event.pre()) {
+                    cancelled = true;
+                } else {
+                    for (CheckBase check : p.getChecks()) {
+                        check.received(event);
+                    }
+                    event.post();
+                    cancelled = event.isCancelled();
                 }
-                event.post(p);
-                cancelled = event.isCancelled();
             }
         } catch (Throwable throwable) {
             throwable.printStackTrace();
@@ -49,7 +51,7 @@ public class PacketHandler extends ChannelDuplexHandler {
         try {
             OutEvent event = PackerBase.getInst().sent(p, packet);
             if (event != null) {
-                for (CheckBase check : p.getChecks().values()) {
+                for (CheckBase check : p.getChecks()) {
                     check.sent(event);
                 }
                 cancelled = event.isCancelled();
@@ -64,9 +66,8 @@ public class PacketHandler extends ChannelDuplexHandler {
     }
 
     public void unregister() {
-        ChannelPipeline pipeline = p.getPipeline();
-        if (pipeline.get(HANDLER_NAME) != null) {
-            pipeline.remove(HANDLER_NAME);
+        if (p.pipeline.get(HANDLER_NAME) != null) {
+            p.pipeline.remove(HANDLER_NAME);
         }
     }
 }

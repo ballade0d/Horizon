@@ -12,8 +12,8 @@ public abstract class ConfigBase {
 
     public static void load(Class<? extends ConfigBase> clazz, Yaml yaml, Yaml def) {
         for (Field field : clazz.getFields()) {
-            LoadInfo annotation;
-            if ((annotation = field.getAnnotation(LoadInfo.class)) == null) {
+            LoadInfo annotation = field.getAnnotation(LoadInfo.class);
+            if (annotation == null) {
                 continue;
             }
             if (!Modifier.isStatic(field.getModifiers())) {
@@ -27,7 +27,7 @@ public abstract class ConfigBase {
             try {
                 field.set(null, value);
             } catch (IllegalArgumentException | IllegalAccessException ignore) {
-                Logger.msg("WARN", "Failed to load the value " + path + " in the config! Using default for that value.");
+                Logger.msg("WARN", "Failed to load the value " + path + " in the config! Using default value.");
                 value = def.get(path);
                 try {
                     field.set(null, value);

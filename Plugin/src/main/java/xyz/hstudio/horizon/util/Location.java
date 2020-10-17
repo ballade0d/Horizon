@@ -1,6 +1,5 @@
 package xyz.hstudio.horizon.util;
 
-import lombok.Getter;
 import xyz.hstudio.horizon.HPlayer;
 import xyz.hstudio.horizon.wrapper.BlockBase;
 import xyz.hstudio.horizon.wrapper.WorldBase;
@@ -12,10 +11,8 @@ import java.util.Set;
 
 public class Location extends Vector3D {
 
-    @Getter
-    protected final WorldBase world;
-    @Getter
-    protected final float yaw, pitch;
+    public final WorldBase world;
+    public float yaw, pitch;
 
     public Location(WorldBase world, double x, double y, double z, float yaw, float pitch) {
         super(x, y, z);
@@ -24,47 +21,87 @@ public class Location extends Vector3D {
         this.pitch = pitch;
     }
 
-    @Override
-    public Location plus(Vector3D loc) {
-        return new Location(world, x + loc.x, y + loc.y, z + loc.z, yaw, pitch);
-    }
+    // Plus
 
-    @Override
     public Location plus(double x, double y, double z) {
         return new Location(world, this.x + x, this.y + y, this.z + z, yaw, pitch);
     }
 
-    public Location setX(double x) {
-        return new Location(world, x, y, z, yaw, pitch);
+    public Location plus(Location vec) {
+        return plus(vec.x, vec.y, vec.z);
     }
 
-    public Location setY(double y) {
-        return new Location(world, x, y, z, yaw, pitch);
+    // Add
+
+    public Location add(double x, double y, double z) {
+        this.x += x;
+        this.y += y;
+        this.z += z;
+        return this;
     }
 
-    public Location setZ(double z) {
-        return new Location(world, x, y, z, yaw, pitch);
+    public Location add(Location vec) {
+        return add(vec.x, vec.y, vec.z);
     }
 
-    public Location setYaw(float yaw) {
-        return new Location(world, x, y, z, yaw, pitch);
+    // Minus
+
+    public Location minus(double x, double y, double z) {
+        return new Location(world, this.x - x, this.y - y, this.z - z, yaw, pitch);
     }
 
-    public Location setPitch(float pitch) {
-        return new Location(world, x, y, z, yaw, pitch);
+    public Location minus(Location vec) {
+        return minus(vec.x, vec.y, vec.z);
+    }
+
+    // Subtract
+
+    public Location subtract(double x, double y, double z) {
+        this.x -= x;
+        this.y -= y;
+        this.z -= z;
+        return this;
+    }
+
+    public Location subtract(Location loc) {
+        return subtract(loc.x, loc.y, loc.z);
+    }
+
+    // Multiply
+
+    public Location multiply(double v) {
+        this.x *= v;
+        this.y *= v;
+        this.z *= v;
+        return this;
+    }
+
+    // Divide
+
+    public Location divide(double v) {
+        this.x /= v;
+        this.y /= v;
+        this.z /= v;
+        return this;
     }
 
     public Vector3D getDirection() {
         return MathUtils.getDirection(yaw, pitch);
     }
 
+    public org.bukkit.Location toBukkit() {
+        return new org.bukkit.Location(world.bukkit(), x, y, z, yaw, pitch);
+    }
+
     public boolean isOnGround(HPlayer p, boolean ignoreOnGround, double depth) {
         Set<BlockBase> blocks = new HashSet<>();
         blocks.addAll(BlockUtils.getBlocksInLocation(this));
         blocks.addAll(BlockUtils.getBlocksInLocation(this.plus(0, -1, 0)));
-        AABB underFeet = new AABB(this.x - 0.3, this.y - depth, this.z - 0.3, this.x + 0.3, this.y, this.z + 0.3);
-        AABB topFeet = underFeet.plus(0, depth + 0.00001, 0, 0, 0, 0);
-        Set<BlockBase> aboveBlocks = !ignoreOnGround ? null : BlockUtils.getBlocksInLocation(this);
+        Set<BlockBase> blocksAbove = !ignoreOnGround ? null : BlockUtils.getBlocksInLocation(this);
+
+        AABB underFeet = toAABB(0.6, 0).add(0, -depth, 0, 0, 0, 0);
+        AABB topFeet = toAABB(0.6, 0).add(0, 0.00001, 0, 0, 0, 0);
+
         for (BlockBase block : blocks) {
             if (block.isLiquid() || !BlockUtils.isSolid(block)) {
                 continue;
@@ -76,7 +113,7 @@ public class Location extends Vector3D {
                 if (!ignoreOnGround) {
                     return true;
                 }
-                for (BlockBase above : aboveBlocks) {
+                for (BlockBase above : blocksAbove) {
                     if (above.isLiquid() || !BlockUtils.isSolid(above)) {
                         continue;
                     }

@@ -1,20 +1,26 @@
 package xyz.hstudio.horizon.event.inbound;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import xyz.hstudio.horizon.HPlayer;
 import xyz.hstudio.horizon.event.InEvent;
 import xyz.hstudio.horizon.util.Vector3D;
 import xyz.hstudio.horizon.util.enums.Direction;
 
-@RequiredArgsConstructor
-@Getter
 public class BlockInteractEvent extends InEvent {
 
-    private final Vector3D targetPos;
-    private final Vector3D cursorPos;
-    private final Vector3D placePos;
-    private final Direction dir;
-    private final InteractType type;
+    public final Vector3D targetPos;
+    public final Vector3D cursorPos;
+    public final Vector3D placePos;
+    public final Direction dir;
+    public final InteractType type;
+
+    public BlockInteractEvent(HPlayer p, Vector3D targetPos, Vector3D cursorPos, Vector3D placePos, Direction dir, InteractType type) {
+        super(p);
+        this.targetPos = targetPos;
+        this.cursorPos = cursorPos;
+        this.placePos = placePos;
+        this.dir = dir;
+        this.type = type;
+    }
 
     public enum InteractType {
         PLACE_BLOCK, INTERACT_BLOCK

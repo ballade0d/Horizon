@@ -67,11 +67,11 @@ public class Packer_v1_8 extends PackerBase {
         float flyingSpeed = serializer.readFloat();
         float walkingSpeed = serializer.readFloat();
 
-        return new AbilitiesEvent(invulnerable, flying, flyable, inCreative, flyingSpeed, walkingSpeed);
+        return new AbilitiesEvent(p, invulnerable, flying, flyable, inCreative, flyingSpeed, walkingSpeed);
     }
 
     private InEvent toEvent(HPlayer p, PacketPlayInArmAnimation packet) {
-        return new ArmSwingEvent();
+        return new ArmSwingEvent(p);
     }
 
     private InEvent toEvent(HPlayer p, PacketPlayInBlockDig packet) {
@@ -134,14 +134,14 @@ public class Packer_v1_8 extends PackerBase {
                     return null;
             }
 
-            return new BlockDigEvent(pos, dir, digType, block);
+            return new BlockDigEvent(p, pos, dir, digType, block);
         }
-        org.bukkit.inventory.ItemStack itemStack = p.inventory().mainHand();
+        org.bukkit.inventory.ItemStack itemStack = p.inventory.mainHand();
         if (itemStack == null) {
             return null;
         }
 
-        return new ItemInteractEvent(interactType, itemStack, Hand.MAIN);
+        return new ItemInteractEvent(p, interactType, itemStack, Hand.MAIN);
     }
 
     private InEvent toEvent(HPlayer p, PacketPlayInBlockPlace packet) {
@@ -197,14 +197,14 @@ public class Packer_v1_8 extends PackerBase {
                 placeType = BlockInteractEvent.InteractType.INTERACT_BLOCK;
             }
 
-            return new BlockInteractEvent(targetPos, cursorPos, placePos, dir, placeType);
+            return new BlockInteractEvent(p, targetPos, cursorPos, placePos, dir, placeType);
         } else {
             if (itemStack == null) {
                 // Interact with nothing in hand, return
                 return null;
             }
 
-            return new ItemInteractEvent(ItemInteractEvent.InteractType.START_USE_ITEM, CraftItemStack.asCraftMirror(itemStack), Hand.MAIN);
+            return new ItemInteractEvent(p, ItemInteractEvent.InteractType.START_USE_ITEM, CraftItemStack.asCraftMirror(itemStack), Hand.MAIN);
         }
     }
 
@@ -224,7 +224,7 @@ public class Packer_v1_8 extends PackerBase {
                 return null;
         }
 
-        return new EntityActionEvent(type, 0);
+        return new EntityActionEvent(p, type, 0);
     }
 
     private InEvent toEvent(HPlayer p, PacketPlayInCloseWindow packet) {
@@ -237,7 +237,7 @@ public class Packer_v1_8 extends PackerBase {
 
         int id = serializer.readByte();
 
-        return new WindowCloseEvent(id);
+        return new WindowCloseEvent(p, id);
     }
 
     private InEvent toEvent(HPlayer p, PacketPlayInEntityAction packet) {
@@ -266,7 +266,7 @@ public class Packer_v1_8 extends PackerBase {
         }
         int jumpBoost = packet.c();
 
-        return new EntityActionEvent(type, jumpBoost);
+        return new EntityActionEvent(p, type, jumpBoost);
     }
 
     private InEvent toEvent(HPlayer p, PacketPlayInFlying.PacketPlayInLook packet) {
@@ -277,12 +277,12 @@ public class Packer_v1_8 extends PackerBase {
             e.printStackTrace();
         }
 
-        Location pos = p.physics().position;
+        Location pos = p.physics.position;
         float yaw = serializer.readFloat();
         float pitch = serializer.readFloat();
         boolean onGround = serializer.readUnsignedByte() != 0;
 
-        return new MoveEvent(new Location(p.getWorld(), pos.getX(), pos.getY(), pos.getZ(), yaw, pitch), onGround, true, false);
+        return new MoveEvent(p, new Location(p.getWorld(), pos.x, pos.y, pos.z, yaw, pitch), onGround, true, false);
     }
 
     private InEvent toEvent(HPlayer p, PacketPlayInFlying.PacketPlayInPosition packet) {
@@ -293,13 +293,13 @@ public class Packer_v1_8 extends PackerBase {
             e.printStackTrace();
         }
 
-        Location pos = p.physics().position;
+        Location pos = p.physics.position;
         double x = serializer.readDouble();
         double y = serializer.readDouble();
         double z = serializer.readDouble();
         boolean onGround = serializer.readUnsignedByte() != 0;
 
-        return new MoveEvent(new Location(p.getWorld(), x, y, z, pos.getYaw(), pos.getPitch()), onGround, false, true);
+        return new MoveEvent(p, new Location(p.getWorld(), x, y, z, pos.yaw, pos.pitch), onGround, false, true);
     }
 
     private InEvent toEvent(HPlayer p, PacketPlayInFlying.PacketPlayInPositionLook packet) {
@@ -317,13 +317,13 @@ public class Packer_v1_8 extends PackerBase {
         float pitch = serializer.readFloat();
         boolean onGround = serializer.readUnsignedByte() != 0;
 
-        return new MoveEvent(new Location(p.getWorld(), x, y, z, yaw, pitch), onGround, true, true);
+        return new MoveEvent(p, new Location(p.getWorld(), x, y, z, yaw, pitch), onGround, true, true);
     }
 
     private InEvent toEvent(HPlayer p, PacketPlayInHeldItemSlot packet) {
         int heldItemSlot = packet.a();
 
-        return new HeldItemEvent(heldItemSlot);
+        return new HeldItemEvent(p, heldItemSlot);
     }
 
     private InEvent toEvent(HPlayer p, PacketPlayInUseEntity packet) {
@@ -357,7 +357,7 @@ public class Packer_v1_8 extends PackerBase {
         Entity nmsEntity = packet.a(((World_v1_8) p.getWorld()).worldServer);
         EntityBase entity = nmsEntity == null ? null : new Entity_v1_8(nmsEntity);
 
-        return new EntityInteractEvent(entityId, type, cursorPos, entity);
+        return new EntityInteractEvent(p, entityId, type, cursorPos, entity);
     }
 
     @Override

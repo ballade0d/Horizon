@@ -50,17 +50,31 @@ public class Async implements Runnable {
 
     @Override
     public void run() {
+        decay();
+        trackEntities();
+
+        tick.incrementAndGet();
+    }
+
+    private void decay() {
+        inst.getPlayers().values().parallelStream()
+                .map(HPlayer::getChecks)
+                .flatMap(Collection::stream)
+                .forEach(check -> check.decay(tick.get()));
+    }
+
+    private void trackEntities() {
         if (tick.get() % 20 == 0) {
             Set<EntityBase> collectedEntities = new HashSet<>();
 
             for (HPlayer p : inst.getPlayers().values()) {
-                for (EntityBase entity : p.getWorld().getNearbyEntities(p.physics().position, 10, 10, 10)) {
+                for (EntityBase entity : p.getWorld().getNearbyEntities(p.physics.position, 10, 10, 10)) {
                     Entity bkEntity = entity.bukkit();
                     if (bkEntity instanceof LivingEntity || bkEntity instanceof Vehicle || bkEntity instanceof Fireball) {
                         collectedEntities.add(entity);
                     }
                 }
-                collectedEntities.add(p.base());
+                collectedEntities.add(p.base);
             }
 
             for (EntityBase entity : collectedEntities) {
@@ -75,7 +89,7 @@ public class Async implements Runnable {
             }
         } else {
             for (HPlayer p : inst.getPlayers().values()) {
-                trackedEntities.put(p.base(), trackedEntities.getOrDefault(p.base(), new ArrayList<>()));
+                trackedEntities.put(p.base, trackedEntities.getOrDefault(p.base, new ArrayList<>()));
             }
         }
 
@@ -87,8 +101,6 @@ public class Async implements Runnable {
             }
             trackedEntities.put(entity, times);
         }
-
-        tick.incrementAndGet();
     }
 
     public List<Location> getHistory(EntityBase entity, int ping, int range) {

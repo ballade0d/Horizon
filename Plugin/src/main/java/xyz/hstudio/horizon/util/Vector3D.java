@@ -1,54 +1,78 @@
 package xyz.hstudio.horizon.util;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
 import org.bukkit.util.NumberConversions;
 
 @AllArgsConstructor
 public class Vector3D {
 
-    @Getter
-    protected final double x, y, z;
+    public double x, y, z;
 
-    public Vector3D plus(Vector3D vec) {
-        return new Vector3D(x + vec.x, y + vec.y, z + vec.z);
-    }
+    // Plus
 
     public Vector3D plus(double x, double y, double z) {
         return new Vector3D(this.x + x, this.y + y, this.z + z);
     }
 
-    public Vector3D minus(Vector3D vec) {
-        return new Vector3D(x - vec.x, y - vec.y, z - vec.z);
+    public Vector3D plus(Vector3D vec) {
+        return plus(vec.x, vec.y, vec.z);
     }
+
+    // Add
+
+    public Vector3D add(double x, double y, double z) {
+        this.x += x;
+        this.y += y;
+        this.z += z;
+        return this;
+    }
+
+    public Vector3D add(Vector3D vec) {
+        return add(vec.x, vec.y, vec.z);
+    }
+
+    // Minus
 
     public Vector3D minus(double x, double y, double z) {
         return new Vector3D(this.x - x, this.y - y, this.z - z);
     }
 
-    public Vector3D multiply(Vector3D vec) {
-        return new Vector3D(x * vec.x, y * vec.y, z * vec.z);
+    public Vector3D minus(Vector3D vec) {
+        return minus(vec.x, vec.y, vec.z);
     }
 
-    public Vector3D divide(Vector3D vec) {
-        return new Vector3D(x / vec.x, y / vec.y, z / vec.z);
+    // Subtract
+
+    public Vector3D subtract(double x, double y, double z) {
+        this.x -= x;
+        this.y -= y;
+        this.z -= z;
+        return this;
     }
 
-    public Vector3D multiply(double m) {
-        return new Vector3D(x * m, y * m, z * m);
+    public Vector3D subtract(Vector3D vec) {
+        return subtract(vec.x, vec.y, vec.z);
     }
 
-    public Vector3D setX(double x) {
-        return new Vector3D(x, y, z);
+    // Multiply
+
+    public Vector3D multiply(double v) {
+        this.x *= v;
+        this.y *= v;
+        this.z *= v;
+        return this;
     }
 
-    public Vector3D setY(double y) {
-        return new Vector3D(x, y, z);
+    // Divide
+
+    public Vector3D divide(double v) {
+        this.x /= v;
+        this.y /= v;
+        this.z /= v;
+        return this;
     }
 
-    public Vector3D setZ(double z) {
-        return new Vector3D(x, y, z);
-    }
+    // Length
 
     public double length() {
         return Math.sqrt(lengthSquared());
@@ -58,6 +82,8 @@ public class Vector3D {
         return NumberConversions.square(x) + NumberConversions.square(y) + NumberConversions.square(z);
     }
 
+    // Distance 3d
+
     public double distance(Vector3D vec) {
         return Math.sqrt(distanceSquared(vec));
     }
@@ -65,6 +91,8 @@ public class Vector3D {
     public double distanceSquared(Vector3D vec) {
         return NumberConversions.square(x - vec.x) + NumberConversions.square(y - vec.y) + NumberConversions.square(z - vec.z);
     }
+
+    // Distance 2d
 
     public double distance2d(Vector3D vec) {
         return Math.sqrt(distance2dSquared(vec));

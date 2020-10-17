@@ -12,6 +12,8 @@ public abstract class WorldBase {
         return Version.getInst().getWorld(world);
     }
 
+    public abstract World bukkit();
+
     public abstract boolean isChunkLoaded(int x, int z);
 
     public abstract boolean isChunkLoaded(Vector3D vec);

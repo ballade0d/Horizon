@@ -9,4 +9,8 @@ public class Config extends ConfigBase {
 
     @LoadInfo(path = "prefix")
     public static String PREFIX;
+
+    public static void load(Yaml yaml) {
+        ConfigBase.load(Config.class, yaml, def);
+    }
 }

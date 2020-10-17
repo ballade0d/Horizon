@@ -1,17 +1,24 @@
 package xyz.hstudio.horizon.event.inbound;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import xyz.hstudio.horizon.HPlayer;
 import xyz.hstudio.horizon.event.InEvent;
 
-@RequiredArgsConstructor
-@Getter
 public class AbilitiesEvent extends InEvent {
 
-    private final boolean invulnerable;
-    private final boolean flying;
-    private final boolean flyable;
-    private final boolean inCreative;
-    private final float flyingSpeed;
-    private final float walkingSpeed;
+    public final boolean invulnerable;
+    public final boolean flying;
+    public final boolean flyable;
+    public final boolean inCreative;
+    public final float flyingSpeed;
+    public final float walkingSpeed;
+
+    public AbilitiesEvent(HPlayer p, boolean invulnerable, boolean flying, boolean flyable, boolean inCreative, float flyingSpeed, float walkingSpeed) {
+        super(p);
+        this.invulnerable = invulnerable;
+        this.flying = flying;
+        this.flyable = flyable;
+        this.inCreative = inCreative;
+        this.flyingSpeed = flyingSpeed;
+        this.walkingSpeed = walkingSpeed;
+    }
 }
