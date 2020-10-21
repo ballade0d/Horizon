@@ -234,15 +234,15 @@ public class KillAura extends Module<KillAuraData, KillAuraNode> {
             if (e.action != InteractEntityEvent.InteractType.ATTACK) {
                 return;
             }
-            if (player.currentTick - data.lastStrafeTick <= 5) {
-                if (++data.directionFails > 2) {
+            if (player.currentTick - data.lastStrafeTick <= 4) {
+                if (++data.directionFails > 3) {
                     // Punish
                     this.punish(event, player, data, 3, 3);
                 }
             } else if (data.directionFails > 0) {
                 data.directionFails--;
             } else {
-                reward(3, data, 0.999);
+                reward(3, data, 0.99);
             }
         }
     }

@@ -47,6 +47,10 @@ public class Sync implements Runnable {
         return times.get(0).key;
     }
 
+    public static void clearHistory(HoriPlayer player) {
+        trackedEntities.remove(player);
+    }
+
     @Override
     public void run() {
         for (Map.Entry<HoriPlayer, Location> entry : pendingTeleports.entrySet()) {

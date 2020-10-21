@@ -1,6 +1,7 @@
 package xyz.hstudio.horizon.module.checks;
 
 import org.bukkit.GameMode;
+import org.bukkit.util.NumberConversions;
 import xyz.hstudio.horizon.Horizon;
 import xyz.hstudio.horizon.api.ModuleType;
 import xyz.hstudio.horizon.compat.McAccessor;
@@ -79,7 +80,7 @@ public class HitBox extends Module<HitBoxData, HitBoxNode> {
 
             if (reach > config.reach_max_reach) {
                 // Punish
-                this.punish(event, player, data, 0, (float) ((reach - config.reach_max_reach) * 20), "d:" + reach);
+                this.punish(event, player, data, 0, NumberConversions.ceil((reach - config.reach_max_reach) * 5), "d:" + reach);
             } else {
                 reward(0, data, 0.99);
             }

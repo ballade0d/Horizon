@@ -4,6 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.EntityType;
+import org.bukkit.util.NumberConversions;
 import xyz.hstudio.horizon.Horizon;
 import xyz.hstudio.horizon.compat.McAccessor;
 import xyz.hstudio.horizon.data.HoriPlayer;
@@ -20,12 +21,13 @@ import xyz.hstudio.horizon.util.wrap.Location;
 import xyz.hstudio.horizon.util.wrap.Vector3D;
 import xyz.hstudio.horizon.wrap.IWrappedBlock;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
 public class MoveEvent extends Event {
 
-    private static final double STRAFE_THRESHOLD = Math.toRadians(0.5);
+    private static final double STRAFE_THRESHOLD = Math.toRadians(0.6);
     private static final String[] ARGS = new String[]{
             "%y_speed%",
             "%xz_speed%",
@@ -83,7 +85,9 @@ public class MoveEvent extends Event {
 
         this.onGroundReally = this.to.isOnGround(player, false, 0.001);
 
-        this.collidingEntities = McAccessor.INSTANCE.getEntities(to.world, player.getPlayer(), cube);
+        // TODO: this may cause an error?
+        // this.collidingEntities = McAccessor.INSTANCE.getEntities(to.world, player.getPlayer(), cube);
+        this.collidingEntities = Collections.EMPTY_SET;
 
         this.isOnSlime = this.checkSlime();
         this.isOnSlimeNext = this.checkSlimeNext();
@@ -442,7 +446,7 @@ public class MoveEvent extends Event {
         double angle = (vectorDir ? 1 : -1) * MathUtils.angle(accelDir, yaw);
 
         double modulo = (angle % (Math.PI / 4)) * (4 / Math.PI);
-        double error = Math.abs(modulo - Math.round(modulo)) * (Math.PI / 4);
+        double error = Math.abs(modulo - NumberConversions.round(modulo)) * (Math.PI / 4);
 
         return error <= STRAFE_THRESHOLD;
     }
@@ -490,8 +494,7 @@ public class MoveEvent extends Event {
                 elapsedTicks = (int) (player.currentTick - tpPair.value);
             }
 
-            boolean matches = tpLoc != null && tpLoc.toVector().equals(to.toVector()) && tpLoc.yaw == to.yaw && tpLoc.pitch == to.pitch;
-            if (!onGround && updatePos && updateRot && matches) {
+            if (!onGround && updatePos && updateRot && to.equals(tpLoc)) {
                 player.position = tpLoc;
                 player.velocity = new Vector3D(0, 0, 0);
 
@@ -500,6 +503,8 @@ public class MoveEvent extends Event {
                 player.teleportAcceptTick = player.currentTick;
 
                 this.isTeleport = true;
+
+                Sync.clearHistory(player);
                 if (player.teleports.size() == 0) {
                     player.isTeleporting = false;
                 } else {

@@ -29,6 +29,7 @@ public class VelocityEvent extends Event {
             return;
         }
         player.velocities.add(new Pair<>(new Vector3D(x, y, z), System.currentTimeMillis()));
+
         if (useExplosionPacket) {
             this.setCancelled(true);
             player.sendPacket(McAccessor.INSTANCE.createExplosionPacket(this.x, this.y, this.z));

@@ -216,7 +216,7 @@ public class PacketConverter_v1_8_R3 implements IPacketConverter {
         Location placed = new Location(player.getWorld(), x, y, z);
         if (!targetedPosition.equals(new Vector3D(-1, -1, -1))) {
             BlockPlaceEvent.PlaceType placeType = itemStack != null && itemStack.getItem() instanceof ItemBlock ? BlockPlaceEvent.PlaceType.PLACE_BLOCK : BlockPlaceEvent.PlaceType.INTERACT_BLOCK;
-            return new BlockPlaceEvent(player, placed, face, CraftItemStack.asBukkitCopy(itemStack).getType(), interaction, placeType);
+            return new BlockPlaceEvent(player, placed, face, CraftItemStack.asCraftMirror(itemStack).getType(), interaction, placeType);
         } else {
             if (bukkitItemStack == null) {
                 return null;

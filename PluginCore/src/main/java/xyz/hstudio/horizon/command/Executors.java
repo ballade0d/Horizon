@@ -122,7 +122,7 @@ public class Executors {
         @Cmd(name = "help", perm = "horizon.cmd.help")
         public void help(final CommandSender sender, final String prefix, final LangFile lang) {
             String version = Horizon.getInst().getDescription().getVersion();
-            sender.sendMessage(prefix + "Horizon(" + version + ") by MrCraftGoo");
+            sender.sendMessage(prefix + "Horizon version " + version + " made by MrCraftGoo");
             sender.sendMessage(prefix + "/horizon reload - reloads horizon");
             sender.sendMessage(prefix + "/horizon verbose - enable or disables verbose");
             sender.sendMessage(prefix + "/horizon analysis <player> - analyses the player selected");
@@ -244,7 +244,7 @@ public class Executors {
             }
         }
 
-        @Cmd(name = "reload", perm = "horizon.cmd.reload", onlyPlayer = false)
+        @Cmd(name = "reload", perm = "horizon.cmd.reload")
         public void reload(final CommandSender sender, final String[] args, final String prefix, final LangFile lang) {
             Horizon.getInst().reload();
             sender.sendMessage(prefix + lang.cmd_reload);

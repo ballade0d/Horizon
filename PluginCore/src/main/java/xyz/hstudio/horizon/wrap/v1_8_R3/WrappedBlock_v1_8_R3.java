@@ -78,28 +78,24 @@ public class WrappedBlock_v1_8_R3 implements IWrappedBlock {
             boxArr[0] = new AABB(x, y, z, x + 1, y, z + 1);
             return boxArr;
         } else if (b instanceof BlockSoil) {
+            AABB[] boxArr = new AABB[1];
             if (player.protocol == 47) {
-                AABB[] boxArr = new AABB[1];
                 boxArr[0] = new AABB(x, y, z, x + 1, y + 1, z + 1);
-                return boxArr;
             } else {
-                AABB[] boxArr = new AABB[1];
                 boxArr[0] = new AABB(x, y, z, x + 1, y + 0.9375, z + 1);
-                return boxArr;
             }
+            return boxArr;
         } else if (b instanceof BlockWaterLily) {
+            AABB[] boxArr = new AABB[1];
             if (player.protocol == 47) {
-                AABB[] boxArr = new AABB[1];
                 boxArr[0] = new AABB(x, y, z, x + 1, y + 0.015625, z + 1);
-                return boxArr;
             } else {
-                AABB[] boxArr = new AABB[1];
                 boxArr[0] = new AABB(x + 0.0625, y, z + 0.0625, x + 0.9375, y + 0.09375, z + 0.9375);
-                return boxArr;
             }
+            return boxArr;
         } else if (b instanceof BlockLadder) {
+            AABB[] boxArr = new AABB[1];
             if (player.protocol == 47) {
-                AABB[] boxArr = new AABB[1];
                 switch (data.get(BlockLadder.FACING)) {
                     case NORTH:
                         boxArr[0] = new AABB(x, y, z + 0.875, x + 1, y + 1, z + 1);
@@ -115,9 +111,7 @@ public class WrappedBlock_v1_8_R3 implements IWrappedBlock {
                         boxArr[0] = new AABB(x, y, z, x + 0.125, y + 1, z + 1);
                         break;
                 }
-                return boxArr;
             } else {
-                AABB[] boxArr = new AABB[1];
                 switch (data.get(BlockLadder.FACING)) {
                     case NORTH:
                         boxArr[0] = new AABB(x, y, z + 0.8125, x + 1, y + 1, z + 1);
@@ -133,8 +127,8 @@ public class WrappedBlock_v1_8_R3 implements IWrappedBlock {
                         boxArr[0] = new AABB(x, y, z, x + 0.1875, y + 1, z + 1);
                         break;
                 }
-                return boxArr;
             }
+            return boxArr;
         }
 
         // Have to update shape

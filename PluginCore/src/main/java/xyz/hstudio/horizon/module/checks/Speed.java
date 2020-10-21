@@ -170,7 +170,7 @@ public class Speed extends Module<SpeedData, SpeedNode> {
             if (player.isSprinting && jump) {
                 adders += 0.2;
             }
-            if (swimming) {
+            if (swimming && player.protocol <= 340) {
                 // Swimming function
                 Vector3D move = e.velocity.clone().setY(0);
                 Vector3D waterForce = e.waterFlowForce.clone().setY(0);

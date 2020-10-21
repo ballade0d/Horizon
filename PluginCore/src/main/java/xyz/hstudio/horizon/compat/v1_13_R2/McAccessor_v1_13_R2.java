@@ -75,7 +75,7 @@ public class McAccessor_v1_13_R2 implements IMcAccessor {
     @Override
     public Set<EntityType> getEntities(final org.bukkit.World world, final Player player, final AABB aabb) {
         World w = ((CraftWorld) world).getHandle();
-        List<Entity> entities = w.getEntities(((CraftPlayer) player).getHandle(), new AxisAlignedBB(aabb.minX - 0.1, aabb.minY - 0.1, aabb.minZ - 0.1, aabb.maxX + 0.1, aabb.maxY + 0.1, aabb.maxZ + 0.1));
+        List<Entity> entities = w.getEntities(null, new AxisAlignedBB(aabb.minX - 0.1, aabb.minY - 0.1, aabb.minZ - 0.1, aabb.maxX + 0.1, aabb.maxY + 0.1, aabb.maxZ + 0.1), null);
         return entities.stream().map(entity -> {
             if (entity instanceof EntityBoat) {
                 return EntityType.BOAT;
