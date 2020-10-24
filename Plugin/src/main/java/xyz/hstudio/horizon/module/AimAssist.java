@@ -15,14 +15,13 @@ public class AimAssist extends CheckBase {
 
     @Override
     public void received(InEvent event) {
-
     }
 
     private void gcd(MoveEvent e) {
-        if (e.teleport) {
+        if (e.teleport || e.to.pitch >= 90) {
             return;
         }
-        float deltaPitch = e.to.pitch - p.physics.position.pitch;
+        float deltaPitch = Math.abs(e.to.pitch - p.physics.position.pitch);
         if (deltaPitch == 0) {
             return;
         }
@@ -34,5 +33,9 @@ public class AimAssist extends CheckBase {
         }
 
         this.lastDeltaPitch = deltaPitch;
+    }
+
+    private double getSensitivity(double gcd) {
+        return (5D / 3D * Math.cbrt(5D / 6D * gcd) - 1D / 3D) * 200;
     }
 }

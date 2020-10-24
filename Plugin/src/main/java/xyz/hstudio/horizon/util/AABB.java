@@ -1,23 +1,37 @@
 package xyz.hstudio.horizon.util;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import org.bukkit.Material;
+import org.bukkit.util.NumberConversions;
+import xyz.hstudio.horizon.HPlayer;
+import xyz.hstudio.horizon.util.enums.Direction;
+import xyz.hstudio.horizon.wrapper.BlockBase;
+import xyz.hstudio.horizon.wrapper.WorldBase;
 
-import java.util.Objects;
+import java.util.*;
 
 @AllArgsConstructor
 public class AABB {
 
-    @Getter
-    protected final Vector3D min, max;
+    public final Vector3D min, max;
 
     public AABB(double minX, double minY, double minZ, double maxX, double maxY, double maxZ) {
         this(new Vector3D(minX, minY, minZ), new Vector3D(maxX, maxY, maxZ));
     }
 
+    public static AABB player() {
+        return new AABB(new Vector3D(-0.3, 0, -0.3), new Vector3D(0.3, 1.8, 0.3));
+    }
+
     public AABB add(double minX, double minY, double minZ, double maxX, double maxY, double maxZ) {
         min.add(minX, minY, minZ);
         max.add(maxX, maxY, maxZ);
+        return this;
+    }
+
+    public AABB add(Vector3D vec) {
+        min.add(vec);
+        max.add(vec);
         return this;
     }
 
@@ -35,6 +49,22 @@ public class AABB {
             return false;
         }
         return !(max.z < other.min.z) && !(min.z > other.max.z);
+    }
+
+    public List<BlockBase> getBlocks(WorldBase world) {
+        List<BlockBase> blocks = new ArrayList<>();
+        for (int x = NumberConversions.floor(min.x); x < NumberConversions.ceil(max.x); x++) {
+            for (int y = NumberConversions.floor(min.y); y < NumberConversions.ceil(max.y); y++) {
+                for (int z = NumberConversions.floor(min.z); z < NumberConversions.ceil(max.z); z++) {
+                    BlockBase block = world.getBlock(x, y, z);
+                    if (block == null) {
+                        continue;
+                    }
+                    blocks.add(block);
+                }
+            }
+        }
+        return blocks;
     }
 
     /**
@@ -90,6 +120,102 @@ public class AABB {
             return ray.getPointAtDistance(tMin);
         }
         return null;
+    }
+
+    public List<AABB> getBlockAABBs(HPlayer p, WorldBase world, Material first, Material... exemptedMats) {
+        Set<Material> exempt = EnumSet.of(first, exemptedMats);
+        List<AABB> aabbs = new ArrayList<>();
+
+        // gotta do this to catch fences and cobble walls
+        AABB expanded = this.add(0, -1, 0, 0, 0, 0);
+        List<BlockBase> blocks = expanded.getBlocks(world);
+
+        for (BlockBase b : blocks) {
+            if (exempt.contains(b.type())) {
+                continue;
+            }
+            AABB[] bAABBs = b.boxes(p);
+            for (AABB aabb : bAABBs) {
+                if (this.collides(aabb)) {
+                    aabbs.add(aabb);
+                }
+            }
+        }
+        return aabbs;
+    }
+
+    public List<AABB> getBlockAABBs(HPlayer p, WorldBase world) {
+        List<AABB> aabbs = new ArrayList<>();
+
+        // gotta do this to catch fences and cobble walls
+        AABB expanded = this.add(0, -1, 0, 0, 0, 0);
+        List<BlockBase> blocks = expanded.getBlocks(world);
+
+        for (BlockBase b : blocks) {
+            AABB[] bAABBs = b.boxes(p);
+            for (AABB aabb : bAABBs) {
+                if (this.collides(aabb)) {
+                    aabbs.add(aabb);
+                }
+            }
+        }
+        return aabbs;
+    }
+
+    public Set<Material> getMaterials(WorldBase world) {
+        Set<Material> mats = EnumSet.noneOf(Material.class);
+        for (int x = NumberConversions.floor(min.x); x < NumberConversions.ceil(max.x); x++) {
+            for (int y = NumberConversions.floor(min.y); y < NumberConversions.ceil(max.y); y++) {
+                for (int z = NumberConversions.floor(min.z); z < NumberConversions.ceil(max.z); z++) {
+                    BlockBase block = world.getBlock(x, y, z);
+                    if (block == null) {
+                        continue;
+                    }
+                    mats.add(block.type());
+                }
+            }
+        }
+        return mats;
+    }
+
+    public Set<Direction> touchingFaces(HPlayer p, WorldBase world, double borderSize) {
+        Vector3D min = this.min.plus(new Vector3D(-borderSize, -borderSize, -borderSize));
+        Vector3D max = this.max.plus(new Vector3D(borderSize, borderSize, borderSize));
+        AABB bigBox = new AABB(min, max);
+        Set<Direction> directions = EnumSet.noneOf(Direction.class);
+        // The coordinates should be floored, but this works too.
+        for (int x = (int) (min.x < 0 ? min.x - 1 : min.x); x <= max.x; x++) {
+            // Always subtract 1 so that fences/walls can be checked
+            for (int y = (int) min.y - 1; y <= max.y; y++) {
+                for (int z = (int) (min.z < 0 ? min.z - 1 : min.z); z <= max.z; z++) {
+                    BlockBase block = world.getBlock(x, y, z);
+                    if (block == null) {
+                        continue;
+                    }
+                    for (AABB blockBox : block.boxes(p)) {
+                        if (blockBox.min.x > this.max.x && blockBox.min.x < bigBox.max.x) {
+                            directions.add(Direction.EAST);
+                        }
+                        if (blockBox.min.y > this.max.y && blockBox.min.y < bigBox.max.y) {
+                            directions.add(Direction.UP);
+                        }
+                        if (blockBox.min.z > this.max.z && blockBox.min.z < bigBox.max.z) {
+                            directions.add(Direction.SOUTH);
+                        }
+                        if (blockBox.max.x > bigBox.min.x && blockBox.max.x < this.min.x) {
+                            directions.add(Direction.WEST);
+                        }
+                        if (blockBox.max.y > bigBox.min.y && blockBox.max.y < this.min.y) {
+                            directions.add(Direction.DOWN);
+                        }
+                        if (blockBox.max.z > bigBox.min.z && blockBox.max.z < this.min.z) {
+                            directions.add(Direction.NORTH);
+                        }
+                    }
+                }
+            }
+        }
+        return directions;
     }
 
     @Override

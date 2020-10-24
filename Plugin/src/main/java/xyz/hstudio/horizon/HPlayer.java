@@ -1,8 +1,11 @@
 package xyz.hstudio.horizon;
 
 import io.netty.channel.ChannelPipeline;
+import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import xyz.hstudio.horizon.api.enums.Detection;
 import xyz.hstudio.horizon.module.AimAssist;
 import xyz.hstudio.horizon.module.CheckBase;
@@ -12,16 +15,11 @@ import xyz.hstudio.horizon.network.PacketHandler;
 import xyz.hstudio.horizon.util.Location;
 import xyz.hstudio.horizon.util.Pair;
 import xyz.hstudio.horizon.util.Vector3D;
-import xyz.hstudio.horizon.wrapper.AccessorBase;
 import xyz.hstudio.horizon.wrapper.EntityBase;
 import xyz.hstudio.horizon.wrapper.WorldBase;
 
-import java.util.Collection;
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static xyz.hstudio.horizon.api.enums.Detection.*;
 
@@ -29,14 +27,14 @@ public class HPlayer {
 
     private static final Horizon inst = Horizon.getPlugin(Horizon.class);
 
-    public final List<Pair<Location, Integer>> teleports = new CopyOnWriteArrayList<>();
+    public final List<Pair<Location, Long>> teleports = new CopyOnWriteArrayList<>();
+    public final Deque<Pair<Integer, Long>> pings = new LinkedList<>();
 
     public final Player bukkit;
     public final EntityBase base;
     public final int protocol;
     public final ChannelPipeline pipeline;
     public final PacketHandler packetHandler;
-    public final AtomicInteger tick;
     public final Inventory inventory;
     public final Physics physics;
     public final Status status;
@@ -44,7 +42,7 @@ public class HPlayer {
 
     public HPlayer(Player bukkit) {
         this.bukkit = bukkit;
-        this.base = EntityBase.getEntity(bukkit);
+        this.base = new EntityBase(bukkit);
         this.protocol = 0; // TODO: Finish this
         this.checks = new EnumMap<Detection, CheckBase>(Detection.class) {
             {
@@ -54,10 +52,8 @@ public class HPlayer {
             }
         };
 
-        this.pipeline = AccessorBase.getInst().getPipeline(this);
+        this.pipeline = ((CraftPlayer) bukkit).getHandle().playerConnection.networkManager.channel.pipeline();
         this.packetHandler = new PacketHandler(this);
-
-        this.tick = new AtomicInteger();
 
         this.inventory = new Inventory();
         this.physics = new Physics();
@@ -75,7 +71,25 @@ public class HPlayer {
     }
 
     public WorldBase getWorld() {
-        return WorldBase.getWorld(bukkit.getWorld());
+        return new WorldBase(bukkit.getWorld());
+    }
+
+    public void addTeleport(Location loc) {
+        teleports.add(new Pair<>(loc, System.currentTimeMillis()));
+        if (teleports.size() > 200) {
+            teleports.remove(0);
+        }
+    }
+
+    @SuppressWarnings("deprecation")
+    public int getPotionAmplifier(PotionEffectType type) {
+        for (PotionEffect e : bukkit.getActivePotionEffects()) {
+            if (e.getType().getId() != type.getId()) {
+                continue;
+            }
+            return e.getAmplifier() + 1;
+        }
+        return 0;
     }
 
     public class Inventory {
@@ -96,10 +110,12 @@ public class HPlayer {
         public Location position;
         public boolean onGround;
         public boolean onGroundReally;
+        public Vector3D prevVelocity;
         public Vector3D velocity;
 
         public Physics() {
             this.position = base.position();
+            this.prevVelocity = new Vector3D(0, 0, 0);
             this.velocity = new Vector3D(0, 0, 0);
         }
 
@@ -111,6 +127,7 @@ public class HPlayer {
 
     public class Status {
 
+        public int ping;
         public boolean isSneaking;
         public boolean isSprinting;
         public boolean isTeleporting;

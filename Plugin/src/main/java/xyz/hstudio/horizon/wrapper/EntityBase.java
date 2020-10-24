@@ -1,29 +1,72 @@
 package xyz.hstudio.horizon.wrapper;
 
-import org.bukkit.entity.Entity;
+import net.minecraft.server.v1_8_R3.AxisAlignedBB;
+import org.bukkit.craftbukkit.v1_8_R3.entity.CraftEntity;
 import xyz.hstudio.horizon.util.AABB;
 import xyz.hstudio.horizon.util.Location;
-import xyz.hstudio.horizon.util.enums.Version;
+import xyz.hstudio.horizon.util.Vector3D;
 
-public abstract class EntityBase {
+public class EntityBase {
 
-    public static EntityBase getEntity(Entity entity) {
-        return Version.getInst().getEntity(entity);
+    protected final WorldBase world;
+    protected final net.minecraft.server.v1_8_R3.Entity entity;
+    protected final org.bukkit.entity.Entity bukkitEntity;
+
+    public EntityBase(org.bukkit.entity.Entity entity) {
+        this.world = new WorldBase(entity.getWorld());
+        this.entity = ((CraftEntity) entity).getHandle();
+        this.bukkitEntity = entity;
     }
 
-    public abstract Location position();
+    protected EntityBase(net.minecraft.server.v1_8_R3.Entity entity) {
+        this.entity = entity;
+        this.world = new WorldBase(entity.world);
+        this.bukkitEntity = entity.getBukkitEntity();
+    }
 
-    public abstract AABB cube();
+    public Location position() {
+        return new Location(world, entity.locX, entity.locY, entity.locZ, entity.yaw, entity.pitch);
+    }
 
-    public abstract float width();
+    public AABB cube() {
+        AxisAlignedBB nmsBox = entity.getBoundingBox();
+        return new AABB(nmsBox.a, nmsBox.b, nmsBox.c, nmsBox.d, nmsBox.e, nmsBox.f);
+    }
 
-    public abstract float length();
+    public AABB cube(Vector3D pos) {
+        Vector3D move = position().subtract(pos);
+        return cube().add(move);
+    }
 
-    public abstract Entity bukkit();
+    public float width() {
+        return entity.width;
+    }
+
+    public float length() {
+        return entity.length;
+    }
+
+    public float borderSize() {
+        return entity.ao();
+    }
+
+    public org.bukkit.entity.Entity bukkit() {
+        return bukkitEntity;
+    }
 
     @Override
-    public abstract boolean equals(Object obj);
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof EntityBase)) {
+            return false;
+        }
+        return entity.getId() == ((EntityBase) obj).entity.getId();
+    }
 
     @Override
-    public abstract int hashCode();
+    public int hashCode() {
+        return entity.hashCode();
+    }
 }

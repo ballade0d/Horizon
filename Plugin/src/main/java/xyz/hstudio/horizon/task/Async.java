@@ -119,4 +119,8 @@ public class Async implements Runnable {
         }
         return history;
     }
+
+    public void clearHistory(EntityBase entity) {
+        trackedEntities.remove(entity);
+    }
 }

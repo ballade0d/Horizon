@@ -89,8 +89,20 @@ public class Location extends Vector3D {
         return MathUtils.getDirection(yaw, pitch);
     }
 
-    public org.bukkit.Location toBukkit() {
+    public org.bukkit.Location bukkit() {
         return new org.bukkit.Location(world.bukkit(), x, y, z, yaw, pitch);
+    }
+
+    public Location newX(double x) {
+        return new Location(world, x, y, z, yaw, pitch);
+    }
+
+    public Location newY(double y) {
+        return new Location(world, x, y, z, yaw, pitch);
+    }
+
+    public Location newZ(double z) {
+        return new Location(world, x, y, z, yaw, pitch);
     }
 
     public boolean isOnGround(HPlayer p, boolean ignoreOnGround, double depth) {
@@ -164,5 +176,10 @@ public class Location extends Vector3D {
         result = 31 * result + Float.hashCode(yaw);
         result = 31 * result + Float.hashCode(pitch);
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return "x: " + x + ", y: " + y + ", z: " + z + ", yaw: " + yaw + ", pitch: " + pitch;
     }
 }

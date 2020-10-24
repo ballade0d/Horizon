@@ -22,11 +22,7 @@ public class BlockUtils {
         solid.add(Material.CARPET);
         solid.add(Material.SKULL);
         solid.add(Material.FLOWER_POT);
-        solid.add(MaterialUtils.END_ROD.parse());
-        solid.add(MaterialUtils.CHORUS_FLOWER.parse());
-        solid.add(MaterialUtils.CHORUS_PLANT.parse());
-        solid.add(MaterialUtils.SEA_PICKLE.parse());
-        solid.add(MaterialUtils.FARMLAND.parse());
+        solid.add(Material.SOIL);
 
         for (Material material : Material.values()) {
             if (material.name().contains("COMPARATOR") || material.name().contains("DIODE")) {

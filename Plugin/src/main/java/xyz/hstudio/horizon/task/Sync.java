@@ -13,7 +13,7 @@ public class Sync extends BukkitRunnable {
     private static final Horizon inst = Horizon.getPlugin(Horizon.class);
     private static final Map<HPlayer, Location> pendingTeleports = new ConcurrentHashMap<>();
 
-    public static void teleport(HPlayer player, final Location to) {
+    public static void teleport(HPlayer player, Location to) {
         if (player == null || to == null) {
             return;
         }
@@ -26,7 +26,7 @@ public class Sync extends BukkitRunnable {
 
     @Override
     public void run() {
-        pendingTeleports.forEach((p, loc) -> p.bukkit.teleport(loc.toBukkit()));
+        pendingTeleports.forEach((p, loc) -> p.bukkit.teleport(loc.bukkit()));
         pendingTeleports.clear();
     }
 }

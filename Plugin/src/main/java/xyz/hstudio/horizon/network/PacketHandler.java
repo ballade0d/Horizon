@@ -51,10 +51,15 @@ public class PacketHandler extends ChannelDuplexHandler {
         try {
             OutEvent event = PackerBase.getInst().sent(p, packet);
             if (event != null) {
-                for (CheckBase check : p.getChecks()) {
-                    check.sent(event);
+                if (!event.pre()) {
+                    cancelled = true;
+                } else {
+                    for (CheckBase check : p.getChecks()) {
+                        check.sent(event);
+                    }
+                    event.post();
+                    cancelled = event.isCancelled();
                 }
-                cancelled = event.isCancelled();
             }
         } catch (Throwable throwable) {
             throwable.printStackTrace();

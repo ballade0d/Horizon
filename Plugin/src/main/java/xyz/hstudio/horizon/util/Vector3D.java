@@ -56,6 +56,10 @@ public class Vector3D {
 
     // Multiply
 
+    public Vector3D multiplyBy(double v) {
+        return new Vector3D(this.x * v, this.y * v, this.z * v);
+    }
+
     public Vector3D multiply(double v) {
         this.x *= v;
         this.y *= v;
@@ -64,6 +68,10 @@ public class Vector3D {
     }
 
     // Divide
+
+    public Vector3D divideBy(double v) {
+        return new Vector3D(this.x / v, this.y / v, this.z / v);
+    }
 
     public Vector3D divide(double v) {
         this.x /= v;
@@ -109,6 +117,18 @@ public class Vector3D {
     public double angle(Vector3D vec) {
         double dot = Math.min(Math.max(dot(vec) / (length() * vec.length()), -1), 1);
         return Math.acos(dot);
+    }
+
+    public Vector3D newX(double x) {
+        return new Vector3D(x, y, z);
+    }
+
+    public Vector3D newY(double y) {
+        return new Vector3D(x, y, z);
+    }
+
+    public Vector3D newZ(double z) {
+        return new Vector3D(x, y, z);
     }
 
     public int getBlockX() {

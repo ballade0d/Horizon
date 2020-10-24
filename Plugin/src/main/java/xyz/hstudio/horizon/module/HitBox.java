@@ -5,7 +5,6 @@ import xyz.hstudio.horizon.event.InEvent;
 import xyz.hstudio.horizon.event.inbound.EntityInteractEvent;
 import xyz.hstudio.horizon.event.inbound.MoveEvent;
 import xyz.hstudio.horizon.util.*;
-import xyz.hstudio.horizon.wrapper.AccessorBase;
 import xyz.hstudio.horizon.wrapper.EntityBase;
 
 import java.util.List;
@@ -17,9 +16,10 @@ public class HitBox extends CheckBase {
 
     private static final int N = 5;
     private final float[] yaws = new float[N], pitches = new float[N];
+    private double buffer;
 
     public HitBox(HPlayer p) {
-        super(p, 1, 100, 100);
+        super(p, 1, 80, 80);
     }
 
     @Override
@@ -44,18 +44,18 @@ public class HitBox extends CheckBase {
             }
             EntityBase entity = e.entity;
 
-            int ping = AccessorBase.getInst().getPing(p);
-
             Vector3D headPos = p.physics.headPos();
             Vector3D direction = p.physics.position.getDirection();
             Ray3D ray = new Ray3D(headPos, direction);
 
+            double epsilon = entity.borderSize() + 0.005;
+
             List<AABB> cubes = inst
                     .getAsync()
-                    .getHistory(entity, ping, 2)
+                    .getHistory(entity, p.status.ping, 3)
                     .stream().map(loc -> loc
                             .toAABB(entity.length(), entity.width())
-                            .expand(0.1, 0.1, 0.1))
+                            .expand(epsilon, epsilon, epsilon))
                     .collect(Collectors.toList());
 
             if (cubes.isEmpty()) {
@@ -69,11 +69,17 @@ public class HitBox extends CheckBase {
                     .mapToDouble(vec -> vec.distance(headPos))
                     .min();
 
-            double dist;
-            if (distance.isPresent() && (dist = distance.getAsDouble() - 0.1) > 3) {
-                System.out.println("Too far! Distance: " + dist);
+            double dist = distance.orElse(0);
+            if (dist > 3.1) {
+                if ((buffer += 1.5) > 3) {
+                    System.out.println("Too far! Distance: " + dist);
+                }
             } else if (cubes.stream().noneMatch(this::direction)) {
-                System.out.println("Did not hit bounding box");
+                if ((buffer += 1.5) > 3) {
+                    System.out.println("Did not hit bounding box");
+                }
+            } else {
+                buffer = Math.max(buffer - 0.75, 0);
             }
         }
     }
@@ -83,6 +89,10 @@ public class HitBox extends CheckBase {
 
         Vector2D point = new Vector2D(yaws[0], pitches[0]);
         for (int i = 0; i < N - 1; i++) {
+            if (point.x == 0 && point.y == 0) {
+                return true;
+            }
+
             Vector2D next = new Vector2D(yaws[i + 1], pitches[i + 1]);
 
             Ray2D ray2D = new Ray2D(point, next.minus(point));

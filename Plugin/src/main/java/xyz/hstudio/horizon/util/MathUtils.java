@@ -1,21 +1,29 @@
 package xyz.hstudio.horizon.util;
 
+import net.minecraft.server.v1_8_R3.MathHelper;
 import org.bukkit.util.NumberConversions;
-import xyz.hstudio.horizon.wrapper.AccessorBase;
 
 public class MathUtils {
 
     public static Vector3D getDirection(float yaw, float pitch) {
         float rotX = (float) Math.toRadians(yaw);
         float rotY = (float) Math.toRadians(pitch);
-        double xz = AccessorBase.getInst().cos(rotY);
+        double xz = MathHelper.cos(rotY);
 
-        double x = -xz * AccessorBase.getInst().sin(rotX);
-        double y = -AccessorBase.getInst().sin(rotY);
-        double z = xz * AccessorBase.getInst().cos(rotX);
+        double x = -xz * MathHelper.sin(rotX);
+        double y = -MathHelper.sin(rotY);
+        double z = xz * MathHelper.cos(rotX);
         return new Vector3D(x, y, z);
     }
 
+    /**
+     * Get greatest common divisor of two values
+     * Please make sure the two values are positive
+     *
+     * @param a value a
+     * @param b value b
+     * @return the gcd
+     */
     public static float gcd(float a, float b) {
         if (a < b) {
             return gcd(b, a);
