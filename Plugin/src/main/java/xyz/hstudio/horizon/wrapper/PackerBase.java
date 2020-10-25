@@ -14,7 +14,6 @@ import xyz.hstudio.horizon.event.outbound.TeleportEvent;
 import xyz.hstudio.horizon.util.Location;
 import xyz.hstudio.horizon.util.Vector3D;
 import xyz.hstudio.horizon.util.enums.Direction;
-import xyz.hstudio.horizon.util.enums.Hand;
 
 import java.io.IOException;
 import java.util.Set;
@@ -149,7 +148,7 @@ public class PackerBase {
             return null;
         }
 
-        return new ItemInteractEvent(p, interactType, itemStack, Hand.MAIN);
+        return new ItemInteractEvent(p, interactType, itemStack);
     }
 
     private InEvent toEvent(HPlayer p, PacketPlayInBlockPlace packet) {
@@ -212,7 +211,7 @@ public class PackerBase {
                 return null;
             }
 
-            return new ItemInteractEvent(p, ItemInteractEvent.InteractType.START_USE_ITEM, CraftItemStack.asCraftMirror(itemStack), Hand.MAIN);
+            return new ItemInteractEvent(p, ItemInteractEvent.InteractType.START_USE_ITEM, CraftItemStack.asCraftMirror(itemStack));
         }
     }
 

@@ -4,7 +4,6 @@ import org.bukkit.Material;
 import org.bukkit.potion.PotionEffectType;
 import xyz.hstudio.horizon.HPlayer;
 import xyz.hstudio.horizon.event.InEvent;
-import xyz.hstudio.horizon.task.Sync;
 import xyz.hstudio.horizon.util.*;
 import xyz.hstudio.horizon.util.enums.Direction;
 
@@ -36,7 +35,7 @@ public class MoveEvent extends InEvent {
 
     @Override
     public boolean pre() {
-        this.velocity = new Vector3D(to.x - p.physics.position.x, to.y - p.physics.position.y, to.z - p.physics.position.z);
+        this.velocity = to.minus(p.physics.position);
 
         if (p.status.isTeleporting) {
             Location tpLoc;
@@ -57,6 +56,7 @@ public class MoveEvent extends InEvent {
                 p.teleports.remove(0);
 
                 this.teleport = true;
+                inst.getAsync().clearHistory(p.base);
                 if (p.teleports.size() == 0) {
                     p.status.isTeleporting = false;
                 } else {
@@ -71,7 +71,7 @@ public class MoveEvent extends InEvent {
                     } else {
                         tp = p.physics.position;
                     }
-                    Sync.teleport(p, tp);
+                    inst.getSync().teleport(p, tp);
                 }
             }
         }
@@ -141,7 +141,7 @@ public class MoveEvent extends InEvent {
     // Checks if the player's dY matches the expected dY
     private boolean testJump() {
         int jumpBoostLvl = p.getPotionAmplifier(PotionEffectType.JUMP);
-        float expectedDY = Math.max(0.42F + jumpBoostLvl * 0.1F, 0F);
+        float expectedDY = Math.max(0.42f + jumpBoostLvl * 0.1f, 0f);
         boolean leftGround = p.physics.onGround && !onGround;
         float dY = (float) (to.y - p.physics.position.y);
 

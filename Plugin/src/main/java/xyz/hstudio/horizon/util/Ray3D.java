@@ -1,15 +1,18 @@
 package xyz.hstudio.horizon.util;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.util.Objects;
 
-@AllArgsConstructor
 public class Ray3D {
 
     @Getter
     protected final Vector3D origin, direction;
+
+    public Ray3D(Vector3D origin, Vector3D direction) {
+        this.origin = origin;
+        this.direction = direction;
+    }
 
     public Vector3D getPointAtDistance(double distance) {
         return new Vector3D(

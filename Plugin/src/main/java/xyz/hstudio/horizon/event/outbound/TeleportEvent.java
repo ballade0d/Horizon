@@ -24,7 +24,6 @@ public class TeleportEvent extends OutEvent {
     @Override
     public void post() {
         p.status.isTeleporting = true;
-        p.addTeleport(new Location(p.getWorld(), x, y, z, yaw % 360F, pitch % 360F));
-        inst.getAsync().clearHistory(p.base);
+        p.addTeleport(new Location(p.getWorld(), x, y, z, yaw % 360f, pitch % 360f));
     }
 }

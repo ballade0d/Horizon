@@ -1,7 +1,6 @@
 package xyz.hstudio.horizon.task;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import lombok.Getter;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.LivingEntity;
@@ -22,14 +21,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class Async implements Runnable {
 
-    private static final Horizon inst = Horizon.getPlugin(Horizon.class);
-
+    private final Horizon inst;
     private final ScheduledExecutorService threadPool;
     private final Map<EntityBase, List<Pair<Location, Integer>>> trackedEntities;
-    @Getter
     private final AtomicInteger tick;
 
-    public Async() {
+    public Async(Horizon inst) {
+        this.inst = inst;
         threadPool = Executors.newSingleThreadScheduledExecutor(new ThreadFactoryBuilder()
                 .setDaemon(true)
                 .setNameFormat("Horizon Processing Thread")
@@ -46,6 +44,10 @@ public class Async implements Runnable {
 
     public void cancel() {
         threadPool.shutdown();
+    }
+
+    public AtomicInteger getTick() {
+        return tick;
     }
 
     @Override

@@ -4,6 +4,7 @@ import io.netty.channel.ChannelPipeline;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import xyz.hstudio.horizon.api.enums.Detection;
@@ -25,7 +26,7 @@ import static xyz.hstudio.horizon.api.enums.Detection.*;
 
 public class HPlayer {
 
-    private static final Horizon inst = Horizon.getPlugin(Horizon.class);
+    private static final Horizon inst = JavaPlugin.getPlugin(Horizon.class);
 
     public final List<Pair<Location, Long>> teleports = new CopyOnWriteArrayList<>();
     public final Deque<Pair<Integer, Long>> pings = new LinkedList<>();

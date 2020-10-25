@@ -10,10 +10,14 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class Sync extends BukkitRunnable {
 
-    private static final Horizon inst = Horizon.getPlugin(Horizon.class);
-    private static final Map<HPlayer, Location> pendingTeleports = new ConcurrentHashMap<>();
+    private final Horizon inst;
+    private final Map<HPlayer, Location> pendingTeleports = new ConcurrentHashMap<>();
 
-    public static void teleport(HPlayer player, Location to) {
+    public Sync(Horizon inst) {
+        this.inst = inst;
+    }
+
+    public void teleport(HPlayer player, Location to) {
         if (player == null || to == null) {
             return;
         }

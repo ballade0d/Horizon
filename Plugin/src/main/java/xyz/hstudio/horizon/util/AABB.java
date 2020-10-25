@@ -1,6 +1,5 @@
 package xyz.hstudio.horizon.util;
 
-import lombok.AllArgsConstructor;
 import org.bukkit.Material;
 import org.bukkit.util.NumberConversions;
 import xyz.hstudio.horizon.HPlayer;
@@ -10,10 +9,14 @@ import xyz.hstudio.horizon.wrapper.WorldBase;
 
 import java.util.*;
 
-@AllArgsConstructor
 public class AABB {
 
     public final Vector3D min, max;
+
+    public AABB(Vector3D min, Vector3D max) {
+        this.min = min;
+        this.max = max;
+    }
 
     public AABB(double minX, double minY, double minZ, double maxX, double maxY, double maxZ) {
         this(new Vector3D(minX, minY, minZ), new Vector3D(maxX, maxY, maxZ));

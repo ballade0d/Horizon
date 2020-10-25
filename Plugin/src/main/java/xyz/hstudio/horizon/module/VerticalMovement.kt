@@ -21,8 +21,7 @@ import kotlin.math.abs
  * @see xyz.hstudio.horizon.util.Physics
  * so expectedYVelocity = (prevYVelocity + -0.08 * 1) * 0.98
  */
-
-class VerticalMovement(p: HPlayer?) : CheckBase(p, 1, 10, 10) {
+class VerticalMovement(p: HPlayer) : CheckBase(p, 1, 10, 10) {
 
     private var estimatedYVelocity = 0f
 
@@ -65,7 +64,7 @@ class VerticalMovement(p: HPlayer?) : CheckBase(p, 1, 10, 10) {
             }
 
             // Keep four decimal places
-            val error = ((deltaY - estimatedYVelocity) * 10000).toInt() / 10000F
+            val error = ((deltaY - estimatedYVelocity) * 10000).toInt() / 10000f
             if (error > 0.001) {
                 println(error)
             }

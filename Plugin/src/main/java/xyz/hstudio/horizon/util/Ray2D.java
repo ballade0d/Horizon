@@ -1,15 +1,18 @@
 package xyz.hstudio.horizon.util;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.util.Objects;
 
-@AllArgsConstructor
 public class Ray2D {
 
     @Getter
     protected final Vector2D origin, direction;
+
+    public Ray2D(Vector2D origin, Vector2D direction) {
+        this.origin = origin;
+        this.direction = direction;
+    }
 
     @Override
     public boolean equals(Object obj) {
