@@ -44,6 +44,11 @@ class HitBox(p: HPlayer) : CheckBase(p, 1, 80, 80) {
         val headPos = p.physics.headPos()
         val direction = p.physics.position.direction
         val ray = Ray3D(headPos, direction)
+
+        if (entity == null) {
+            return; //to avoid NPE
+        }
+
         val epsilon = entity.borderSize() + 0.005
         val cubes = inst
                 .async
