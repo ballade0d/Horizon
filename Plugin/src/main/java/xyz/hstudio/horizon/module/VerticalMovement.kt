@@ -3,7 +3,8 @@ package xyz.hstudio.horizon.module
 import xyz.hstudio.horizon.HPlayer
 import xyz.hstudio.horizon.event.InEvent
 import xyz.hstudio.horizon.event.inbound.MoveEvent
-import xyz.hstudio.horizon.util.Physics
+import xyz.hstudio.horizon.util.Physics.AIR_RESISTANCE_VERTICAL
+import xyz.hstudio.horizon.util.Physics.GRAVITATIONAL_ACCELERATION
 import kotlin.math.abs
 
 /**
@@ -33,7 +34,7 @@ class VerticalMovement(p: HPlayer) : CheckBase(p, 1, 10, 10) {
 
     private fun move(e: MoveEvent) {
         val deltaY = e.velocity.y.toFloat()
-        var estimatedYVelocity = (estimatedYVelocity + Physics.GRAVITATIONAL_ACCELERATION) * Physics.AIR_RESISTANCE_VERTICAL
+        var estimatedYVelocity = (estimatedYVelocity + GRAVITATIONAL_ACCELERATION) * AIR_RESISTANCE_VERTICAL
         var skip = false
         when {
             e.step -> {
@@ -53,20 +54,27 @@ class VerticalMovement(p: HPlayer) : CheckBase(p, 1, 10, 10) {
             if (e.onGround) {
                 estimatedYVelocity = 0f
             } else {
+                // Fix jump bug when standing still
+                // Wtf MoJang???
+                if (abs(estimatedYVelocity) < 0.005 && deltaY < 0 && p.physics.velocity.y > 0 && e.to.distance2dSquared(p.physics.position) < 1E-6) {
+                    estimatedYVelocity = deltaY
+                }
+                /*
                 // Fix 1.8 jump bug
-                if (abs(estimatedYVelocity) < 0.005 && estimatedYVelocity != 0f && deltaY <= 0) {
+                if (abs(estimatedYVelocity) < 0.003 && estimatedYVelocity != 0f && deltaY <= 0) {
                     estimatedYVelocity = deltaY
                 }
                 // Fix 1.9 jump bug
-                if (deltaY < 0 && p.physics.prevVelocity.y >= 0 && e.to.distance2dSquared(p.physics.position) < 0.000001) {
+                if (deltaY < 0 && p.physics.prevVelocity.y >= 0 && e.to.distance2dSquared(p.physics.position) < 1E-6) {
                     estimatedYVelocity = deltaY
                 }
+                */
             }
 
             // Keep four decimal places
             val error = ((deltaY - estimatedYVelocity) * 10000).toInt() / 10000f
             if (error > 0.001) {
-                println(error)
+                println("Error:$error")
             }
         }
 

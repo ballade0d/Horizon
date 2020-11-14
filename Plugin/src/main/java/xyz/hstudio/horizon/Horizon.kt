@@ -45,7 +45,7 @@ class Horizon : JavaPlugin() {
         Config.load(Yaml.loadConfiguration(configFile))
 
         // Register for joined players
-        Bukkit.getOnlinePlayers().forEach { bukkit: Player? -> HPlayer(bukkit) }
+        Bukkit.getOnlinePlayers().forEach { bukkit: Player -> HPlayer(bukkit) }
 
         // Register when player joins
         Bukkit.getPluginManager().registerEvents(object : Listener {

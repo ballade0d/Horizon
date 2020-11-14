@@ -39,9 +39,7 @@ public class PacketHandler extends ChannelDuplexHandler {
         } catch (Throwable throwable) {
             throwable.printStackTrace();
         } finally {
-            if (!cancelled) {
-                super.channelRead(context, packet);
-            }
+            if (!cancelled) super.channelRead(context, packet);
         }
     }
 
@@ -64,15 +62,11 @@ public class PacketHandler extends ChannelDuplexHandler {
         } catch (Throwable throwable) {
             throwable.printStackTrace();
         } finally {
-            if (!cancelled) {
-                super.write(context, packet, promise);
-            }
+            if (!cancelled) super.write(context, packet, promise);
         }
     }
 
     public void unregister() {
-        if (p.pipeline.get(HANDLER_NAME) != null) {
-            p.pipeline.remove(HANDLER_NAME);
-        }
+        if (p.pipeline.get(HANDLER_NAME) != null) p.pipeline.remove(HANDLER_NAME);
     }
 }

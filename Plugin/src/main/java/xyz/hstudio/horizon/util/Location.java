@@ -115,24 +115,14 @@ public class Location extends Vector3D {
         AABB topFeet = toAABB(0.6, 0).add(0, 0.00001, 0, 0, 0, 0);
 
         for (BlockBase block : blocks) {
-            if (block.isLiquid() || !BlockUtils.isSolid(block)) {
-                continue;
-            }
+            if (block.isLiquid() || !BlockUtils.isSolid(block)) continue;
             for (AABB bBox : block.boxes(p)) {
-                if (!bBox.collides(underFeet)) {
-                    continue;
-                }
-                if (!ignoreOnGround) {
-                    return true;
-                }
+                if (!bBox.collides(underFeet)) continue;
+                if (!ignoreOnGround) return true;
                 for (BlockBase above : blocksAbove) {
-                    if (above.isLiquid() || !BlockUtils.isSolid(above)) {
-                        continue;
-                    }
+                    if (above.isLiquid() || !BlockUtils.isSolid(above)) continue;
                     for (AABB aboveBox : above.boxes(p)) {
-                        if (aboveBox.collides(topFeet)) {
-                            return false;
-                        }
+                        if (aboveBox.collides(topFeet)) return false;
                     }
                 }
             }
@@ -147,12 +137,8 @@ public class Location extends Vector3D {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (!(obj instanceof Location)) {
-            return false;
-        }
+        if (this == obj) return true;
+        if (!(obj instanceof Location)) return false;
         Location other = (Location) obj;
         if (!Objects.equals(world, other.world)) {
             return false;

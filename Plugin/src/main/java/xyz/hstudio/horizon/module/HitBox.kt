@@ -15,17 +15,15 @@ class HitBox(p: HPlayer) : CheckBase(p, 1, 80, 80) {
     private var buffer = 0.0
 
     override fun received(event: InEvent?) {
-        if (event is MoveEvent) {
+        if (event is MoveEvent)
             move(event)
-        } else if (event is EntityInteractEvent) {
+        else if (event is EntityInteractEvent)
             interact(event)
-        }
     }
 
     private fun move(e: MoveEvent) {
-        if (!e.hasLook) {
-            return
-        }
+        if (!e.hasLook) return
+
         val yaw = e.to.yaw
         val pitch = e.to.pitch
 
@@ -37,17 +35,14 @@ class HitBox(p: HPlayer) : CheckBase(p, 1, 80, 80) {
     }
 
     private fun interact(e: EntityInteractEvent) {
-        if (e.type != EntityInteractEvent.InteractType.ATTACK) {
-            return
-        }
+        if (e.type != EntityInteractEvent.InteractType.ATTACK) return
+
         val entity = e.entity
         val headPos = p.physics.headPos()
         val direction = p.physics.position.direction
         val ray = Ray3D(headPos, direction)
 
-        if (entity == null) {
-            return; //to avoid NPE
-        }
+        if (entity == null) return // to avoid NPE
 
         val epsilon = entity.borderSize() + 0.005
         val cubes = inst
@@ -59,9 +54,8 @@ class HitBox(p: HPlayer) : CheckBase(p, 1, 80, 80) {
                             .expand(epsilon, epsilon, epsilon)
                 }
                 .collect(Collectors.toList())
-        if (cubes.isEmpty()) {
-            return
-        }
+        if (cubes.isEmpty()) return
+
         val distance = cubes
                 .stream()
                 .map { cube: AABB -> cube.intersectsRay(ray, 0f, Float.MAX_VALUE) }
@@ -86,9 +80,8 @@ class HitBox(p: HPlayer) : CheckBase(p, 1, 80, 80) {
         val headPos = p.physics.headPos()
         var point = Vector2D(yaws[0].toDouble(), pitches[0].toDouble())
         for (i in 0 until N - 1) {
-            if (point.x == 0.0 && point.y == 0.0) {
-                return true
-            }
+            if (point.x == 0.0 && point.y == 0.0) return true
+
             val next = Vector2D(yaws[i + 1].toDouble(), pitches[i + 1].toDouble())
             val ray2D = Ray2D(point, next.minus(point))
             val tracer2D = ray2D.Tracer()

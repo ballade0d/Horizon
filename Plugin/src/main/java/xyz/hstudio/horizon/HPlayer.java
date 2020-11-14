@@ -8,6 +8,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import xyz.hstudio.horizon.api.enums.Detection;
+import xyz.hstudio.horizon.event.outbound.AttributeEvent;
 import xyz.hstudio.horizon.module.AimAssist;
 import xyz.hstudio.horizon.module.CheckBase;
 import xyz.hstudio.horizon.module.HitBox;
@@ -29,6 +30,8 @@ public class HPlayer {
     private static final Horizon inst = JavaPlugin.getPlugin(Horizon.class);
 
     public final List<Pair<Location, Long>> teleports = new CopyOnWriteArrayList<>();
+    public final List<Pair<Vector3D, Long>> velocities = new CopyOnWriteArrayList<>();
+    public final List<AttributeEvent.AttributeModifier> moveFactors = new CopyOnWriteArrayList<>();
     public final Deque<Pair<Integer, Long>> pings = new LinkedList<>();
 
     public final Player bukkit;
@@ -75,19 +78,33 @@ public class HPlayer {
         return new WorldBase(bukkit.getWorld());
     }
 
+    public float moveFactor() {
+        float value = 0.1f;
+        for (AttributeEvent.AttributeModifier modifier : this.moveFactors) {
+            switch (modifier.operation) {
+                case 0:
+                    value += modifier.value;
+                    continue;
+                case 1:
+                case 2:
+                    // WTF case 1 and 2 is the same???
+                    value += value * modifier.value;
+                    continue;
+                default:
+            }
+        }
+        return value;
+    }
+
     public void addTeleport(Location loc) {
         teleports.add(new Pair<>(loc, System.currentTimeMillis()));
-        if (teleports.size() > 200) {
-            teleports.remove(0);
-        }
+        if (teleports.size() > 200) teleports.remove(0);
     }
 
     @SuppressWarnings("deprecation")
     public int getPotionAmplifier(PotionEffectType type) {
         for (PotionEffect e : bukkit.getActivePotionEffects()) {
-            if (e.getType().getId() != type.getId()) {
-                continue;
-            }
+            if (e.getType().getId() != type.getId()) continue;
             return e.getAmplifier() + 1;
         }
         return 0;
@@ -132,5 +149,6 @@ public class HPlayer {
         public boolean isSneaking;
         public boolean isSprinting;
         public boolean isTeleporting;
+        public boolean isUsingItem;
     }
 }

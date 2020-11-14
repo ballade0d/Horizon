@@ -45,12 +45,8 @@ public class AABB {
     }
 
     public boolean collides(AABB other) {
-        if (max.x < other.min.x || min.x > other.max.x) {
-            return false;
-        }
-        if (max.y < other.min.y || min.y > other.max.y) {
-            return false;
-        }
+        if (max.x < other.min.x || min.x > other.max.x) return false;
+        if (max.y < other.min.y || min.y > other.max.y) return false;
         return !(max.z < other.min.z) && !(min.z > other.max.z);
     }
 
@@ -60,9 +56,7 @@ public class AABB {
             for (int y = NumberConversions.floor(min.y); y < NumberConversions.ceil(max.y); y++) {
                 for (int z = NumberConversions.floor(min.z); z < NumberConversions.ceil(max.z); z++) {
                     BlockBase block = world.getBlock(x, y, z);
-                    if (block == null) {
-                        continue;
-                    }
+                    if (block == null) continue;
                     blocks.add(block);
                 }
             }
@@ -95,33 +89,19 @@ public class AABB {
         bbox = signDirY ? min : max;
         double tyMax = (bbox.y - ray.origin.y) * invDir.y;
 
-        if (tMin > tyMax || tyMin > tMax) {
-            return null;
-        }
-        if (tyMin > tMin) {
-            tMin = tyMin;
-        }
-        if (tyMax < tMax) {
-            tMax = tyMax;
-        }
+        if (tMin > tyMax || tyMin > tMax) return null;
+        if (tyMin > tMin) tMin = tyMin;
+        if (tyMax < tMax) tMax = tyMax;
 
         bbox = signDirZ ? max : min;
         double tzMin = (bbox.z - ray.origin.z) * invDir.z;
         bbox = signDirZ ? min : max;
         double tzMax = (bbox.z - ray.origin.z) * invDir.z;
 
-        if (tMin > tzMax || tzMin > tMax) {
-            return null;
-        }
-        if (tzMin > tMin) {
-            tMin = tzMin;
-        }
-        if (tzMax < tMax) {
-            tMax = tzMax;
-        }
-        if (tMin < maxDist && tMax > minDist) {
-            return ray.getPointAtDistance(tMin);
-        }
+        if (tMin > tzMax || tzMin > tMax) return null;
+        if (tzMin > tMin) tMin = tzMin;
+        if (tzMax < tMax) tMax = tzMax;
+        if (tMin < maxDist && tMax > minDist) return ray.getPointAtDistance(tMin);
         return null;
     }
 
@@ -134,14 +114,10 @@ public class AABB {
         List<BlockBase> blocks = expanded.getBlocks(world);
 
         for (BlockBase b : blocks) {
-            if (exempt.contains(b.type())) {
-                continue;
-            }
+            if (exempt.contains(b.type())) continue;
             AABB[] bAABBs = b.boxes(p);
             for (AABB aabb : bAABBs) {
-                if (this.collides(aabb)) {
-                    aabbs.add(aabb);
-                }
+                if (this.collides(aabb)) aabbs.add(aabb);
             }
         }
         return aabbs;
@@ -157,9 +133,7 @@ public class AABB {
         for (BlockBase b : blocks) {
             AABB[] bAABBs = b.boxes(p);
             for (AABB aabb : bAABBs) {
-                if (this.collides(aabb)) {
-                    aabbs.add(aabb);
-                }
+                if (this.collides(aabb)) aabbs.add(aabb);
             }
         }
         return aabbs;
@@ -171,9 +145,7 @@ public class AABB {
             for (int y = NumberConversions.floor(min.y); y < NumberConversions.ceil(max.y); y++) {
                 for (int z = NumberConversions.floor(min.z); z < NumberConversions.ceil(max.z); z++) {
                     BlockBase block = world.getBlock(x, y, z);
-                    if (block == null) {
-                        continue;
-                    }
+                    if (block == null) continue;
                     mats.add(block.type());
                 }
             }
@@ -192,9 +164,7 @@ public class AABB {
             for (int y = (int) min.y - 1; y <= max.y; y++) {
                 for (int z = (int) (min.z < 0 ? min.z - 1 : min.z); z <= max.z; z++) {
                     BlockBase block = world.getBlock(x, y, z);
-                    if (block == null) {
-                        continue;
-                    }
+                    if (block == null) continue;
                     for (AABB blockBox : block.boxes(p)) {
                         if (blockBox.min.x > this.max.x && blockBox.min.x < bigBox.max.x) {
                             directions.add(Direction.EAST);

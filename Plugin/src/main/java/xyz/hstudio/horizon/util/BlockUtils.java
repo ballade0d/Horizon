@@ -25,9 +25,7 @@ public class BlockUtils {
         solid.add(Material.SOIL);
 
         for (Material material : Material.values()) {
-            if (material.name().contains("COMPARATOR") || material.name().contains("DIODE")) {
-                solid.add(material);
-            }
+            if (material.name().contains("COMPARATOR") || material.name().contains("DIODE")) solid.add(material);
         }
 
         solid.removeIf(Objects::isNull);

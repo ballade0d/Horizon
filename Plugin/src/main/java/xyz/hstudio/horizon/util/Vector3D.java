@@ -154,12 +154,8 @@ public class Vector3D {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (!(obj instanceof Vector3D)) {
-            return false;
-        }
+        if (this == obj) return true;
+        if (!(obj instanceof Vector3D)) return false;
         Vector3D other = (Vector3D) obj;
         if (Double.doubleToRawLongBits(x) != Double.doubleToRawLongBits(other.x)) {
             return false;

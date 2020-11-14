@@ -16,12 +16,8 @@ public class Ray2D {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (!(obj instanceof Ray2D)) {
-            return false;
-        }
+        if (this == obj) return true;
+        if (!(obj instanceof Ray2D)) return false;
         Ray2D other = (Ray2D) obj;
         return Objects.equals(origin, other.origin) && Objects.equals(direction, other.direction);
     }

@@ -56,12 +56,8 @@ public class EntityBase {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (!(obj instanceof EntityBase)) {
-            return false;
-        }
+        if (this == obj) return true;
+        if (!(obj instanceof EntityBase)) return false;
         return entity.getId() == ((EntityBase) obj).entity.getId();
     }
 

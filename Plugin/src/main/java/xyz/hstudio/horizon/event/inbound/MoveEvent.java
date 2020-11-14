@@ -4,11 +4,16 @@ import org.bukkit.Material;
 import org.bukkit.potion.PotionEffectType;
 import xyz.hstudio.horizon.HPlayer;
 import xyz.hstudio.horizon.event.InEvent;
-import xyz.hstudio.horizon.util.*;
+import xyz.hstudio.horizon.util.AABB;
+import xyz.hstudio.horizon.util.Location;
+import xyz.hstudio.horizon.util.Pair;
+import xyz.hstudio.horizon.util.Vector3D;
 import xyz.hstudio.horizon.util.enums.Direction;
 
 import java.util.List;
 import java.util.Set;
+
+import static xyz.hstudio.horizon.util.Physics.GRAVITATIONAL_ACCELERATION;
 
 public class MoveEvent extends InEvent {
 
@@ -57,20 +62,16 @@ public class MoveEvent extends InEvent {
 
                 this.teleport = true;
                 inst.getAsync().clearHistory(p.base);
-                if (p.teleports.size() == 0) {
-                    p.status.isTeleporting = false;
-                } else {
-                    return false;
-                }
+
+                if (p.teleports.size() == 0) p.status.isTeleporting = false;
+                else return false;
             } else if (!p.bukkit.isSleeping()) {
                 if (elapsedTime > p.status.ping + 800) {
                     Location tp;
                     if (p.teleports.size() > 0) {
                         tp = p.teleports.get(p.teleports.size() - 1).getKey();
                         p.teleports.clear();
-                    } else {
-                        tp = p.physics.position;
-                    }
+                    } else tp = p.physics.position;
                     inst.getSync().teleport(p, tp);
                 }
             }
@@ -94,21 +95,17 @@ public class MoveEvent extends InEvent {
         Location extrapolate = to;
         // when on ground, Y velocity is inherently 0; no need to do pointless math.
         extrapolate.newY(extrapolate.y + (p.physics.onGroundReally ? -0.0784 :
-                ((p.physics.velocity.y + Physics.GRAVITATIONAL_ACCELERATION) * 0.98)));
+                ((p.physics.velocity.y + GRAVITATIONAL_ACCELERATION) * 0.98)));
 
         AABB box = AABB.player().add(extrapolate);
         List<AABB> verticalCollision = box.getBlockAABBs(p, p.getWorld(), Material.WEB);
 
-        if (verticalCollision.isEmpty() && !p.physics.onGround) {
-            return false;
-        }
+        if (verticalCollision.isEmpty() && !p.physics.onGround) return false;
 
         double highestVertical = extrapolate.y;
         for (AABB blockAABB : verticalCollision) {
             double aabbMaxY = blockAABB.max.y;
-            if (aabbMaxY > highestVertical) {
-                highestVertical = aabbMaxY;
-            }
+            if (aabbMaxY > highestVertical) highestVertical = aabbMaxY;
         }
 
         // move to this position, but with clipped Y (moving horizontally)
@@ -116,23 +113,15 @@ public class MoveEvent extends InEvent {
 
         List<AABB> horizontalCollision = box.getBlockAABBs(p, p.getWorld(), Material.WEB);
 
-        if (horizontalCollision.isEmpty()) {
-            return false;
-        }
+        if (horizontalCollision.isEmpty()) return false;
 
         double expectedY = prevPos.y;
         double highestPointOnAABB = -1;
         for (AABB blockAABB : horizontalCollision) {
             double blockAABBY = blockAABB.max.y;
-            if (blockAABBY - prevPos.y > 0.6) {
-                return false;
-            }
-            if (blockAABBY > expectedY) {
-                expectedY = blockAABBY;
-            }
-            if (blockAABBY > highestPointOnAABB) {
-                highestPointOnAABB = blockAABBY;
-            }
+            if (blockAABBY - prevPos.y > 0.6) return false;
+            if (blockAABBY > expectedY) expectedY = blockAABBY;
+            if (blockAABBY > highestPointOnAABB) highestPointOnAABB = blockAABBY;
         }
 
         return (onGround || onGroundReally) && Math.abs(prevPos.y - highestPointOnAABB) > 0.0001 && Math.abs(to.y - expectedY) < 0.0001;
@@ -158,18 +147,13 @@ public class MoveEvent extends InEvent {
             box.add(p.physics.position.plus(new Vector3D(0, expectedDY, 0)));
             boolean collidedBefore = !box.getBlockAABBs(p, to.world).isEmpty();
 
-            if (collidedNow && !collidedBefore && leftGround && dY == 0) {
-                expectedDY = 0;
-            }
+            if (collidedNow && !collidedBefore && leftGround && dY == 0) expectedDY = 0;
         }
 
         Set<Material> touchedBlocks = p.base.cube(to).getMaterials(p.getWorld());
         if (touchedBlocks.contains(Material.WEB)) {
-            if (hasPos) {
-                expectedDY *= 0.05;
-            } else {
-                expectedDY = 0;
-            }
+            if (hasPos) expectedDY *= 0.05;
+            else expectedDY = 0;
         }
 
         boolean kbSimilarToJump = acceptedKnockback != null && (Math.abs(acceptedKnockback.y - expectedDY) < 0.001 || touchCeiling);

@@ -13,12 +13,8 @@ public abstract class ConfigBase {
     public static void load(Class<? extends ConfigBase> clazz, Yaml yaml, Yaml def) {
         for (Field field : clazz.getFields()) {
             LoadInfo annotation = field.getAnnotation(LoadInfo.class);
-            if (annotation == null) {
-                continue;
-            }
-            if (!Modifier.isStatic(field.getModifiers())) {
-                continue;
-            }
+            if (annotation == null) continue;
+            if (!Modifier.isStatic(field.getModifiers())) continue;
 
             String path = annotation.path();
 

@@ -13,15 +13,9 @@ abstract class CheckBase(protected val p: HPlayer, private val decayAmount: Int,
     private var failedTick = 0
 
     fun decay(tick: Long) {
-        if (decayInterval == -1 || violation == 0) {
-            return
-        }
-        if (tick % decayInterval != 0L) {
-            return
-        }
-        if (inst.async.tick.get() - failedTick < decayDelay) {
-            return
-        }
+        if (decayInterval == -1 || violation == 0) return
+        if (tick % decayInterval != 0L) return
+        if (inst.async.tick.get() - failedTick < decayDelay) return
         violation = (violation - decayAmount).coerceAtLeast(0)
     }
 

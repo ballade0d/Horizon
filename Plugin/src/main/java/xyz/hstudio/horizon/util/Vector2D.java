@@ -65,16 +65,11 @@ public class Vector2D {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (!(obj instanceof Vector2D)) {
-            return false;
-        }
+        if (this == obj) return true;
+        if (!(obj instanceof Vector2D)) return false;
         Vector2D other = (Vector2D) obj;
-        if (Double.doubleToRawLongBits(x) != Double.doubleToRawLongBits(other.x)) {
-            return false;
-        } else return Double.doubleToRawLongBits(y) == Double.doubleToRawLongBits(other.y);
+        if (Double.doubleToRawLongBits(x) != Double.doubleToRawLongBits(other.x)) return false;
+        else return Double.doubleToRawLongBits(y) == Double.doubleToRawLongBits(other.y);
     }
 
     @Override

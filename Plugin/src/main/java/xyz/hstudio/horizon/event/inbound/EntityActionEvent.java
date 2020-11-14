@@ -2,6 +2,7 @@ package xyz.hstudio.horizon.event.inbound;
 
 import xyz.hstudio.horizon.HPlayer;
 import xyz.hstudio.horizon.event.InEvent;
+import xyz.hstudio.horizon.event.outbound.AttributeEvent;
 
 public class EntityActionEvent extends InEvent {
 
@@ -25,6 +26,10 @@ public class EntityActionEvent extends InEvent {
                 break;
             case START_SPRINTING:
                 p.status.isSprinting = true;
+                // Client increases moving speed whenever it starts sprinting
+                // although the attribute packet haven't been sent back to the client
+                // so let's update it here
+                p.moveFactors.add(AttributeEvent.SPRINT_MODIFIER);
                 break;
             case STOP_SPRINTING:
                 p.status.isSprinting = false;

@@ -24,12 +24,8 @@ public class Ray3D {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (!(obj instanceof Ray3D)) {
-            return false;
-        }
+        if (this == obj) return true;
+        if (!(obj instanceof Ray3D)) return false;
         Ray3D other = (Ray3D) obj;
         return Objects.equals(origin, other.origin) && Objects.equals(direction, other.direction);
     }

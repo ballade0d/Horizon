@@ -9,6 +9,7 @@ import xyz.hstudio.horizon.HPlayer;
 import xyz.hstudio.horizon.event.InEvent;
 import xyz.hstudio.horizon.event.OutEvent;
 import xyz.hstudio.horizon.event.inbound.*;
+import xyz.hstudio.horizon.event.outbound.AttributeEvent;
 import xyz.hstudio.horizon.event.outbound.KeepaliveRequestEvent;
 import xyz.hstudio.horizon.event.outbound.TeleportEvent;
 import xyz.hstudio.horizon.util.Location;
@@ -16,7 +17,10 @@ import xyz.hstudio.horizon.util.Vector3D;
 import xyz.hstudio.horizon.util.enums.Direction;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 public class PackerBase {
 
@@ -114,9 +118,8 @@ public class PackerBase {
         if (interactType == null) {
             Vector3D pos = new Vector3D(nmsPos.getX(), nmsPos.getY(), nmsPos.getZ());
             BlockBase block = p.getWorld().getBlock(pos);
-            if (block == null) {
-                return null;
-            }
+            if (block == null) return null;
+
             Direction dir;
             switch (nmsDir) {
                 case UP:
@@ -144,9 +147,7 @@ public class PackerBase {
             return new BlockDigEvent(p, pos, dir, digType, block);
         }
         org.bukkit.inventory.ItemStack itemStack = p.inventory.mainHand();
-        if (itemStack == null) {
-            return null;
-        }
+        if (itemStack == null) return null;
 
         return new ItemInteractEvent(p, interactType, itemStack);
     }
@@ -376,6 +377,8 @@ public class PackerBase {
             return toEvent(p, (PacketPlayOutPosition) packet);
         } else if (packet instanceof PacketPlayOutKeepAlive) {
             return toEvent(p, (PacketPlayOutKeepAlive) packet);
+        } else if (packet instanceof PacketPlayOutUpdateAttributes) {
+            return toEvent(p, (PacketPlayOutUpdateAttributes) packet);
         }
         return null;
     }
@@ -405,5 +408,34 @@ public class PackerBase {
         }
         int id = serializer.e();
         return new KeepaliveRequestEvent(p, id);
+    }
+
+    private OutEvent toEvent(HPlayer p, PacketPlayOutUpdateAttributes packet) {
+        PacketDataSerializer serializer = new PacketDataSerializer(Unpooled.buffer(0));
+        try {
+            packet.b(serializer);
+            int id = serializer.e();
+            if (id != p.bukkit.getEntityId()) {
+                return null;
+            }
+            List<AttributeEvent.AttributeSnapshot> snapshots = new ArrayList<>();
+            int size = serializer.readInt();
+            for (int i = 0; i < size; ++i) {
+                String key = serializer.c(64);
+                double baseValue = serializer.readDouble();
+                int magic = serializer.e();
+                List<AttributeEvent.AttributeModifier> modifiers = new ArrayList<>();
+                for (int var2 = 0; var2 < magic; ++var2) {
+                    UUID uuid = serializer.g();
+                    double value = serializer.readDouble();
+                    byte operation = serializer.readByte();
+                    modifiers.add(new AttributeEvent.AttributeModifier(uuid, value, operation));
+                }
+                snapshots.add(new AttributeEvent.AttributeSnapshot(key, baseValue, magic, modifiers));
+            }
+            return new AttributeEvent(p, snapshots);
+        } catch (Exception e) {
+            return null;
+        }
     }
 }
