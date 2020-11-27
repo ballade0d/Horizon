@@ -25,11 +25,14 @@ public class MathUtils {
      * @return the gcd
      */
     public static float gcd(float a, float b) {
-        if (a < b) return gcd(b, a);
-        if (Math.abs(b) < 0.001)
+        if (a < b) {
+            return gcd(b, a);
+        }
+        if (Math.abs(b) < 0.001) {
             return a;
-        else
+        } else {
             return gcd(b, a - NumberConversions.floor(a / b) * b);
+        }
     }
 
     public static float lcm(float a, float b) {

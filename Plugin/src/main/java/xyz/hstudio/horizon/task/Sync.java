@@ -18,7 +18,9 @@ public class Sync extends BukkitRunnable {
     }
 
     public void teleport(HPlayer player, Location to) {
-        if (player == null || to == null) return;
+        if (player == null || to == null) {
+            return;
+        }
         pendingTeleports.put(player, to);
     }
 

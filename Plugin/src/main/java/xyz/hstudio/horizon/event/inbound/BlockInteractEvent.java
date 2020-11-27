@@ -1,11 +1,12 @@
 package xyz.hstudio.horizon.event.inbound;
 
+import net.minecraft.server.v1_8_R3.PacketPlayInBlockPlace;
 import xyz.hstudio.horizon.HPlayer;
 import xyz.hstudio.horizon.event.InEvent;
 import xyz.hstudio.horizon.util.Vector3D;
 import xyz.hstudio.horizon.util.enums.Direction;
 
-public class BlockInteractEvent extends InEvent {
+public class BlockInteractEvent extends InEvent<PacketPlayInBlockPlace> {
 
     public final Vector3D targetPos;
     public final Vector3D cursorPos;

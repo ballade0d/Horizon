@@ -1,11 +1,12 @@
 package xyz.hstudio.horizon.event.inbound;
 
+import net.minecraft.server.v1_8_R3.PacketPlayInUseEntity;
 import xyz.hstudio.horizon.HPlayer;
 import xyz.hstudio.horizon.event.InEvent;
 import xyz.hstudio.horizon.util.Vector3D;
 import xyz.hstudio.horizon.wrapper.EntityBase;
 
-public class EntityInteractEvent extends InEvent {
+public class EntityInteractEvent extends InEvent<PacketPlayInUseEntity> {
 
     public final int entityId;
     public final InteractType type;

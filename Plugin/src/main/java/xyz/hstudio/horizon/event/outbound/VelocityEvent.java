@@ -1,15 +1,14 @@
 package xyz.hstudio.horizon.event.outbound;
 
+import net.minecraft.server.v1_8_R3.PacketPlayOutEntityVelocity;
 import xyz.hstudio.horizon.HPlayer;
 import xyz.hstudio.horizon.event.OutEvent;
-import xyz.hstudio.horizon.util.Pair;
-import xyz.hstudio.horizon.util.Vector3D;
 
-public class VelocityEvent extends OutEvent {
+public class VelocityEvent extends OutEvent<PacketPlayOutEntityVelocity> {
 
-    public final double x;
-    public final double y;
-    public final double z;
+    public final float x;
+    public final float y;
+    public final float z;
 
     public VelocityEvent(HPlayer p, float x, float y, float z) {
         super(p);
@@ -20,7 +19,10 @@ public class VelocityEvent extends OutEvent {
 
     @Override
     public void post() {
-        p.velocities.add(new Pair<>(new Vector3D(x, y, z), System.currentTimeMillis()));
-        if (p.velocities.size() > 20) p.velocities.remove(0);
+        p.sendSimulatedAction(() -> {
+            p.velocity.x = this.x;
+            p.velocity.y = this.y;
+            p.velocity.z = this.z;
+        });
     }
 }

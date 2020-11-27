@@ -24,7 +24,7 @@ public class PacketHandler extends ChannelDuplexHandler {
     public void channelRead(ChannelHandlerContext context, Object packet) throws Exception {
         boolean cancelled = false;
         try {
-            InEvent event = PackerBase.getInst().received(p, packet);
+            InEvent<?> event = PackerBase.getInst().received(p, packet);
             if (event != null) {
                 if (!event.pre()) {
                     cancelled = true;
@@ -35,6 +35,7 @@ public class PacketHandler extends ChannelDuplexHandler {
                     event.post();
                     cancelled = event.isCancelled();
                 }
+                event.apply(packet);
             }
         } catch (Throwable throwable) {
             throwable.printStackTrace();
@@ -47,7 +48,7 @@ public class PacketHandler extends ChannelDuplexHandler {
     public void write(ChannelHandlerContext context, Object packet, ChannelPromise promise) throws Exception {
         boolean cancelled = false;
         try {
-            OutEvent event = PackerBase.getInst().sent(p, packet);
+            OutEvent<?> event = PackerBase.getInst().sent(p, packet);
             if (event != null) {
                 if (!event.pre()) {
                     cancelled = true;
@@ -58,6 +59,7 @@ public class PacketHandler extends ChannelDuplexHandler {
                     event.post();
                     cancelled = event.isCancelled();
                 }
+                event.apply(packet);
             }
         } catch (Throwable throwable) {
             throwable.printStackTrace();

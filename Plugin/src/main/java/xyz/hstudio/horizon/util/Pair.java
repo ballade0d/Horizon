@@ -18,8 +18,12 @@ public class Pair<K, V> {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (!(obj instanceof Pair)) return false;
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof Pair)) {
+            return false;
+        }
         Pair<?, ?> other = (Pair<?, ?>) obj;
         return Objects.equals(other.key, key) && Objects.equals(other.value, value);
     }

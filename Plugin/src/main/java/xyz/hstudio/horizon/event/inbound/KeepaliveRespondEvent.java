@@ -1,10 +1,11 @@
 package xyz.hstudio.horizon.event.inbound;
 
+import net.minecraft.server.v1_8_R3.PacketPlayInKeepAlive;
 import xyz.hstudio.horizon.HPlayer;
 import xyz.hstudio.horizon.event.InEvent;
 import xyz.hstudio.horizon.util.Pair;
 
-public class KeepaliveRespondEvent extends InEvent {
+public class KeepaliveRespondEvent extends InEvent<PacketPlayInKeepAlive> {
 
     public final int id;
 
@@ -15,7 +16,13 @@ public class KeepaliveRespondEvent extends InEvent {
 
     @Override
     public boolean pre() {
-        Pair<Integer, Long> first = p.pings.pollFirst();
+        if (p.executeSimulatedAction(id)) {
+            // Cancel this packet cuz the packet is used to check
+            // if the player has received the packet that has sent by the server
+            return false;
+        }
+
+        Pair<Integer, Long> first = p.pings.poll();
         if (first == null) {
             // Kick
             return false;

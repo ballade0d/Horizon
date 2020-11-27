@@ -1,9 +1,10 @@
 package xyz.hstudio.horizon.event.inbound;
 
+import net.minecraft.server.v1_8_R3.PacketPlayInAbilities;
 import xyz.hstudio.horizon.HPlayer;
 import xyz.hstudio.horizon.event.InEvent;
 
-public class AbilitiesEvent extends InEvent {
+public class AbilitiesEvent extends InEvent<PacketPlayInAbilities> {
 
     public final boolean invulnerable;
     public final boolean flying;

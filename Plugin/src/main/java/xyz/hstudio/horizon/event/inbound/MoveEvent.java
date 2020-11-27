@@ -1,5 +1,7 @@
 package xyz.hstudio.horizon.event.inbound;
 
+import com.esotericsoftware.reflectasm.FieldAccess;
+import net.minecraft.server.v1_8_R3.PacketPlayInFlying;
 import org.bukkit.Material;
 import org.bukkit.potion.PotionEffectType;
 import xyz.hstudio.horizon.HPlayer;
@@ -13,9 +15,12 @@ import xyz.hstudio.horizon.util.enums.Direction;
 import java.util.List;
 import java.util.Set;
 
+import static xyz.hstudio.horizon.util.Physics.AIR_RESISTANCE_VERTICAL;
 import static xyz.hstudio.horizon.util.Physics.GRAVITATIONAL_ACCELERATION;
 
-public class MoveEvent extends InEvent {
+public class MoveEvent extends InEvent<PacketPlayInFlying> {
+
+    public static final FieldAccess ACCESS = FieldAccess.get(PacketPlayInFlying.class);
 
     public final Location to;
     public final boolean onGround;
@@ -23,12 +28,15 @@ public class MoveEvent extends InEvent {
     public final boolean hasPos;
 
     public Vector3D velocity;
-    public Vector3D acceptedKnockback; // TODO finish this
+    public Vector3D expectedVelocity;
+    public Vector3D acceptedVelocity;
+    public boolean knockBack;
     public boolean teleport;
     public boolean onGroundReally;
     public boolean touchCeiling;
     public boolean step;
     public boolean jump;
+    // TODO: Check for move direction (WASD)
 
     public MoveEvent(HPlayer p, Location to, boolean onGround, boolean hasLook, boolean hasPos) {
         super(p);
@@ -41,6 +49,18 @@ public class MoveEvent extends InEvent {
     @Override
     public boolean pre() {
         this.velocity = to.minus(p.physics.position);
+
+        if (p.velocity.x != 0 || p.velocity.y != 0 || p.velocity.z != 0) {
+            this.expectedVelocity = new Vector3D(p.velocity.x, p.velocity.y, p.velocity.z);
+            this.acceptedVelocity = this.velocity;
+
+            // TODO: More checks
+            this.knockBack = expectedVelocity.distance(acceptedVelocity) < 0.01;
+            if (knockBack) {
+                p.velocity.x = p.velocity.y = p.velocity.z = 0;
+                System.out.println("Accepted Velocity");
+            }
+        }
 
         if (p.status.isTeleporting) {
             Location tpLoc;
@@ -63,8 +83,11 @@ public class MoveEvent extends InEvent {
                 this.teleport = true;
                 inst.getAsync().clearHistory(p.base);
 
-                if (p.teleports.size() == 0) p.status.isTeleporting = false;
-                else return false;
+                if (p.teleports.size() == 0) {
+                    p.status.isTeleporting = false;
+                } else {
+                    return false;
+                }
             } else if (!p.bukkit.isSleeping()) {
                 if (elapsedTime > p.status.ping + 800) {
                     Location tp;
@@ -95,7 +118,7 @@ public class MoveEvent extends InEvent {
         Location extrapolate = to;
         // when on ground, Y velocity is inherently 0; no need to do pointless math.
         extrapolate.newY(extrapolate.y + (p.physics.onGroundReally ? -0.0784 :
-                ((p.physics.velocity.y + GRAVITATIONAL_ACCELERATION) * 0.98)));
+                ((p.physics.velocity.y + GRAVITATIONAL_ACCELERATION) * AIR_RESISTANCE_VERTICAL)));
 
         AABB box = AABB.player().add(extrapolate);
         List<AABB> verticalCollision = box.getBlockAABBs(p, p.getWorld(), Material.WEB);
@@ -124,7 +147,8 @@ public class MoveEvent extends InEvent {
             if (blockAABBY > highestPointOnAABB) highestPointOnAABB = blockAABBY;
         }
 
-        return (onGround || onGroundReally) && Math.abs(prevPos.y - highestPointOnAABB) > 0.0001 && Math.abs(to.y - expectedY) < 0.0001;
+        return (onGround || onGroundReally) && Math.abs(prevPos.y - highestPointOnAABB) > 0.0001 &&
+                Math.abs(to.y - expectedY) < 0.0001;
     }
 
     // Checks if the player's dY matches the expected dY
@@ -139,12 +163,12 @@ public class MoveEvent extends InEvent {
         {
             AABB box = AABB.player();
             box.expand(-0.000001, -0.000001, -0.000001);
-            box.add(to.plus(new Vector3D(0, expectedDY, 0)));
+            box.add(to.plus(0, expectedDY, 0));
             boolean collidedNow = !box.getBlockAABBs(p, to.world).isEmpty();
 
             box = AABB.player();
             box.expand(-0.000001, -0.000001, -0.000001);
-            box.add(p.physics.position.plus(new Vector3D(0, expectedDY, 0)));
+            box.add(p.physics.position.plus(0, expectedDY, 0));
             boolean collidedBefore = !box.getBlockAABBs(p, to.world).isEmpty();
 
             if (collidedNow && !collidedBefore && leftGround && dY == 0) expectedDY = 0;
@@ -156,8 +180,11 @@ public class MoveEvent extends InEvent {
             else expectedDY = 0;
         }
 
-        boolean kbSimilarToJump = acceptedKnockback != null && (Math.abs(acceptedKnockback.y - expectedDY) < 0.001 || touchCeiling);
-        return !kbSimilarToJump && ((expectedDY == 0 && p.physics.onGround) || leftGround) && (dY == expectedDY || touchCeiling);
+        boolean kbSimilarToJump = acceptedVelocity != null &&
+                (Math.abs(acceptedVelocity.y - expectedDY) < 0.001 || touchCeiling);
+        return !kbSimilarToJump &&
+                ((expectedDY == 0 && p.physics.onGround) || leftGround) &&
+                (dY == expectedDY || touchCeiling);
     }
 
     @Override

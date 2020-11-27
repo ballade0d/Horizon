@@ -1,6 +1,7 @@
 package xyz.hstudio.horizon.event.outbound;
 
 import lombok.AllArgsConstructor;
+import net.minecraft.server.v1_8_R3.PacketPlayOutUpdateAttributes;
 import xyz.hstudio.horizon.HPlayer;
 import xyz.hstudio.horizon.event.OutEvent;
 
@@ -8,10 +9,10 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
-public class AttributeEvent extends OutEvent {
+public class AttributeEvent extends OutEvent<PacketPlayOutUpdateAttributes> {
 
     public static final UUID SPRINT_UUID = UUID.fromString("662a6b8d-da3e-4c1c-8813-96ea6097278d");
-    public static final AttributeModifier SPRINT_MODIFIER = new AttributeEvent.AttributeModifier(AttributeEvent.SPRINT_UUID, 0.3, 2);
+    public static final AttributeModifier SPRINT_MODIFIER = new AttributeModifier(SPRINT_UUID, 0.3, 2);
 
     public final List<AttributeSnapshot> snapshots;
 
@@ -31,16 +32,16 @@ public class AttributeEvent extends OutEvent {
                     // p.speedData.attributeBypass = true;
                     // player.sendSimulatedAction(() -> player.speedData.attributeBypass = false);
 
-                    // Latency
-                    p.moveFactors.clear();
+                    p.sendSimulatedAction(p.moveFactors::clear);
                 }
             } else {
                 snapshot.modifiers.sort(Comparator.comparingInt(o -> o.operation));
 
-                // Latency
-                p.moveFactors.clear();
-                // This rewrite the whole list
-                p.moveFactors.addAll(snapshot.modifiers);
+                // This rewrites the whole list
+                p.sendSimulatedAction(() -> {
+                    p.moveFactors.clear();
+                    p.moveFactors.addAll(snapshot.modifiers);
+                });
             }
             break;
         }
@@ -50,7 +51,6 @@ public class AttributeEvent extends OutEvent {
     public static class AttributeSnapshot {
         public final String key;
         public final double baseValue;
-        public final int size;
         public final List<AttributeModifier> modifiers;
     }
 

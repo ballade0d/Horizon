@@ -98,20 +98,26 @@ public class Async implements Runnable {
         for (EntityBase entity : trackedEntities.keySet()) {
             List<Pair<Location, Integer>> times = trackedEntities.getOrDefault(entity, new ArrayList<>());
             times.add(new Pair<>(entity.position(), tick.get()));
-            if (times.size() > 30) times.remove(0);
+            if (times.size() > 30) {
+                times.remove(0);
+            }
             trackedEntities.put(entity, times);
         }
     }
 
     public List<Location> getHistory(EntityBase entity, int ping, int range) {
         List<Pair<Location, Integer>> times = trackedEntities.get(entity);
-        if (times == null || times.isEmpty()) return Collections.emptyList();
+        if (times == null || times.isEmpty()) {
+            return Collections.emptyList();
+        }
 
         List<Location> history = new ArrayList<>();
         int ticks = tick.get() - NumberConversions.floor(ping / 50D);
         // Loop backwards
         for (int i = times.size() - 1; i >= 0; i--) {
-            if (Math.abs(ticks - times.get(i).getValue()) > range) continue;
+            if (Math.abs(ticks - times.get(i).getValue()) > range) {
+                continue;
+            }
             history.add(times.get(i).getKey());
         }
         return history;

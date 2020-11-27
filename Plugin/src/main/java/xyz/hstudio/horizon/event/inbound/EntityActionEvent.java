@@ -1,10 +1,11 @@
 package xyz.hstudio.horizon.event.inbound;
 
+import net.minecraft.server.v1_8_R3.PacketPlayInEntityAction;
 import xyz.hstudio.horizon.HPlayer;
 import xyz.hstudio.horizon.event.InEvent;
 import xyz.hstudio.horizon.event.outbound.AttributeEvent;
 
-public class EntityActionEvent extends InEvent {
+public class EntityActionEvent extends InEvent<PacketPlayInEntityAction> {
 
     public final ActionType type;
     public final int jumpBoost;
@@ -39,6 +40,6 @@ public class EntityActionEvent extends InEvent {
     }
 
     public enum ActionType {
-        PERFORM_RESPAWN, REQUEST_STATS, OPEN_INVENTORY, START_SNEAKING, STOP_SNEAKING, STOP_SLEEPING, START_SPRINTING, STOP_SPRINTING, RIDING_JUMP
+        START_SNEAKING, STOP_SNEAKING, STOP_SLEEPING, START_SPRINTING, STOP_SPRINTING, RIDING_JUMP
     }
 }
