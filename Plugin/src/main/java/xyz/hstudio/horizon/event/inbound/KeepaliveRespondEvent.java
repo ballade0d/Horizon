@@ -33,6 +33,6 @@ public class KeepaliveRespondEvent extends InEvent<PacketPlayInKeepAlive> {
         }
         int ping = (int) (System.currentTimeMillis() - first.getValue());
         p.status.ping = (p.status.ping * 3 + ping) / 4;
-        return super.pre();
+        return true;
     }
 }

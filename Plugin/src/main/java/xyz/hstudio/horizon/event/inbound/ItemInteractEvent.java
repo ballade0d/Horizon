@@ -16,6 +16,11 @@ public class ItemInteractEvent extends InEvent<PacketPlayInBlockDig> {
         this.itemStack = itemStack;
     }
 
+    @Override
+    public void post() {
+        p.status.isEating = p.status.isPullingBow = p.status.isBlocking = false;
+    }
+
     public enum InteractType {
         DROP_ALL_ITEMS, DROP_ITEM, RELEASE_USE_ITEM
     }

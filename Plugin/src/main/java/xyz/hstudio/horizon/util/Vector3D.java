@@ -123,6 +123,14 @@ public class Vector3D {
         return Math.acos(dot);
     }
 
+    public Vector3D normalize() {
+        double length = this.length();
+        this.x /= length;
+        this.y /= length;
+        this.z /= length;
+        return this;
+    }
+
     public Vector3D newX(double x) {
         return new Vector3D(x, y, z);
     }

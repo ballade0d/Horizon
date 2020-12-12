@@ -21,6 +21,5 @@ public class KeepaliveRequestEvent extends OutEvent<PacketPlayOutKeepAlive> {
             return;
         }
         p.pings.offer(new Pair<>(id, System.currentTimeMillis()));
-        super.post();
     }
 }

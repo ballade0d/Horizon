@@ -48,8 +48,9 @@ public class GroundSpoof extends CheckBase {
             }
 
             // TODO: Check for client blocks
+            // TODO: Rewrite packets
 
-            e.modify(x -> MoveEvent.ACCESS.set(x, 5, false));
+            // e.modify(x -> MoveEvent.ACCESS.set(x, 5, false));
 
             System.out.println("GroundSpoof");
         }

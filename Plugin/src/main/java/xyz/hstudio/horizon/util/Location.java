@@ -117,9 +117,8 @@ public class Location extends Vector3D {
         blocks.addAll(BlockUtils.getBlocksInLocation(this));
         blocks.addAll(BlockUtils.getBlocksInLocation(this.plus(0, -1, 0)));
         Set<BlockBase> blocksAbove = !ignoreOnGround ? null : BlockUtils.getBlocksInLocation(this);
-
-        AABB underFeet = toAABB(0.6, 0).add(0, -depth, 0, 0, 0, 0);
-        AABB topFeet = toAABB(0.6, 0).add(0, 0.00001, 0, 0, 0, 0);
+        AABB underFeet = new AABB(x - 0.3, y - depth, z - 0.3, x + 0.3, y, z + 0.3);
+        AABB topFeet = underFeet.plus(0, depth + 0.00001, 0, 0, 0, 0);
 
         for (BlockBase block : blocks) {
             if (block.isLiquid() || !BlockUtils.isSolid(block)) {

@@ -14,6 +14,18 @@ public class AimAssist extends CheckBase {
         super(p, 1, 200, 200);
     }
 
+    private static double modulusRotation(double sensitivity, double pitch) {
+        return pitch % Math.pow(sensitivity * 0.6000000238418579 + 0.20000000298023224, 3) * 1.2;
+    }
+
+    private static double gcdToSensitive(float gcd) {
+        return (Math.cbrt(gcd / 0.15 / 8.0) - 0.2) / 0.6;
+    }
+
+    private static double sensToPercent(double sensitivity) {
+        return sensitivity / 0.5 * 100;
+    }
+
     public void received(InEvent<?> event) {
         if (event instanceof MoveEvent) {
             gcd((MoveEvent) event);
@@ -44,25 +56,13 @@ public class AimAssist extends CheckBase {
         double o = modulusRotation(sensitivity, pitch);
         int len = String.valueOf(o).length();
         if (o == 0.0) {
-            // Add more vl
+            // Add a lot of vl?
             System.out.println("Invalid A");
         }
         if (sensitivity > 99 && o > 0 && len > 0 && len < 8) {
-            System.out.println("Invalid B len:$len");
+            System.out.println("Invalid B len:" + len);
         }
 
         lastDeltaPitch = deltaPitch;
-    }
-
-    private static double modulusRotation(double sensitivity, double pitch) {
-        return pitch % Math.pow(sensitivity * 0.6 + 0.2, 3) * 1.2;
-    }
-
-    private static double gcdToSensitive(float gcd) {
-        return (Math.cbrt(gcd / 0.15 / 8.0) - 0.2) / 0.6;
-    }
-
-    private static double sensToPercent(double sensitivity) {
-        return sensitivity / 0.5 * 100;
     }
 }

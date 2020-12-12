@@ -38,6 +38,14 @@ public class AABB {
         return this;
     }
 
+    public AABB plus(double minX, double minY, double minZ, double maxX, double maxY, double maxZ) {
+        return new AABB(min.x + minX, min.y + minY, min.z + minZ, max.x + maxX, max.y + maxY, max.z + maxZ);
+    }
+
+    public AABB plus(Vector3D vec) {
+        return plus(vec.x, vec.y, vec.z, vec.x, vec.y, vec.z);
+    }
+
     public AABB expand(double x, double y, double z) {
         min.subtract(x, y, z);
         max.add(x, y, z);
@@ -45,8 +53,12 @@ public class AABB {
     }
 
     public boolean collides(AABB other) {
-        if (max.x < other.min.x || min.x > other.max.x) return false;
-        if (max.y < other.min.y || min.y > other.max.y) return false;
+        if (max.x < other.min.x || min.x > other.max.x) {
+            return false;
+        }
+        if (max.y < other.min.y || min.y > other.max.y) {
+            return false;
+        }
         return !(max.z < other.min.z) && !(min.z > other.max.z);
     }
 
@@ -56,12 +68,30 @@ public class AABB {
             for (int y = NumberConversions.floor(min.y); y < NumberConversions.ceil(max.y); y++) {
                 for (int z = NumberConversions.floor(min.z); z < NumberConversions.ceil(max.z); z++) {
                     BlockBase block = world.getBlock(x, y, z);
-                    if (block == null) continue;
+                    if (block == null) {
+                        continue;
+                    }
                     blocks.add(block);
                 }
             }
         }
         return blocks;
+    }
+
+    public Set<Material> getMaterials(WorldBase world) {
+        Set<Material> mats = EnumSet.noneOf(Material.class);
+        for (int x = NumberConversions.floor(min.x); x < NumberConversions.ceil(max.x); x++) {
+            for (int y = NumberConversions.floor(min.y); y < NumberConversions.ceil(max.y); y++) {
+                for (int z = NumberConversions.floor(min.z); z < NumberConversions.ceil(max.z); z++) {
+                    BlockBase block = world.getBlock(x, y, z);
+                    if (block == null) {
+                        continue;
+                    }
+                    mats.add(block.type());
+                }
+            }
+        }
+        return mats;
     }
 
     /**
@@ -89,19 +119,33 @@ public class AABB {
         bbox = signDirY ? min : max;
         double tyMax = (bbox.y - ray.origin.y) * invDir.y;
 
-        if (tMin > tyMax || tyMin > tMax) return null;
-        if (tyMin > tMin) tMin = tyMin;
-        if (tyMax < tMax) tMax = tyMax;
+        if (tMin > tyMax || tyMin > tMax) {
+            return null;
+        }
+        if (tyMin > tMin) {
+            tMin = tyMin;
+        }
+        if (tyMax < tMax) {
+            tMax = tyMax;
+        }
 
         bbox = signDirZ ? max : min;
         double tzMin = (bbox.z - ray.origin.z) * invDir.z;
         bbox = signDirZ ? min : max;
         double tzMax = (bbox.z - ray.origin.z) * invDir.z;
 
-        if (tMin > tzMax || tzMin > tMax) return null;
-        if (tzMin > tMin) tMin = tzMin;
-        if (tzMax < tMax) tMax = tzMax;
-        if (tMin < maxDist && tMax > minDist) return ray.getPointAtDistance(tMin);
+        if (tMin > tzMax || tzMin > tMax) {
+            return null;
+        }
+        if (tzMin > tMin) {
+            tMin = tzMin;
+        }
+        if (tzMax < tMax) {
+            tMax = tzMax;
+        }
+        if (tMin < maxDist && tMax > minDist) {
+            return ray.getPointAtDistance(tMin);
+        }
         return null;
     }
 
@@ -114,10 +158,14 @@ public class AABB {
         List<BlockBase> blocks = expanded.getBlocks(world);
 
         for (BlockBase b : blocks) {
-            if (exempt.contains(b.type())) continue;
+            if (exempt.contains(b.type())) {
+                continue;
+            }
             AABB[] bAABBs = b.boxes(p);
             for (AABB aabb : bAABBs) {
-                if (this.collides(aabb)) aabbs.add(aabb);
+                if (this.collides(aabb)) {
+                    aabbs.add(aabb);
+                }
             }
         }
         return aabbs;
@@ -133,24 +181,12 @@ public class AABB {
         for (BlockBase b : blocks) {
             AABB[] bAABBs = b.boxes(p);
             for (AABB aabb : bAABBs) {
-                if (this.collides(aabb)) aabbs.add(aabb);
-            }
-        }
-        return aabbs;
-    }
-
-    public Set<Material> getMaterials(WorldBase world) {
-        Set<Material> mats = EnumSet.noneOf(Material.class);
-        for (int x = NumberConversions.floor(min.x); x < NumberConversions.ceil(max.x); x++) {
-            for (int y = NumberConversions.floor(min.y); y < NumberConversions.ceil(max.y); y++) {
-                for (int z = NumberConversions.floor(min.z); z < NumberConversions.ceil(max.z); z++) {
-                    BlockBase block = world.getBlock(x, y, z);
-                    if (block == null) continue;
-                    mats.add(block.type());
+                if (this.collides(aabb)) {
+                    aabbs.add(aabb);
                 }
             }
         }
-        return mats;
+        return aabbs;
     }
 
     public Set<Direction> touchingFaces(HPlayer p, WorldBase world, double borderSize) {

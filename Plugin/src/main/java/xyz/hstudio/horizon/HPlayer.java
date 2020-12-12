@@ -90,8 +90,9 @@ public class HPlayer {
                     value += modifier.value;
                     continue;
                 case 1:
+                    value += 0.1f * modifier.value;
+                    continue;
                 case 2:
-                    // WTF case 1 and 2 is the same???
                     value += value * modifier.value;
                     continue;
                 default:
@@ -154,6 +155,7 @@ public class HPlayer {
         public boolean onGroundReally;
         public Vector3D prevVelocity;
         public Vector3D velocity;
+        public float friction;
 
         public Physics() {
             this.position = base.position();
@@ -173,6 +175,9 @@ public class HPlayer {
         public boolean isSneaking;
         public boolean isSprinting;
         public boolean isTeleporting;
+        public boolean hitSlowdown;
+
+        public boolean isEating, isPullingBow, isBlocking;
 
         public Status() {
             this.ping = bukkit.getHandle().ping;
@@ -184,5 +189,7 @@ public class HPlayer {
     public class Velocity {
 
         public float x, y, z;
+        public boolean firstTick;
+        public long time;
     }
 }

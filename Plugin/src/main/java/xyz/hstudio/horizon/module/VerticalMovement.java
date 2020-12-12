@@ -4,6 +4,22 @@ import xyz.hstudio.horizon.HPlayer;
 import xyz.hstudio.horizon.event.InEvent;
 import xyz.hstudio.horizon.event.inbound.MoveEvent;
 
+/**
+ * Vertical movement check.
+ * <p>
+ * a = (vt - v0) / t -> vt = v0 + at
+ * <p>
+ * vt is the velocity of the time t
+ * v0 is the velocity of the beginning
+ * a is the gravitational acceleration (g = -0.08 in Minecraft)
+ * t is the time, measured in ticks
+ * <p>
+ * we also need to multiply it with vertical air resistance (k = 0.98 in Minecraft)
+ *
+ * @see xyz.hstudio.horizon.util.Physics
+ * so expectedYVelocity = (prevYVelocity + -0.08 * 1) * 0.98
+ */
+
 public class VerticalMovement extends CheckBase {
 
     private float estimatedYVelocity;
@@ -29,7 +45,8 @@ public class VerticalMovement extends CheckBase {
             estimatedYVelocity = deltaY;
             skip = true;
         } else if (e.knockBack) {
-            estimatedYVelocity = (float) e.acceptedVelocity.y;
+            estimatedYVelocity = deltaY;
+            skip = true;
         } else if (e.onGround && !this.p.physics.onGround) {
             estimatedYVelocity = 0F;
             skip = true;

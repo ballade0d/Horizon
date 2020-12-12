@@ -29,9 +29,6 @@ public class AttributeEvent extends OutEvent<PacketPlayOutUpdateAttributes> {
             }
             if (snapshot.modifiers.size() == 0) {
                 if (!p.status.isSprinting) {
-                    // p.speedData.attributeBypass = true;
-                    // player.sendSimulatedAction(() -> player.speedData.attributeBypass = false);
-
                     p.sendSimulatedAction(p.moveFactors::clear);
                 }
             } else {

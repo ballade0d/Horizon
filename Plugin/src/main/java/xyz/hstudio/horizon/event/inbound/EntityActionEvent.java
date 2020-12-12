@@ -36,7 +36,6 @@ public class EntityActionEvent extends InEvent<PacketPlayInEntityAction> {
                 p.status.isSprinting = false;
                 break;
         }
-        super.post();
     }
 
     public enum ActionType {

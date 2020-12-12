@@ -30,7 +30,6 @@ public enum Version {
             .filter(Version::validate)
             .findFirst()
             .orElse(UNKNOWN);
-    ;
 
     public abstract boolean validate();
 }
