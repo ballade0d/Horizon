@@ -8,7 +8,9 @@ import xyz.hstudio.horizon.util.MathUtils;
 
 public class AimAssist extends CheckBase {
 
+    double lastPlayerSensitivity = 0;
     private float lastDeltaPitch = 0f;
+    private int buffer = 0;
 
     public AimAssist(HPlayer p) {
         super(p, 1, 200, 200);
@@ -29,6 +31,7 @@ public class AimAssist extends CheckBase {
     public void received(InEvent<?> event) {
         if (event instanceof MoveEvent) {
             gcd((MoveEvent) event);
+            mousePrediction((MoveEvent) event);
         }
     }
 
@@ -64,5 +67,42 @@ public class AimAssist extends CheckBase {
         }
 
         lastDeltaPitch = deltaPitch;
+    }
+
+    /**
+     * This false flags with large pitch movements but not with OptiFine zoom :)
+     */
+    private void mousePrediction(MoveEvent e) {
+        // Code stolen from above
+        float pitch = e.to.pitch;
+
+        float deltaPitch = Math.abs(pitch - p.physics.position.pitch);
+        val gcd = MathUtils.gcd(deltaPitch, lastDeltaPitch);
+        double sensitivity = sensToPercent(gcdToSensitive(gcd));
+
+        // Check if sensitivity is invalid
+//        if (sensitivity > 200 || sensitivity < 0) {
+//            System.out.println("Invalid sensitivity");
+//        }
+
+        // Try to predict rotation using sensitivity.
+        // TODO improve this
+
+        double f1 = ((lastPlayerSensitivity * 0.6f + 0.2f) * lastDeltaPitch);
+        double mouseDelta = (e.to.pitch - e.from.pitch) / f1 * 0.15;
+        double expectedPitch = e.from.pitch + mouseDelta;
+
+        // Check if difference between actual and expected is too big.
+        // Ideally the buffer isn't needed.
+        if (Math.abs(e.to.pitch - expectedPitch) >= 3 && buffer++ >= 3) {
+            buffer = 0;
+            System.out.println("Unexpected rotation!");
+            System.out.println(Math.abs(e.to.pitch - expectedPitch));
+        }
+
+//        System.out.println("expected: " + expectedPitch);
+//        System.out.println("actual: " + e.to.pitch);
+
+        lastPlayerSensitivity = sensitivity;
     }
 }

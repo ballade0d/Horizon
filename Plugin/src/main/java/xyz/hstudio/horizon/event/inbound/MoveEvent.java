@@ -21,6 +21,7 @@ import static xyz.hstudio.horizon.util.Physics.GRAVITATIONAL_ACCELERATION;
 public class MoveEvent extends InEvent<PacketPlayInFlying> {
 
     public final Location to;
+    public final Location from;
     public final boolean onGround;
     public final boolean hasLook;
     public final boolean hasPos;
@@ -44,8 +45,9 @@ public class MoveEvent extends InEvent<PacketPlayInFlying> {
     //This is the friction that affects this move's velocity.
     private float oldFriction;
 
-    public MoveEvent(HPlayer p, Location to, boolean onGround, boolean hasLook, boolean hasPos) {
-        super(p);
+    public MoveEvent(HPlayer player, Location to, boolean onGround, boolean hasLook, boolean hasPos) {
+        super(player);
+        this.from = player.physics.position;
         this.to = to;
         this.onGround = onGround;
         this.hasLook = hasLook;
