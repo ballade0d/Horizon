@@ -41,10 +41,7 @@ public class VerticalMovement extends CheckBase {
         if (e.step) {
             estimatedYVelocity = 0.0F;
             skip = true;
-        } else if (e.jump) {
-            estimatedYVelocity = deltaY;
-            skip = true;
-        } else if (e.knockBack) {
+        } else if (e.jump || e.knockBack) {
             estimatedYVelocity = deltaY;
             skip = true;
         } else if (e.onGround && !this.p.physics.onGround) {

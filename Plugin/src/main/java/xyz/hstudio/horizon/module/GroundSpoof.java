@@ -1,5 +1,8 @@
 package xyz.hstudio.horizon.module;
 
+import io.netty.buffer.Unpooled;
+import net.minecraft.server.v1_8_R3.PacketDataSerializer;
+import net.minecraft.server.v1_8_R3.PacketPlayInFlying;
 import org.bukkit.Material;
 import xyz.hstudio.horizon.HPlayer;
 import xyz.hstudio.horizon.event.InEvent;
@@ -48,9 +51,21 @@ public class GroundSpoof extends CheckBase {
             }
 
             // TODO: Check for client blocks
-            // TODO: Rewrite packets
 
-            // e.modify(x -> MoveEvent.ACCESS.set(x, 5, false));
+            e.modify(packet -> {
+                try {
+                    PacketDataSerializer serializer = new PacketDataSerializer(Unpooled.buffer());
+                    packet.b(serializer);
+                    if (packet instanceof PacketPlayInFlying.PacketPlayInPosition) {
+                        serializer.setByte(24, 0);
+                    } else if (packet instanceof PacketPlayInFlying.PacketPlayInLook) {
+                        serializer.setByte(8, 0);
+                    } else if (packet instanceof PacketPlayInFlying.PacketPlayInPositionLook) {
+                        serializer.setByte(32, 0);
+                    }
+                } catch (Exception ignore) {
+                }
+            });
 
             System.out.println("GroundSpoof");
         }

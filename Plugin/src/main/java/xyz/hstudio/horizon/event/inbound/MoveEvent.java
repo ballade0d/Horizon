@@ -1,15 +1,15 @@
 package xyz.hstudio.horizon.event.inbound;
 
-import net.minecraft.server.v1_8_R3.MathHelper;
 import net.minecraft.server.v1_8_R3.PacketPlayInFlying;
 import org.bukkit.Material;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.util.NumberConversions;
 import xyz.hstudio.horizon.HPlayer;
 import xyz.hstudio.horizon.event.InEvent;
-import xyz.hstudio.horizon.util.*;
+import xyz.hstudio.horizon.util.AABB;
+import xyz.hstudio.horizon.util.Location;
+import xyz.hstudio.horizon.util.Pair;
+import xyz.hstudio.horizon.util.Vector3D;
 import xyz.hstudio.horizon.util.enums.Direction;
-import xyz.hstudio.horizon.util.enums.Key;
 import xyz.hstudio.horizon.wrapper.BlockBase;
 
 import java.util.List;
@@ -28,16 +28,14 @@ public class MoveEvent extends InEvent<PacketPlayInFlying> {
     public Vector3D velocity;
     public Set<Direction> touchFaces;
     public Set<Material> touchBlocks;
-    public Vector3D expectedVelocity;
-    public Vector3D acceptedVelocity;
     public boolean knockBack;
     public boolean teleport;
     public boolean onGroundReally;
     public boolean touchCeiling;
     public boolean step;
     public boolean jump;
-    private Key key;
-    private float forward, strafe;
+    public boolean failedVelocity;
+    public Vector3D acceptedVelocity;
     // TODO: Finish this
     //This is the friction that is used to compute this move's initial force.
     private float newFriction;
@@ -62,8 +60,7 @@ public class MoveEvent extends InEvent<PacketPlayInFlying> {
         this.touchFaces = new AABB(to.x - 0.299999, to.y + 0.000001, to.z - 0.299999, to.x + 0.299999, to.y + 1.799999, to.z + 0.299999).touchingFaces(p, to.world, 0.0001);
         this.touchBlocks = AABB.player().expand(-0.001, -0.001, -0.001).add(velocity).getMaterials(to.world);
 
-        this.key = computeKey();
-
+        /*
         switch (this.key) {
             case W:
                 forward = 1f;
@@ -134,7 +131,8 @@ public class MoveEvent extends InEvent<PacketPlayInFlying> {
                     touchBlocks.contains(Material.VINE) || touchBlocks.contains(Material.WEB) ||
                     touchFaces.stream().anyMatch(Direction::horizontal);
 
-            this.knockBack = spec || expectedVelocity.distance(velocity) < 0.01;
+            double ratio = velocity.length() / expectedVelocity.length();
+            this.knockBack = spec || ratio > 0.8;
 
             if (knockBack) {
                 this.acceptedVelocity = velocity;
@@ -152,6 +150,7 @@ public class MoveEvent extends InEvent<PacketPlayInFlying> {
                 p.velocity.z = 0;
             }
         }
+        */
 
         if (p.status.isTeleporting) {
             Location tpLoc;
@@ -195,6 +194,9 @@ public class MoveEvent extends InEvent<PacketPlayInFlying> {
         this.step = testStep();
         this.jump = testJump();
 
+        this.acceptedVelocity = testVelocity();
+        this.knockBack = this.acceptedVelocity != null;
+
         return true;
     }
 
@@ -210,6 +212,83 @@ public class MoveEvent extends InEvent<PacketPlayInFlying> {
         return friction;
     }
 
+    /*
+    private Key computeKey() {
+        if ((p.physics.onGround && !onGround) || (velocity.x == 0.0 && velocity.z == 0.0 && onGround)) {
+            return p.physics.key;
+        }
+        double prevX;
+        double prevZ;
+        if (p.velocity.firstTick) {
+            prevX = p.velocity.x;
+            prevZ = p.velocity.z;
+        } else {
+            prevX = p.physics.velocity.x;
+            prevZ = p.physics.velocity.z;
+            if (p.physics.wasOnGround) {
+                prevX *= oldFriction;
+                prevZ *= oldFriction;
+            } else {
+                prevX *= 0.91;
+                prevZ *= 0.91;
+            }
+            if (Math.abs(prevX) < 0.005) {
+                prevX = 0;
+            }
+            if (Math.abs(prevZ) < 0.005) {
+                prevZ = 0;
+            }
+        }
+
+        if (p.status.hitSlowdown) {
+            prevX *= 0.6;
+            prevZ *= 0.6;
+        }
+
+        double accelX = velocity.x - prevX;
+        double accelZ = velocity.z - prevZ;
+
+        System.out.println(velocity.x + ", "+velocity.z + ", "+accelX + ", "+accelZ);
+
+        int precision = String.valueOf((int) Math.abs(Math.max(to.x, to.z))).length();
+        precision = 15 - precision;
+        double preD = 1.2 * Math.pow(10, -Math.max(3, precision - 5));
+
+        Key key = Key.NONE;
+        if (Math.abs(accelX) + Math.abs(accelZ) > preD) {
+            float motionYaw = (float) (Math.toDegrees(Math.atan2(accelZ, accelX)) - 90 - to.yaw);
+            while (motionYaw > 360) {
+                motionYaw -= 360;
+            }
+            while (motionYaw < 0) {
+                motionYaw += 360;
+            }
+            motionYaw /= 45f;
+            int dir = NumberConversions.round(motionYaw);
+            if (dir == 0 || dir == 8) {
+                key = Key.W;
+            } else if (dir == 1) {
+                key = Key.W_D;
+            } else if (dir == 2) {
+                key = Key.D;
+            } else if (dir == 3) {
+                key = Key.S_D;
+            } else if (dir == 4) {
+                key = Key.S;
+            } else if (dir == 5) {
+                key = Key.S_A;
+            } else if (dir == 6) {
+                key = Key.A;
+            } else if (dir == 7) {
+                key = Key.W_A;
+            }
+        }
+
+        return key;
+    }
+
+    // Wrong condition when player stop pressing any key.
+    // Wrong condition when jumping
     private Key computeKey() {
         Vector3D prev = new Vector3D(p.physics.velocity.x, 0, p.physics.velocity.z);
 
@@ -236,10 +315,15 @@ public class MoveEvent extends InEvent<PacketPlayInFlying> {
         }
         double dX = velocity.x;
         double dZ = velocity.z;
-        dX /= p.velocity.firstTick ? 1 : newFriction;
-        dZ /= p.velocity.firstTick ? 1 : newFriction;
+        System.out.println(dX + ", " + dZ);
+        dX /= p.velocity.firstTick && !p.physics.onGround ? 1 : oldFriction;
+        dZ /= p.velocity.firstTick && !p.physics.onGround ? 1 : oldFriction;
         dX -= p.velocity.firstTick ? p.velocity.x : prev.x;
         dZ -= p.velocity.firstTick ? p.velocity.z : prev.z;
+
+        if(Math.abs(dX) < 1E-6 || Math.abs(dZ) < 1E-6){
+            return Key.NONE;
+        }
 
         Vector3D accelDir = new Vector3D(dX, 0, dZ).normalize();
         Vector3D yaw = MathUtils.getDirection(to.yaw, 0).normalize();
@@ -248,23 +332,24 @@ public class MoveEvent extends InEvent<PacketPlayInFlying> {
 
         double cross = yaw.z * accelDir.x - accelDir.z * yaw.x;
 
-        int dir = NumberConversions.round(angle / 45);
-
         Key key = Key.NONE;
-        if (dir == 0) {
+        if (Math.abs(angle - 0) < 1) {
             key = Key.W;
-        } else if (dir == 1) {
+        } else if (Math.abs(angle - 45) < 1) {
             key = cross > 0 ? Key.W_A : Key.W_D;
-        } else if (dir == 2) {
+        } else if (Math.abs(angle - 90) < 1) {
             key = cross > 0 ? Key.A : Key.D;
-        } else if (dir == 3) {
+        } else if (Math.abs(angle - 135) < 1) {
             key = cross > 0 ? Key.S_A : Key.S_D;
-        } else if (dir == 4) {
+        } else if (Math.abs(angle - 180) < 1) {
             key = Key.S;
         }
 
+        System.out.println(key + ", " + angle);
+
         return key;
     }
+    */
 
     private boolean testTouchCeiling() {
         Vector3D pos = p.physics.position.newY(to.y);
@@ -357,11 +442,53 @@ public class MoveEvent extends InEvent<PacketPlayInFlying> {
                 (dY == expectedDY || touchCeiling);
     }
 
+    private Vector3D testVelocity() {
+        if (p.velocity.x == 0 && p.velocity.y == 0 && p.velocity.z == 0) {
+            return null;
+        }
+        double speedPotMultiplier = 1 + p.getPotionAmplifier(PotionEffectType.SPEED) * 0.2;
+        double sprintMultiplier = p.status.isSprinting ? 1.3 : 1;
+        double weirdConstant = jump && p.status.isSprinting ? 0.2518462 : 0.098;
+        double baseMultiplier = 5 * p.bukkit.getWalkSpeed() * speedPotMultiplier;
+        double maxDiscrepancy = weirdConstant * baseMultiplier * sprintMultiplier + 0.003;
+
+        double x = p.status.hitSlowdown ? 0.6 * p.velocity.x : p.velocity.x;
+        double y = p.velocity.y;
+        double z = p.status.hitSlowdown ? 0.6 * p.velocity.z : p.velocity.z;
+
+        if (!((touchFaces.contains(Direction.UP) && y > 0) || (touchFaces.contains(Direction.DOWN) && y < 0)) &&
+                Math.abs(y - velocity.y) > 0.01 &&
+                !jump && !step) {
+            failedVelocity = true;
+            return null;
+        }
+
+        double minX = x - maxDiscrepancy;
+        double maxX = x + maxDiscrepancy;
+        double minZ = z - maxDiscrepancy;
+        double maxZ = z + maxDiscrepancy;
+        if (!((touchFaces.contains(Direction.EAST) && x > 0) || (touchFaces.contains(Direction.WEST) && x < 0)) &&
+                !(velocity.x <= maxX && velocity.x >= minX)) {
+            failedVelocity = true;
+            return null;
+        }
+        if (!((touchFaces.contains(Direction.SOUTH) && z > 0) || (touchFaces.contains(Direction.NORTH) && z < 0)) &&
+                !(velocity.z <= maxZ && velocity.z >= minZ)) {
+            failedVelocity = true;
+            return null;
+        }
+
+        p.velocity.x = p.velocity.y = p.velocity.z = 0;
+
+        return new Vector3D(x, y, z);
+    }
+
     @Override
     public void post() {
         HPlayer.Physics physics = p.physics;
 
         physics.position = to;
+        physics.wasOnGround = physics.onGround;
         physics.onGround = onGround;
         physics.onGroundReally = onGroundReally;
         physics.prevVelocity = physics.velocity;

@@ -191,6 +191,11 @@ public class PackerBase {
 
         ItemStack itemStack = packet.getItemStack();
 
+        // TODO: Kick player here?
+        if (itemStack == null) {
+            return null;
+        }
+
         Vector3D cursorPos = new Vector3D(packet.d(), packet.e(), packet.f());
 
         Vector3D placePos = new Vector3D(x, y, z);

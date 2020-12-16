@@ -152,6 +152,7 @@ public class HPlayer {
 
         public Location position;
         public boolean onGround;
+        public boolean wasOnGround;
         public boolean onGroundReally;
         public Vector3D prevVelocity;
         public Vector3D velocity;
