@@ -30,7 +30,6 @@ public class HPlayer {
 
     private static final Horizon inst = JavaPlugin.getPlugin(Horizon.class);
 
-    public final List<Pair<Location, Long>> teleports = new CopyOnWriteArrayList<>();
     public final List<AttributeEvent.AttributeModifier> moveFactors = new CopyOnWriteArrayList<>();
     public final Queue<Pair<Integer, Long>> pings = new ConcurrentLinkedQueue<>();
     public final Map<Integer, Runnable> simulatedCmds = new ConcurrentHashMap<>();
@@ -44,6 +43,7 @@ public class HPlayer {
     public final Physics physics;
     public final Status status;
     public final Velocity velocity;
+    public final Teleport teleport;
     private final Map<Detection, CheckBase> checks;
 
     public HPlayer(Player bukkit) {
@@ -66,6 +66,7 @@ public class HPlayer {
         this.physics = new Physics();
         this.status = new Status();
         this.velocity = new Velocity();
+        this.teleport = new Teleport();
 
         inst.getPlayers().put(bukkit.getUniqueId(), this);
     }
@@ -175,7 +176,6 @@ public class HPlayer {
         public int ping;
         public boolean isSneaking;
         public boolean isSprinting;
-        public boolean isTeleporting;
         public boolean hitSlowdown;
 
         public boolean isEating, isPullingBow, isBlocking;
@@ -190,7 +190,11 @@ public class HPlayer {
     public class Velocity {
 
         public float x, y, z;
-        public boolean firstTick;
-        public long time;
+    }
+
+    public class Teleport {
+
+        public boolean teleporting;
+        public Location location;
     }
 }

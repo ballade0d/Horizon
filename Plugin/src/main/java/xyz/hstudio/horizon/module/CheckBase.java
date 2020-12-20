@@ -50,4 +50,7 @@ public abstract class CheckBase {
 
     public void sent(OutEvent<?> event) {
     }
+
+    public void tickAsync(int tick) {
+    }
 }

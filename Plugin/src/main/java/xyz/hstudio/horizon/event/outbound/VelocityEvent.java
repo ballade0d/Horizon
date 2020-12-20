@@ -23,8 +23,6 @@ public class VelocityEvent extends OutEvent<PacketPlayOutEntityVelocity> {
             p.velocity.x = this.x;
             p.velocity.y = this.y;
             p.velocity.z = this.z;
-            p.velocity.firstTick = true;
-            p.velocity.time = System.currentTimeMillis();
         });
     }
 }

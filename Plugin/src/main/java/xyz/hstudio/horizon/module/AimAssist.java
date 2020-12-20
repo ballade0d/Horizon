@@ -1,6 +1,5 @@
 package xyz.hstudio.horizon.module;
 
-import lombok.val;
 import xyz.hstudio.horizon.HPlayer;
 import xyz.hstudio.horizon.event.InEvent;
 import xyz.hstudio.horizon.event.inbound.MoveEvent;
@@ -26,6 +25,7 @@ public class AimAssist extends CheckBase {
         return sensitivity / 0.5 * 100;
     }
 
+    @Override
     public void received(InEvent<?> event) {
         if (event instanceof MoveEvent) {
             gcd((MoveEvent) event);
@@ -38,21 +38,18 @@ public class AimAssist extends CheckBase {
         }
 
         float pitch = e.to.pitch;
-
         float deltaPitch = Math.abs(pitch - p.physics.position.pitch);
 
         if (deltaPitch == 0) {
             return;
         }
 
-        val gcd = MathUtils.gcd(deltaPitch, lastDeltaPitch);
-
+        float gcd = MathUtils.gcd(deltaPitch, lastDeltaPitch);
         if (gcd < 0.00001) {
             System.out.println("Invalid GCD");
         }
 
         double sensitivity = sensToPercent(gcdToSensitive(gcd));
-
         double o = modulusRotation(sensitivity, pitch);
         int len = String.valueOf(o).length();
         if (o == 0.0) {

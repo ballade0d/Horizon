@@ -4,7 +4,6 @@ import net.minecraft.server.v1_8_R3.PacketPlayOutPosition;
 import xyz.hstudio.horizon.HPlayer;
 import xyz.hstudio.horizon.event.OutEvent;
 import xyz.hstudio.horizon.util.Location;
-import xyz.hstudio.horizon.util.Pair;
 
 public class TeleportEvent extends OutEvent<PacketPlayOutPosition> {
 
@@ -25,11 +24,9 @@ public class TeleportEvent extends OutEvent<PacketPlayOutPosition> {
 
     @Override
     public void post() {
-        p.status.isTeleporting = true;
-        Location loc = new Location(p.getWorld(), x, y, z, yaw % 360f, pitch % 360f);
-        p.teleports.add(new Pair<>(loc, System.currentTimeMillis()));
-        if (p.teleports.size() > 200) {
-            p.teleports.remove(0);
-        }
+        p.sendSimulatedAction(() -> {
+            p.teleport.teleporting = true;
+            p.teleport.location = new Location(p.getWorld(), x, y, z, yaw % 360f, pitch % 360f);
+        });
     }
 }

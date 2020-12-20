@@ -52,17 +52,16 @@ public class Async implements Runnable {
 
     @Override
     public void run() {
-        decay();
-        trackEntities();
-
-        tick.incrementAndGet();
-    }
-
-    private void decay() {
         inst.getPlayers().values().stream()
                 .map(HPlayer::getChecks)
                 .flatMap(Collection::stream)
-                .forEach(check -> check.decay(tick.get()));
+                .forEach(check -> {
+                    check.tickAsync(tick.get());
+                    check.decay(tick.get());
+                });
+        trackEntities();
+
+        tick.incrementAndGet();
     }
 
     private void trackEntities() {

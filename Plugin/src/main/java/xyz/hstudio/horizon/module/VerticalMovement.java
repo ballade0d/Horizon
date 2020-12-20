@@ -28,6 +28,7 @@ public class VerticalMovement extends CheckBase {
         super(p, 1, 10, 10);
     }
 
+    @Override
     public void received(InEvent<?> event) {
         if (event instanceof MoveEvent) {
             move((MoveEvent) event);
@@ -38,7 +39,7 @@ public class VerticalMovement extends CheckBase {
         float deltaY = (float) e.velocity.y;
         float estimatedYVelocity = (this.estimatedYVelocity + -0.08F) * 0.98F;
         boolean skip = false;
-        if (e.step) {
+        if (e.step || e.teleport) {
             estimatedYVelocity = 0.0F;
             skip = true;
         } else if (e.jump || e.knockBack) {

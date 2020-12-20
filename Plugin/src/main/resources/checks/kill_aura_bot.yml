@@ -1,0 +1,17 @@
+command_only: true
+# The update interval of the bot.
+# Measured in ticks.
+update_interval: 2
+xz_distance: 3.3
+y_distance: 2.0
+offset:
+  x: 0.5
+  y: 0.8
+  z: 0.5
+show_damage: true
+show_swing: true
+show_armor: true
+realistic_ping: true
+# Not recommended to enable it on bungee servers (may cause problems).
+# Recommended to enable it on a single server / waterfall servers.
+async_packet: false

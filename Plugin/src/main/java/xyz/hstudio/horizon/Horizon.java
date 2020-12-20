@@ -9,6 +9,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import xyz.hstudio.horizon.configuration.Config;
+import xyz.hstudio.horizon.module.KillAuraBot;
 import xyz.hstudio.horizon.task.Async;
 import xyz.hstudio.horizon.task.Sync;
 import xyz.hstudio.horizon.util.BlockUtils;
@@ -54,6 +55,9 @@ public final class Horizon extends JavaPlugin {
             saveResource("config.yml", true);
         }
         Config.load(Yaml.loadConfiguration(configFile));
+
+        // Load the config of checks
+        KillAuraBot.init();
 
         // Register for joined players
         Bukkit.getOnlinePlayers().forEach(HPlayer::new);

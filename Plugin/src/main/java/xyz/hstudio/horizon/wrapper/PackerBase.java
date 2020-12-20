@@ -117,7 +117,9 @@ public class PackerBase {
         if (interactType == null) {
             Vector3D pos = new Vector3D(nmsPos.getX(), nmsPos.getY(), nmsPos.getZ());
             BlockBase block = p.getWorld().getBlock(pos);
-            if (block == null) return null;
+            if (block == null) {
+                return null;
+            }
 
             Direction dir;
             switch (nmsDir) {
@@ -146,7 +148,9 @@ public class PackerBase {
             return new BlockDigEvent(p, pos, dir, digType, block);
         }
         org.bukkit.inventory.ItemStack itemStack = p.inventory.mainHand();
-        if (itemStack == null) return null;
+        if (itemStack == null) {
+            return null;
+        }
 
         return new ItemInteractEvent(p, interactType, itemStack);
     }
@@ -191,16 +195,15 @@ public class PackerBase {
 
         ItemStack itemStack = packet.getItemStack();
 
-        // TODO: Kick player here?
-        if (itemStack == null) {
-            return null;
-        }
-
         Vector3D cursorPos = new Vector3D(packet.d(), packet.e(), packet.f());
 
         Vector3D placePos = new Vector3D(x, y, z);
 
         if (!targetPos.equals(INVALID_7) && !targetPos.equals(INVALID_8)) {
+            if (itemStack == null) {
+                // TODO: The player probably placed a null block, kick him?
+                return null;
+            }
             org.bukkit.Material mat = CraftMagicNumbers.getMaterial(itemStack.getItem());
             BlockInteractEvent.InteractType placeType;
             if (mat != null && mat != org.bukkit.Material.AIR) {
@@ -212,10 +215,9 @@ public class PackerBase {
             return new BlockInteractEvent(p, targetPos, cursorPos, placePos, dir, placeType);
         } else {
             if (itemStack == null) {
-                // Interact with nothing in hand, return
+                // Interact with nothing in hand.
                 return null;
             }
-
             return new StartUseItemEvent(p, CraftItemStack.asCraftMirror(itemStack));
         }
     }

@@ -1,13 +1,11 @@
 package xyz.hstudio.horizon.configuration;
 
-import lombok.RequiredArgsConstructor;
 import xyz.hstudio.horizon.Logger;
 import xyz.hstudio.horizon.util.Yaml;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
-@RequiredArgsConstructor
 public abstract class ConfigBase {
 
     public static void load(Class<? extends ConfigBase> clazz, Yaml yaml, Yaml def) {

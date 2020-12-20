@@ -36,7 +36,9 @@ public class WorldBase {
 
     public BlockBase getBlock(int x, int y, int z) {
         Chunk chunk = worldServer.chunkProviderServer.getChunkIfLoaded(x >> 4, z >> 4);
-        if (chunk == null) return null;
+        if (chunk == null) {
+            return null;
+        }
         return new BlockBase(this, chunk.getTypeAbs(x, y, z).getBlockData(), x, y, z);
     }
 
@@ -56,8 +58,12 @@ public class WorldBase {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (!(obj instanceof WorldBase)) return false;
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof WorldBase)) {
+            return false;
+        }
         return bukkit().getUID().equals(((WorldBase) obj).bukkit().getUID());
     }
 }
