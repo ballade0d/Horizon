@@ -161,11 +161,11 @@ public class KillAuraBot extends CheckBase {
 
             boolean sprinting = ThreadLocalRandom.current().nextBoolean();
             if (sprinting) {
-                setSneaking(false);
-                setSprinting(true);
+                bot.setSneaking(false);
+                bot.setSprinting(true);
             } else {
-                setSprinting(false);
-                setSneaking(true);
+                bot.setSprinting(false);
+                bot.setSneaking(true);
             }
 
             if (show_swing) {
@@ -207,7 +207,7 @@ public class KillAuraBot extends CheckBase {
         return pos.plus(MathHelper.sin(yaw) * xz_distance, y_distance, MathHelper.cos(yaw) * -xz_distance);
     }
 
-    public void spawn(HPlayer p) {
+    private void spawn() {
         Packet<?> packet;
         packet = new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER, bot);
         p.pipeline.writeAndFlush(packet);
@@ -215,7 +215,7 @@ public class KillAuraBot extends CheckBase {
         p.pipeline.writeAndFlush(packet);
     }
 
-    public void destroy(HPlayer p) {
+    private void destroy() {
         Packet<?> packet;
         packet = new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.REMOVE_PLAYER, bot);
         p.pipeline.writeAndFlush(packet);
@@ -223,34 +223,26 @@ public class KillAuraBot extends CheckBase {
         p.pipeline.writeAndFlush(packet);
     }
 
-    public void updatePing(HPlayer p) {
+    private void updatePing() {
         Packet<?> packet;
         bot.ping = RandomUtils.randomBoundaryInt(100, 500);
         packet = new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.UPDATE_LATENCY, bot);
         p.pipeline.writeAndFlush(packet);
     }
 
-    public void setSneaking(boolean sneaking) {
-        bot.setSneaking(sneaking);
-    }
-
-    public void setSprinting(boolean sprinting) {
-        bot.setSprinting(sprinting);
-    }
-
-    public void updateStatus(HPlayer p) {
+    private void updateStatus() {
         Packet<?> packet;
         packet = new PacketPlayOutEntityMetadata(bot.getId(), bot.getDataWatcher(), true);
         p.pipeline.writeAndFlush(packet);
     }
 
-    public void swingArm(HPlayer p) {
+    private void swingArm() {
         Packet<?> packet;
         packet = new PacketPlayOutAnimation(bot, 0);
         p.pipeline.writeAndFlush(packet);
     }
 
-    public void damage(HPlayer p) {
+    private void damage() {
         double oldHealth = bot.getHealth();
         double newHealth = RandomUtils.randomBoundaryInt(1, 19);
         bot.getDataWatcher().watch(6, newHealth);
@@ -261,7 +253,7 @@ public class KillAuraBot extends CheckBase {
         }
     }
 
-    public void move(HPlayer p, double x, double y, double z, float yaw, float pitch) {
+    private void move(double x, double y, double z, float yaw, float pitch) {
         Packet<?> packet;
 
         Vector3D relative = new Vector3D(x, y, z)
@@ -284,7 +276,7 @@ public class KillAuraBot extends CheckBase {
         p.pipeline.writeAndFlush(packet);
     }
 
-    public void setArmor(HPlayer p) {
+    private void setArmor() {
         Packet<?> packet;
         ItemStack itemStack;
         itemStack = HELMET[ThreadLocalRandom.current().nextInt(HELMET.length)];
