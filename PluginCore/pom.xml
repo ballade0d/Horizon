@@ -5,7 +5,7 @@
     <parent>
         <artifactId>Horizon</artifactId>
         <groupId>xyz.hstudio</groupId>
-        <version>BETA15</version>
+        <version>BETA16</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -46,22 +46,27 @@
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot1.8.8</artifactId>
             <version>1.8.8</version>
-            <systemPath>D:/Minecraft/Plugin/Cores/Spigot1.8.8.jar</systemPath>
+            <systemPath>C:/Minecraft/Plugin/Cores/Spigot1.8.8.jar</systemPath>
             <scope>system</scope>
         </dependency>
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot1.12.2</artifactId>
             <version>1.12.2</version>
-            <systemPath>D:/Minecraft/Plugin/Cores/Spigot1.12.2.jar</systemPath>
+            <systemPath>C:/Minecraft/Plugin/Cores/Spigot1.12.2.jar</systemPath>
             <scope>system</scope>
         </dependency>
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot1.13.2</artifactId>
             <version>1.13.2</version>
-            <systemPath>D:/Minecraft/Plugin/Cores/Spigot1.13.2.jar</systemPath>
+            <systemPath>C:/Minecraft/Plugin/Cores/Spigot1.13.2.jar</systemPath>
             <scope>system</scope>
+        </dependency>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>8.0.22</version>
         </dependency>
         <dependency>
             <groupId>me.clip</groupId>
@@ -80,6 +85,18 @@
             <artifactId>ProtocolSupport</artifactId>
             <version>513e8f0371</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.10</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.googlecode.json-simple</groupId>
+            <artifactId>json-simple</artifactId>
+            <version>1.1.1</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 
