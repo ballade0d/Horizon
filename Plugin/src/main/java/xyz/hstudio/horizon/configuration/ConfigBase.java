@@ -8,6 +8,8 @@ import java.lang.reflect.Modifier;
 
 public abstract class ConfigBase {
 
+    public boolean discord_integration_enabled;
+
     public static void load(Class<? extends ConfigBase> clazz, Yaml yaml, Yaml def) {
         for (Field field : clazz.getFields()) {
             LoadInfo annotation = field.getAnnotation(LoadInfo.class);

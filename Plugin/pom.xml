@@ -29,6 +29,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>8.0.22</version>
+        </dependency>
+        <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
             <version>1.8.8-R0.1-SNAPSHOT</version>
@@ -39,6 +44,13 @@
             <artifactId>spigot1.8.8</artifactId>
             <version>1.8.8</version>
             <systemPath>C:/Minecraft/Plugin/Cores/Spigot1.8.8.jar</systemPath>
+            <scope>system</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.spigotmc</groupId>
+            <artifactId>spigot1.12.2</artifactId>
+            <version>1.12.2</version>
+            <systemPath>C:/Minecraft/Plugin/Cores/Spigot1.12.2.jar</systemPath>
             <scope>system</scope>
         </dependency>
         <dependency>
