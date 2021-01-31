@@ -10,22 +10,22 @@ public class Config extends ConfigBase {
     @LoadInfo(path = "prefix")
     public static String PREFIX;
 
-    @LoadInfo(path= "discord_integration.enabled")
-    public boolean discord_integration_enabled = true;
+    @LoadInfo(path = "discord_integration.enabled")
+    public boolean discord_integration_enabled = false;
     @LoadInfo(path = "discord_integration.webhookURL")
     public String discord_integration_webhookURL = "";
 
-    @LoadInfo(path = "MySQL.enabled")
-    public static boolean mysql_enabled = true;
-    @LoadInfo(path = "MySQL.host")
+    @LoadInfo(path = "mysql.enabled")
+    public static boolean mysql_enabled = false;
+    @LoadInfo(path = "mysql.host")
     public static String mysql_host = "";
-    @LoadInfo(path = "MySQL.database")
+    @LoadInfo(path = "mysql.database")
     public static String mysql_database = "";
-    @LoadInfo(path = "MySQL.user")
+    @LoadInfo(path = "mysql.user")
     public static String mysql_user = "";
-    @LoadInfo(path = "MySQL.password")
+    @LoadInfo(path = "mysql.password")
     public static String mysql_password = "";
-    @LoadInfo(path = "MySQL.port")
+    @LoadInfo(path = "mysql.port")
     public static int mysql_port = 3306;
 
     @LoadInfo(path = "kirin.enabled")

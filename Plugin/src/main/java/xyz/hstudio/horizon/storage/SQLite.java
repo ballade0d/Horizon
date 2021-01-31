@@ -1,17 +1,17 @@
 package xyz.hstudio.horizon.storage;
 
-import xyz.hstudio.horizon.configuration.*;
+import xyz.hstudio.horizon.configuration.Config;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 
 public class SQLite {
+
     private Connection connection;
-    private static SQLite instance;
 
     public void setupSql() {
-        instance = this;
         String host = Config.mysql_host;
         String database = Config.mysql_database;
         String user = Config.mysql_user;
@@ -21,14 +21,15 @@ public class SQLite {
         if (Config.mysql_enabled) {
             try {
                 synchronized (this) {
-                    if (getConnection() != null && !getConnection().isClosed()) return;
-
+                    if (getConnection() != null && !getConnection().isClosed()) {
+                        return;
+                    }
                     setConnection(DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + "/" + database + "?autoReconnect=true&useLegacyDatetimeCode=false&serverTimezone=UTC", user, pass));
                     System.out.println(Config.PREFIX + "Connected to MySQL!");
                 }
             } catch (SQLException e) {
                 e.printStackTrace();
-                System.out.println(Config.PREFIX +"Couldn't connect to MySQL!");
+                System.out.println(Config.PREFIX + "Failed to connect to MySQL!");
             }
 
             createTables();
@@ -61,9 +62,4 @@ public class SQLite {
     private Connection getConnection() {
         return this.connection;
     }
-
-    public static SQLite getInstance() {
-        return instance;
-    }
-
 }

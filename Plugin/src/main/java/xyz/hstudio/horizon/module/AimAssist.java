@@ -7,7 +7,7 @@ import xyz.hstudio.horizon.util.MathUtils;
 
 public class AimAssist extends CheckBase {
 
-    double lastPlayerSensitivity = 0;
+    private double lastSensitivity = 0;
     private float lastDeltaPitch = 0f;
     private int buffer = 0;
 
@@ -30,9 +30,47 @@ public class AimAssist extends CheckBase {
     @Override
     public void received(InEvent<?> event) {
         if (event instanceof MoveEvent) {
-            gcd((MoveEvent) event);
             mousePrediction((MoveEvent) event);
+            gcd((MoveEvent) event);
         }
+    }
+
+    /**
+     * This false flags with large pitch movements but not with OptiFine zoom :)
+     */
+    private void mousePrediction(MoveEvent e) {
+
+        float deltaPitch = Math.abs(e.to.pitch - e.from.pitch);
+        float gcd = MathUtils.gcd(deltaPitch, lastDeltaPitch);
+        double sensitivity = sensToPercent(gcdToSensitive(gcd));
+
+        /*
+        // Check if sensitivity is invalid
+        if (sensitivity > 200 || sensitivity < 0) {
+            System.out.println("Invalid sensitivity");
+        }
+        */
+
+        // Try to predict rotation using sensitivity.
+        // TODO improve this
+
+        double f1 = ((lastSensitivity * 0.6f + 0.2f) * lastDeltaPitch);
+        double mouseDelta = (e.to.pitch - e.from.pitch) / f1 * 0.15;
+        double expectedPitch = e.from.pitch + mouseDelta;
+
+        // Check if difference between actual and expected is too big.
+        // Ideally the buffer isn't needed.
+        if (Math.abs(e.to.pitch - expectedPitch) >= 3 && buffer++ >= 3) {
+            buffer = 0;
+            // System.out.println("Unexpected rotation! " + Math.abs(e.to.pitch - expectedPitch));
+        }
+
+        /*
+        System.out.println("expected: " + expectedPitch);
+        System.out.println("actual: " + e.to.pitch);
+        */
+
+        lastSensitivity = sensitivity;
     }
 
     private void gcd(MoveEvent e) {
@@ -41,7 +79,7 @@ public class AimAssist extends CheckBase {
         }
 
         float pitch = e.to.pitch;
-        float deltaPitch = Math.abs(pitch - p.physics.position.pitch);
+        float deltaPitch = Math.abs(pitch - e.from.pitch);
 
         if (deltaPitch == 0) {
             return;
@@ -59,47 +97,11 @@ public class AimAssist extends CheckBase {
             // Add a lot of vl?
             System.out.println("Invalid A");
         }
+        // This check could false, maybe add a buffer?
         if (sensitivity > 99 && o > 0 && len > 0 && len < 8) {
             System.out.println("Invalid B len:" + len);
         }
 
         lastDeltaPitch = deltaPitch;
-    }
-
-    /**
-     * This false flags with large pitch movements but not with OptiFine zoom :)
-     */
-    private void mousePrediction(MoveEvent e) {
-        // Code stolen from above
-        float pitch = e.to.pitch;
-
-        float deltaPitch = Math.abs(pitch - p.physics.position.pitch);
-        val gcd = MathUtils.gcd(deltaPitch, lastDeltaPitch);
-        double sensitivity = sensToPercent(gcdToSensitive(gcd));
-
-        // Check if sensitivity is invalid
-//        if (sensitivity > 200 || sensitivity < 0) {
-//            System.out.println("Invalid sensitivity");
-//        }
-
-        // Try to predict rotation using sensitivity.
-        // TODO improve this
-
-        double f1 = ((lastPlayerSensitivity * 0.6f + 0.2f) * lastDeltaPitch);
-        double mouseDelta = (e.to.pitch - e.from.pitch) / f1 * 0.15;
-        double expectedPitch = e.from.pitch + mouseDelta;
-
-        // Check if difference between actual and expected is too big.
-        // Ideally the buffer isn't needed.
-        if (Math.abs(e.to.pitch - expectedPitch) >= 3 && buffer++ >= 3) {
-            buffer = 0;
-            System.out.println("Unexpected rotation!");
-            System.out.println(Math.abs(e.to.pitch - expectedPitch));
-        }
-
-//        System.out.println("expected: " + expectedPitch);
-//        System.out.println("actual: " + e.to.pitch);
-
-        lastPlayerSensitivity = sensitivity;
     }
 }

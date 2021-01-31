@@ -8,10 +8,9 @@ import java.lang.reflect.Modifier;
 
 public abstract class ConfigBase {
 
-    public boolean discord_integration_enabled;
-
     public static void load(Class<? extends ConfigBase> clazz, Yaml yaml, Yaml def) {
         for (Field field : clazz.getFields()) {
+            field.setAccessible(true);
             LoadInfo annotation = field.getAnnotation(LoadInfo.class);
             if (annotation == null || !Modifier.isStatic(field.getModifiers())) {
                 continue;
@@ -23,15 +22,17 @@ public abstract class ConfigBase {
 
             try {
                 field.set(null, value);
-            } catch (Exception ignore) {
-                Logger.msg("WARN", "Failed to load the value " + path + " in the config! Using default value.");
+            } catch (Exception e) {
+                Logger.msg("WARN", "Failed to load the value " + path + " in the config! Using default value. Stacktrace:");
+                e.printStackTrace();
                 value = def.get(path);
                 try {
                     field.set(null, value);
-                } catch (Exception e) {
-                    e.printStackTrace();
+                } catch (Exception ignore) {
                 }
             }
+
+            field.setAccessible(false);
         }
     }
 }

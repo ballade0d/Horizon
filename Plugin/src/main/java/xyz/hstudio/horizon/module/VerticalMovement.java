@@ -3,6 +3,7 @@ package xyz.hstudio.horizon.module;
 import xyz.hstudio.horizon.HPlayer;
 import xyz.hstudio.horizon.event.InEvent;
 import xyz.hstudio.horizon.event.inbound.MoveEvent;
+import xyz.hstudio.horizon.util.enums.Direction;
 
 /**
  * Vertical movement check.
@@ -15,11 +16,9 @@ import xyz.hstudio.horizon.event.inbound.MoveEvent;
  * t is the time, measured in ticks
  * <p>
  * we also need to multiply it with vertical air resistance (k = 0.98 in Minecraft)
- *
- * @see xyz.hstudio.horizon.util.Physics
+ * <p>
  * so expectedYVelocity = (prevYVelocity + -0.08 * 1) * 0.98
  */
-
 public class VerticalMovement extends CheckBase {
 
     private float estimatedYVelocity;
@@ -42,7 +41,7 @@ public class VerticalMovement extends CheckBase {
         if (e.step || e.teleport) {
             estimatedYVelocity = 0.0F;
             skip = true;
-        } else if (e.jump || e.knockBack) {
+        } else if (e.jump || e.knockBack || e.onSlime) {
             estimatedYVelocity = deltaY;
             skip = true;
         } else if (e.onGround && !this.p.physics.onGround) {
@@ -52,6 +51,12 @@ public class VerticalMovement extends CheckBase {
             estimatedYVelocity = deltaY == 0 ? 0 : -(Math.min(Math.abs(deltaY - -0.0784F), Math.abs(deltaY - -0.0754F)) - deltaY);
             skip = true;
         }
+        // Blocks above
+        boolean hitHead = e.touchedFaces.contains(Direction.UP);
+        boolean hasHitHead = p.physics.touchedFaces.contains(Direction.UP);
+        if (hitHead && !hasHitHead) {
+            deltaY = estimatedYVelocity = 0;
+        }
 
         if (!skip) {
             if (e.onGround) {
@@ -60,7 +65,7 @@ public class VerticalMovement extends CheckBase {
 
             float error = Math.abs(deltaY - estimatedYVelocity);
             if (error > 0.001) {
-                System.out.println("Invalid motion! Delta:" + deltaY + ", Error:" + error + ", Estimated:" + estimatedYVelocity);
+                System.out.println("Invalid motion! Delta:" + deltaY + ", Estimated:" + estimatedYVelocity + ", Error:" + error);
             }
         }
         this.estimatedYVelocity = estimatedYVelocity;

@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 public class HitBox extends CheckBase {
 
     private static final int N = 5;
+
     private final float[] yaws = new float[N], pitches = new float[N];
     private double buffer;
 
@@ -104,7 +105,7 @@ public class HitBox extends CheckBase {
             double distance = point.distance(next);
             double rate = distance / 10;
             while (tracer2D.trace(rate) < distance) {
-                Vector3D dir = MathUtils.getDirection((float) tracer2D.x, (float) tracer2D.y);
+                Vector3D dir = MathUtils.getDirection(tracer2D.x, tracer2D.y);
                 Ray3D ray3D = new Ray3D(headPos, dir);
 
                 if (cube.intersectsRay(ray3D, 0, Float.MAX_VALUE) != null) {

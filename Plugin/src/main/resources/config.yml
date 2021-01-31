@@ -1,1 +1,13 @@
 prefix: ''
+
+discord_integration:
+  enabled: false
+  webhookURL: ''
+
+mysql:
+  enabled: false
+  host: ''
+  database: ''
+  user: ''
+  password: ''
+  port: 3306

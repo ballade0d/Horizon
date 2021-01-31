@@ -28,24 +28,24 @@ public class GroundSpoof extends CheckBase {
             return;
         }
         /*
-        if (e.onGroundReally || player.currentTick < 20 || player.vehicleBypass || e.stepLegitly ||
-                e.isTeleport || e.piston || !e.collidingEntities.isEmpty() || player.isFlying()) {
+        if (player.currentTick < 20 || player.vehicleBypass ||
+                e.piston || !e.collidingEntities.isEmpty() || player.isFlying()) {
             return
         }
          */
         if (e.onGround) {
             // Do another check to make sure if player is really not on ground
             // to avoid some false positives.
-            if (e.to.isOnGround(p, false, 0.3)) {
+            if (e.to.onGround(p, false, 0.3)) {
                 return;
             }
 
-            Location checkLoc = new Location(e.to.world, p.physics.position.x, e.to.y, p.physics.position.z);
-            if (checkLoc.isOnGround(p, false, 0.3)) {
+            Location checkLoc = new Location(e.to.world, e.from.x, e.to.y, e.from.z);
+            if (checkLoc.onGround(p, false, 0.3)) {
                 return;
             }
 
-            AABB aabb = AABB.player().expand(0.0, -0.0001, 0.0).add(e.to);
+            AABB aabb = e.to.toAABB().expand(0.0, -0.0001, 0.0);
             if (aabb.getBlockAABBs(p, p.getWorld(), Material.WEB).isEmpty()) {
                 return;
             }

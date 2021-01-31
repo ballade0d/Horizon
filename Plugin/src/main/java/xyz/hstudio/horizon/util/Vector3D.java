@@ -60,10 +60,6 @@ public class Vector3D {
 
     // Multiply
 
-    public Vector3D multiplyBy(double v) {
-        return new Vector3D(this.x * v, this.y * v, this.z * v);
-    }
-
     public Vector3D multiply(double v) {
         this.x *= v;
         this.y *= v;
@@ -72,10 +68,6 @@ public class Vector3D {
     }
 
     // Divide
-
-    public Vector3D divideBy(double v) {
-        return new Vector3D(this.x / v, this.y / v, this.z / v);
-    }
 
     public Vector3D divide(double v) {
         this.x /= v;
@@ -158,6 +150,10 @@ public class Vector3D {
     public AABB toAABB(double length, double width) {
         width /= 2;
         return new AABB(x - width, y, z - width, x + width, y + length, z + width);
+    }
+
+    public AABB toAABB() {
+        return new AABB(x - 0.3, y, z - 0.3, x + 0.3, y + 1.8, z + 0.3);
     }
 
     @Override

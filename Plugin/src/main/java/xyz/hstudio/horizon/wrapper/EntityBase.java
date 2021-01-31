@@ -1,6 +1,5 @@
 package xyz.hstudio.horizon.wrapper;
 
-import net.minecraft.server.v1_8_R3.AxisAlignedBB;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftEntity;
 import xyz.hstudio.horizon.util.AABB;
 import xyz.hstudio.horizon.util.Location;
@@ -18,7 +17,7 @@ public class EntityBase {
         this.bukkitEntity = entity;
     }
 
-    protected EntityBase(net.minecraft.server.v1_8_R3.Entity entity) {
+    public EntityBase(net.minecraft.server.v1_8_R3.Entity entity) {
         this.entity = entity;
         this.world = new WorldBase(entity.world);
         this.bukkitEntity = entity.getBukkitEntity();
@@ -28,14 +27,9 @@ public class EntityBase {
         return new Location(world, entity.locX, entity.locY, entity.locZ, entity.yaw, entity.pitch);
     }
 
-    public AABB cube() {
-        AxisAlignedBB nmsBox = entity.getBoundingBox();
-        return new AABB(nmsBox.a, nmsBox.b, nmsBox.c, nmsBox.d, nmsBox.e, nmsBox.f);
-    }
-
     public AABB cube(Vector3D pos) {
         Vector3D move = position().subtract(pos);
-        return cube().add(move);
+        return move.toAABB();
     }
 
     public float width() {

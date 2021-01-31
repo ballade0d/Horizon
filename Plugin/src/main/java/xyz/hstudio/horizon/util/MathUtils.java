@@ -5,7 +5,7 @@ import org.bukkit.util.NumberConversions;
 
 public class MathUtils {
 
-    public static Vector3D getDirection(float yaw, float pitch) {
+    public static Vector3D getDirection(double yaw, double pitch) {
         float rotX = (float) Math.toRadians(yaw);
         float rotY = (float) Math.toRadians(pitch);
         double xz = MathHelper.cos(rotY);

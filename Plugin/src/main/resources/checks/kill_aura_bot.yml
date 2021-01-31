@@ -12,6 +12,6 @@ show_damage: true
 show_swing: true
 show_armor: true
 realistic_ping: true
-# Not recommended to enable it on bungee servers (may cause problems).
-# Recommended to enable it on a single server / waterfall servers.
+# Not recommended to enable it on BungeeCord servers (may cause problems).
+# Recommended to enable it on a single server / WaterFall servers.
 async_packet: false

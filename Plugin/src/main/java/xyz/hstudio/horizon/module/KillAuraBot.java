@@ -21,41 +21,11 @@ import xyz.hstudio.horizon.util.RandomUtils;
 import xyz.hstudio.horizon.util.Vector3D;
 import xyz.hstudio.horizon.util.Yaml;
 
-import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
-import static xyz.hstudio.horizon.module.KillAuraBotCfg.*;
-
-class KillAuraBotCfg extends ConfigBase {
-    static final Yaml def = Yaml.loadConfiguration(Horizon.class.getResourceAsStream("check/kill_aura_bot.yml"));
-
-    @LoadInfo(path = "command_only")
-    public static boolean command_only;
-    @LoadInfo(path = "update_interval")
-    public static int update_interval;
-    @LoadInfo(path = "xz_distance")
-    public static double xz_distance;
-    @LoadInfo(path = "y_distance")
-    public static double y_distance;
-    @LoadInfo(path = "offset_x")
-    public static double offset_x;
-    @LoadInfo(path = "offset_y")
-    public static double offset_y;
-    @LoadInfo(path = "offset_z")
-    public static double offset_z;
-    @LoadInfo(path = "show_damage")
-    public static boolean show_damage;
-    @LoadInfo(path = "show_swing")
-    public static boolean show_swing;
-    @LoadInfo(path = "show_armor")
-    public static boolean show_armor;
-    @LoadInfo(path = "realistic_ping")
-    public static boolean realistic_ping;
-    @LoadInfo(path = "async_packet")
-    public static boolean async_packet;
-}
+import static xyz.hstudio.horizon.module.KillAuraBot.Cfg.*;
 
 public class KillAuraBot extends CheckBase {
 
@@ -93,7 +63,6 @@ public class KillAuraBot extends CheckBase {
             new ItemStack(CraftMagicNumbers.getItem(Material.CHAINMAIL_BOOTS)),
             new ItemStack(CraftMagicNumbers.getItem(Material.DIAMOND_BOOTS)),
     };
-
     private EntityPlayer bot;
 
     public KillAuraBot(HPlayer p) {
@@ -109,11 +78,7 @@ public class KillAuraBot extends CheckBase {
     }
 
     public static void init() {
-        File file = new File(inst.getDataFolder(), "checks/kill_aura_bot.yml");
-        if (!file.isFile()) {
-            inst.saveResource("checks/kill_aura_bot.yml", true);
-        }
-        ConfigBase.load(KillAuraBotCfg.class, Yaml.loadConfiguration(file), def);
+        CheckBase.init("kill_aura_bot", Cfg.class, def);
     }
 
     public void received(InEvent<?> event) {
@@ -129,10 +94,10 @@ public class KillAuraBot extends CheckBase {
             bot = prepare();
             Location to = computeLoc(p.physics.position, xz_distance, y_distance);
             KillAuraBot.run(() -> {
-                move(p, to.x, to.y, to.z, p.physics.position.yaw, p.physics.position.pitch);
-                spawn(p);
+                move(to.x, to.y, to.z, p.physics.position.yaw, p.physics.position.pitch);
+                spawn();
                 if (show_armor) {
-                    setArmor(p);
+                    setArmor();
                 }
             }, async_packet);
         } else if (event instanceof MoveEvent) {
@@ -141,7 +106,7 @@ public class KillAuraBot extends CheckBase {
                 return;
             }
             KillAuraBot.run(() -> {
-                destroy(p);
+                destroy();
                 bot = null;
             }, async_packet);
         }
@@ -157,7 +122,7 @@ public class KillAuraBot extends CheckBase {
         to.add(new Vector3D(offset_x * ThreadLocalRandom.current().nextDouble(), offset_y * ThreadLocalRandom.current().nextDouble(), offset_z * ThreadLocalRandom.current().nextDouble()));
 
         KillAuraBot.run(() -> {
-            move(p, to.x, to.y, to.z, p.physics.position.yaw, p.physics.position.pitch);
+            move(to.x, to.y, to.z, p.physics.position.yaw, p.physics.position.pitch);
 
             boolean sprinting = ThreadLocalRandom.current().nextBoolean();
             if (sprinting) {
@@ -169,18 +134,18 @@ public class KillAuraBot extends CheckBase {
             }
 
             if (show_swing) {
-                swingArm(p);
+                swingArm();
             }
 
             if (show_damage && tick % 30 == 0) {
-                damage(p);
+                damage();
             }
 
             if (realistic_ping && tick % 40 == 0) {
-                updatePing(p);
+                updatePing();
             }
 
-            updateStatus(p);
+            updateStatus();
         }, async_packet);
     }
 
@@ -268,7 +233,9 @@ public class KillAuraBot extends CheckBase {
         } else {
             packet = new PacketPlayOutEntity.PacketPlayOutRelEntityMoveLook(bot.getId(),
                     (byte) (relative.x * 32), (byte) (relative.y * 32), (byte) (relative.z * 32),
-                    (byte) yaw, (byte) pitch, ThreadLocalRandom.current().nextBoolean());
+                    (byte) yaw, (byte) pitch,
+                    // Random onGround status to avoid bypass.
+                    ThreadLocalRandom.current().nextBoolean());
         }
 
         p.pipeline.writeAndFlush(packet);
@@ -298,5 +265,34 @@ public class KillAuraBot extends CheckBase {
         itemStack = HAND[ThreadLocalRandom.current().nextInt(HAND.length)];
         packet = new PacketPlayOutEntityEquipment(bot.getId(), 0, itemStack);
         p.pipeline.writeAndFlush(packet);
+    }
+
+    static class Cfg extends ConfigBase {
+        static final Yaml def = Yaml.loadConfiguration(Horizon.class.getResourceAsStream("/checks/kill_aura_bot.yml"));
+
+        @LoadInfo(path = "command_only")
+        static boolean command_only;
+        @LoadInfo(path = "update_interval")
+        static int update_interval;
+        @LoadInfo(path = "xz_distance")
+        static double xz_distance;
+        @LoadInfo(path = "y_distance")
+        static double y_distance;
+        @LoadInfo(path = "offset.x")
+        static double offset_x;
+        @LoadInfo(path = "offset.y")
+        static double offset_y;
+        @LoadInfo(path = "offset.z")
+        static double offset_z;
+        @LoadInfo(path = "show_damage")
+        static boolean show_damage;
+        @LoadInfo(path = "show_swing")
+        static boolean show_swing;
+        @LoadInfo(path = "show_armor")
+        static boolean show_armor;
+        @LoadInfo(path = "realistic_ping")
+        static boolean realistic_ping;
+        @LoadInfo(path = "async_packet")
+        static boolean async_packet;
     }
 }

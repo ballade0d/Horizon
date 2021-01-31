@@ -22,7 +22,7 @@ public class AABB {
         this(new Vector3D(minX, minY, minZ), new Vector3D(maxX, maxY, maxZ));
     }
 
-    public static AABB player() {
+    public static AABB def() {
         return new AABB(new Vector3D(-0.3, 0, -0.3), new Vector3D(0.3, 1.8, 0.3));
     }
 
@@ -62,7 +62,7 @@ public class AABB {
         return !(max.z < other.min.z) && !(min.z > other.max.z);
     }
 
-    public List<BlockBase> getBlocks(WorldBase world) {
+    public List<BlockBase> blocks(WorldBase world) {
         List<BlockBase> blocks = new ArrayList<>();
         for (int x = NumberConversions.floor(min.x); x < NumberConversions.ceil(max.x); x++) {
             for (int y = NumberConversions.floor(min.y); y < NumberConversions.ceil(max.y); y++) {
@@ -78,7 +78,7 @@ public class AABB {
         return blocks;
     }
 
-    public Set<Material> getMaterials(WorldBase world) {
+    public Set<Material> materials(WorldBase world) {
         Set<Material> mats = EnumSet.noneOf(Material.class);
         for (int x = NumberConversions.floor(min.x); x < NumberConversions.ceil(max.x); x++) {
             for (int y = NumberConversions.floor(min.y); y < NumberConversions.ceil(max.y); y++) {
@@ -155,7 +155,7 @@ public class AABB {
 
         // gotta do this to catch fences and cobble walls
         AABB expanded = this.add(0, -1, 0, 0, 0, 0);
-        List<BlockBase> blocks = expanded.getBlocks(world);
+        List<BlockBase> blocks = expanded.blocks(world);
 
         for (BlockBase b : blocks) {
             if (exempt.contains(b.type())) {
@@ -176,7 +176,7 @@ public class AABB {
 
         // gotta do this to catch fences and cobble walls
         AABB expanded = this.add(0, -1, 0, 0, 0, 0);
-        List<BlockBase> blocks = expanded.getBlocks(world);
+        List<BlockBase> blocks = expanded.blocks(world);
 
         for (BlockBase b : blocks) {
             AABB[] bAABBs = b.boxes(p);
@@ -200,7 +200,9 @@ public class AABB {
             for (int y = (int) min.y - 1; y <= max.y; y++) {
                 for (int z = (int) (min.z < 0 ? min.z - 1 : min.z); z <= max.z; z++) {
                     BlockBase block = world.getBlock(x, y, z);
-                    if (block == null) continue;
+                    if (block == null) {
+                        continue;
+                    }
                     for (AABB blockBox : block.boxes(p)) {
                         if (blockBox.min.x > this.max.x && blockBox.min.x < bigBox.max.x) {
                             directions.add(Direction.EAST);

@@ -15,6 +15,7 @@ import xyz.hstudio.horizon.network.PacketHandler;
 import xyz.hstudio.horizon.util.Location;
 import xyz.hstudio.horizon.util.Pair;
 import xyz.hstudio.horizon.util.Vector3D;
+import xyz.hstudio.horizon.util.enums.Direction;
 import xyz.hstudio.horizon.wrapper.EntityBase;
 import xyz.hstudio.horizon.wrapper.WorldBase;
 
@@ -55,6 +56,7 @@ public class HPlayer {
                 put(AIM_ASSIST, new AimAssist(HPlayer.this));
                 put(GROUND_SPOOF, new GroundSpoof(HPlayer.this));
                 put(HIT_BOX, new HitBox(HPlayer.this));
+                put(KILL_AURA_BOT, new KillAuraBot(HPlayer.this));
                 put(VERTICAL_MOVEMENT, new VerticalMovement(HPlayer.this));
             }
         };
@@ -158,6 +160,7 @@ public class HPlayer {
         public Vector3D prevVelocity;
         public Vector3D velocity;
         public float friction;
+        public Set<Direction> touchedFaces = Collections.emptySet();
 
         public Physics() {
             this.position = base.position();

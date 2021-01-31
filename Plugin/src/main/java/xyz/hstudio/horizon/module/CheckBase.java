@@ -4,8 +4,12 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.NumberConversions;
 import xyz.hstudio.horizon.HPlayer;
 import xyz.hstudio.horizon.Horizon;
+import xyz.hstudio.horizon.configuration.ConfigBase;
 import xyz.hstudio.horizon.event.InEvent;
 import xyz.hstudio.horizon.event.OutEvent;
+import xyz.hstudio.horizon.util.Yaml;
+
+import java.io.File;
 
 public abstract class CheckBase {
 
@@ -24,6 +28,14 @@ public abstract class CheckBase {
         this.decayAmount = decayAmount;
         this.decayDelay = decayDelay;
         this.decayInterval = decayInterval;
+    }
+
+    public static void init(String cfgName, Class<? extends ConfigBase> clazz, Yaml def) {
+        File file = new File(inst.getDataFolder(), "checks/" + cfgName + ".yml");
+        if (!file.isFile()) {
+            inst.saveResource("checks/" + cfgName + ".yml", true);
+        }
+        ConfigBase.load(clazz, Yaml.loadConfiguration(file), def);
     }
 
     public void decay(long tick) {

@@ -112,7 +112,7 @@ public class Location extends Vector3D {
         return new Location(world, x, y, z, yaw, pitch);
     }
 
-    public boolean isOnGround(HPlayer p, boolean ignoreOnGround, double depth) {
+    public boolean onGround(HPlayer p, boolean ignoreOnGround, double depth) {
         Set<BlockBase> blocks = new HashSet<>();
         blocks.addAll(BlockUtils.getBlocksInLocation(this));
         blocks.addAll(BlockUtils.getBlocksInLocation(this.plus(0, -1, 0)));

@@ -14,9 +14,6 @@ import xyz.hstudio.horizon.wrapper.BlockBase;
 import java.util.List;
 import java.util.Set;
 
-import static xyz.hstudio.horizon.util.Physics.AIR_RESISTANCE_VERTICAL;
-import static xyz.hstudio.horizon.util.Physics.GRAVITATIONAL_ACCELERATION;
-
 public class MoveEvent extends InEvent<PacketPlayInFlying> {
 
     public final Location to;
@@ -55,9 +52,9 @@ public class MoveEvent extends InEvent<PacketPlayInFlying> {
     //This is the friction that affects this move's velocity.
     private float oldFriction;
 
-    public MoveEvent(HPlayer player, Location to, boolean onGround, boolean hasLook, boolean hasPos) {
-        super(player);
-        this.from = player.physics.position;
+    public MoveEvent(HPlayer p, Location to, boolean onGround, boolean hasLook, boolean hasPos) {
+        super(p);
+        this.from = p.physics.position;
         this.to = to;
         this.onGround = onGround;
         this.hasLook = hasLook;
@@ -66,7 +63,7 @@ public class MoveEvent extends InEvent<PacketPlayInFlying> {
 
     @Override
     public boolean pre() {
-        this.velocity = to.minus(p.physics.position);
+        this.velocity = to.minus(from);
 
         this.teleport = testTeleport();
 
@@ -74,10 +71,10 @@ public class MoveEvent extends InEvent<PacketPlayInFlying> {
         this.oldFriction = p.physics.friction;
 
         this.touchedFaces = new AABB(to.x - 0.299999, to.y + 0.000001, to.z - 0.299999, to.x + 0.299999, to.y + 1.799999, to.z + 0.299999).touchingFaces(p, to.world, 0.0001);
-        this.touchedBlocks = AABB.player().expand(-0.001, -0.001, -0.001).add(velocity).getMaterials(to.world);
+        this.touchedBlocks = to.toAABB().expand(-0.001, -0.001, -0.001).materials(to.world);
 
         this.touchCeiling = testTouchCeiling();
-        this.onGroundReally = to.isOnGround(p, false, 0.001);
+        this.onGroundReally = to.onGround(p, false, 0.001);
         this.step = testStep();
         this.jump = testJump();
         this.onSlime = testOnSlime();
@@ -85,6 +82,11 @@ public class MoveEvent extends InEvent<PacketPlayInFlying> {
         this.acceptedVelocity = testVelocity();
         this.knockBack = this.acceptedVelocity != null;
 
+        boolean glidingInUnloadedChunk = Math.abs(velocity.y - -0.098) < 0.0000001 && (acceptedVelocity == null || Math.abs(acceptedVelocity.y - -0.098) > 0.0000001);
+        if (!teleport && glidingInUnloadedChunk) {
+            inst.getSync().teleport(p, from);
+            return false;
+        }
         return true;
     }
 
@@ -94,6 +96,7 @@ public class MoveEvent extends InEvent<PacketPlayInFlying> {
         }
         if (!onGround && hasPos && hasLook && to.equals(p.teleport.location)) {
             inst.getAsync().clearHistory(p.base);
+            p.teleport.teleporting = false;
             return true;
         } else if (!p.bukkit.isSleeping()) {
             inst.getSync().teleport(p, p.teleport.location);
@@ -105,8 +108,7 @@ public class MoveEvent extends InEvent<PacketPlayInFlying> {
     private float computeFriction() {
         float friction = 0.91F;
         if (onGround) {
-            Vector3D pos = p.physics.position;
-            BlockBase b = new Location(to.world, pos.x, pos.y - 1, pos.z).getBlock();
+            BlockBase b = new Location(to.world, from.x, from.y - 1, from.z).getBlock();
             if (b != null) {
                 friction *= b.friction();
             }
@@ -115,19 +117,18 @@ public class MoveEvent extends InEvent<PacketPlayInFlying> {
     }
 
     private boolean testTouchCeiling() {
-        Vector3D pos = p.physics.position.newY(to.y);
-        AABB collisionBox = AABB.player().expand(-0.000001, -0.000001, -0.000001).add(pos);
+        Vector3D pos = from.newY(to.y);
+        AABB collisionBox = pos.toAABB().expand(-0.000001, -0.000001, -0.000001);
         return collisionBox.touchingFaces(p, to.world, 0.0001).contains(Direction.UP);
     }
 
     private boolean testStep() {
-        Vector3D prevPos = p.physics.position;
         Location extrapolate = to;
         // when on ground, Y velocity is inherently 0; no need to do pointless math.
         extrapolate.newY(extrapolate.y + (p.physics.onGroundReally ? -0.0784 :
-                ((p.physics.velocity.y + GRAVITATIONAL_ACCELERATION) * AIR_RESISTANCE_VERTICAL)));
+                ((p.physics.velocity.y - 0.08) * 0.98)));
 
-        AABB box = AABB.player().add(extrapolate);
+        AABB box = extrapolate.toAABB();
         List<AABB> verticalCollision = box.getBlockAABBs(p, p.getWorld(), Material.WEB);
 
         if (verticalCollision.isEmpty() && !p.physics.onGround) {
@@ -143,7 +144,7 @@ public class MoveEvent extends InEvent<PacketPlayInFlying> {
         }
 
         // move to this position, but with clipped Y (moving horizontally)
-        box = AABB.player().add(to.newY(highestVertical)).expand(0, -0.00000000001, 0);
+        box = to.newY(highestVertical).toAABB().expand(0, -0.00000000001, 0);
 
         List<AABB> horizontalCollision = box.getBlockAABBs(p, p.getWorld(), Material.WEB);
 
@@ -151,11 +152,11 @@ public class MoveEvent extends InEvent<PacketPlayInFlying> {
             return false;
         }
 
-        double expectedY = prevPos.y;
+        double expectedY = from.y;
         double highestPointOnAABB = -1;
         for (AABB blockAABB : horizontalCollision) {
             double blockAABBY = blockAABB.max.y;
-            if (blockAABBY - prevPos.y > 0.6) {
+            if (blockAABBY - from.y > 0.6) {
                 return false;
             }
             if (blockAABBY > expectedY) {
@@ -166,7 +167,7 @@ public class MoveEvent extends InEvent<PacketPlayInFlying> {
             }
         }
 
-        return (onGround || onGroundReally) && Math.abs(prevPos.y - highestPointOnAABB) > 0.0001 &&
+        return (onGround || onGroundReally) && Math.abs(from.y - highestPointOnAABB) > 0.0001 &&
                 Math.abs(to.y - expectedY) < 0.0001;
     }
 
@@ -175,19 +176,19 @@ public class MoveEvent extends InEvent<PacketPlayInFlying> {
         int jumpBoostLvl = p.getPotionAmplifier(PotionEffectType.JUMP);
         float expectedDY = Math.max(0.42f + jumpBoostLvl * 0.1f, 0f);
         boolean leftGround = p.physics.onGround && !onGround;
-        float dY = (float) (to.y - p.physics.position.y);
+        float dY = (float) (to.y - from.y);
 
         // Jumping right as you enter a 2-block-high space will not change your motY.
         // When these conditions are met, we'll give them the benefit of the doubt and say that they jumped.
         {
-            AABB box = AABB.player();
+            AABB box = AABB.def();
             box.expand(-0.000001, -0.000001, -0.000001);
             box.add(to.plus(0, expectedDY, 0));
             boolean collidedNow = !box.getBlockAABBs(p, to.world).isEmpty();
 
-            box = AABB.player();
+            box = AABB.def();
             box.expand(-0.000001, -0.000001, -0.000001);
-            box.add(p.physics.position.plus(0, expectedDY, 0));
+            box.add(from.plus(0, expectedDY, 0));
             boolean collidedBefore = !box.getBlockAABBs(p, to.world).isEmpty();
 
             if (collidedNow && !collidedBefore && leftGround && dY == 0) {
@@ -195,7 +196,7 @@ public class MoveEvent extends InEvent<PacketPlayInFlying> {
             }
         }
 
-        Set<Material> touchedBlocks = p.base.cube(to).getMaterials(p.getWorld());
+        Set<Material> touchedBlocks = p.base.cube(to).materials(p.getWorld());
         if (touchedBlocks.contains(Material.WEB)) {
             if (hasPos) {
                 expectedDY *= 0.05;
@@ -212,8 +213,8 @@ public class MoveEvent extends InEvent<PacketPlayInFlying> {
     }
 
     private boolean testOnSlime() {
-        float deltaY = (float) (to.y - p.physics.position.y);
-        BlockBase standingOn = p.physics.position.plus(0, -0.2, 0).getBlock();
+        float deltaY = (float) (to.y - from.y);
+        BlockBase standingOn = from.plus(0, -0.2, 0).getBlock();
         if (standingOn == null || standingOn.type() != Material.SLIME_BLOCK) {
             return false;
         }
@@ -276,6 +277,8 @@ public class MoveEvent extends InEvent<PacketPlayInFlying> {
         physics.prevVelocity = physics.velocity;
         physics.velocity = velocity;
         physics.friction = newFriction;
+
+        physics.touchedFaces = touchedFaces;
 
         p.status.hitSlowdown = false;
     }

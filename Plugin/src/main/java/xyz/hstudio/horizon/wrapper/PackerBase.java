@@ -1,7 +1,6 @@
 package xyz.hstudio.horizon.wrapper;
 
 import io.netty.buffer.Unpooled;
-import lombok.Getter;
 import net.minecraft.server.v1_8_R3.*;
 import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_8_R3.util.CraftMagicNumbers;
@@ -25,13 +24,10 @@ import java.util.UUID;
 
 public class PackerBase {
 
-    protected static final Vector3D INVALID_7 = new Vector3D(-1, 255, -1);
-    protected static final Vector3D INVALID_8 = new Vector3D(-1, -1, -1);
+    private static final Vector3D INVALID_7 = new Vector3D(-1, 255, -1);
+    private static final Vector3D INVALID_8 = new Vector3D(-1, -1, -1);
 
-    @Getter
-    private static final PackerBase inst = new PackerBase();
-
-    public InEvent<?> received(HPlayer p, Object packet) {
+    public static InEvent<?> received(HPlayer p, Object packet) {
         if (packet instanceof PacketPlayInAbilities) {
             return toEvent(p, (PacketPlayInAbilities) packet);
         } else if (packet instanceof PacketPlayInArmAnimation) {
@@ -60,7 +56,7 @@ public class PackerBase {
         return null;
     }
 
-    private InEvent<?> toEvent(HPlayer p, PacketPlayInAbilities packet) {
+    private static InEvent<?> toEvent(HPlayer p, PacketPlayInAbilities packet) {
         PacketDataSerializer serializer = new PacketDataSerializer(Unpooled.buffer(9));
         try {
             packet.b(serializer);
@@ -80,11 +76,11 @@ public class PackerBase {
         return new AbilitiesEvent(p, invulnerable, flying, flyable, inCreative, flyingSpeed, walkingSpeed);
     }
 
-    private InEvent<?> toEvent(HPlayer p, PacketPlayInArmAnimation packet) {
+    private static InEvent<?> toEvent(HPlayer p, PacketPlayInArmAnimation packet) {
         return new ArmSwingEvent(p);
     }
 
-    private InEvent<?> toEvent(HPlayer p, PacketPlayInBlockDig packet) {
+    private static InEvent<?> toEvent(HPlayer p, PacketPlayInBlockDig packet) {
         BlockPosition nmsPos = packet.a();
         EnumDirection nmsDir = packet.b();
         PacketPlayInBlockDig.EnumPlayerDigType nmsType = packet.c();
@@ -155,7 +151,7 @@ public class PackerBase {
         return new ItemInteractEvent(p, interactType, itemStack);
     }
 
-    private InEvent<?> toEvent(HPlayer p, PacketPlayInBlockPlace packet) {
+    private static InEvent<?> toEvent(HPlayer p, PacketPlayInBlockPlace packet) {
         BlockPosition nmsPos = packet.a();
         int x = nmsPos.getX();
         int y = nmsPos.getY();
@@ -200,12 +196,11 @@ public class PackerBase {
         Vector3D placePos = new Vector3D(x, y, z);
 
         if (!targetPos.equals(INVALID_7) && !targetPos.equals(INVALID_8)) {
-            if (itemStack == null) {
+            if (itemStack == null || itemStack.getItem() == null) {
                 // TODO: The player probably placed a null block, kick him?
                 return null;
             }
             org.bukkit.Material mat = CraftMagicNumbers.getMaterial(itemStack.getItem());
-            // NPE thrown at above line
             BlockInteractEvent.InteractType placeType;
             if (mat != null && mat != org.bukkit.Material.AIR) {
                 placeType = BlockInteractEvent.InteractType.PLACE_BLOCK;
@@ -223,7 +218,7 @@ public class PackerBase {
         }
     }
 
-    private InEvent<?> toEvent(HPlayer p, PacketPlayInCloseWindow packet) {
+    private static InEvent<?> toEvent(HPlayer p, PacketPlayInCloseWindow packet) {
         PacketDataSerializer serializer = new PacketDataSerializer(Unpooled.buffer(1));
         try {
             packet.b(serializer);
@@ -236,7 +231,7 @@ public class PackerBase {
         return new WindowCloseEvent(p, id);
     }
 
-    private InEvent<?> toEvent(HPlayer p, PacketPlayInEntityAction packet) {
+    private static InEvent<?> toEvent(HPlayer p, PacketPlayInEntityAction packet) {
         EntityActionEvent.ActionType type;
         switch (packet.b()) {
             case START_SNEAKING:
@@ -265,7 +260,7 @@ public class PackerBase {
         return new EntityActionEvent(p, type, jumpBoost);
     }
 
-    private InEvent<?> toEvent(HPlayer p, PacketPlayInFlying.PacketPlayInLook packet) {
+    private static InEvent<?> toEvent(HPlayer p, PacketPlayInFlying.PacketPlayInLook packet) {
         PacketDataSerializer serializer = new PacketDataSerializer(Unpooled.buffer(9));
         try {
             packet.b(serializer);
@@ -281,7 +276,7 @@ public class PackerBase {
         return new MoveEvent(p, new Location(p.getWorld(), pos.x, pos.y, pos.z, yaw, pitch), onGround, true, false);
     }
 
-    private InEvent<?> toEvent(HPlayer p, PacketPlayInFlying.PacketPlayInPosition packet) {
+    private static InEvent<?> toEvent(HPlayer p, PacketPlayInFlying.PacketPlayInPosition packet) {
         PacketDataSerializer serializer = new PacketDataSerializer(Unpooled.buffer(25));
         try {
             packet.b(serializer);
@@ -298,7 +293,7 @@ public class PackerBase {
         return new MoveEvent(p, new Location(p.getWorld(), x, y, z, pos.yaw, pos.pitch), onGround, false, true);
     }
 
-    private InEvent<?> toEvent(HPlayer p, PacketPlayInFlying.PacketPlayInPositionLook packet) {
+    private static InEvent<?> toEvent(HPlayer p, PacketPlayInFlying.PacketPlayInPositionLook packet) {
         PacketDataSerializer serializer = new PacketDataSerializer(Unpooled.buffer(33));
         try {
             packet.b(serializer);
@@ -316,13 +311,13 @@ public class PackerBase {
         return new MoveEvent(p, new Location(p.getWorld(), x, y, z, yaw, pitch), onGround, true, true);
     }
 
-    private InEvent<?> toEvent(HPlayer p, PacketPlayInHeldItemSlot packet) {
+    private static InEvent<?> toEvent(HPlayer p, PacketPlayInHeldItemSlot packet) {
         int heldItemSlot = packet.a();
 
         return new HeldItemEvent(p, heldItemSlot);
     }
 
-    private InEvent<?> toEvent(HPlayer p, PacketPlayInUseEntity packet) {
+    private static InEvent<?> toEvent(HPlayer p, PacketPlayInUseEntity packet) {
         PacketDataSerializer serializer = new PacketDataSerializer(Unpooled.buffer());
         try {
             packet.b(serializer);
@@ -356,11 +351,11 @@ public class PackerBase {
         return new EntityInteractEvent(p, entityId, type, cursorPos, entity);
     }
 
-    private InEvent<?> toEvent(HPlayer p, PacketPlayInKeepAlive packet) {
+    private static InEvent<?> toEvent(HPlayer p, PacketPlayInKeepAlive packet) {
         return new KeepaliveRespondEvent(p, packet.a());
     }
 
-    public OutEvent<?> sent(HPlayer p, Object packet) throws IOException {
+    public static OutEvent<?> sent(HPlayer p, Object packet) throws IOException {
         if (packet instanceof PacketPlayOutPosition) {
             return toEvent(p, (PacketPlayOutPosition) packet);
         } else if (packet instanceof PacketPlayOutKeepAlive) {
@@ -373,7 +368,7 @@ public class PackerBase {
         return null;
     }
 
-    private OutEvent<?> toEvent(HPlayer p, PacketPlayOutPosition packet) throws IOException {
+    private static OutEvent<?> toEvent(HPlayer p, PacketPlayOutPosition packet) throws IOException {
         PacketDataSerializer serializer = new PacketDataSerializer(Unpooled.buffer());
         packet.b(serializer);
         double x = serializer.readDouble();
@@ -385,14 +380,14 @@ public class PackerBase {
         return new TeleportEvent(p, x, y, z, yaw, pitch);
     }
 
-    private OutEvent<?> toEvent(HPlayer p, PacketPlayOutKeepAlive packet) throws IOException {
+    private static OutEvent<?> toEvent(HPlayer p, PacketPlayOutKeepAlive packet) throws IOException {
         PacketDataSerializer serializer = new PacketDataSerializer(Unpooled.buffer());
         packet.b(serializer);
         int id = serializer.e();
         return new KeepaliveRequestEvent(p, id);
     }
 
-    private OutEvent<?> toEvent(HPlayer p, PacketPlayOutUpdateAttributes packet) throws IOException {
+    private static OutEvent<?> toEvent(HPlayer p, PacketPlayOutUpdateAttributes packet) throws IOException {
         PacketDataSerializer serializer = new PacketDataSerializer(Unpooled.buffer());
         packet.b(serializer);
         int id = serializer.e();
@@ -417,7 +412,7 @@ public class PackerBase {
         return new AttributeEvent(p, snapshots);
     }
 
-    private OutEvent<?> toEvent(HPlayer p, PacketPlayOutEntityVelocity packet) throws IOException {
+    private static OutEvent<?> toEvent(HPlayer p, PacketPlayOutEntityVelocity packet) throws IOException {
         PacketDataSerializer serializer = new PacketDataSerializer(Unpooled.buffer());
         packet.b(serializer);
         int id = serializer.e();

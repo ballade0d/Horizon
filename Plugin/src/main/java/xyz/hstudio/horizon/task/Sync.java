@@ -1,5 +1,6 @@
 package xyz.hstudio.horizon.task;
 
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import xyz.hstudio.horizon.HPlayer;
 import xyz.hstudio.horizon.Horizon;
@@ -37,7 +38,7 @@ public class Sync extends BukkitRunnable {
 
     @Override
     public void run() {
-        pendingTeleports.entrySet().removeIf(entry -> entry.getKey().bukkit.teleport(entry.getValue().bukkit()));
+        pendingTeleports.entrySet().removeIf(entry -> entry.getKey().bukkit.teleport(entry.getValue().bukkit(), PlayerTeleportEvent.TeleportCause.PLUGIN));
 
         Runnable runnable;
         while ((runnable = tasks.poll()) != null) {
