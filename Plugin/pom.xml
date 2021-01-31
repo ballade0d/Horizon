@@ -18,16 +18,21 @@
 
     <repositories>
         <repository>
-            <id>spigot-api</id>
-            <url>https://hub.spigotmc.org/nexus/content/groups/public/</url>
-        </repository>
-        <repository>
             <id>placeholderapi</id>
             <url>https://repo.extendedclip.com/content/repositories/placeholderapi/</url>
+        </repository>
+        <repository>
+            <id>nms-repo</id>
+            <url>https://repo.codemc.io/repository/nms/</url>
         </repository>
     </repositories>
 
     <dependencies>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>8.0.22</version>
+        </dependency>
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
@@ -38,13 +43,26 @@
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot1.8.8</artifactId>
             <version>1.8.8</version>
-            <systemPath>G:/workspace/Cores/Spigot1.8.8.jar</systemPath>
+            <systemPath>C:/Minecraft/Plugin/Cores/Spigot1.8.8.jar</systemPath>
+            <scope>system</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.spigotmc</groupId>
+            <artifactId>spigot1.12.2</artifactId>
+            <version>1.12.2</version>
+            <systemPath>C:/Minecraft/Plugin/Cores/Spigot1.12.2.jar</systemPath>
             <scope>system</scope>
         </dependency>
         <dependency>
             <groupId>me.clip</groupId>
             <artifactId>placeholderapi</artifactId>
             <version>2.10.4</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.spigotmc</groupId>
+            <artifactId>spigot</artifactId>
+            <version>1.8.8-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
