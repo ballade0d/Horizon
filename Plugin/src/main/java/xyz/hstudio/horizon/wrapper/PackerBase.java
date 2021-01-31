@@ -205,6 +205,7 @@ public class PackerBase {
                 return null;
             }
             org.bukkit.Material mat = CraftMagicNumbers.getMaterial(itemStack.getItem());
+            // NPE thrown at above line
             BlockInteractEvent.InteractType placeType;
             if (mat != null && mat != org.bukkit.Material.AIR) {
                 placeType = BlockInteractEvent.InteractType.PLACE_BLOCK;
