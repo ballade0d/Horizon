@@ -93,13 +93,12 @@ public class AimAssist extends CheckBase {
         double sensitivity = sensToPercent(gcdToSensitive(gcd));
         double o = modulusRotation(sensitivity, pitch);
         int len = String.valueOf(o).length();
+        // Add a lot of vl?
         if (o == 0.0) {
-            // Add a lot of vl?
             System.out.println("Invalid A");
         }
-        // This check could false, maybe add a buffer?
-        if (sensitivity > 99 && o > 0 && len > 0 && len < 8) {
-            System.out.println("Invalid B len:" + len);
+        if (sensitivity > 99 && o > 0 && len > 0 && len < 4) {
+            System.out.println("Invalid B l:" + len + ", o:" + o);
         }
 
         lastDeltaPitch = deltaPitch;

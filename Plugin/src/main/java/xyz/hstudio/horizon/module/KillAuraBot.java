@@ -88,13 +88,11 @@ public class KillAuraBot extends CheckBase {
                 System.out.println("Hit bot!");
                 return;
             }
-            if (command_only || bot != null) {
+            if (bot != null) {
                 return;
             }
             bot = prepare();
-            Location to = computeLoc(p.physics.position, xz_distance, y_distance);
             KillAuraBot.run(() -> {
-                move(to.x, to.y, to.z, p.physics.position.yaw, p.physics.position.pitch);
                 spawn();
                 if (show_armor) {
                     setArmor();
@@ -208,8 +206,8 @@ public class KillAuraBot extends CheckBase {
     }
 
     private void damage() {
-        double oldHealth = bot.getHealth();
-        double newHealth = RandomUtils.randomBoundaryInt(1, 19);
+        float oldHealth = bot.getHealth();
+        float newHealth = RandomUtils.randomBoundaryInt(1, 19);
         bot.getDataWatcher().watch(6, newHealth);
         if (newHealth < oldHealth) {
             Packet<?> packet;

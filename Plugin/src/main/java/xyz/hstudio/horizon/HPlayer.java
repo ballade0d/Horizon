@@ -50,11 +50,13 @@ public class HPlayer {
     public HPlayer(Player bukkit) {
         this.bukkit = (CraftPlayer) bukkit;
         this.base = new EntityBase(bukkit);
-        this.protocol = 0; // TODO: Finish this
+        this.protocol = 47; // TODO: Finish this
         this.checks = new EnumMap<Detection, CheckBase>(Detection.class) {
             {
                 put(AIM_ASSIST, new AimAssist(HPlayer.this));
+                put(BAD_PACKETS, new BadPackets(HPlayer.this));
                 put(GROUND_SPOOF, new GroundSpoof(HPlayer.this));
+                put(HEALTH_TAG, new HealthTag(HPlayer.this));
                 put(HIT_BOX, new HitBox(HPlayer.this));
                 put(KILL_AURA_BOT, new KillAuraBot(HPlayer.this));
                 put(VERTICAL_MOVEMENT, new VerticalMovement(HPlayer.this));

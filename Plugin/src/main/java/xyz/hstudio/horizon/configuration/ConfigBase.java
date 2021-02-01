@@ -9,12 +9,12 @@ import java.lang.reflect.Modifier;
 public abstract class ConfigBase {
 
     public static void load(Class<? extends ConfigBase> clazz, Yaml yaml, Yaml def) {
-        for (Field field : clazz.getFields()) {
-            field.setAccessible(true);
+        for (Field field : clazz.getDeclaredFields()) {
             LoadInfo annotation = field.getAnnotation(LoadInfo.class);
             if (annotation == null || !Modifier.isStatic(field.getModifiers())) {
                 continue;
             }
+            field.setAccessible(true);
 
             String path = annotation.path();
 

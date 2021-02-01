@@ -9,12 +9,6 @@ public class Config extends ConfigBase {
 
     @LoadInfo(path = "prefix")
     public static String PREFIX;
-
-    @LoadInfo(path = "discord_integration.enabled")
-    public boolean discord_integration_enabled = false;
-    @LoadInfo(path = "discord_integration.webhookURL")
-    public String discord_integration_webhookURL = "";
-
     @LoadInfo(path = "mysql.enabled")
     public static boolean mysql_enabled = false;
     @LoadInfo(path = "mysql.host")
@@ -27,7 +21,10 @@ public class Config extends ConfigBase {
     public static String mysql_password = "";
     @LoadInfo(path = "mysql.port")
     public static int mysql_port = 3306;
-
+    @LoadInfo(path = "discord_integration.enabled")
+    public boolean discord_integration_enabled = false;
+    @LoadInfo(path = "discord_integration.webhookURL")
+    public String discord_integration_webhookURL = "";
     @LoadInfo(path = "kirin.enabled")
     public boolean kirin_enabled = true;
     @LoadInfo(path = "kirin.license")

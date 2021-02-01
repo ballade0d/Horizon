@@ -12,4 +12,9 @@ public class HeldItemEvent extends InEvent<PacketPlayInHeldItemSlot> {
         super(p);
         this.heldItemSlot = heldItemSlot;
     }
+
+    @Override
+    public void post() {
+        p.inventory.heldSlot = heldItemSlot;
+    }
 }

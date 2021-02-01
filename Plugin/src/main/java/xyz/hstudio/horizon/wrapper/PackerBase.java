@@ -8,10 +8,7 @@ import xyz.hstudio.horizon.HPlayer;
 import xyz.hstudio.horizon.event.InEvent;
 import xyz.hstudio.horizon.event.OutEvent;
 import xyz.hstudio.horizon.event.inbound.*;
-import xyz.hstudio.horizon.event.outbound.AttributeEvent;
-import xyz.hstudio.horizon.event.outbound.KeepaliveRequestEvent;
-import xyz.hstudio.horizon.event.outbound.TeleportEvent;
-import xyz.hstudio.horizon.event.outbound.VelocityEvent;
+import xyz.hstudio.horizon.event.outbound.*;
 import xyz.hstudio.horizon.util.Location;
 import xyz.hstudio.horizon.util.Vector3D;
 import xyz.hstudio.horizon.util.enums.Direction;
@@ -364,6 +361,8 @@ public class PackerBase {
             return toEvent(p, (PacketPlayOutUpdateAttributes) packet);
         } else if (packet instanceof PacketPlayOutEntityVelocity) {
             return toEvent(p, (PacketPlayOutEntityVelocity) packet);
+        } else if (packet instanceof PacketPlayOutEntityMetadata) {
+            return toEvent(p, (PacketPlayOutEntityMetadata) packet);
         }
         return null;
     }
@@ -423,5 +422,16 @@ public class PackerBase {
         float y = serializer.readShort() / 8000F;
         float z = serializer.readShort() / 8000F;
         return new VelocityEvent(p, x, y, z);
+    }
+
+    private static OutEvent<?> toEvent(HPlayer p, PacketPlayOutEntityMetadata packet) throws IOException {
+        PacketDataSerializer serializer = new PacketDataSerializer(Unpooled.buffer());
+        packet.b(serializer);
+        int id = serializer.e();
+        List<DataWatcher.WatchableObject> metadata = DataWatcher.b(serializer);
+        if (metadata == null) {
+            return null;
+        }
+        return new MetaEvent(p, id, metadata);
     }
 }

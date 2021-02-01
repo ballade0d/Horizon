@@ -1,5 +1,6 @@
 package xyz.hstudio.horizon.storage;
 
+import xyz.hstudio.horizon.Logger;
 import xyz.hstudio.horizon.configuration.Config;
 
 import java.sql.Connection;
@@ -11,7 +12,7 @@ public class SQLite {
 
     private Connection connection;
 
-    public void setupSql() {
+    public void setup() {
         String host = Config.mysql_host;
         String database = Config.mysql_database;
         String user = Config.mysql_user;
@@ -21,45 +22,36 @@ public class SQLite {
         if (Config.mysql_enabled) {
             try {
                 synchronized (this) {
-                    if (getConnection() != null && !getConnection().isClosed()) {
+                    if (connection != null && !connection.isClosed()) {
                         return;
                     }
-                    setConnection(DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + "/" + database + "?autoReconnect=true&useLegacyDatetimeCode=false&serverTimezone=UTC", user, pass));
-                    System.out.println(Config.PREFIX + "Connected to MySQL!");
+                    connection = DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + "/" + database + "?autoReconnect=true&useLegacyDatetimeCode=false&serverTimezone=UTC", user, pass);
+                    Logger.msg("INFO", "Connected to MySQL!");
                 }
             } catch (SQLException e) {
                 e.printStackTrace();
-                System.out.println(Config.PREFIX + "Failed to connect to MySQL!");
+                Logger.msg("WARN", "Failed to connect to MySQL!");
             }
 
             createTables();
         } else {
-            System.out.println(Config.PREFIX + "MySQL was chosen to not be enabled!");
+            Logger.msg("INFO", "MySQL was chosen to not be enabled!");
         }
-    }
-
-    private void setConnection(Connection connection) {
-        this.connection = connection;
     }
 
     private void createTables() {
         try {
-            String sqlCreate1 = "CREATE TABLE IF NOT EXISTS HORIZON(" +
+            String cmd = "CREATE TABLE IF NOT EXISTS HORIZON(" +
                     "ID INTEGER AUTO_INCREMENT NOT NULL," +
                     "PLAYER TEXT," +
                     "IP TEXT," +
                     "PING TEXT," +
-                    "TPS TEXT," +
                     "VL TEXT," +
                     "primary key(id))";
-            Statement sql1 = getConnection().createStatement();
-            sql1.execute(sqlCreate1);
+            Statement statement = connection.createStatement();
+            statement.execute(cmd);
         } catch (SQLException e) {
-            System.out.println(Config.PREFIX + "Couldn't create MySQL Tables!");
+            Logger.msg("WARN", "Failed to create MySQL tables!");
         }
-    }
-
-    private Connection getConnection() {
-        return this.connection;
     }
 }

@@ -10,6 +10,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import xyz.hstudio.horizon.configuration.Config;
 import xyz.hstudio.horizon.module.KillAuraBot;
+import xyz.hstudio.horizon.storage.SQLite;
 import xyz.hstudio.horizon.task.Async;
 import xyz.hstudio.horizon.task.Sync;
 import xyz.hstudio.horizon.util.BlockUtils;
@@ -30,6 +31,8 @@ public final class Horizon extends JavaPlugin {
     private final Async async = new Async(this);
     @Getter
     private final Sync sync = new Sync(this);
+    @Getter
+    private final SQLite sql = new SQLite();
 
     public Horizon() {
         Preconditions.checkState(
@@ -55,6 +58,9 @@ public final class Horizon extends JavaPlugin {
             saveResource("config.yml", true);
         }
         Config.load(Yaml.loadConfiguration(configFile));
+
+        // Setup for SQL
+        sql.setup();
 
         // Load the config of checks
         KillAuraBot.init();

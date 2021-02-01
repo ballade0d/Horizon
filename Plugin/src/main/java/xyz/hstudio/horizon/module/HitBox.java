@@ -104,9 +104,17 @@ public class HitBox extends CheckBase {
 
             double distance = point.distance(next);
             double rate = distance / 10;
+
+            // Check for the origin point
+            Vector3D dir = MathUtils.getDirection(tracer2D.x, tracer2D.y);
+            Ray3D ray3D = new Ray3D(headPos, dir);
+            if (cube.intersectsRay(ray3D, 0, Float.MAX_VALUE) != null) {
+                return true;
+            }
+
             while (tracer2D.trace(rate) < distance) {
-                Vector3D dir = MathUtils.getDirection(tracer2D.x, tracer2D.y);
-                Ray3D ray3D = new Ray3D(headPos, dir);
+                dir = MathUtils.getDirection(tracer2D.x, tracer2D.y);
+                ray3D = new Ray3D(headPos, dir);
 
                 if (cube.intersectsRay(ray3D, 0, Float.MAX_VALUE) != null) {
                     return true;

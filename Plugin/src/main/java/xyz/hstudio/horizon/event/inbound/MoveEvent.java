@@ -74,7 +74,7 @@ public class MoveEvent extends InEvent<PacketPlayInFlying> {
         this.touchedBlocks = to.toAABB().expand(-0.001, -0.001, -0.001).materials(to.world);
 
         this.touchCeiling = testTouchCeiling();
-        this.onGroundReally = to.onGround(p, false, 0.001);
+        this.onGroundReally = to.onGround(p, false, 0.02);
         this.step = testStep();
         this.jump = testJump();
         this.onSlime = testOnSlime();

@@ -34,19 +34,17 @@ public class GroundSpoof extends CheckBase {
         }
          */
         if (e.onGround) {
-            // Do another check to make sure if player is really not on ground
-            // to avoid some false positives.
-            if (e.to.onGround(p, false, 0.3)) {
-                return;
-            }
+            // Must also check position before, because in the client, Y is clipped first.
+            // In the client, if Y is clipped, then onGround is set to true.
+            Location checkLoc = e.from.newY(e.to.y);
 
-            Location checkLoc = new Location(e.to.world, e.from.x, e.to.y, e.from.z);
-            if (checkLoc.onGround(p, false, 0.3)) {
-                return;
-            }
+            // Stop checker-climbers
+            AABB aabb = e.to.toAABB();
+            aabb.expand(0, -0.0001, 0);
 
-            AABB aabb = e.to.toAABB().expand(0.0, -0.0001, 0.0);
-            if (aabb.getBlockAABBs(p, p.getWorld(), Material.WEB).isEmpty()) {
+            boolean notPhasing = aabb.getBlockAABBs(p, p.getWorld(), Material.WEB).isEmpty();
+            boolean pass = checkLoc.onGround(p, false, 0.02);
+            if (notPhasing && pass) {
                 return;
             }
 

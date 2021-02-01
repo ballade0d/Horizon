@@ -1,9 +1,6 @@
 package xyz.hstudio.horizon.wrapper;
 
-import net.minecraft.server.v1_8_R3.AxisAlignedBB;
-import net.minecraft.server.v1_8_R3.Chunk;
-import net.minecraft.server.v1_8_R3.Entity;
-import net.minecraft.server.v1_8_R3.WorldServer;
+import net.minecraft.server.v1_8_R3.*;
 import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
 import xyz.hstudio.horizon.util.Vector3D;
 
@@ -39,7 +36,9 @@ public class WorldBase {
         if (chunk == null) {
             return null;
         }
-        return new BlockBase(this, chunk.getTypeAbs(x, y, z).getBlockData(), x, y, z);
+        BlockPosition bPos = new BlockPosition(x, y, z);
+        // return new BlockBase(this, chunk.getTypeAbs(x, y, z).getBlockData(), x, y, z); // This only get type
+        return new BlockBase(this, chunk.getBlockData(bPos), bPos);
     }
 
     public BlockBase getBlock(Vector3D vec) {
@@ -54,6 +53,10 @@ public class WorldBase {
             entityBaseList.add(new EntityBase(entity));
         }
         return entityBaseList;
+    }
+
+    public Entity getEntity(int id) {
+        return worldServer.a(id);
     }
 
     @Override

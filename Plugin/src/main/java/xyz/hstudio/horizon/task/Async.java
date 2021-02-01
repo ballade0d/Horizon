@@ -8,6 +8,7 @@ import org.bukkit.entity.Vehicle;
 import org.bukkit.util.NumberConversions;
 import xyz.hstudio.horizon.HPlayer;
 import xyz.hstudio.horizon.Horizon;
+import xyz.hstudio.horizon.module.CheckBase;
 import xyz.hstudio.horizon.util.Location;
 import xyz.hstudio.horizon.util.Pair;
 import xyz.hstudio.horizon.wrapper.EntityBase;
@@ -52,13 +53,12 @@ public class Async implements Runnable {
 
     @Override
     public void run() {
-        inst.getPlayers().values().stream()
-                .map(HPlayer::getChecks)
-                .flatMap(Collection::stream)
-                .forEach(check -> {
-                    check.tickAsync(tick.get());
-                    check.decay(tick.get());
-                });
+        for (HPlayer p : inst.getPlayers().values()) {
+            for (CheckBase check : p.getChecks()) {
+                check.tickAsync(tick.get());
+                check.decay(tick.get());
+            }
+        }
         trackEntities();
 
         tick.incrementAndGet();

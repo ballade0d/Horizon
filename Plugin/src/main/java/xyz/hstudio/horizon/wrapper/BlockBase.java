@@ -16,11 +16,12 @@ public class BlockBase {
     protected final BlockPosition bPos;
     protected final Material type;
 
-    public BlockBase(WorldBase world, IBlockData data, int x, int y, int z) {
+    public BlockBase(WorldBase world, IBlockData data, BlockPosition bPos) {
         this.world = world;
         this.data = data;
-        this.bPos = new BlockPosition(x, y, z);
+        this.bPos = bPos;
         this.type = CraftMagicNumbers.getMaterial(this.data.getBlock());
+        data.getBlock().updateShape(world.worldServer, bPos);
     }
 
     public Material type() {
@@ -108,7 +109,6 @@ public class BlockBase {
             return boxes;
         }
 
-        b.updateShape(world.worldServer, bPos);
         List<AxisAlignedBB> bbs = new ArrayList<>();
         AxisAlignedBB cube = new AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1);
         b.a(world.worldServer, bPos, data, cube, bbs, null);
