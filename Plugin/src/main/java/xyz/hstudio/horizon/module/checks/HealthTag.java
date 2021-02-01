@@ -1,17 +1,18 @@
-package xyz.hstudio.horizon.module;
+package xyz.hstudio.horizon.module.checks;
 
 import io.netty.buffer.Unpooled;
 import net.minecraft.server.v1_8_R3.*;
 import xyz.hstudio.horizon.HPlayer;
 import xyz.hstudio.horizon.event.OutEvent;
 import xyz.hstudio.horizon.event.outbound.MetaEvent;
+import xyz.hstudio.horizon.module.CheckBase;
 
 import java.io.IOException;
 
 public class HealthTag extends CheckBase {
 
     public HealthTag(HPlayer p) {
-        super(p, 0, 0, -1);
+        super(p);
     }
 
     @Override
@@ -54,6 +55,7 @@ public class HealthTag extends CheckBase {
                     serializer.clear();
                     serializer.b(e.id);
                     DataWatcher.a(e.metadata, serializer);
+                    packet.a(serializer);
                 } catch (IOException ignore) {
                 }
             });

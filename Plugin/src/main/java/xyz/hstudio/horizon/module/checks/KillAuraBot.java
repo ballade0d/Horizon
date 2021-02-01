@@ -1,4 +1,4 @@
-package xyz.hstudio.horizon.module;
+package xyz.hstudio.horizon.module.checks;
 
 import com.mojang.authlib.GameProfile;
 import net.minecraft.server.v1_8_R3.*;
@@ -11,11 +11,13 @@ import org.bukkit.craftbukkit.v1_8_R3.util.CraftChatMessage;
 import org.bukkit.craftbukkit.v1_8_R3.util.CraftMagicNumbers;
 import xyz.hstudio.horizon.HPlayer;
 import xyz.hstudio.horizon.Horizon;
+import xyz.hstudio.horizon.api.enums.Detection;
 import xyz.hstudio.horizon.configuration.ConfigBase;
 import xyz.hstudio.horizon.configuration.LoadInfo;
 import xyz.hstudio.horizon.event.InEvent;
 import xyz.hstudio.horizon.event.inbound.EntityInteractEvent;
 import xyz.hstudio.horizon.event.inbound.MoveEvent;
+import xyz.hstudio.horizon.module.CheckBase;
 import xyz.hstudio.horizon.util.Location;
 import xyz.hstudio.horizon.util.RandomUtils;
 import xyz.hstudio.horizon.util.Vector3D;
@@ -25,7 +27,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
-import static xyz.hstudio.horizon.module.KillAuraBot.Cfg.*;
+import static xyz.hstudio.horizon.module.checks.KillAuraBot.Cfg.*;
 
 public class KillAuraBot extends CheckBase {
 
@@ -69,23 +71,11 @@ public class KillAuraBot extends CheckBase {
         super(p, 1, 100, 100);
     }
 
-    private static void run(Runnable runnable, boolean async) {
-        if (async) {
-            runnable.run();
-        } else {
-            inst.getSync().runSync(runnable);
-        }
-    }
-
-    public static void init() {
-        CheckBase.init("kill_aura_bot", Cfg.class, def);
-    }
-
     public void received(InEvent<?> event) {
         if (event instanceof EntityInteractEvent) {
             EntityInteractEvent e = (EntityInteractEvent) event;
             if (e.entity == null && bot != null && e.entityId == bot.getId()) {
-                System.out.println("Hit bot!");
+                punish(e, "KillAuraBot (TEdzP)", 1, Detection.KILL_AURA_BOT, null);
                 return;
             }
             if (bot != null) {
@@ -263,6 +253,18 @@ public class KillAuraBot extends CheckBase {
         itemStack = HAND[ThreadLocalRandom.current().nextInt(HAND.length)];
         packet = new PacketPlayOutEntityEquipment(bot.getId(), 0, itemStack);
         p.pipeline.writeAndFlush(packet);
+    }
+
+    private static void run(Runnable runnable, boolean async) {
+        if (async) {
+            runnable.run();
+        } else {
+            inst.getSync().runSync(runnable);
+        }
+    }
+
+    public static void init() {
+        CheckBase.init("kill_aura_bot", Cfg.class, def);
     }
 
     static class Cfg extends ConfigBase {

@@ -122,4 +122,16 @@ public class BlockBase {
 
         return boxes;
     }
+
+    public int getX() {
+        return bPos.getX();
+    }
+
+    public int getY() {
+        return bPos.getY();
+    }
+
+    public int getZ() {
+        return bPos.getZ();
+    }
 }

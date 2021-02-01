@@ -10,7 +10,8 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import xyz.hstudio.horizon.api.enums.Detection;
 import xyz.hstudio.horizon.event.outbound.AttributeEvent;
-import xyz.hstudio.horizon.module.*;
+import xyz.hstudio.horizon.module.CheckBase;
+import xyz.hstudio.horizon.module.checks.*;
 import xyz.hstudio.horizon.network.PacketHandler;
 import xyz.hstudio.horizon.util.Location;
 import xyz.hstudio.horizon.util.Pair;
@@ -59,6 +60,7 @@ public class HPlayer {
                 put(HEALTH_TAG, new HealthTag(HPlayer.this));
                 put(HIT_BOX, new HitBox(HPlayer.this));
                 put(KILL_AURA_BOT, new KillAuraBot(HPlayer.this));
+                put(NO_SWING, new NoSwing(HPlayer.this));
                 put(VERTICAL_MOVEMENT, new VerticalMovement(HPlayer.this));
             }
         };
@@ -156,6 +158,7 @@ public class HPlayer {
     public class Physics {
 
         public Location position;
+        public Location prevPosition;
         public boolean onGround;
         public boolean wasOnGround;
         public boolean onGroundReally;

@@ -270,6 +270,7 @@ public class MoveEvent extends InEvent<PacketPlayInFlying> {
     public void post() {
         HPlayer.Physics physics = p.physics;
 
+        physics.prevPosition = physics.position;
         physics.position = to;
         physics.wasOnGround = physics.onGround;
         physics.onGround = onGround;

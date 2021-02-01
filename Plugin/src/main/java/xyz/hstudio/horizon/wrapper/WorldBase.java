@@ -59,6 +59,10 @@ public class WorldBase {
         return worldServer.a(id);
     }
 
+    public PacketPlayOutBlockChange updateBlock(BlockBase block) {
+        return new PacketPlayOutBlockChange(worldServer, new BlockPosition(block.getX(), block.getY(), block.getZ()));
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {

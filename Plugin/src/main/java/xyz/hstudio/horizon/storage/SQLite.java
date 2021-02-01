@@ -30,7 +30,8 @@ public class SQLite {
                 }
             } catch (SQLException e) {
                 e.printStackTrace();
-                Logger.msg("WARN", "Failed to connect to MySQL!");
+                Logger.msg("WARN", "Failed to connect to MySQL! Stacktrace:");
+                e.printStackTrace();
             }
 
             createTables();
@@ -51,7 +52,8 @@ public class SQLite {
             Statement statement = connection.createStatement();
             statement.execute(cmd);
         } catch (SQLException e) {
-            Logger.msg("WARN", "Failed to create MySQL tables!");
+            Logger.msg("WARN", "Failed to create MySQL tables! Stacktrace:");
+            e.printStackTrace();
         }
     }
 }

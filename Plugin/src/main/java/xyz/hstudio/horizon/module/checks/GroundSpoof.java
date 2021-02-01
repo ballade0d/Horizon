@@ -1,12 +1,14 @@
-package xyz.hstudio.horizon.module;
+package xyz.hstudio.horizon.module.checks;
 
 import io.netty.buffer.Unpooled;
 import net.minecraft.server.v1_8_R3.PacketDataSerializer;
 import net.minecraft.server.v1_8_R3.PacketPlayInFlying;
 import org.bukkit.Material;
 import xyz.hstudio.horizon.HPlayer;
+import xyz.hstudio.horizon.api.enums.Detection;
 import xyz.hstudio.horizon.event.InEvent;
 import xyz.hstudio.horizon.event.inbound.MoveEvent;
+import xyz.hstudio.horizon.module.CheckBase;
 import xyz.hstudio.horizon.util.AABB;
 import xyz.hstudio.horizon.util.Location;
 
@@ -65,7 +67,7 @@ public class GroundSpoof extends CheckBase {
                 }
             });
 
-            System.out.println("GroundSpoof");
+            punish(e, "GroundSpoof (azDxY)", 1, Detection.GROUND_SPOOF, null);
         }
     }
 }

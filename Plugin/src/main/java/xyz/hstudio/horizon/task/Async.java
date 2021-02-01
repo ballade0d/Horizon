@@ -47,8 +47,8 @@ public class Async implements Runnable {
         threadPool.shutdown();
     }
 
-    public AtomicInteger getTick() {
-        return tick;
+    public int getTick() {
+        return tick.get();
     }
 
     @Override

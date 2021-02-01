@@ -1,8 +1,12 @@
-prefix: ''
+# Horizon Prefix ( [Prefix] [Message] )
+prefix: '§9Horizon §1» §r§3'
 
+# Would you like to enable discord integration?
+# Sends notification when a player is detected for cheating according to YOUR check.yml setup
 discord_integration:
   enabled: false
-  webhookURL: ''
+  token: ''
+  channel_name: ''
 
 mysql:
   enabled: false
@@ -11,3 +15,13 @@ mysql:
   user: ''
   password: ''
   port: 3306
+
+# Would you like to enable kirin?
+# Kirin is the paid version of Horizon,
+# you will be able to purchase a license in our website.
+kirin:
+  enabled: false
+  licence: ''
+
+# Should Horizon fix ghost-blocks?
+ghost_block_fix: true

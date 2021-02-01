@@ -5,15 +5,21 @@ import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import xyz.hstudio.horizon.configuration.Config;
-import xyz.hstudio.horizon.module.KillAuraBot;
+import xyz.hstudio.horizon.configuration.Execution;
+import xyz.hstudio.horizon.module.checks.HitBox;
+import xyz.hstudio.horizon.module.checks.KillAuraBot;
 import xyz.hstudio.horizon.storage.SQLite;
 import xyz.hstudio.horizon.task.Async;
 import xyz.hstudio.horizon.task.Sync;
+import xyz.hstudio.horizon.util.AABB;
 import xyz.hstudio.horizon.util.BlockUtils;
+import xyz.hstudio.horizon.util.Location;
 import xyz.hstudio.horizon.util.Yaml;
 import xyz.hstudio.horizon.util.enums.Version;
 
@@ -59,10 +65,17 @@ public final class Horizon extends JavaPlugin {
         }
         Config.load(Yaml.loadConfiguration(configFile));
 
+        File executionFile = new File(folder, "execution.yml");
+        if (!folder.isDirectory() || !executionFile.isFile()) {
+            saveResource("execution.yml", true);
+        }
+        Execution.load(Yaml.loadConfiguration(executionFile));
+
         // Setup for SQL
         sql.setup();
 
         // Load the config of checks
+        HitBox.init();
         KillAuraBot.init();
 
         // Register for joined players
@@ -73,6 +86,23 @@ public final class Horizon extends JavaPlugin {
             @EventHandler
             public void onJoin(PlayerJoinEvent e) {
                 new HPlayer(e.getPlayer());
+            }
+
+            @EventHandler(priority = EventPriority.MONITOR)
+            public void onTeleport(PlayerTeleportEvent e) {
+                if (e.getCause() != PlayerTeleportEvent.TeleportCause.UNKNOWN || !Config.ghost_block_fix) {
+                    return;
+                }
+
+                HPlayer p = players.get(e.getPlayer().getUniqueId());
+                if (p == null) {
+                    return;
+                }
+                AABB aabb = new Location(
+                        p.getWorld(), e.getTo().getX(), e.getTo().getY(), e.getTo().getZ()
+                ).toAABB().expand(0.1, 0.1, 0.1);
+
+                aabb.blocks(p.getWorld()).forEach(b -> p.pipeline.writeAndFlush(p.getWorld().updateBlock(b)));
             }
         }, this);
     }

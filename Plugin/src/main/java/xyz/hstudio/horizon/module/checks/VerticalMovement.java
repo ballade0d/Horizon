@@ -1,8 +1,10 @@
-package xyz.hstudio.horizon.module;
+package xyz.hstudio.horizon.module.checks;
 
 import xyz.hstudio.horizon.HPlayer;
+import xyz.hstudio.horizon.api.enums.Detection;
 import xyz.hstudio.horizon.event.InEvent;
 import xyz.hstudio.horizon.event.inbound.MoveEvent;
+import xyz.hstudio.horizon.module.CheckBase;
 import xyz.hstudio.horizon.util.enums.Direction;
 
 /**
@@ -22,6 +24,7 @@ import xyz.hstudio.horizon.util.enums.Direction;
 public class VerticalMovement extends CheckBase {
 
     private float estimatedYVelocity;
+    private boolean tp;
 
     public VerticalMovement(HPlayer p) {
         super(p, 1, 10, 10);
@@ -31,6 +34,7 @@ public class VerticalMovement extends CheckBase {
     public void received(InEvent<?> event) {
         if (event instanceof MoveEvent) {
             move((MoveEvent) event);
+            step((MoveEvent) event);
         }
     }
 
@@ -38,9 +42,13 @@ public class VerticalMovement extends CheckBase {
         float deltaY = (float) e.velocity.y;
         float estimatedYVelocity = (this.estimatedYVelocity + -0.08F) * 0.98F;
         boolean skip = false;
-        if (e.step || e.teleport) {
+        if (e.teleport) {
+            estimatedYVelocity = 0.0F;
+            tp = skip = true;
+        } else if (e.step || tp) {
             estimatedYVelocity = 0.0F;
             skip = true;
+            tp = false;
         } else if (e.jump || e.knockBack || e.onSlime) {
             estimatedYVelocity = deltaY;
             skip = true;
@@ -48,6 +56,7 @@ public class VerticalMovement extends CheckBase {
             estimatedYVelocity = 0F;
             skip = true;
         } else if (Math.abs(estimatedYVelocity) < 0.005 && deltaY <= 0 && p.physics.velocity.y > 0) {
+            // Jump error
             estimatedYVelocity = deltaY == 0 ? 0 : -(Math.min(Math.abs(deltaY - -0.0784F), Math.abs(deltaY - -0.0754F)) - deltaY);
             skip = true;
         }
@@ -65,9 +74,26 @@ public class VerticalMovement extends CheckBase {
 
             float error = Math.abs(deltaY - estimatedYVelocity);
             if (error > 0.001) {
-                System.out.println("Invalid motion! Delta:" + deltaY + ", Estimated:" + estimatedYVelocity + ", Error:" + error);
+                punish(e, "VerticalMovement (5GjoR)", Math.abs(error) * 5, Detection.VERTICAL_MOVEMENT,
+                        "d:" + deltaY + ", e:" + estimatedYVelocity + ", e:" + error);
             }
         }
         this.estimatedYVelocity = estimatedYVelocity;
+    }
+
+    private void step(MoveEvent e) {
+        if (e.step || e.teleport || e.knockBack || e.onSlime) {
+            return;
+        }
+        double deltaY = e.velocity.y;
+
+        if ((deltaY > 0.6 || deltaY < -0.0784) && e.onGround && p.physics.onGround) {
+            punish(e, "VerticalMovement (c4slM)", 4, Detection.VERTICAL_MOVEMENT,
+                    "d:" + deltaY);
+        } else if (e.onGroundReally && Math.abs(p.physics.prevVelocity.y - 0.333) < 0.01 &&
+                Math.abs(p.physics.velocity.y - 0.248) < 0.01 && deltaY <= 0) {
+            punish(e, "VerticalMovement (14b0l)", 4, Detection.VERTICAL_MOVEMENT,
+                    "d:" + deltaY);
+        }
     }
 }

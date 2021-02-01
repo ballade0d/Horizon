@@ -3,6 +3,8 @@ package xyz.hstudio.horizon.util;
 import net.minecraft.server.v1_8_R3.MathHelper;
 import org.bukkit.util.NumberConversions;
 
+import java.util.Arrays;
+
 public class MathUtils {
 
     public static Vector3D getDirection(double yaw, double pitch) {
@@ -37,5 +39,27 @@ public class MathUtils {
 
     public static float lcm(float a, float b) {
         return (a / gcd(a, b)) * b;
+    }
+
+    public static double stdev(double[] data) {
+        double mean = mean(data);
+        double dividend = 0;
+        for (double num : data) {
+            dividend += Math.pow(num - mean, 2);
+        }
+        return Math.sqrt(dividend / (data.length - 1));
+    }
+
+    public static double mean(double[] data) {
+        double ans = 0;
+        for (double num : data) {
+            ans += num;
+        }
+        ans /= data.length;
+        return ans;
+    }
+
+    public static double average(double[] data) {
+        return Arrays.stream(data).average().orElse(0);
     }
 }

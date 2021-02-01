@@ -1,5 +1,6 @@
 package xyz.hstudio.horizon.util;
 
+import org.bukkit.util.NumberConversions;
 import xyz.hstudio.horizon.HPlayer;
 import xyz.hstudio.horizon.wrapper.BlockBase;
 import xyz.hstudio.horizon.wrapper.WorldBase;
@@ -94,6 +95,23 @@ public class Location extends Vector3D {
 
     public Vector3D getDirection() {
         return MathUtils.getDirection(yaw, pitch);
+    }
+
+    public Location setDirection(Vector3D vector) {
+        double x = vector.x;
+        double z = vector.z;
+        if (x == 0 && z == 0) {
+            float pitch = vector.y > 0 ? -90f : 90f;
+            return new Location(world, x, y, z, yaw, pitch);
+        } else {
+            double theta = Math.atan2(-x, z);
+            float yaw = (float) Math.toDegrees((theta + Math.PI * 2) % (Math.PI * 2));
+            double x2 = NumberConversions.square(x);
+            double z2 = NumberConversions.square(z);
+            double xz = Math.sqrt(x2 + z2);
+            float pitch = (float) Math.toDegrees(Math.atan(-vector.y / xz));
+            return new Location(world, x, y, z, yaw, pitch);
+        }
     }
 
     public org.bukkit.Location bukkit() {

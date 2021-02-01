@@ -1,9 +1,14 @@
-package xyz.hstudio.horizon.module;
+package xyz.hstudio.horizon.module.checks;
 
 import xyz.hstudio.horizon.HPlayer;
+import xyz.hstudio.horizon.Horizon;
+import xyz.hstudio.horizon.api.enums.Detection;
+import xyz.hstudio.horizon.configuration.ConfigBase;
+import xyz.hstudio.horizon.configuration.LoadInfo;
 import xyz.hstudio.horizon.event.InEvent;
 import xyz.hstudio.horizon.event.inbound.EntityInteractEvent;
 import xyz.hstudio.horizon.event.inbound.MoveEvent;
+import xyz.hstudio.horizon.module.CheckBase;
 import xyz.hstudio.horizon.util.*;
 import xyz.hstudio.horizon.wrapper.EntityBase;
 
@@ -11,6 +16,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.OptionalDouble;
 import java.util.stream.Collectors;
+
+import static xyz.hstudio.horizon.module.checks.HitBox.Cfg.*;
 
 public class HitBox extends CheckBase {
 
@@ -52,11 +59,11 @@ public class HitBox extends CheckBase {
             Vector3D direction = p.physics.position.getDirection();
             Ray3D ray = new Ray3D(headPos, direction);
 
-            double epsilon = entity.borderSize() + 0.005;
+            double epsilon = entity.borderSize() + box_epsilon;
 
             List<AABB> cubes = inst
                     .getAsync()
-                    .getHistory(entity, p.status.ping, 3)
+                    .getHistory(entity, p.status.ping, history_range)
                     .stream().map(loc -> loc
                             .toAABB(entity.length(), entity.width())
                             .expand(epsilon, epsilon, epsilon))
@@ -74,16 +81,17 @@ public class HitBox extends CheckBase {
                     .min();
 
             double dist = distance.orElse(0);
-            if (dist > 3.1) {
-                if ((buffer += 1.5) > 3) {
-                    System.out.println("Too far! Distance: " + dist);
+            if (dist > limit) {
+                if ((buffer += buffer_adder) > max_buffer) {
+                    punish(e, "HitBox (TYCqq)", (dist - limit) * 10, Detection.HIT_BOX,
+                            "d:" + dist);
                 }
             } else if (cubes.stream().noneMatch(this::direction)) {
-                if ((buffer += 1.5) > 3) {
-                    System.out.println("Did not hit bounding box");
+                if ((buffer += buffer_adder) > max_buffer) {
+                    punish(e, "HitBox (COY9Y)", 2, Detection.HIT_BOX, null);
                 }
             } else {
-                buffer = Math.max(buffer - 0.75, 0);
+                buffer = Math.max(buffer - buffer_reducer, 0);
             }
         }
     }
@@ -103,7 +111,7 @@ public class HitBox extends CheckBase {
             Ray2D.Tracer tracer2D = ray2D.new Tracer();
 
             double distance = point.distance(next);
-            double rate = distance / 10;
+            double rate = distance / step;
 
             // Check for the origin point
             Vector3D dir = MathUtils.getDirection(tracer2D.x, tracer2D.y);
@@ -123,5 +131,28 @@ public class HitBox extends CheckBase {
             point = next;
         }
         return false;
+    }
+
+    public static void init() {
+        CheckBase.init("hit_box", HitBox.Cfg.class, def);
+    }
+
+    static class Cfg extends ConfigBase {
+        static final Yaml def = Yaml.loadConfiguration(Horizon.class.getResourceAsStream("/checks/hit_box.yml"));
+
+        @LoadInfo(path = "max_buffer")
+        static int max_buffer;
+        @LoadInfo(path = "buffer_adder")
+        static double buffer_adder;
+        @LoadInfo(path = "buffer_reducer")
+        static double buffer_reducer;
+        @LoadInfo(path = "box_epsilon")
+        static double box_epsilon;
+        @LoadInfo(path = "history_range")
+        static int history_range;
+        @LoadInfo(path = "limit")
+        static double limit;
+        @LoadInfo(path = "step")
+        static int step;
     }
 }

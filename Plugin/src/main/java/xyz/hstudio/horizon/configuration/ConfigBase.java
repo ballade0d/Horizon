@@ -18,16 +18,16 @@ public abstract class ConfigBase {
 
             String path = annotation.path();
 
-            Object value = yaml.get(path);
-
             try {
-                field.set(null, value);
+                if (!yaml.contains(path)) {
+                    throw new Exception();
+                }
+                field.set(null, yaml.get(path));
             } catch (Exception e) {
                 Logger.msg("WARN", "Failed to load the value " + path + " in the config! Using default value. Stacktrace:");
                 e.printStackTrace();
-                value = def.get(path);
                 try {
-                    field.set(null, value);
+                    field.set(null, def.get(path));
                 } catch (Exception ignore) {
                 }
             }
