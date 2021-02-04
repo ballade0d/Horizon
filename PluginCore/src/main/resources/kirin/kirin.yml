@@ -1,3 +1,0 @@
-# Should Horizon replace Velocity packet with Explosion packet?
-# This can make some anti velocity hacks unavailable.
-use_explosion_packet: true
