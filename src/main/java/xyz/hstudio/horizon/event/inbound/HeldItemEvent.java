@@ -2,9 +2,9 @@ package xyz.hstudio.horizon.event.inbound;
 
 import net.minecraft.server.v1_8_R3.PacketPlayInHeldItemSlot;
 import xyz.hstudio.horizon.HPlayer;
-import xyz.hstudio.horizon.event.InEvent;
+import xyz.hstudio.horizon.event.Event;
 
-public class HeldItemEvent extends InEvent<PacketPlayInHeldItemSlot> {
+public class HeldItemEvent extends Event<PacketPlayInHeldItemSlot> {
 
     public final int heldItemSlot;
 

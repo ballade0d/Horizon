@@ -3,13 +3,13 @@ package xyz.hstudio.horizon.event.outbound;
 import lombok.AllArgsConstructor;
 import net.minecraft.server.v1_8_R3.PacketPlayOutUpdateAttributes;
 import xyz.hstudio.horizon.HPlayer;
-import xyz.hstudio.horizon.event.OutEvent;
+import xyz.hstudio.horizon.event.Event;
 
 import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
-public class AttributeEvent extends OutEvent<PacketPlayOutUpdateAttributes> {
+public class AttributeEvent extends Event<PacketPlayOutUpdateAttributes> {
 
     public static final UUID SPRINT_UUID = UUID.fromString("662a6b8d-da3e-4c1c-8813-96ea6097278d");
     public static final AttributeModifier SPRINT_MODIFIER = new AttributeModifier(SPRINT_UUID, 0.3, 2);

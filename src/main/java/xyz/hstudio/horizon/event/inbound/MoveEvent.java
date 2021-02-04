@@ -4,7 +4,7 @@ import net.minecraft.server.v1_8_R3.PacketPlayInFlying;
 import org.bukkit.Material;
 import org.bukkit.potion.PotionEffectType;
 import xyz.hstudio.horizon.HPlayer;
-import xyz.hstudio.horizon.event.InEvent;
+import xyz.hstudio.horizon.event.Event;
 import xyz.hstudio.horizon.util.AABB;
 import xyz.hstudio.horizon.util.Location;
 import xyz.hstudio.horizon.util.Vector3D;
@@ -14,7 +14,7 @@ import xyz.hstudio.horizon.wrapper.BlockBase;
 import java.util.List;
 import java.util.Set;
 
-public class MoveEvent extends InEvent<PacketPlayInFlying> {
+public class MoveEvent extends Event<PacketPlayInFlying> {
 
     public final Location to;
     public final Location from;

@@ -12,8 +12,7 @@ import xyz.hstudio.horizon.Horizon;
 import xyz.hstudio.horizon.api.enums.Detection;
 import xyz.hstudio.horizon.api.event.PlayerViolationEvent;
 import xyz.hstudio.horizon.configuration.Execution;
-import xyz.hstudio.horizon.event.InEvent;
-import xyz.hstudio.horizon.event.OutEvent;
+import xyz.hstudio.horizon.event.Event;
 
 import java.util.List;
 
@@ -58,7 +57,7 @@ public abstract class CheckBase {
         violation = Math.max(violation - decayAmount, 0);
     }
 
-    protected void punish(InEvent<?> event, String type, double adder, Detection detection, String info) {
+    protected void punish(Event<?> event, String type, double adder, Detection detection, String info) {
         int vl = this.violation + Math.max(NumberConversions.round(adder), 1);
 
         PlayerViolationEvent api = new PlayerViolationEvent(p.bukkit, detection, type, vl, info);
@@ -88,10 +87,7 @@ public abstract class CheckBase {
         this.failedTick = inst.getAsync().getTick();
     }
 
-    public void received(InEvent<?> event) {
-    }
-
-    public void sent(OutEvent<?> event) {
+    public void run(Event<?> event) {
     }
 
     public void tickAsync(int tick) {

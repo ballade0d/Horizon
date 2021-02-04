@@ -4,8 +4,7 @@ import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
 import xyz.hstudio.horizon.HPlayer;
-import xyz.hstudio.horizon.event.InEvent;
-import xyz.hstudio.horizon.event.OutEvent;
+import xyz.hstudio.horizon.event.Event;
 import xyz.hstudio.horizon.module.CheckBase;
 import xyz.hstudio.horizon.wrapper.PackerBase;
 
@@ -22,53 +21,38 @@ public class PacketHandler extends ChannelDuplexHandler {
 
     @Override
     public void channelRead(ChannelHandlerContext context, Object packet) throws Exception {
-        boolean cancelled = false;
-        try {
-            InEvent<?> event = PackerBase.received(p, packet);
-            if (event != null) {
-                if (!event.pre()) {
-                    cancelled = true;
-                } else {
-                    for (CheckBase check : p.getChecks()) {
-                        check.received(event);
-                    }
-                    event.post();
-                    cancelled = event.isCancelled();
-                }
-                event.apply(packet);
-            }
-        } catch (Throwable throwable) {
-            throwable.printStackTrace();
-        } finally {
-            if (!cancelled) {
-                super.channelRead(context, packet);
-            }
+        Event<?> event = PackerBase.received(p, packet);
+        if (run(event, packet)) {
+            super.channelRead(context, packet);
         }
     }
 
     @Override
     public void write(ChannelHandlerContext context, Object packet, ChannelPromise promise) throws Exception {
-        boolean cancelled = false;
+        Event<?> event = PackerBase.sent(p, packet);
+        if (run(event, packet)) {
+            super.write(context, packet, promise);
+        }
+    }
+
+    private boolean run(Event<?> event, Object packet) {
         try {
-            OutEvent<?> event = PackerBase.sent(p, packet);
-            if (event != null) {
-                if (!event.pre()) {
-                    cancelled = true;
-                } else {
-                    for (CheckBase check : p.getChecks()) {
-                        check.sent(event);
-                    }
-                    event.post();
-                    cancelled = event.isCancelled();
+            if (event == null) {
+                return true;
+            }
+            if (!event.pre()) {
+                return false;
+            } else {
+                for (CheckBase check : p.getChecks()) {
+                    check.run(event);
                 }
+                event.post();
                 event.apply(packet);
+                return !event.isCancelled();
             }
         } catch (Throwable throwable) {
             throwable.printStackTrace();
-        } finally {
-            if (!cancelled) {
-                super.write(context, packet, promise);
-            }
+            return true;
         }
     }
 

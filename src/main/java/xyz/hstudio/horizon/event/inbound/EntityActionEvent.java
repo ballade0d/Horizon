@@ -2,10 +2,10 @@ package xyz.hstudio.horizon.event.inbound;
 
 import net.minecraft.server.v1_8_R3.PacketPlayInEntityAction;
 import xyz.hstudio.horizon.HPlayer;
-import xyz.hstudio.horizon.event.InEvent;
+import xyz.hstudio.horizon.event.Event;
 import xyz.hstudio.horizon.event.outbound.AttributeEvent;
 
-public class EntityActionEvent extends InEvent<PacketPlayInEntityAction> {
+public class EntityActionEvent extends Event<PacketPlayInEntityAction> {
 
     public final ActionType type;
     public final int jumpBoost;

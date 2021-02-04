@@ -2,7 +2,7 @@ package xyz.hstudio.horizon.module.checks;
 
 import xyz.hstudio.horizon.HPlayer;
 import xyz.hstudio.horizon.api.enums.Detection;
-import xyz.hstudio.horizon.event.InEvent;
+import xyz.hstudio.horizon.event.Event;
 import xyz.hstudio.horizon.event.inbound.EntityActionEvent;
 import xyz.hstudio.horizon.event.inbound.HeldItemEvent;
 import xyz.hstudio.horizon.module.CheckBase;
@@ -14,7 +14,7 @@ public class BadPackets extends CheckBase {
     }
 
     @Override
-    public void received(InEvent<?> event) {
+    public void run(Event<?> event) {
         if (event instanceof HeldItemEvent) {
             held((HeldItemEvent) event);
         } else if (event instanceof EntityActionEvent) {

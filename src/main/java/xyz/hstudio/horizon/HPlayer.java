@@ -65,6 +65,7 @@ public class HPlayer {
                 put(KILL_AURA, new KillAura(HPlayer.this));
                 put(KILL_AURA_BOT, new KillAuraBot(HPlayer.this));
                 put(NO_SWING, new NoSwing(HPlayer.this));
+                put(PHASE, new Phase(HPlayer.this));
                 put(VERTICAL_MOVEMENT, new VerticalMovement(HPlayer.this));
             }
         };
@@ -91,6 +92,10 @@ public class HPlayer {
 
     public WorldBase getWorld() {
         return new WorldBase(bukkit.getWorld());
+    }
+
+    public boolean teleportUnsafe(Location loc) {
+        return bukkit.teleport(loc.bukkit());
     }
 
     public float moveFactor() {

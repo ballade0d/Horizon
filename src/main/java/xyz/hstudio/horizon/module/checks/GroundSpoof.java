@@ -6,7 +6,7 @@ import net.minecraft.server.v1_8_R3.PacketPlayInFlying;
 import org.bukkit.Material;
 import xyz.hstudio.horizon.HPlayer;
 import xyz.hstudio.horizon.api.enums.Detection;
-import xyz.hstudio.horizon.event.InEvent;
+import xyz.hstudio.horizon.event.Event;
 import xyz.hstudio.horizon.event.inbound.MoveEvent;
 import xyz.hstudio.horizon.module.CheckBase;
 import xyz.hstudio.horizon.util.AABB;
@@ -19,7 +19,7 @@ public class GroundSpoof extends CheckBase {
     }
 
     @Override
-    public void received(InEvent<?> event) {
+    public void run(Event<?> event) {
         if (event instanceof MoveEvent) {
             check((MoveEvent) event);
         }

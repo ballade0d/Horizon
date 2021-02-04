@@ -2,10 +2,10 @@ package xyz.hstudio.horizon.event.inbound;
 
 import net.minecraft.server.v1_8_R3.PacketPlayInKeepAlive;
 import xyz.hstudio.horizon.HPlayer;
-import xyz.hstudio.horizon.event.InEvent;
+import xyz.hstudio.horizon.event.Event;
 import xyz.hstudio.horizon.util.Pair;
 
-public class KeepaliveRespondEvent extends InEvent<PacketPlayInKeepAlive> {
+public class KeepaliveRespondEvent extends Event<PacketPlayInKeepAlive> {
 
     public final int id;
 

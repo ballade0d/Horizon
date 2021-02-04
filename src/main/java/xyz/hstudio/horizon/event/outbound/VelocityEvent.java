@@ -2,9 +2,9 @@ package xyz.hstudio.horizon.event.outbound;
 
 import net.minecraft.server.v1_8_R3.PacketPlayOutEntityVelocity;
 import xyz.hstudio.horizon.HPlayer;
-import xyz.hstudio.horizon.event.OutEvent;
+import xyz.hstudio.horizon.event.Event;
 
-public class VelocityEvent extends OutEvent<PacketPlayOutEntityVelocity> {
+public class VelocityEvent extends Event<PacketPlayOutEntityVelocity> {
 
     public final float x;
     public final float y;

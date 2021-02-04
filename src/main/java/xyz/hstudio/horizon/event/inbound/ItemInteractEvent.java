@@ -3,9 +3,9 @@ package xyz.hstudio.horizon.event.inbound;
 import net.minecraft.server.v1_8_R3.PacketPlayInBlockDig;
 import org.bukkit.inventory.ItemStack;
 import xyz.hstudio.horizon.HPlayer;
-import xyz.hstudio.horizon.event.InEvent;
+import xyz.hstudio.horizon.event.Event;
 
-public class ItemInteractEvent extends InEvent<PacketPlayInBlockDig> {
+public class ItemInteractEvent extends Event<PacketPlayInBlockDig> {
 
     public final InteractType type;
     public final ItemStack itemStack;

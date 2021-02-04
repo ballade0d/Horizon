@@ -1,6 +1,7 @@
 package xyz.hstudio.horizon.task;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import org.apache.commons.io.IOUtils;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.LivingEntity;
@@ -13,19 +14,22 @@ import xyz.hstudio.horizon.util.Location;
 import xyz.hstudio.horizon.util.Pair;
 import xyz.hstudio.horizon.wrapper.EntityBase;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.zip.GZIPOutputStream;
 
 public class Async implements Runnable {
 
     private final Horizon inst;
     private final ScheduledExecutorService threadPool;
-    private final Map<EntityBase, List<Pair<Location, Integer>>> trackedEntities;
-    private final AtomicInteger tick;
+    private final AtomicInteger tick = new AtomicInteger();
 
     public Async(Horizon inst) {
         this.inst = inst;
@@ -34,9 +38,47 @@ public class Async implements Runnable {
                 .setNameFormat("Horizon Processing Thread")
                 .build());
 
-        trackedEntities = new ConcurrentHashMap<>();
+        try {
+            File logs = new File(inst.getDataFolder(), "logs");
+            if (!logs.exists() && !logs.mkdirs()) {
+                throw new IllegalStateException("Failed to enable log system.");
+            }
+            File[] files = logs.listFiles();
+            if (files == null) {
+                throw new IllegalStateException("Failed to enable log system.");
+            }
 
-        tick = new AtomicInteger();
+            String date = DateTimeFormatter.ofPattern("yyyy-MM-dd").format(LocalDateTime.now());
+
+            int count = 0;
+            for (File file : files) {
+                if (!file.getName().startsWith(date)) {
+                    continue;
+                }
+                count++;
+            }
+
+            File oldLog = new File(logs, date + "-" + count + ".log");
+            if (oldLog.exists()) {
+                FileInputStream input = new FileInputStream(oldLog);
+                GZIPOutputStream output = new GZIPOutputStream(new FileOutputStream(new File(logs, date + "-" + count + ".log.gz")));
+                IOUtils.copy(input, output);
+                output.close();
+                input.close();
+                if (!oldLog.delete()) {
+                    throw new IllegalStateException("Failed to enable log system.");
+                }
+            }
+
+            File log = new File(logs, date + "-" + (count + 1) + ".log");
+            if (!log.createNewFile()) {
+                throw new IllegalStateException("Failed to enable log system.");
+            }
+
+            this.logOutput = new FileOutputStream(log, true);
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     public void start() {
@@ -53,16 +95,30 @@ public class Async implements Runnable {
 
     @Override
     public void run() {
+        executeChecks();
+        trackEntities();
+        writeLogs();
+
+        tick.incrementAndGet();
+    }
+
+    /**
+     * Check executor
+     */
+
+    private void executeChecks() {
         for (HPlayer p : inst.getPlayers().values()) {
             for (CheckBase check : p.getChecks()) {
                 check.tickAsync(tick.get());
                 check.decay(tick.get());
             }
         }
-        trackEntities();
-
-        tick.incrementAndGet();
     }
+
+    /**
+     * Entity tracker
+     */
+    private final Map<EntityBase, List<Pair<Location, Integer>>> trackedEntities = new ConcurrentHashMap<>();
 
     private void trackEntities() {
         if (tick.get() % 20 == 0) {
@@ -124,5 +180,28 @@ public class Async implements Runnable {
 
     public void clearHistory(EntityBase entity) {
         trackedEntities.remove(entity);
+    }
+
+    /**
+     * Log system
+     */
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private final Deque<String> logs = new ConcurrentLinkedDeque<>();
+    private final FileOutputStream logOutput;
+
+    private void writeLogs() {
+        String time = "[" + FORMATTER.format(LocalDateTime.now()) + "] ";
+        try {
+            for (String message : logs) {
+                this.logOutput.write((time + message).getBytes());
+                this.logOutput.write(System.lineSeparator().getBytes());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void log(String message) {
+        logs.addLast(message);
     }
 }

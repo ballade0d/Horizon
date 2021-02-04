@@ -2,7 +2,7 @@ package xyz.hstudio.horizon.module.checks;
 
 import xyz.hstudio.horizon.HPlayer;
 import xyz.hstudio.horizon.api.enums.Detection;
-import xyz.hstudio.horizon.event.InEvent;
+import xyz.hstudio.horizon.event.Event;
 import xyz.hstudio.horizon.event.inbound.ArmSwingEvent;
 import xyz.hstudio.horizon.event.inbound.EntityInteractEvent;
 import xyz.hstudio.horizon.module.CheckBase;
@@ -16,11 +16,11 @@ public class NoSwing extends CheckBase {
     }
 
     @Override
-    public void received(InEvent<?> event) {
+    public void run(Event<?> event) {
         hit(event);
     }
 
-    private void hit(InEvent<?> event) {
+    private void hit(Event<?> event) {
         if (event instanceof ArmSwingEvent) {
             swingExpected = false;
         } else if (event instanceof EntityInteractEvent) {

@@ -10,52 +10,52 @@ import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
-@LoadClass(file = "/config.yml")
+@LoadFrom("config.yml")
 public class Config {
 
-    @LoadInfo(path = "prefix")
+    @LoadInfo("prefix")
     public static String PREFIX;
 
-    @LoadInfo(path = "mysql.enabled")
-    public static boolean mysql_enabled;
-    @LoadInfo(path = "mysql.host")
-    public static String mysql_host;
-    @LoadInfo(path = "mysql.database")
-    public static String mysql_database;
-    @LoadInfo(path = "mysql.user")
-    public static String mysql_user;
-    @LoadInfo(path = "mysql.password")
-    public static String mysql_password;
-    @LoadInfo(path = "mysql.port")
-    public static int mysql_port;
+    @LoadInfo("mysql.enabled")
+    public static boolean MYSQL_ENABLED;
+    @LoadInfo("mysql.host")
+    public static String MYSQL_HOST;
+    @LoadInfo("mysql.database")
+    public static String MYSQL_DATABASE;
+    @LoadInfo("mysql.user")
+    public static String MYSQL_USER;
+    @LoadInfo("mysql.password")
+    public static String MYSQL_PASSWORD;
+    @LoadInfo("mysql.port")
+    public static int MYSQL_PORT;
 
-    @LoadInfo(path = "discord_integration.enabled")
-    public static boolean discord_integration_enabled;
-    @LoadInfo(path = "discord_integration.token")
-    public static String discord_integration_token;
-    @LoadInfo(path = "discord_integration.channel_name")
-    public static String discord_integration_channel_name;
+    @LoadInfo("discord_integration.enabled")
+    public static boolean DISCORD_INTEGRATION_ENABLED;
+    @LoadInfo("discord_integration.token")
+    public static String DISCORD_INTEGRATION_TOKEN;
+    @LoadInfo("discord_integration.channel_name")
+    public static String DISCORD_INTEGRATION_CHANNEL_NAME;
 
-    @LoadInfo(path = "kirin.enabled")
-    public static boolean kirin_enabled;
-    @LoadInfo(path = "kirin.license")
-    public static String kirin_license;
+    @LoadInfo("kirin.enabled")
+    public static boolean KIRIN_ENABLED;
+    @LoadInfo("kirin.license")
+    public static String KIRIN_LICENSE;
 
-    @LoadInfo(path = "ghost_block_fix")
-    public static boolean ghost_block_fix;
+    @LoadInfo("ghost_block_fix")
+    public static boolean GHOST_BLOCK_FIX;
 
     public static void load(Class<?> clazz) {
-        LoadClass definer = clazz.getAnnotation(LoadClass.class);
+        LoadFrom definer = clazz.getAnnotation(LoadFrom.class);
         if (definer == null) {
             throw new IllegalStateException();
         }
 
         Horizon inst = JavaPlugin.getPlugin(Horizon.class);
-        YamlConfiguration def = Yaml.loadConfiguration(Horizon.class.getResourceAsStream(definer.file()));
+        YamlConfiguration def = Yaml.loadConfiguration(inst.getResource(definer.value()));
 
-        File file = new File(inst.getDataFolder(), definer.file());
+        File file = new File(inst.getDataFolder(), definer.value());
         if (!file.isFile()) {
-            inst.saveResource(definer.file(), true);
+            inst.saveResource(definer.value(), true);
         }
 
         YamlConfiguration yaml = Yaml.loadConfiguration(file);
@@ -67,16 +67,15 @@ public class Config {
             }
             field.setAccessible(true);
 
-            String path = annotation.path();
+            String path = annotation.value();
 
             try {
                 if (!yaml.contains(path)) {
-                    throw new Exception();
+                    throw new IllegalStateException("Cannot find the value in the config.");
                 }
                 field.set(null, yaml.get(path));
             } catch (Exception e) {
-                Logger.msg("WARN", "Failed to load the value " + path + " in the config! Using default value. Stacktrace:");
-                e.printStackTrace();
+                Logger.msg("WARN", "Failed to load the value " + path + " in the file " + definer.value() + " ! Using default value. Reason: " + e.getMessage());
                 try {
                     field.set(null, def.get(path));
                 } catch (Exception ignore) {

@@ -11,9 +11,9 @@ import org.bukkit.craftbukkit.v1_8_R3.util.CraftChatMessage;
 import org.bukkit.craftbukkit.v1_8_R3.util.CraftMagicNumbers;
 import xyz.hstudio.horizon.HPlayer;
 import xyz.hstudio.horizon.api.enums.Detection;
-import xyz.hstudio.horizon.configuration.LoadClass;
+import xyz.hstudio.horizon.configuration.LoadFrom;
 import xyz.hstudio.horizon.configuration.LoadInfo;
-import xyz.hstudio.horizon.event.InEvent;
+import xyz.hstudio.horizon.event.Event;
 import xyz.hstudio.horizon.event.inbound.EntityInteractEvent;
 import xyz.hstudio.horizon.event.inbound.MoveEvent;
 import xyz.hstudio.horizon.module.CheckBase;
@@ -25,33 +25,33 @@ import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
-@LoadClass(file = "/checks/kill_aura_bot.yml")
+@LoadFrom("checks/kill_aura_bot.yml")
 public class KillAuraBot extends CheckBase {
 
-    @LoadInfo(path = "command_only")
-    private static boolean command_only;
-    @LoadInfo(path = "update_interval")
-    private static int update_interval;
-    @LoadInfo(path = "xz_distance")
-    private static double xz_distance;
-    @LoadInfo(path = "y_distance")
-    private static double y_distance;
-    @LoadInfo(path = "offset.x")
-    private static double offset_x;
-    @LoadInfo(path = "offset.y")
-    private static double offset_y;
-    @LoadInfo(path = "offset.z")
-    private static double offset_z;
-    @LoadInfo(path = "show_damage")
-    private static boolean show_damage;
-    @LoadInfo(path = "show_swing")
-    private static boolean show_swing;
-    @LoadInfo(path = "show_armor")
-    private static boolean show_armor;
-    @LoadInfo(path = "realistic_ping")
-    private static boolean realistic_ping;
-    @LoadInfo(path = "async_packet")
-    private static boolean async_packet;
+    @LoadInfo("command_only")
+    private static boolean COMMAND_ONLY;
+    @LoadInfo("update_interval")
+    private static int UPDATE_INTERVAL;
+    @LoadInfo("xz_distance")
+    private static double XZ_DISTANCE;
+    @LoadInfo("y_distance")
+    private static double Y_DISTANCE;
+    @LoadInfo("offset.x")
+    private static double OFFSET_X;
+    @LoadInfo("offset.y")
+    private static double OFFSET_Y;
+    @LoadInfo("offset.z")
+    private static double OFFSET_Z;
+    @LoadInfo("show_damage")
+    private static boolean SHOW_DAMAGE;
+    @LoadInfo("show_swing")
+    private static boolean SHOW_SWING;
+    @LoadInfo("show_armor")
+    private static boolean SHOW_ARMOR;
+    @LoadInfo("realistic_ping")
+    private static boolean REALISTIC_PING;
+    @LoadInfo("async_packet")
+    private static boolean ASYNC_PACKET;
 
     private static final ItemStack[] HELMET = {
             new ItemStack(CraftMagicNumbers.getItem(Material.LEATHER_HELMET)),
@@ -93,7 +93,8 @@ public class KillAuraBot extends CheckBase {
         super(p, 1, 100, 100);
     }
 
-    public void received(InEvent<?> event) {
+    @Override
+    public void run(Event<?> event) {
         if (event instanceof EntityInteractEvent) {
             EntityInteractEvent e = (EntityInteractEvent) event;
             if (e.entity == null && bot != null && e.entityId == bot.getId()) {
@@ -106,10 +107,10 @@ public class KillAuraBot extends CheckBase {
             bot = prepare();
             KillAuraBot.run(() -> {
                 spawn();
-                if (show_armor) {
+                if (SHOW_ARMOR) {
                     setArmor();
                 }
-            }, async_packet);
+            }, ASYNC_PACKET);
         } else if (event instanceof MoveEvent) {
             MoveEvent e = (MoveEvent) event;
             if (!e.teleport || bot == null) {
@@ -118,18 +119,18 @@ public class KillAuraBot extends CheckBase {
             KillAuraBot.run(() -> {
                 destroy();
                 bot = null;
-            }, async_packet);
+            }, ASYNC_PACKET);
         }
     }
 
     public void tickAsync(int tick) {
-        if (tick % update_interval != 0 || bot == null) {
+        if (tick % UPDATE_INTERVAL != 0 || bot == null) {
             return;
         }
         // TODO: check for command only
-        Location to = computeLoc(p.physics.position, xz_distance, y_distance);
+        Location to = computeLoc(p.physics.position, XZ_DISTANCE, Y_DISTANCE);
 
-        to.add(new Vector3D(offset_x * ThreadLocalRandom.current().nextDouble(), offset_y * ThreadLocalRandom.current().nextDouble(), offset_z * ThreadLocalRandom.current().nextDouble()));
+        to.add(new Vector3D(OFFSET_X * ThreadLocalRandom.current().nextDouble(), OFFSET_Y * ThreadLocalRandom.current().nextDouble(), OFFSET_Z * ThreadLocalRandom.current().nextDouble()));
 
         KillAuraBot.run(() -> {
             move(to.x, to.y, to.z, p.physics.position.yaw, p.physics.position.pitch);
@@ -143,20 +144,20 @@ public class KillAuraBot extends CheckBase {
                 bot.setSneaking(true);
             }
 
-            if (show_swing) {
+            if (SHOW_SWING) {
                 swingArm();
             }
 
-            if (show_damage && tick % 30 == 0) {
+            if (SHOW_DAMAGE && tick % 30 == 0) {
                 damage();
             }
 
-            if (realistic_ping && tick % 40 == 0) {
+            if (REALISTIC_PING && tick % 40 == 0) {
                 updatePing();
             }
 
             updateStatus();
-        }, async_packet);
+        }, ASYNC_PACKET);
     }
 
     private EntityPlayer prepare() {
@@ -169,7 +170,7 @@ public class KillAuraBot extends CheckBase {
         GameProfile profile = new GameProfile(uuid, name);
         PlayerInteractManager playerInteractManager = new PlayerInteractManager(worldServer);
         EntityPlayer entityPlayer = new EntityPlayer(minecraftServer, worldServer, profile, playerInteractManager);
-        Location loc = computeLoc(p.physics.position, xz_distance, y_distance);
+        Location loc = computeLoc(p.physics.position, XZ_DISTANCE, Y_DISTANCE);
         entityPlayer.listName = CraftChatMessage.fromString("§f" + name)[0];
         entityPlayer.setInvisible(false);
         entityPlayer.setLocation(loc.x, loc.y, loc.z, loc.yaw, loc.pitch);

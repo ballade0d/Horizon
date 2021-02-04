@@ -2,10 +2,10 @@ package xyz.hstudio.horizon.event.outbound;
 
 import net.minecraft.server.v1_8_R3.PacketPlayOutPosition;
 import xyz.hstudio.horizon.HPlayer;
-import xyz.hstudio.horizon.event.OutEvent;
+import xyz.hstudio.horizon.event.Event;
 import xyz.hstudio.horizon.util.Location;
 
-public class TeleportEvent extends OutEvent<PacketPlayOutPosition> {
+public class TeleportEvent extends Event<PacketPlayOutPosition> {
 
     public final double x;
     public final double y;

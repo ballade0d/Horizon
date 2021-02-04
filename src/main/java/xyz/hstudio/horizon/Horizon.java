@@ -1,6 +1,5 @@
 package xyz.hstudio.horizon;
 
-import com.google.common.base.Preconditions;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -21,7 +20,6 @@ import xyz.hstudio.horizon.util.AABB;
 import xyz.hstudio.horizon.util.BlockUtils;
 import xyz.hstudio.horizon.util.Location;
 import xyz.hstudio.horizon.util.Yaml;
-import xyz.hstudio.horizon.util.enums.Version;
 
 import java.io.File;
 import java.net.URLClassLoader;
@@ -41,16 +39,17 @@ public final class Horizon extends JavaPlugin {
     private final SQLite sql = new SQLite();
 
     public Horizon() {
-        Preconditions.checkState(
-                Version.getInst() != Version.UNKNOWN,
-                "Unsupported version!");
+        try {
+            Class.forName("net.minecraft.server.v1_8_R3.MinecraftServer");
+        } catch (ClassNotFoundException e) {
+            throw new IllegalStateException("Unsupported version!");
+        }
     }
 
     @Override
     public void onEnable() {
         // Async task
         async.start();
-
         // Sync task
         sync.start();
 
@@ -90,7 +89,7 @@ public final class Horizon extends JavaPlugin {
 
             @EventHandler(priority = EventPriority.MONITOR)
             public void onTeleport(PlayerTeleportEvent e) {
-                if (e.getCause() != PlayerTeleportEvent.TeleportCause.UNKNOWN || !Config.ghost_block_fix) {
+                if (e.getCause() != PlayerTeleportEvent.TeleportCause.UNKNOWN || !Config.GHOST_BLOCK_FIX) {
                     return;
                 }
 

@@ -2,7 +2,7 @@ package xyz.hstudio.horizon.module.checks;
 
 import xyz.hstudio.horizon.HPlayer;
 import xyz.hstudio.horizon.api.enums.Detection;
-import xyz.hstudio.horizon.event.InEvent;
+import xyz.hstudio.horizon.event.Event;
 import xyz.hstudio.horizon.event.inbound.MoveEvent;
 import xyz.hstudio.horizon.module.CheckBase;
 import xyz.hstudio.horizon.util.enums.Direction;
@@ -31,7 +31,7 @@ public class VerticalMovement extends CheckBase {
     }
 
     @Override
-    public void received(InEvent<?> event) {
+    public void run(Event<?> event) {
         if (event instanceof MoveEvent) {
             move((MoveEvent) event);
             step((MoveEvent) event);

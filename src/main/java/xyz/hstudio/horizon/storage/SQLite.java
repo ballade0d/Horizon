@@ -13,13 +13,13 @@ public class SQLite {
     private Connection connection;
 
     public void setup() {
-        String host = Config.mysql_host;
-        String database = Config.mysql_database;
-        String user = Config.mysql_user;
-        String pass = Config.mysql_password;
-        int port = Config.mysql_port;
+        String host = Config.MYSQL_HOST;
+        String database = Config.MYSQL_DATABASE;
+        String user = Config.MYSQL_USER;
+        String pass = Config.MYSQL_PASSWORD;
+        int port = Config.MYSQL_PORT;
 
-        if (Config.mysql_enabled) {
+        if (Config.MYSQL_ENABLED) {
             try {
                 synchronized (this) {
                     if (connection != null && !connection.isClosed()) {

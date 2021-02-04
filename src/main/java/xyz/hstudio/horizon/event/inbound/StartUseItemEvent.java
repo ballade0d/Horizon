@@ -6,9 +6,9 @@ import org.bukkit.Material;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.inventory.ItemStack;
 import xyz.hstudio.horizon.HPlayer;
-import xyz.hstudio.horizon.event.InEvent;
+import xyz.hstudio.horizon.event.Event;
 
-public class StartUseItemEvent extends InEvent<PacketPlayInBlockPlace> {
+public class StartUseItemEvent extends Event<PacketPlayInBlockPlace> {
 
     public final ItemStack itemStack;
 

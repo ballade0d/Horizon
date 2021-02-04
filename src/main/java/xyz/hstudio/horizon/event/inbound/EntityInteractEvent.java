@@ -5,11 +5,11 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import xyz.hstudio.horizon.HPlayer;
-import xyz.hstudio.horizon.event.InEvent;
+import xyz.hstudio.horizon.event.Event;
 import xyz.hstudio.horizon.util.Vector3D;
 import xyz.hstudio.horizon.wrapper.EntityBase;
 
-public class EntityInteractEvent extends InEvent<PacketPlayInUseEntity> {
+public class EntityInteractEvent extends Event<PacketPlayInUseEntity> {
 
     public final int entityId;
     public final InteractType type;

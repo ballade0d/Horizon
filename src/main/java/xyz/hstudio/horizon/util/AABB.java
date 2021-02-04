@@ -38,6 +38,12 @@ public class AABB {
         return this;
     }
 
+    public void shrink(double x, double y, double z) {
+        Vector3D subtraction = new Vector3D(x, y, z);
+        min.add(subtraction);
+        max.subtract(subtraction);
+    }
+
     public AABB plus(double minX, double minY, double minZ, double maxX, double maxY, double maxZ) {
         return new AABB(min.x + minX, min.y + minY, min.z + minZ, max.x + maxX, max.y + maxY, max.z + maxZ);
     }

@@ -9,5 +9,5 @@ import java.lang.annotation.Target;
 @Target(value = ElementType.FIELD)
 public @interface LoadInfo {
 
-    String path();
+    String value();
 }

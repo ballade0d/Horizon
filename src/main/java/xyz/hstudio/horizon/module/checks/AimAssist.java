@@ -3,7 +3,7 @@ package xyz.hstudio.horizon.module.checks;
 import org.bukkit.util.NumberConversions;
 import xyz.hstudio.horizon.HPlayer;
 import xyz.hstudio.horizon.api.enums.Detection;
-import xyz.hstudio.horizon.event.InEvent;
+import xyz.hstudio.horizon.event.Event;
 import xyz.hstudio.horizon.event.inbound.MoveEvent;
 import xyz.hstudio.horizon.module.CheckBase;
 import xyz.hstudio.horizon.util.MathUtils;
@@ -33,7 +33,7 @@ public class AimAssist extends CheckBase {
     }
 
     @Override
-    public void received(InEvent<?> event) {
+    public void run(Event<?> event) {
         if (event instanceof MoveEvent) {
             //mousePrediction((MoveEvent) event);
             gcd((MoveEvent) event);
@@ -75,7 +75,6 @@ public class AimAssist extends CheckBase {
         // System.out.println("expected: " + expectedPitch);
         // System.out.println("actual: " + e.to.pitch);
 
-
         lastSensitivity = sensitivity;
     }
     */
@@ -107,7 +106,6 @@ public class AimAssist extends CheckBase {
                     null);
         }
         int len = String.valueOf(mod).length();
-        System.out.println(len);
         if (mod > 0 && len > 0 && len < 8) {
             punish(e, "AimAssist (DGGub)", 3, Detection.AIM_ASSIST,
                     "mod:" + mod + ", l:" + len);

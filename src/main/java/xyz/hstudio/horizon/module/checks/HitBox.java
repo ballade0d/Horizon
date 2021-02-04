@@ -2,9 +2,9 @@ package xyz.hstudio.horizon.module.checks;
 
 import xyz.hstudio.horizon.HPlayer;
 import xyz.hstudio.horizon.api.enums.Detection;
-import xyz.hstudio.horizon.configuration.LoadClass;
+import xyz.hstudio.horizon.configuration.LoadFrom;
 import xyz.hstudio.horizon.configuration.LoadInfo;
-import xyz.hstudio.horizon.event.InEvent;
+import xyz.hstudio.horizon.event.Event;
 import xyz.hstudio.horizon.event.inbound.EntityInteractEvent;
 import xyz.hstudio.horizon.event.inbound.MoveEvent;
 import xyz.hstudio.horizon.module.CheckBase;
@@ -16,23 +16,23 @@ import java.util.Objects;
 import java.util.OptionalDouble;
 import java.util.stream.Collectors;
 
-@LoadClass(file = "/checks/hit_box.yml")
+@LoadFrom("checks/hit_box.yml")
 public class HitBox extends CheckBase {
 
-    @LoadInfo(path = "max_buffer")
-    private static int max_buffer;
-    @LoadInfo(path = "buffer_adder")
-    private static double buffer_adder;
-    @LoadInfo(path = "buffer_reducer")
-    private static double buffer_reducer;
-    @LoadInfo(path = "box_epsilon")
-    private static double box_epsilon;
-    @LoadInfo(path = "history_range")
-    private static int history_range;
-    @LoadInfo(path = "limit")
-    private static double limit;
-    @LoadInfo(path = "step")
-    private static int step;
+    @LoadInfo("max_buffer")
+    private static int MAX_BUFFER;
+    @LoadInfo("buffer_adder")
+    private static double BUFFER_ADDER;
+    @LoadInfo("buffer_reducer")
+    private static double BUFFER_REDUCER;
+    @LoadInfo("box_epsilon")
+    private static double BOX_EPSILON;
+    @LoadInfo("history_range")
+    private static int HISTORY_RANGE;
+    @LoadInfo("limit")
+    private static double LIMIT;
+    @LoadInfo("step")
+    private static int STEP;
 
     private static final int N = 5;
 
@@ -44,7 +44,7 @@ public class HitBox extends CheckBase {
     }
 
     @Override
-    public void received(InEvent<?> event) {
+    public void run(Event<?> event) {
         if (event instanceof MoveEvent) {
             MoveEvent e = (MoveEvent) event;
             if (!e.hasLook) {
@@ -72,11 +72,11 @@ public class HitBox extends CheckBase {
             Vector3D direction = p.physics.position.getDirection();
             Ray3D ray = new Ray3D(headPos, direction);
 
-            double epsilon = entity.borderSize() + box_epsilon;
+            double epsilon = entity.borderSize() + BOX_EPSILON;
 
             List<AABB> cubes = inst
                     .getAsync()
-                    .getHistory(entity, p.status.ping, history_range)
+                    .getHistory(entity, p.status.ping, HISTORY_RANGE)
                     .stream().map(loc -> loc
                             .toAABB(entity.length(), entity.width())
                             .expand(epsilon, epsilon, epsilon))
@@ -94,17 +94,17 @@ public class HitBox extends CheckBase {
                     .min();
 
             double dist = distance.orElse(0);
-            if (dist > limit) {
-                if ((buffer += buffer_adder) > max_buffer) {
-                    punish(e, "HitBox (TYCqq)", (dist - limit) * 10, Detection.HIT_BOX,
+            if (dist > LIMIT) {
+                if ((buffer += BUFFER_ADDER) > MAX_BUFFER) {
+                    punish(e, "HitBox (TYCqq)", (dist - LIMIT) * 10, Detection.HIT_BOX,
                             "d:" + dist);
                 }
             } else if (cubes.stream().noneMatch(this::direction)) {
-                if ((buffer += buffer_adder) > max_buffer) {
+                if ((buffer += BUFFER_ADDER) > MAX_BUFFER) {
                     punish(e, "HitBox (COY9Y)", 2, Detection.HIT_BOX, null);
                 }
             } else {
-                buffer = Math.max(buffer - buffer_reducer, 0);
+                buffer = Math.max(buffer - BUFFER_REDUCER, 0);
             }
         }
     }
@@ -124,7 +124,7 @@ public class HitBox extends CheckBase {
             Ray2D.Tracer tracer2D = ray2D.new Tracer();
 
             double distance = point.distance(next);
-            double rate = distance / step;
+            double rate = distance / STEP;
 
             // Check for the origin point
             Vector3D dir = MathUtils.getDirection(tracer2D.x, tracer2D.y);
