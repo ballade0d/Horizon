@@ -9,18 +9,15 @@ public class EntityBase {
 
     protected final WorldBase world;
     protected final net.minecraft.server.v1_8_R3.Entity entity;
-    protected final org.bukkit.entity.Entity bukkitEntity;
 
     public EntityBase(org.bukkit.entity.Entity entity) {
         this.world = new WorldBase(entity.getWorld());
         this.entity = ((CraftEntity) entity).getHandle();
-        this.bukkitEntity = entity;
     }
 
     public EntityBase(net.minecraft.server.v1_8_R3.Entity entity) {
         this.entity = entity;
         this.world = new WorldBase(entity.world);
-        this.bukkitEntity = entity.getBukkitEntity();
     }
 
     public Location position() {
@@ -42,10 +39,6 @@ public class EntityBase {
 
     public float borderSize() {
         return entity.ao();
-    }
-
-    public org.bukkit.entity.Entity bukkit() {
-        return bukkitEntity;
     }
 
     @Override

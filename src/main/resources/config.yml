@@ -21,7 +21,7 @@ mysql:
 # you will be able to purchase a license in our website.
 kirin:
   enabled: false
-  licence: ''
+  license: ''
 
 # Should Horizon fix ghost-blocks?
 ghost_block_fix: true

@@ -1,3 +1,5 @@
+enable: true
+
 max_buffer: 3
 buffer_adder: 1.5
 buffer_reducer: 0.75

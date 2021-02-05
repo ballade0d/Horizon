@@ -6,13 +6,19 @@ import net.minecraft.server.v1_8_R3.PacketPlayInFlying;
 import org.bukkit.Material;
 import xyz.hstudio.horizon.HPlayer;
 import xyz.hstudio.horizon.api.enums.Detection;
+import xyz.hstudio.horizon.configuration.LoadFrom;
+import xyz.hstudio.horizon.configuration.LoadInfo;
 import xyz.hstudio.horizon.event.Event;
 import xyz.hstudio.horizon.event.inbound.MoveEvent;
 import xyz.hstudio.horizon.module.CheckBase;
 import xyz.hstudio.horizon.util.AABB;
 import xyz.hstudio.horizon.util.Location;
 
+@LoadFrom("checks/ground_spoof.yml")
 public class GroundSpoof extends CheckBase {
+
+    @LoadInfo("enable")
+    private static boolean ENABLE;
 
     public GroundSpoof(HPlayer p) {
         super(p, 1, 40, 40);
@@ -20,6 +26,7 @@ public class GroundSpoof extends CheckBase {
 
     @Override
     public void run(Event<?> event) {
+        if (!ENABLE) return;
         if (event instanceof MoveEvent) {
             check((MoveEvent) event);
         }

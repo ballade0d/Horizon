@@ -19,6 +19,8 @@ import java.util.stream.Collectors;
 @LoadFrom("checks/hit_box.yml")
 public class HitBox extends CheckBase {
 
+    @LoadInfo("enable")
+    private static boolean ENABLE;
     @LoadInfo("max_buffer")
     private static int MAX_BUFFER;
     @LoadInfo("buffer_adder")
@@ -45,6 +47,7 @@ public class HitBox extends CheckBase {
 
     @Override
     public void run(Event<?> event) {
+        if (!ENABLE) return;
         if (event instanceof MoveEvent) {
             MoveEvent e = (MoveEvent) event;
             if (!e.hasLook) {

@@ -2,12 +2,18 @@ package xyz.hstudio.horizon.module.checks;
 
 import xyz.hstudio.horizon.HPlayer;
 import xyz.hstudio.horizon.api.enums.Detection;
+import xyz.hstudio.horizon.configuration.LoadFrom;
+import xyz.hstudio.horizon.configuration.LoadInfo;
 import xyz.hstudio.horizon.event.Event;
 import xyz.hstudio.horizon.event.inbound.EntityActionEvent;
 import xyz.hstudio.horizon.event.inbound.EntityInteractEvent;
 import xyz.hstudio.horizon.module.CheckBase;
 
+@LoadFrom("checks/kill_aura.yml")
 public class KillAura extends CheckBase {
+
+    @LoadInfo("enable")
+    private static boolean ENABLE;
 
     private int startSprintTick;
     private int kbTick;
@@ -18,6 +24,7 @@ public class KillAura extends CheckBase {
 
     @Override
     public void run(Event<?> event) {
+        if (!ENABLE) return;
         superKb(event);
     }
 

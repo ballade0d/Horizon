@@ -50,6 +50,10 @@ public class WorldBase {
         List<Entity> entityList = worldServer.a((Entity) null, bb, null);
         List<EntityBase> entityBaseList = new ArrayList<>(entityList.size());
         for (Entity entity : entityList) {
+            if (!(entity instanceof EntityLiving) && !(entity instanceof EntityMinecartAbstract) &&
+                    !(entity instanceof EntityFireball) && !(entity instanceof EntityBoat)) {
+                continue;
+            }
             entityBaseList.add(new EntityBase(entity));
         }
         return entityBaseList;

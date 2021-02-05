@@ -20,7 +20,7 @@ public enum HorizonAPI {
         if (hp == null) {
             return 0;
         }
-        return hp.getCheckMap().get(detection).getViolation();
+        return hp.checks.get(detection).getViolation();
     }
 
     public boolean setViolation(Player p, Detection detection, int violation) {
@@ -30,7 +30,7 @@ public enum HorizonAPI {
         if (hp == null) {
             return false;
         }
-        hp.getCheckMap().get(detection).setViolation(violation);
+        hp.checks.get(detection).setViolation(violation);
         return true;
     }
 }

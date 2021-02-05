@@ -2,10 +2,6 @@ package xyz.hstudio.horizon.task;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.apache.commons.io.IOUtils;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Fireball;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Vehicle;
 import org.bukkit.util.NumberConversions;
 import xyz.hstudio.horizon.HPlayer;
 import xyz.hstudio.horizon.Horizon;
@@ -108,7 +104,7 @@ public class Async implements Runnable {
 
     private void executeChecks() {
         for (HPlayer p : inst.getPlayers().values()) {
-            for (CheckBase check : p.getChecks()) {
+            for (CheckBase check : p.checks.values()) {
                 check.tickAsync(tick.get());
                 check.decay(tick.get());
             }
@@ -125,13 +121,8 @@ public class Async implements Runnable {
             Set<EntityBase> collectedEntities = new HashSet<>();
 
             for (HPlayer p : inst.getPlayers().values()) {
-                for (EntityBase entity : p.getWorld().getNearbyEntities(p.physics.position, 10, 10, 10)) {
-                    Entity bkEntity = entity.bukkit();
-                    if (bkEntity instanceof LivingEntity || bkEntity instanceof Vehicle || bkEntity instanceof Fireball) {
-                        collectedEntities.add(entity);
-                    }
-                }
                 collectedEntities.add(p.base);
+                collectedEntities.addAll(p.getWorld().getNearbyEntities(p.physics.position, 10, 10, 10));
             }
 
             for (EntityBase entity : collectedEntities) {
@@ -149,6 +140,7 @@ public class Async implements Runnable {
                 trackedEntities.put(p.base, trackedEntities.getOrDefault(p.base, new ArrayList<>()));
             }
         }
+
 
         for (EntityBase entity : trackedEntities.keySet()) {
             List<Pair<Location, Integer>> times = trackedEntities.getOrDefault(entity, new ArrayList<>());
@@ -193,9 +185,11 @@ public class Async implements Runnable {
         String time = "[" + FORMATTER.format(LocalDateTime.now()) + "] ";
         try {
             for (String message : logs) {
-                this.logOutput.write((time + message).getBytes());
-                this.logOutput.write(System.lineSeparator().getBytes());
+                logOutput.write((time + message).getBytes());
+                logOutput.write(System.lineSeparator().getBytes());
             }
+            logs.clear();
+            logOutput.flush();
         } catch (IOException e) {
             e.printStackTrace();
         }

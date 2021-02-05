@@ -3,12 +3,18 @@ package xyz.hstudio.horizon.module.checks;
 import org.bukkit.util.NumberConversions;
 import xyz.hstudio.horizon.HPlayer;
 import xyz.hstudio.horizon.api.enums.Detection;
+import xyz.hstudio.horizon.configuration.LoadFrom;
+import xyz.hstudio.horizon.configuration.LoadInfo;
 import xyz.hstudio.horizon.event.Event;
 import xyz.hstudio.horizon.event.inbound.MoveEvent;
 import xyz.hstudio.horizon.module.CheckBase;
 import xyz.hstudio.horizon.util.MathUtils;
 
+@LoadFrom("checks/aim_assist.yml")
 public class AimAssist extends CheckBase {
+
+    @LoadInfo("enable")
+    private static boolean ENABLE;
 
     /*
      * Gcd
@@ -34,6 +40,7 @@ public class AimAssist extends CheckBase {
 
     @Override
     public void run(Event<?> event) {
+        if (!ENABLE) return;
         if (event instanceof MoveEvent) {
             //mousePrediction((MoveEvent) event);
             gcd((MoveEvent) event);

@@ -1,3 +1,5 @@
+enable: true
+
 command_only: true
 # The update interval of the bot.
 # Measured in ticks.

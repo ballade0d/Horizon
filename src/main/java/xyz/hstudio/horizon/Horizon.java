@@ -11,8 +11,7 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import xyz.hstudio.horizon.configuration.Config;
 import xyz.hstudio.horizon.configuration.Execution;
-import xyz.hstudio.horizon.module.checks.HitBox;
-import xyz.hstudio.horizon.module.checks.KillAuraBot;
+import xyz.hstudio.horizon.module.checks.*;
 import xyz.hstudio.horizon.storage.SQLite;
 import xyz.hstudio.horizon.task.Async;
 import xyz.hstudio.horizon.task.Sync;
@@ -22,6 +21,7 @@ import xyz.hstudio.horizon.util.Location;
 import xyz.hstudio.horizon.util.Yaml;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URLClassLoader;
 import java.util.Map;
 import java.util.UUID;
@@ -74,8 +74,17 @@ public final class Horizon extends JavaPlugin {
         sql.setup();
 
         // Load the config of checks
+        Config.load(AimAssist.class);
+        Config.load(AntiVelocity.class);
+        Config.load(BadPackets.class);
+        Config.load(GroundSpoof.class);
+        Config.load(HealthTag.class);
         Config.load(HitBox.class);
+        Config.load(KillAura.class);
         Config.load(KillAuraBot.class);
+        Config.load(NoSwing.class);
+        Config.load(Phase.class);
+        Config.load(VerticalMovement.class);
 
         // Register for joined players
         Bukkit.getOnlinePlayers().forEach(HPlayer::new);
@@ -104,6 +113,13 @@ public final class Horizon extends JavaPlugin {
                 aabb.blocks(p.getWorld()).forEach(b -> p.pipeline.writeAndFlush(p.getWorld().updateBlock(b)));
             }
         }, this);
+
+        try {
+            Config.watcher();
+        } catch (IOException e) {
+            Logger.msg("WARN", "Failed to register WatchService! Stacktrace:");
+            e.printStackTrace();
+        }
     }
 
     public void onDisable() {

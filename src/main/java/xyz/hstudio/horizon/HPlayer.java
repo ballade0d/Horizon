@@ -46,7 +46,7 @@ public class HPlayer {
     public final Status status;
     public final Velocity velocity;
     public final Teleport teleport;
-    private final Map<Detection, CheckBase> checks;
+    public final Map<Detection, CheckBase> checks;
 
     public int currTick;
 
@@ -54,7 +54,7 @@ public class HPlayer {
         this.bukkit = (CraftPlayer) bukkit;
         this.base = new EntityBase(bukkit);
         this.protocol = 47; // TODO: Finish this
-        this.checks = new EnumMap<Detection, CheckBase>(Detection.class) {
+        this.checks = Collections.unmodifiableMap(new EnumMap<Detection, CheckBase>(Detection.class) {
             {
                 put(AIM_ASSIST, new AimAssist(HPlayer.this));
                 put(ANTI_VELOCITY, new AntiVelocity(HPlayer.this));
@@ -68,7 +68,7 @@ public class HPlayer {
                 put(PHASE, new Phase(HPlayer.this));
                 put(VERTICAL_MOVEMENT, new VerticalMovement(HPlayer.this));
             }
-        };
+        });
 
         this.pipeline = this.bukkit.getHandle().playerConnection.networkManager.channel.pipeline();
         this.packetHandler = new PacketHandler(this);
@@ -80,10 +80,6 @@ public class HPlayer {
         this.teleport = new Teleport();
 
         inst.getPlayers().put(bukkit.getUniqueId(), this);
-    }
-
-    public Map<Detection, CheckBase> getCheckMap() {
-        return checks;
     }
 
     public Collection<CheckBase> getChecks() {

@@ -4,6 +4,8 @@ import org.bukkit.Material;
 import org.bukkit.material.Openable;
 import xyz.hstudio.horizon.HPlayer;
 import xyz.hstudio.horizon.api.enums.Detection;
+import xyz.hstudio.horizon.configuration.LoadFrom;
+import xyz.hstudio.horizon.configuration.LoadInfo;
 import xyz.hstudio.horizon.event.Event;
 import xyz.hstudio.horizon.event.inbound.MoveEvent;
 import xyz.hstudio.horizon.module.CheckBase;
@@ -11,7 +13,11 @@ import xyz.hstudio.horizon.util.*;
 import xyz.hstudio.horizon.wrapper.BlockBase;
 import xyz.hstudio.horizon.wrapper.WorldBase;
 
+@LoadFrom("checks/phase.yml")
 public class Phase extends CheckBase {
+
+    @LoadInfo("enable")
+    private static boolean ENABLE;
 
     private static final double HORIZONTAL_DISTANCE_THRESHOLD = Math.pow(0.4, 2);
     private static final double VERTICAL_DISTANCE_THRESHOLD = 1;
@@ -22,6 +28,7 @@ public class Phase extends CheckBase {
 
     @Override
     public void run(Event<?> event) {
+        if (!ENABLE) return;
         if (!(event instanceof MoveEvent)) {
             return;
         }
@@ -42,7 +49,7 @@ public class Phase extends CheckBase {
         AABB playerFrom = from.toAABB();
         playerFrom.shrink(0.1, 0, 0.1);
         playerFrom.min.y += 0.4;
-        playerFrom.max.y += 0.1;
+        playerFrom.max.y -= 0.1;
         AABB playerTo = playerFrom.plus(e.velocity);
 
         Vector3D minBigBox = new Vector3D(Math.min(playerFrom.min.x, playerTo.min.x), Math.min(playerFrom.min.y, playerTo.min.y), Math.min(playerFrom.min.z, playerTo.min.z));

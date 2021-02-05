@@ -2,6 +2,8 @@ package xyz.hstudio.horizon.module.checks;
 
 import xyz.hstudio.horizon.HPlayer;
 import xyz.hstudio.horizon.api.enums.Detection;
+import xyz.hstudio.horizon.configuration.LoadFrom;
+import xyz.hstudio.horizon.configuration.LoadInfo;
 import xyz.hstudio.horizon.event.Event;
 import xyz.hstudio.horizon.event.inbound.MoveEvent;
 import xyz.hstudio.horizon.module.CheckBase;
@@ -21,7 +23,13 @@ import xyz.hstudio.horizon.util.enums.Direction;
  * <p>
  * so expectedYVelocity = (prevYVelocity + -0.08 * 1) * 0.98
  */
+@LoadFrom("checks/vertical_movement.yml")
 public class VerticalMovement extends CheckBase {
+
+    @LoadInfo("enable")
+    private static boolean ENABLE;
+    @LoadInfo("precision")
+    private static float PRECISION;
 
     private float estimatedYVelocity;
     private boolean tp;
@@ -32,6 +40,7 @@ public class VerticalMovement extends CheckBase {
 
     @Override
     public void run(Event<?> event) {
+        if (!ENABLE) return;
         if (event instanceof MoveEvent) {
             move((MoveEvent) event);
             step((MoveEvent) event);
@@ -73,7 +82,7 @@ public class VerticalMovement extends CheckBase {
             }
 
             float error = Math.abs(deltaY - estimatedYVelocity);
-            if (error > 0.001) {
+            if (error > PRECISION) {
                 punish(e, "VerticalMovement (5GjoR)", Math.abs(error) * 5, Detection.VERTICAL_MOVEMENT,
                         "d:" + deltaY + ", e:" + estimatedYVelocity + ", e:" + error);
             }

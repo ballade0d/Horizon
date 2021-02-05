@@ -71,6 +71,7 @@ public abstract class CheckBase {
             if (!(this.violation < matcher && vl >= matcher)) {
                 continue;
             }
+            // Commands must be executed in the main thread
             inst.getSync().runSync(() -> {
                 for (String command : action.get(matcher)) {
                     command = command.replace("%player%", p.bukkit.getName());

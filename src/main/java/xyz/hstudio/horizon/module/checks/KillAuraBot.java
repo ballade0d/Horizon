@@ -28,6 +28,8 @@ import java.util.concurrent.ThreadLocalRandom;
 @LoadFrom("checks/kill_aura_bot.yml")
 public class KillAuraBot extends CheckBase {
 
+    @LoadInfo("enable")
+    private static boolean ENABLE;
     @LoadInfo("command_only")
     private static boolean COMMAND_ONLY;
     @LoadInfo("update_interval")
@@ -95,6 +97,7 @@ public class KillAuraBot extends CheckBase {
 
     @Override
     public void run(Event<?> event) {
+        if (!ENABLE) return;
         if (event instanceof EntityInteractEvent) {
             EntityInteractEvent e = (EntityInteractEvent) event;
             if (e.entity == null && bot != null && e.entityId == bot.getId()) {

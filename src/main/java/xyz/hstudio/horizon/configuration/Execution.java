@@ -30,7 +30,7 @@ public class Execution {
                 try {
                     action.put(Integer.parseInt(vl), yaml.getStringList(name + "." + vl));
                 } catch (NumberFormatException e) {
-                    Logger.msg("WARN", "Failed to load the file execution.yml! Reason: '" + vl + "' is not a integer");
+                    Logger.msg("WARN", "Failed to load the execution of " + name + " ! Reason: '" + vl + "' is not a integer.");
                 }
             }
             collection.put(detection, action);

@@ -43,7 +43,7 @@ public class PacketHandler extends ChannelDuplexHandler {
             if (!event.pre()) {
                 return false;
             } else {
-                for (CheckBase check : p.getChecks()) {
+                for (CheckBase check : p.checks.values()) {
                     check.run(event);
                 }
                 event.post();
