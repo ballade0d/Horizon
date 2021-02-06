@@ -44,6 +44,8 @@ public class KillAuraBot extends CheckBase {
     private static double OFFSET_Y;
     @LoadInfo("offset.z")
     private static double OFFSET_Z;
+    @LoadInfo("show_arrow")
+    private static boolean SHOW_ARROW;
     @LoadInfo("show_damage")
     private static boolean SHOW_DAMAGE;
     @LoadInfo("show_swing")
@@ -177,6 +179,10 @@ public class KillAuraBot extends CheckBase {
         entityPlayer.listName = CraftChatMessage.fromString("§f" + name)[0];
         entityPlayer.setInvisible(false);
         entityPlayer.setLocation(loc.x, loc.y, loc.z, loc.yaw, loc.pitch);
+
+        if (SHOW_ARROW) {
+            entityPlayer.getDataWatcher().watch(9, (byte) RandomUtils.randomBoundaryInt(1, 10));
+        }
 
         return entityPlayer;
     }

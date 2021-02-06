@@ -1,5 +1,6 @@
 package xyz.hstudio.horizon.module.checks;
 
+import org.bukkit.Material;
 import xyz.hstudio.horizon.HPlayer;
 import xyz.hstudio.horizon.api.enums.Detection;
 import xyz.hstudio.horizon.configuration.LoadFrom;
@@ -23,7 +24,13 @@ public class AntiVelocity extends CheckBase {
         if (!ENABLE) return;
         if (event instanceof MoveEvent) {
             MoveEvent e = (MoveEvent) event;
-            if (e.failedVelocity && !e.teleport && p.bukkit.getVehicle() == null) {
+            if (e.teleport) {
+                return;
+            }
+            if (e.touchedBlocks.contains(Material.LADDER) || e.touchedBlocks.contains(Material.VINE)) {
+                return;
+            }
+            if (e.failedVelocity && p.bukkit.getVehicle() == null) {
                 punish(e, "AntiVelocity (uxzPm)", 1, Detection.ANTI_VELOCITY, null);
             }
         }

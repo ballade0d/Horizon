@@ -10,6 +10,7 @@ offset:
   x: 0.5
   y: 0.8
   z: 0.5
+show_arrow: true
 show_damage: true
 show_swing: true
 show_armor: true

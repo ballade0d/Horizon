@@ -220,7 +220,7 @@ public class MoveEvent extends Event<PacketPlayInFlying> {
         if (standingOn == null || standingOn.type() != Material.SLIME_BLOCK) {
             return false;
         }
-        float prevPrevDeltaY = (float) p.physics.prevVelocity.y;
+        float prevPrevDeltaY = (float) p.physics.oldVelocity.y;
         float expected = (-((prevPrevDeltaY - 0.08F) * 0.98F) - 0.08F) * 0.98F;
         // TODO: you're supposed to get the sneaking from the LAST tick, not this one
         return !p.status.isSneaking && p.physics.onGround && !onGround && deltaY >= 0 && Math.abs(expected - deltaY) < 0.001;
@@ -229,6 +229,12 @@ public class MoveEvent extends Event<PacketPlayInFlying> {
     // Old velocity tester
     private Vector3D testVelocity() {
         if (p.velocity.x == 0 && p.velocity.y == 0 && p.velocity.z == 0) {
+            return null;
+        }
+        // This should fix any false positives caused by network lags.
+        if (p.currTick - p.velocity.receivedTick > 5) {
+            p.velocity.x = p.velocity.y = p.velocity.z = 0;
+            failedVelocity = true;
             return null;
         }
         double speedPotMultiplier = 1 + p.getPotionAmplifier(PotionEffectType.SPEED) * 0.2;
@@ -244,7 +250,6 @@ public class MoveEvent extends Event<PacketPlayInFlying> {
         if (!((touchedFaces.contains(Direction.UP) && y > 0) || (touchedFaces.contains(Direction.DOWN) && y < 0)) &&
                 Math.abs(y - velocity.y) > 0.01 &&
                 !jump && !step) {
-            failedVelocity = true;
             return null;
         }
 
@@ -254,12 +259,10 @@ public class MoveEvent extends Event<PacketPlayInFlying> {
         double maxZ = z + maxDiscrepancy;
         if (!((touchedFaces.contains(Direction.EAST) && x > 0) || (touchedFaces.contains(Direction.WEST) && x < 0)) &&
                 !(velocity.x <= maxX && velocity.x >= minX)) {
-            failedVelocity = true;
             return null;
         }
         if (!((touchedFaces.contains(Direction.SOUTH) && z > 0) || (touchedFaces.contains(Direction.NORTH) && z < 0)) &&
                 !(velocity.z <= maxZ && velocity.z >= minZ)) {
-            failedVelocity = true;
             return null;
         }
 
@@ -272,12 +275,10 @@ public class MoveEvent extends Event<PacketPlayInFlying> {
     public void post() {
         HPlayer.Physics physics = p.physics;
 
-        physics.prevPosition = physics.position;
         physics.position = to;
-        physics.wasOnGround = physics.onGround;
         physics.onGround = onGround;
         physics.onGroundReally = onGroundReally;
-        physics.prevVelocity = physics.velocity;
+        physics.oldVelocity = physics.velocity;
         physics.velocity = velocity;
         physics.friction = newFriction;
 

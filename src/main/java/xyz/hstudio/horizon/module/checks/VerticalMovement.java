@@ -29,7 +29,7 @@ public class VerticalMovement extends CheckBase {
     @LoadInfo("enable")
     private static boolean ENABLE;
     @LoadInfo("precision")
-    private static float PRECISION;
+    private static double PRECISION;
 
     private float estimatedYVelocity;
     private boolean tp;
@@ -99,7 +99,7 @@ public class VerticalMovement extends CheckBase {
         if ((deltaY > 0.6 || deltaY < -0.0784) && e.onGround && p.physics.onGround) {
             punish(e, "VerticalMovement (c4slM)", 4, Detection.VERTICAL_MOVEMENT,
                     "d:" + deltaY);
-        } else if (e.onGroundReally && Math.abs(p.physics.prevVelocity.y - 0.333) < 0.01 &&
+        } else if (e.onGroundReally && Math.abs(p.physics.oldVelocity.y - 0.333) < 0.01 &&
                 Math.abs(p.physics.velocity.y - 0.248) < 0.01 && deltaY <= 0) {
             punish(e, "VerticalMovement (14b0l)", 4, Detection.VERTICAL_MOVEMENT,
                     "d:" + deltaY);

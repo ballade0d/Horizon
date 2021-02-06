@@ -163,18 +163,16 @@ public class HPlayer {
     public class Physics {
 
         public Location position;
-        public Location prevPosition;
         public boolean onGround;
-        public boolean wasOnGround;
         public boolean onGroundReally;
-        public Vector3D prevVelocity;
+        public Vector3D oldVelocity;
         public Vector3D velocity;
         public float friction;
         public Set<Direction> touchedFaces = Collections.emptySet();
 
         public Physics() {
             this.position = base.position();
-            this.prevVelocity = new Vector3D(0, 0, 0);
+            this.oldVelocity = new Vector3D(0, 0, 0);
             this.velocity = new Vector3D(0, 0, 0);
         }
 
@@ -203,6 +201,7 @@ public class HPlayer {
     public class Velocity {
 
         public float x, y, z;
+        public int receivedTick;
     }
 
     public class Teleport {

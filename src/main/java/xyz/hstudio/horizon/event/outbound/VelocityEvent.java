@@ -23,6 +23,7 @@ public class VelocityEvent extends Event<PacketPlayOutEntityVelocity> {
             p.velocity.x = this.x;
             p.velocity.y = this.y;
             p.velocity.z = this.z;
+            p.velocity.receivedTick = p.currTick;
         });
     }
 }
