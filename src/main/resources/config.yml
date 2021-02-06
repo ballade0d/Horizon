@@ -16,11 +16,12 @@ mysql:
   password: ''
   port: 3306
 
-# Would you like to enable kirin?
+# Would you like to enable Kirin?
 # Kirin is the paid version of Horizon,
 # you will be able to purchase a license in our website.
 kirin:
   enabled: false
+  email: ''
   license: ''
 
 # Should Horizon fix ghost-blocks?

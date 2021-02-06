@@ -1,0 +1,20 @@
+# Permissions that are disabled by default
+improved_lava: false
+crosshair_sync: false
+refill_fix: false
+
+# GUI permissions
+gui_all: true
+gui_potion_effects: true
+gui_armor_hud: true
+gui_item_hud: true
+
+# Permissions that are enabled by default
+blockbuild: true
+tags: true
+chat: true
+animations: true
+saturation_bar: true
+
+execution:
+  - 'horizon message %player% is using LabyMod'

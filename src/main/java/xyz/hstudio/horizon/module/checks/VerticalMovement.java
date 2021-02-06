@@ -69,11 +69,15 @@ public class VerticalMovement extends CheckBase {
             estimatedYVelocity = deltaY == 0 ? 0 : -(Math.min(Math.abs(deltaY - -0.0784F), Math.abs(deltaY - -0.0754F)) - deltaY);
             skip = true;
         }
-        // Blocks above
+        // Jump under block false positive
         boolean hitHead = e.touchedFaces.contains(Direction.UP);
         boolean hasHitHead = p.physics.touchedFaces.contains(Direction.UP);
         if (hitHead && !hasHitHead) {
             deltaY = estimatedYVelocity = 0;
+        }
+        // Tower false positive
+        if (p.physics.onGround && !e.onGround && p.physics.velocity.y == 0 && (Math.abs(deltaY - 0.4044449) < 0.001 || Math.abs(deltaY - 0.3955759) < 0.001)) {
+            deltaY = estimatedYVelocity = 0.42F;
         }
 
         if (!skip) {

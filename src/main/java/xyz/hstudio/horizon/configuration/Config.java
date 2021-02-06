@@ -50,6 +50,8 @@ public class Config {
 
     @LoadInfo("kirin.enabled")
     public static boolean KIRIN_ENABLED;
+    @LoadInfo("kirin.email")
+    public static String KIRIN_EMAIL;
     @LoadInfo("kirin.license")
     public static String KIRIN_LICENSE;
 
