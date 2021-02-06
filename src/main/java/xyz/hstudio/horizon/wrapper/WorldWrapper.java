@@ -7,15 +7,15 @@ import xyz.hstudio.horizon.util.Vector3D;
 import java.util.ArrayList;
 import java.util.List;
 
-public class WorldBase {
+public class WorldWrapper {
 
     protected final WorldServer worldServer;
 
-    public WorldBase(org.bukkit.World bukkitWorld) {
+    public WorldWrapper(org.bukkit.World bukkitWorld) {
         this.worldServer = ((CraftWorld) bukkitWorld).getHandle();
     }
 
-    public WorldBase(net.minecraft.server.v1_8_R3.World world) {
+    public WorldWrapper(net.minecraft.server.v1_8_R3.World world) {
         this.worldServer = world.getWorld().getHandle();
     }
 
@@ -31,39 +31,39 @@ public class WorldBase {
         return worldServer.chunkProviderServer.isChunkLoaded(vec.getBlockX() >> 4, vec.getBlockZ() >> 4);
     }
 
-    public BlockBase getBlock(int x, int y, int z) {
+    public BlockWrapper getBlock(int x, int y, int z) {
         Chunk chunk = worldServer.chunkProviderServer.getChunkIfLoaded(x >> 4, z >> 4);
         if (chunk == null) {
             return null;
         }
         BlockPosition bPos = new BlockPosition(x, y, z);
         // return new BlockBase(this, chunk.getTypeAbs(x, y, z).getBlockData(), x, y, z); // This only get type
-        return new BlockBase(this, chunk.getBlockData(bPos), bPos);
+        return new BlockWrapper(this, chunk.getBlockData(bPos), bPos);
     }
 
-    public BlockBase getBlock(Vector3D vec) {
+    public BlockWrapper getBlock(Vector3D vec) {
         return getBlock(vec.getBlockX(), vec.getBlockY(), vec.getBlockZ());
     }
 
-    public List<EntityBase> getNearbyEntities(Vector3D vec, double x, double y, double z) {
+    public List<EntityWrapper> getNearbyEntities(Vector3D vec, double x, double y, double z) {
         AxisAlignedBB bb = new AxisAlignedBB(vec.x - x, vec.y - y, vec.z - z, vec.x + x, vec.y + y, vec.z + z);
         List<Entity> entityList = worldServer.a((Entity) null, bb, null);
-        List<EntityBase> entityBaseList = new ArrayList<>(entityList.size());
+        List<EntityWrapper> entityWrapperList = new ArrayList<>(entityList.size());
         for (Entity entity : entityList) {
             if (!(entity instanceof EntityLiving) && !(entity instanceof EntityMinecartAbstract) &&
                     !(entity instanceof EntityFireball) && !(entity instanceof EntityBoat)) {
                 continue;
             }
-            entityBaseList.add(new EntityBase(entity));
+            entityWrapperList.add(new EntityWrapper(entity));
         }
-        return entityBaseList;
+        return entityWrapperList;
     }
 
     public Entity getEntity(int id) {
         return worldServer.a(id);
     }
 
-    public PacketPlayOutBlockChange updateBlock(BlockBase block) {
+    public PacketPlayOutBlockChange updateBlock(BlockWrapper block) {
         return new PacketPlayOutBlockChange(worldServer, new BlockPosition(block.getX(), block.getY(), block.getZ()));
     }
 
@@ -72,9 +72,9 @@ public class WorldBase {
         if (this == obj) {
             return true;
         }
-        if (!(obj instanceof WorldBase)) {
+        if (!(obj instanceof WorldWrapper)) {
             return false;
         }
-        return bukkit().getUID().equals(((WorldBase) obj).bukkit().getUID());
+        return bukkit().getUID().equals(((WorldWrapper) obj).bukkit().getUID());
     }
 }

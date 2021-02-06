@@ -5,19 +5,19 @@ import xyz.hstudio.horizon.util.AABB;
 import xyz.hstudio.horizon.util.Location;
 import xyz.hstudio.horizon.util.Vector3D;
 
-public class EntityBase {
+public class EntityWrapper {
 
-    protected final WorldBase world;
+    protected final WorldWrapper world;
     protected final net.minecraft.server.v1_8_R3.Entity entity;
 
-    public EntityBase(org.bukkit.entity.Entity entity) {
-        this.world = new WorldBase(entity.getWorld());
+    public EntityWrapper(org.bukkit.entity.Entity entity) {
+        this.world = new WorldWrapper(entity.getWorld());
         this.entity = ((CraftEntity) entity).getHandle();
     }
 
-    public EntityBase(net.minecraft.server.v1_8_R3.Entity entity) {
+    public EntityWrapper(net.minecraft.server.v1_8_R3.Entity entity) {
         this.entity = entity;
-        this.world = new WorldBase(entity.world);
+        this.world = new WorldWrapper(entity.world);
     }
 
     public Location position() {
@@ -46,10 +46,10 @@ public class EntityBase {
         if (this == obj) {
             return true;
         }
-        if (!(obj instanceof EntityBase)) {
+        if (!(obj instanceof EntityWrapper)) {
             return false;
         }
-        return entity.getId() == ((EntityBase) obj).entity.getId();
+        return entity.getId() == ((EntityWrapper) obj).entity.getId();
     }
 
     @Override

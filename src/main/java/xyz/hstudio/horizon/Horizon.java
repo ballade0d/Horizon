@@ -107,10 +107,10 @@ public final class Horizon extends JavaPlugin {
                     return;
                 }
                 AABB aabb = new Location(
-                        p.getWorld(), e.getTo().getX(), e.getTo().getY(), e.getTo().getZ()
+                        p.world(), e.getTo().getX(), e.getTo().getY(), e.getTo().getZ()
                 ).toAABB().expand(0.1, 0.1, 0.1);
 
-                aabb.blocks(p.getWorld()).forEach(b -> p.pipeline.writeAndFlush(p.getWorld().updateBlock(b)));
+                aabb.blocks(p.world()).forEach(b -> p.pipeline.writeAndFlush(p.world().updateBlock(b)));
             }
         }, this);
 

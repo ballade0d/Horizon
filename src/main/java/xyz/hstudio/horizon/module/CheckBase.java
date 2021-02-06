@@ -60,7 +60,7 @@ public abstract class CheckBase {
     protected void punish(Event<?> event, String type, double adder, Detection detection, String info) {
         int vl = this.violation + Math.max(NumberConversions.round(adder), 1);
 
-        PlayerViolationEvent api = new PlayerViolationEvent(p.bukkit, detection, type, vl, info);
+        PlayerViolationEvent api = new PlayerViolationEvent(p.nms.getBukkitEntity(), detection, type, vl, info);
         Bukkit.getPluginManager().callEvent(api);
         if (api.isCancelled()) {
             return;
@@ -74,7 +74,7 @@ public abstract class CheckBase {
             // Commands must be executed in the main thread
             inst.getSync().runSync(() -> {
                 for (String command : action.get(matcher)) {
-                    command = command.replace("%player%", p.bukkit.getName());
+                    command = command.replace("%player%", p.nms.getName());
                     command = command.replace("%id%", RandomStringUtils.randomAlphanumeric(6));
                     Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
                 }
@@ -82,7 +82,7 @@ public abstract class CheckBase {
             break;
         }
 
-        p.bukkit.sendMessage(type + " " + info);
+        p.sendMessage(type + " " + info);
 
         this.violation = vl;
         this.failedTick = inst.getAsync().getTick();

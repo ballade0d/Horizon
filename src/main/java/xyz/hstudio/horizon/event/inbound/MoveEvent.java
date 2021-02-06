@@ -1,15 +1,15 @@
 package xyz.hstudio.horizon.event.inbound;
 
+import net.minecraft.server.v1_8_R3.MobEffectList;
 import net.minecraft.server.v1_8_R3.PacketPlayInFlying;
 import org.bukkit.Material;
-import org.bukkit.potion.PotionEffectType;
 import xyz.hstudio.horizon.HPlayer;
 import xyz.hstudio.horizon.event.Event;
 import xyz.hstudio.horizon.util.AABB;
 import xyz.hstudio.horizon.util.Location;
 import xyz.hstudio.horizon.util.Vector3D;
 import xyz.hstudio.horizon.util.enums.Direction;
-import xyz.hstudio.horizon.wrapper.BlockBase;
+import xyz.hstudio.horizon.wrapper.BlockWrapper;
 
 import java.util.List;
 import java.util.Set;
@@ -100,7 +100,7 @@ public class MoveEvent extends Event<PacketPlayInFlying> {
             inst.getAsync().clearHistory(p.base);
             p.teleport.teleporting = false;
             return true;
-        } else if (!p.bukkit.isSleeping()) {
+        } else if (!p.nms.isSleeping()) {
             inst.getSync().teleport(p, p.teleport.location);
         }
         p.teleport.teleporting = false;
@@ -110,7 +110,7 @@ public class MoveEvent extends Event<PacketPlayInFlying> {
     private float computeFriction() {
         float friction = 0.91F;
         if (onGround) {
-            BlockBase b = new Location(to.world, from.x, from.y - 1, from.z).getBlock();
+            BlockWrapper b = new Location(to.world, from.x, from.y - 1, from.z).getBlock();
             if (b != null) {
                 friction *= b.friction();
             }
@@ -131,7 +131,7 @@ public class MoveEvent extends Event<PacketPlayInFlying> {
                 ((p.physics.velocity.y - 0.08) * 0.98)));
 
         AABB box = extrapolate.toAABB();
-        List<AABB> verticalCollision = box.getBlockAABBs(p, p.getWorld(), Material.WEB);
+        List<AABB> verticalCollision = box.getBlockAABBs(p, p.world(), Material.WEB);
 
         if (verticalCollision.isEmpty() && !p.physics.onGround) {
             return false;
@@ -148,7 +148,7 @@ public class MoveEvent extends Event<PacketPlayInFlying> {
         // move to this position, but with clipped Y (moving horizontally)
         box = to.newY(highestVertical).toAABB().expand(0, -0.00000000001, 0);
 
-        List<AABB> horizontalCollision = box.getBlockAABBs(p, p.getWorld(), Material.WEB);
+        List<AABB> horizontalCollision = box.getBlockAABBs(p, p.world(), Material.WEB);
 
         if (horizontalCollision.isEmpty()) {
             return false;
@@ -175,7 +175,7 @@ public class MoveEvent extends Event<PacketPlayInFlying> {
 
     // Checks if the player's dY matches the expected dY
     private boolean testJump() {
-        int jumpBoostLvl = p.getPotionAmplifier(PotionEffectType.JUMP);
+        int jumpBoostLvl = p.getEffectAmplifier(MobEffectList.JUMP);
         float expectedDY = Math.max(0.42f + jumpBoostLvl * 0.1f, 0f);
         boolean leftGround = p.physics.onGround && !onGround;
         float dY = (float) (to.y - from.y);
@@ -198,7 +198,7 @@ public class MoveEvent extends Event<PacketPlayInFlying> {
             }
         }
 
-        Set<Material> touchedBlocks = p.base.cube(to).materials(p.getWorld());
+        Set<Material> touchedBlocks = p.base.cube(to).materials(p.world());
         if (touchedBlocks.contains(Material.WEB)) {
             if (hasPos) {
                 expectedDY *= 0.05;
@@ -216,7 +216,7 @@ public class MoveEvent extends Event<PacketPlayInFlying> {
 
     private boolean testOnSlime() {
         float deltaY = (float) (to.y - from.y);
-        BlockBase standingOn = from.plus(0, -0.2, 0).getBlock();
+        BlockWrapper standingOn = from.plus(0, -0.2, 0).getBlock();
         if (standingOn == null || standingOn.type() != Material.SLIME_BLOCK) {
             return false;
         }
@@ -237,10 +237,10 @@ public class MoveEvent extends Event<PacketPlayInFlying> {
             failedVelocity = true;
             return null;
         }
-        double speedPotMultiplier = 1 + p.getPotionAmplifier(PotionEffectType.SPEED) * 0.2;
+        double speedPotMultiplier = 1 + p.getEffectAmplifier(MobEffectList.FASTER_MOVEMENT) * 0.2;
         double sprintMultiplier = p.status.isSprinting ? 1.3 : 1;
         double weirdConstant = jump && p.status.isSprinting ? 0.2518462 : 0.098;
-        double baseMultiplier = 5 * p.bukkit.getWalkSpeed() * speedPotMultiplier;
+        double baseMultiplier = 5 * p.walkSpeed() * speedPotMultiplier;
         double maxDiscrepancy = weirdConstant * baseMultiplier * sprintMultiplier + 0.003;
 
         double x = p.status.hitSlowdown ? 0.6 * p.velocity.x : p.velocity.x;
@@ -250,6 +250,7 @@ public class MoveEvent extends Event<PacketPlayInFlying> {
         if (!((touchedFaces.contains(Direction.UP) && y > 0) || (touchedFaces.contains(Direction.DOWN) && y < 0)) &&
                 Math.abs(y - velocity.y) > 0.01 &&
                 !jump && !step) {
+            p.sendMessage("A");
             return null;
         }
 
@@ -259,10 +260,12 @@ public class MoveEvent extends Event<PacketPlayInFlying> {
         double maxZ = z + maxDiscrepancy;
         if (!((touchedFaces.contains(Direction.EAST) && x > 0) || (touchedFaces.contains(Direction.WEST) && x < 0)) &&
                 !(velocity.x <= maxX && velocity.x >= minX)) {
+            p.sendMessage("B");
             return null;
         }
         if (!((touchedFaces.contains(Direction.SOUTH) && z > 0) || (touchedFaces.contains(Direction.NORTH) && z < 0)) &&
                 !(velocity.z <= maxZ && velocity.z >= minZ)) {
+            p.sendMessage("C");
             return null;
         }
 

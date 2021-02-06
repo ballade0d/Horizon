@@ -4,8 +4,8 @@ import org.bukkit.Material;
 import org.bukkit.util.NumberConversions;
 import xyz.hstudio.horizon.HPlayer;
 import xyz.hstudio.horizon.util.enums.Direction;
-import xyz.hstudio.horizon.wrapper.BlockBase;
-import xyz.hstudio.horizon.wrapper.WorldBase;
+import xyz.hstudio.horizon.wrapper.BlockWrapper;
+import xyz.hstudio.horizon.wrapper.WorldWrapper;
 
 import java.util.*;
 
@@ -68,12 +68,12 @@ public class AABB {
         return !(max.z < other.min.z) && !(min.z > other.max.z);
     }
 
-    public List<BlockBase> blocks(WorldBase world) {
-        List<BlockBase> blocks = new ArrayList<>();
+    public List<BlockWrapper> blocks(WorldWrapper world) {
+        List<BlockWrapper> blocks = new ArrayList<>();
         for (int x = NumberConversions.floor(min.x); x < NumberConversions.ceil(max.x); x++) {
             for (int y = NumberConversions.floor(min.y); y < NumberConversions.ceil(max.y); y++) {
                 for (int z = NumberConversions.floor(min.z); z < NumberConversions.ceil(max.z); z++) {
-                    BlockBase block = world.getBlock(x, y, z);
+                    BlockWrapper block = world.getBlock(x, y, z);
                     if (block == null) {
                         continue;
                     }
@@ -84,12 +84,12 @@ public class AABB {
         return blocks;
     }
 
-    public Set<Material> materials(WorldBase world) {
+    public Set<Material> materials(WorldWrapper world) {
         Set<Material> mats = EnumSet.noneOf(Material.class);
         for (int x = NumberConversions.floor(min.x); x < NumberConversions.ceil(max.x); x++) {
             for (int y = NumberConversions.floor(min.y); y < NumberConversions.ceil(max.y); y++) {
                 for (int z = NumberConversions.floor(min.z); z < NumberConversions.ceil(max.z); z++) {
-                    BlockBase block = world.getBlock(x, y, z);
+                    BlockWrapper block = world.getBlock(x, y, z);
                     if (block == null) {
                         continue;
                     }
@@ -155,15 +155,15 @@ public class AABB {
         return null;
     }
 
-    public List<AABB> getBlockAABBs(HPlayer p, WorldBase world, Material first, Material... exemptedMats) {
+    public List<AABB> getBlockAABBs(HPlayer p, WorldWrapper world, Material first, Material... exemptedMats) {
         Set<Material> exempt = EnumSet.of(first, exemptedMats);
         List<AABB> aabbs = new ArrayList<>();
 
         // gotta do this to catch fences and cobble walls
         AABB expanded = this.add(0, -1, 0, 0, 0, 0);
-        List<BlockBase> blocks = expanded.blocks(world);
+        List<BlockWrapper> blocks = expanded.blocks(world);
 
-        for (BlockBase b : blocks) {
+        for (BlockWrapper b : blocks) {
             if (exempt.contains(b.type())) {
                 continue;
             }
@@ -177,14 +177,14 @@ public class AABB {
         return aabbs;
     }
 
-    public List<AABB> getBlockAABBs(HPlayer p, WorldBase world) {
+    public List<AABB> getBlockAABBs(HPlayer p, WorldWrapper world) {
         List<AABB> aabbs = new ArrayList<>();
 
         // gotta do this to catch fences and cobble walls
         AABB expanded = this.add(0, -1, 0, 0, 0, 0);
-        List<BlockBase> blocks = expanded.blocks(world);
+        List<BlockWrapper> blocks = expanded.blocks(world);
 
-        for (BlockBase b : blocks) {
+        for (BlockWrapper b : blocks) {
             AABB[] bAABBs = b.boxes(p);
             for (AABB aabb : bAABBs) {
                 if (this.collides(aabb)) {
@@ -195,7 +195,7 @@ public class AABB {
         return aabbs;
     }
 
-    public Set<Direction> touchingFaces(HPlayer p, WorldBase world, double borderSize) {
+    public Set<Direction> touchingFaces(HPlayer p, WorldWrapper world, double borderSize) {
         Vector3D min = this.min.plus(new Vector3D(-borderSize, -borderSize, -borderSize));
         Vector3D max = this.max.plus(new Vector3D(borderSize, borderSize, borderSize));
         AABB bigBox = new AABB(min, max);
@@ -205,7 +205,7 @@ public class AABB {
             // Always subtract 1 so that fences/walls can be checked
             for (int y = (int) min.y - 1; y <= max.y; y++) {
                 for (int z = (int) (min.z < 0 ? min.z - 1 : min.z); z <= max.z; z++) {
-                    BlockBase block = world.getBlock(x, y, z);
+                    BlockWrapper block = world.getBlock(x, y, z);
                     if (block == null) {
                         continue;
                     }

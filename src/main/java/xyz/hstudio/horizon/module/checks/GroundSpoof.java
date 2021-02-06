@@ -51,7 +51,7 @@ public class GroundSpoof extends CheckBase {
             AABB aabb = e.to.toAABB();
             aabb.expand(0, -0.0001, 0);
 
-            boolean notPhasing = aabb.getBlockAABBs(p, p.getWorld(), Material.WEB).isEmpty();
+            boolean notPhasing = aabb.getBlockAABBs(p, p.world(), Material.WEB).isEmpty();
             boolean pass = checkLoc.onGround(p, false, 0.02);
             if (notPhasing && pass) {
                 return;

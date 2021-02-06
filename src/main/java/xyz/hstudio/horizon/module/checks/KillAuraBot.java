@@ -167,7 +167,7 @@ public class KillAuraBot extends CheckBase {
 
     private EntityPlayer prepare() {
         MinecraftServer minecraftServer = ((CraftServer) Bukkit.getServer()).getServer();
-        WorldServer worldServer = ((CraftWorld) p.getWorld().bukkit()).getHandle();
+        WorldServer worldServer = ((CraftWorld) p.world().bukkit()).getHandle();
 
         String name = RandomStringUtils.randomAlphanumeric(8);
 

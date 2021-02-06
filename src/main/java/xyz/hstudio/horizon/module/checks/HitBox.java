@@ -9,7 +9,7 @@ import xyz.hstudio.horizon.event.inbound.EntityInteractEvent;
 import xyz.hstudio.horizon.event.inbound.MoveEvent;
 import xyz.hstudio.horizon.module.CheckBase;
 import xyz.hstudio.horizon.util.*;
-import xyz.hstudio.horizon.wrapper.EntityBase;
+import xyz.hstudio.horizon.wrapper.EntityWrapper;
 
 import java.util.List;
 import java.util.Objects;
@@ -66,7 +66,7 @@ public class HitBox extends CheckBase {
             if (e.type != EntityInteractEvent.InteractType.ATTACK) {
                 return;
             }
-            EntityBase entity = e.entity;
+            EntityWrapper entity = e.entity;
             if (entity == null) {
                 return;
             }

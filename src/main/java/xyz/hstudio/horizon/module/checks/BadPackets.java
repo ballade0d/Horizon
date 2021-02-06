@@ -37,11 +37,11 @@ public class BadPackets extends CheckBase {
 
     private void sneak(EntityActionEvent e) {
         if (e.type == EntityActionEvent.ActionType.START_SNEAKING) {
-            if (p.status.isSneaking && p.bukkit.isSneaking()) {
+            if (p.status.isSneaking && p.nms.isSneaking()) {
                 punish(e, "BadPackets (YwjXR)", 10, Detection.BAD_PACKETS, null);
             }
         } else if (e.type == EntityActionEvent.ActionType.STOP_SNEAKING) {
-            if (!p.status.isSneaking && !p.bukkit.isSneaking()) {
+            if (!p.status.isSneaking && !p.nms.isSneaking()) {
                 punish(e, "BadPackets (YzQap)", 10, Detection.BAD_PACKETS, null);
             }
         }

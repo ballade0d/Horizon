@@ -5,16 +5,16 @@ import xyz.hstudio.horizon.HPlayer;
 import xyz.hstudio.horizon.event.Event;
 import xyz.hstudio.horizon.util.Vector3D;
 import xyz.hstudio.horizon.util.enums.Direction;
-import xyz.hstudio.horizon.wrapper.BlockBase;
+import xyz.hstudio.horizon.wrapper.BlockWrapper;
 
 public class BlockDigEvent extends Event<PacketPlayInBlockDig> {
 
     public final Vector3D pos;
     public final Direction dir;
     public final DigType type;
-    public final BlockBase block;
+    public final BlockWrapper block;
 
-    public BlockDigEvent(HPlayer p, Vector3D pos, Direction dir, DigType type, BlockBase block) {
+    public BlockDigEvent(HPlayer p, Vector3D pos, Direction dir, DigType type, BlockWrapper block) {
         super(p);
         this.pos = pos;
         this.dir = dir;

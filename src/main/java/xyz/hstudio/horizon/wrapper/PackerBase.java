@@ -2,7 +2,6 @@ package xyz.hstudio.horizon.wrapper;
 
 import io.netty.buffer.Unpooled;
 import net.minecraft.server.v1_8_R3.*;
-import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_8_R3.util.CraftMagicNumbers;
 import xyz.hstudio.horizon.HPlayer;
 import xyz.hstudio.horizon.event.Event;
@@ -108,7 +107,7 @@ public class PackerBase {
 
         if (interactType == null) {
             Vector3D pos = new Vector3D(nmsPos.getX(), nmsPos.getY(), nmsPos.getZ());
-            BlockBase block = p.getWorld().getBlock(pos);
+            BlockWrapper block = p.world().getBlock(pos);
             if (block == null) {
                 return null;
             }
@@ -139,7 +138,7 @@ public class PackerBase {
 
             return new BlockDigEvent(p, pos, dir, digType, block);
         }
-        org.bukkit.inventory.ItemStack itemStack = p.inventory.mainHand();
+        ItemWrapper itemStack = p.inventory.hand();
         if (itemStack == null) {
             return null;
         }
@@ -210,7 +209,7 @@ public class PackerBase {
                 // Interact with nothing in hand.
                 return null;
             }
-            return new StartUseItemEvent(p, CraftItemStack.asCraftMirror(itemStack));
+            return new StartUseItemEvent(p, new ItemWrapper(itemStack));
         }
     }
 
@@ -269,7 +268,7 @@ public class PackerBase {
         float pitch = serializer.readFloat();
         boolean onGround = serializer.readUnsignedByte() != 0;
 
-        return new MoveEvent(p, new Location(p.getWorld(), pos.x, pos.y, pos.z, yaw, pitch), onGround, true, false);
+        return new MoveEvent(p, new Location(p.world(), pos.x, pos.y, pos.z, yaw, pitch), onGround, true, false);
     }
 
     private static Event<?> toEvent(HPlayer p, PacketPlayInFlying.PacketPlayInPosition packet) {
@@ -286,7 +285,7 @@ public class PackerBase {
         double z = serializer.readDouble();
         boolean onGround = serializer.readUnsignedByte() != 0;
 
-        return new MoveEvent(p, new Location(p.getWorld(), x, y, z, pos.yaw, pos.pitch), onGround, false, true);
+        return new MoveEvent(p, new Location(p.world(), x, y, z, pos.yaw, pos.pitch), onGround, false, true);
     }
 
     private static Event<?> toEvent(HPlayer p, PacketPlayInFlying.PacketPlayInPositionLook packet) {
@@ -304,7 +303,7 @@ public class PackerBase {
         float pitch = serializer.readFloat();
         boolean onGround = serializer.readUnsignedByte() != 0;
 
-        return new MoveEvent(p, new Location(p.getWorld(), x, y, z, yaw, pitch), onGround, true, true);
+        return new MoveEvent(p, new Location(p.world(), x, y, z, yaw, pitch), onGround, true, true);
     }
 
     private static Event<?> toEvent(HPlayer p, PacketPlayInHeldItemSlot packet) {
@@ -341,8 +340,8 @@ public class PackerBase {
             cursorPos = new Vector3D(serializer.readFloat(), serializer.readFloat(), serializer.readFloat());
         }
 
-        Entity nmsEntity = packet.a(p.getWorld().worldServer);
-        EntityBase entity = nmsEntity == null ? null : new EntityBase(nmsEntity);
+        Entity nmsEntity = packet.a(p.world().worldServer);
+        EntityWrapper entity = nmsEntity == null ? null : new EntityWrapper(nmsEntity);
 
         return new EntityInteractEvent(p, entityId, type, cursorPos, entity);
     }
@@ -389,7 +388,7 @@ public class PackerBase {
         PacketDataSerializer serializer = new PacketDataSerializer(Unpooled.buffer());
         packet.b(serializer);
         int id = serializer.e();
-        if (id != p.bukkit.getEntityId()) {
+        if (id != p.nms.getId()) {
             return null;
         }
         List<AttributeEvent.AttributeSnapshot> snapshots = new ArrayList<>();
@@ -414,7 +413,7 @@ public class PackerBase {
         PacketDataSerializer serializer = new PacketDataSerializer(Unpooled.buffer());
         packet.b(serializer);
         int id = serializer.e();
-        if (id != p.bukkit.getEntityId()) {
+        if (id != p.nms.getId()) {
             return null;
         }
         float x = serializer.readShort() / 8000F;

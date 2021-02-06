@@ -1,7 +1,7 @@
 package xyz.hstudio.horizon.util;
 
 import org.bukkit.Material;
-import xyz.hstudio.horizon.wrapper.BlockBase;
+import xyz.hstudio.horizon.wrapper.BlockWrapper;
 
 import java.util.EnumSet;
 import java.util.HashSet;
@@ -30,7 +30,7 @@ public class BlockUtils {
         }
     }
 
-    public static boolean isSolid(BlockBase block) {
+    public static boolean isSolid(BlockWrapper block) {
         return block.isSolid() || SOLID.contains(block.type());
     }
 
@@ -38,8 +38,8 @@ public class BlockUtils {
         return type.isSolid() || SOLID.contains(type);
     }
 
-    public static Set<BlockBase> getBlocksInLocation(Location loc) {
-        Set<BlockBase> blocks = new HashSet<>();
+    public static Set<BlockWrapper> getBlocksInLocation(Location loc) {
+        Set<BlockWrapper> blocks = new HashSet<>();
         blocks.add(loc.plus(0.3, 0, 0).getBlock());
         blocks.add(loc.plus(0, 0, 0.3).getBlock());
         blocks.add(loc.plus(-0.3, 0, 0).getBlock());

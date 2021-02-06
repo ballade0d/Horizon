@@ -10,8 +10,8 @@ import xyz.hstudio.horizon.event.Event;
 import xyz.hstudio.horizon.event.inbound.MoveEvent;
 import xyz.hstudio.horizon.module.CheckBase;
 import xyz.hstudio.horizon.util.*;
-import xyz.hstudio.horizon.wrapper.BlockBase;
-import xyz.hstudio.horizon.wrapper.WorldBase;
+import xyz.hstudio.horizon.wrapper.BlockWrapper;
+import xyz.hstudio.horizon.wrapper.WorldWrapper;
 
 @LoadFrom("checks/phase.yml")
 public class Phase extends CheckBase {
@@ -59,7 +59,7 @@ public class Phase extends CheckBase {
         // We need to grab blocks below us too, such as fences
         AABB selection = bigBox.plus(0, -0.6, 0, 0, 0, 0);
 
-        WorldBase world = to.world;
+        WorldWrapper world = to.world;
         for (int x = selection.min.getBlockX(); x <= selection.max.getBlockX(); x++) {
             for (int y = selection.min.getBlockY(); y <= selection.max.getBlockY(); y++) {
                 for (int z = selection.min.getBlockZ(); z <= selection.max.getBlockZ(); z++) {
@@ -68,7 +68,7 @@ public class Phase extends CheckBase {
                         continue;
                     }
 
-                    BlockBase block = world.getBlock(x, y, z);
+                    BlockWrapper block = world.getBlock(x, y, z);
                     if (block == null || !block.isSolid()) {
                         continue;
                     }

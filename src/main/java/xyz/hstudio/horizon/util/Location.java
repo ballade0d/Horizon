@@ -2,8 +2,8 @@ package xyz.hstudio.horizon.util;
 
 import org.bukkit.util.NumberConversions;
 import xyz.hstudio.horizon.HPlayer;
-import xyz.hstudio.horizon.wrapper.BlockBase;
-import xyz.hstudio.horizon.wrapper.WorldBase;
+import xyz.hstudio.horizon.wrapper.BlockWrapper;
+import xyz.hstudio.horizon.wrapper.WorldWrapper;
 
 import javax.annotation.Nullable;
 import java.util.HashSet;
@@ -12,17 +12,17 @@ import java.util.Set;
 
 public class Location extends Vector3D {
 
-    public final WorldBase world;
+    public final WorldWrapper world;
     public float yaw, pitch;
 
-    public Location(WorldBase world, double x, double y, double z, float yaw, float pitch) {
+    public Location(WorldWrapper world, double x, double y, double z, float yaw, float pitch) {
         super(x, y, z);
         this.world = world;
         this.yaw = yaw;
         this.pitch = pitch;
     }
 
-    public Location(WorldBase world, double x, double y, double z) {
+    public Location(WorldWrapper world, double x, double y, double z) {
         super(x, y, z);
         this.world = world;
         this.yaw = 0;
@@ -131,14 +131,14 @@ public class Location extends Vector3D {
     }
 
     public boolean onGround(HPlayer p, boolean ignoreOnGround, double depth) {
-        Set<BlockBase> blocks = new HashSet<>();
+        Set<BlockWrapper> blocks = new HashSet<>();
         blocks.addAll(BlockUtils.getBlocksInLocation(this));
         blocks.addAll(BlockUtils.getBlocksInLocation(this.plus(0, -1, 0)));
-        Set<BlockBase> blocksAbove = !ignoreOnGround ? null : BlockUtils.getBlocksInLocation(this);
+        Set<BlockWrapper> blocksAbove = !ignoreOnGround ? null : BlockUtils.getBlocksInLocation(this);
         AABB underFeet = new AABB(x - 0.3, y - depth, z - 0.3, x + 0.3, y, z + 0.3);
         AABB topFeet = underFeet.plus(0, depth + 0.00001, 0, 0, 0, 0);
 
-        for (BlockBase block : blocks) {
+        for (BlockWrapper block : blocks) {
             if (block.isLiquid() || !BlockUtils.isSolid(block)) {
                 continue;
             }
@@ -149,7 +149,7 @@ public class Location extends Vector3D {
                 if (!ignoreOnGround) {
                     return true;
                 }
-                for (BlockBase above : blocksAbove) {
+                for (BlockWrapper above : blocksAbove) {
                     if (above.isLiquid() || !BlockUtils.isSolid(above)) {
                         continue;
                     }
@@ -165,7 +165,7 @@ public class Location extends Vector3D {
     }
 
     @Nullable
-    public BlockBase getBlock() {
+    public BlockWrapper getBlock() {
         return world.getBlock(this);
     }
 

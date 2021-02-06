@@ -30,7 +30,7 @@ public class AntiVelocity extends CheckBase {
             if (e.touchedBlocks.contains(Material.LADDER) || e.touchedBlocks.contains(Material.VINE)) {
                 return;
             }
-            if (e.failedVelocity && p.bukkit.getVehicle() == null) {
+            if (e.failedVelocity && p.nms.vehicle == null) {
                 punish(e, "AntiVelocity (uxzPm)", 1, Detection.ANTI_VELOCITY, null);
             }
         }

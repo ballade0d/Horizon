@@ -27,11 +27,11 @@ public class HealthTag extends CheckBase {
         if (event instanceof MetaEvent) {
             MetaEvent e = (MetaEvent) event;
 
-            if (e.id == p.bukkit.getEntityId()) {
+            if (e.id == p.nms.getId()) {
                 return;
             }
 
-            Entity entity = p.getWorld().getEntity(e.id);
+            Entity entity = p.world().getEntity(e.id);
             if (entity == null) {
                 return;
             }
@@ -41,7 +41,7 @@ public class HealthTag extends CheckBase {
             if (!(entity instanceof EntityHuman) && !(entity instanceof EntityMonster) && !(entity instanceof EntityAnimal) && !(entity instanceof EntityGolem) && !(entity instanceof EntityWaterAnimal) && !(entity instanceof EntityVillager)) {
                 return;
             }
-            if (p.bukkit.getVehicle() != null && p.bukkit.getVehicle().getUniqueId().equals(entity.getUniqueID())) {
+            if (entity.equals(p.nms.vehicle)) {
                 return;
             }
             boolean reset = false;

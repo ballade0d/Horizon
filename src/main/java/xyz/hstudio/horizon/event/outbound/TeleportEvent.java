@@ -26,7 +26,7 @@ public class TeleportEvent extends Event<PacketPlayOutPosition> {
     public void post() {
         p.sendSimulatedAction(() -> {
             p.teleport.teleporting = true;
-            p.teleport.location = new Location(p.getWorld(), x, y, z, yaw % 360f, pitch % 360f);
+            p.teleport.location = new Location(p.world(), x, y, z, yaw % 360f, pitch % 360f);
         });
     }
 }

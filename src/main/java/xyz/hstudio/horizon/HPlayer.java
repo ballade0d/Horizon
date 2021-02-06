@@ -1,13 +1,11 @@
 package xyz.hstudio.horizon;
 
 import io.netty.channel.ChannelPipeline;
-import net.minecraft.server.v1_8_R3.PacketPlayOutKeepAlive;
+import net.minecraft.server.v1_8_R3.*;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_8_R3.util.CraftChatMessage;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import xyz.hstudio.horizon.api.enums.Detection;
 import xyz.hstudio.horizon.event.outbound.AttributeEvent;
 import xyz.hstudio.horizon.module.CheckBase;
@@ -17,8 +15,9 @@ import xyz.hstudio.horizon.util.Location;
 import xyz.hstudio.horizon.util.Pair;
 import xyz.hstudio.horizon.util.Vector3D;
 import xyz.hstudio.horizon.util.enums.Direction;
-import xyz.hstudio.horizon.wrapper.EntityBase;
-import xyz.hstudio.horizon.wrapper.WorldBase;
+import xyz.hstudio.horizon.wrapper.EntityWrapper;
+import xyz.hstudio.horizon.wrapper.ItemWrapper;
+import xyz.hstudio.horizon.wrapper.WorldWrapper;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -36,8 +35,8 @@ public class HPlayer {
     public final Queue<Pair<Integer, Long>> pings = new ConcurrentLinkedQueue<>();
     public final Map<Integer, Runnable> simulatedCmds = new ConcurrentHashMap<>();
 
-    public final CraftPlayer bukkit;
-    public final EntityBase base;
+    public final EntityPlayer nms;
+    public final EntityWrapper base;
     public final int protocol;
     public final ChannelPipeline pipeline;
     public final PacketHandler packetHandler;
@@ -50,15 +49,16 @@ public class HPlayer {
 
     public int currTick;
 
-    public HPlayer(Player bukkit) {
-        this.bukkit = (CraftPlayer) bukkit;
-        this.base = new EntityBase(bukkit);
+    public HPlayer(Player shit) {
+        this.nms = ((CraftPlayer) shit).getHandle();
+        this.base = new EntityWrapper(nms);
         this.protocol = 47; // TODO: Finish this
         this.checks = Collections.unmodifiableMap(new EnumMap<Detection, CheckBase>(Detection.class) {
             {
                 put(AIM_ASSIST, new AimAssist(HPlayer.this));
                 put(ANTI_VELOCITY, new AntiVelocity(HPlayer.this));
                 put(BAD_PACKETS, new BadPackets(HPlayer.this));
+                put(FAST_BREAK, new FastBreak(HPlayer.this));
                 put(GROUND_SPOOF, new GroundSpoof(HPlayer.this));
                 put(HEALTH_TAG, new HealthTag(HPlayer.this));
                 put(HIT_BOX, new HitBox(HPlayer.this));
@@ -70,7 +70,7 @@ public class HPlayer {
             }
         });
 
-        this.pipeline = this.bukkit.getHandle().playerConnection.networkManager.channel.pipeline();
+        this.pipeline = nms.playerConnection.networkManager.channel.pipeline();
         this.packetHandler = new PacketHandler(this);
 
         this.inventory = new Inventory();
@@ -79,19 +79,19 @@ public class HPlayer {
         this.velocity = new Velocity();
         this.teleport = new Teleport();
 
-        inst.getPlayers().put(bukkit.getUniqueId(), this);
+        inst.getPlayers().put(nms.getUniqueID(), this);
     }
 
-    public Collection<CheckBase> getChecks() {
-        return checks.values();
+    public void sendMessage(String message) {
+        nms.sendMessage(CraftChatMessage.fromString(message));
     }
 
-    public WorldBase getWorld() {
-        return new WorldBase(bukkit.getWorld());
+    public WorldWrapper world() {
+        return new WorldWrapper(nms.getWorld());
     }
 
     public boolean teleportUnsafe(Location loc) {
-        return bukkit.teleport(loc.bukkit());
+        return nms.getBukkitEntity().teleport(loc.bukkit());
     }
 
     public float moveFactor() {
@@ -111,6 +111,10 @@ public class HPlayer {
             }
         }
         return value;
+    }
+
+    public WorldSettings.EnumGamemode getMode() {
+        return nms.playerInteractManager.getGameMode();
     }
 
     /**
@@ -136,13 +140,20 @@ public class HPlayer {
         return true;
     }
 
-    public int getPotionAmplifier(PotionEffectType type) {
-        for (PotionEffect e : bukkit.getActivePotionEffects()) {
-            // hashCode returns effect id
-            if (e.getType().hashCode() != type.hashCode()) {
+    public float flySpeed() {
+        return nms.abilities.flySpeed * 2.0F;
+    }
+
+    public float walkSpeed() {
+        return nms.abilities.walkSpeed * 2.0F;
+    }
+
+    public int getEffectAmplifier(MobEffectList type) {
+        for (MobEffect effect : nms.getEffects()) {
+            if (effect.getEffectId() != type.id) {
                 continue;
             }
-            return e.getAmplifier() + 1;
+            return effect.getAmplifier() + 1;
         }
         return 0;
     }
@@ -152,11 +163,16 @@ public class HPlayer {
         public int heldSlot;
 
         public Inventory() {
-            this.heldSlot = bukkit.getInventory().getHeldItemSlot();
+            this.heldSlot = nms.inventory.itemInHandIndex;
         }
 
-        public ItemStack mainHand() {
-            return bukkit.getInventory().getItem(heldSlot);
+        public ItemWrapper hand() {
+            return new ItemWrapper(nms.inventory.items[heldSlot]);
+        }
+
+        public boolean contains(org.bukkit.Material type) {
+            return Arrays.stream(nms.inventory.items)
+                    .anyMatch(i -> Item.getId(i.getItem()) == type.getId());
         }
     }
 
@@ -192,9 +208,9 @@ public class HPlayer {
         public boolean isEating, isPullingBow, isBlocking;
 
         public Status() {
-            this.ping = bukkit.getHandle().ping;
-            this.isSneaking = bukkit.isSneaking();
-            this.isSprinting = bukkit.isSprinting();
+            this.ping = nms.ping;
+            this.isSneaking = nms.isSneaking();
+            this.isSprinting = nms.isSprinting();
         }
     }
 
