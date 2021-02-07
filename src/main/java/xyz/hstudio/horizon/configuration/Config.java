@@ -147,7 +147,6 @@ public class Config {
                             new YamlConfiguration().load(new InputStreamReader(new FileInputStream(changed), StandardCharsets.UTF_8));
 
                             // Finally, reload the configuration
-                            Logger.msg("INFO", "Auto reloading " + changed.getName());
                             load(clazz);
                         } catch (Exception ignore) {
                         }

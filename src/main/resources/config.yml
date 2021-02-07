@@ -10,9 +10,9 @@ discord_integration:
 
 mysql:
   enabled: false
-  host: ''
-  database: ''
-  user: ''
+  host: '127.0.0.1'
+  database: 'horizon'
+  user: 'root'
   password: ''
   port: 3306
 

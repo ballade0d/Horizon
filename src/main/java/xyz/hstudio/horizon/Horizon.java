@@ -12,7 +12,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import xyz.hstudio.horizon.configuration.Config;
 import xyz.hstudio.horizon.configuration.Execution;
 import xyz.hstudio.horizon.module.checks.*;
-import xyz.hstudio.horizon.storage.SQLite;
+import xyz.hstudio.horizon.storage.MySQL;
 import xyz.hstudio.horizon.task.Async;
 import xyz.hstudio.horizon.task.Sync;
 import xyz.hstudio.horizon.util.AABB;
@@ -36,7 +36,7 @@ public final class Horizon extends JavaPlugin {
     @Getter
     private final Sync sync = new Sync(this);
     @Getter
-    private final SQLite sql = new SQLite();
+    private final MySQL sql = new MySQL();
 
     public Horizon() {
         try {

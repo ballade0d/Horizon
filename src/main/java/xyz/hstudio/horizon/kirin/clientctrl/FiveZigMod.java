@@ -4,6 +4,4 @@ import xyz.hstudio.horizon.configuration.LoadFrom;
 
 @LoadFrom("kirin/clientctrl/fivezigmod.yml")
 public class FiveZigMod {
-
-
 }
