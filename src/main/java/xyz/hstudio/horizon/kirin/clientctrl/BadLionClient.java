@@ -6,5 +6,4 @@ import xyz.hstudio.horizon.configuration.LoadFrom;
 public class BadLionClient {
 
 
-
 }
