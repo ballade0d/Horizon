@@ -14,6 +14,10 @@ public class AntiVelocity extends CheckBase {
 
     @LoadInfo("enable")
     private static boolean ENABLE;
+    @LoadInfo("xz_epsilon")
+    public static double XZ_EPSILON;
+    @LoadInfo("y_epsilon")
+    public static double Y_EPSILON;
 
     public AntiVelocity(HPlayer p) {
         super(p);

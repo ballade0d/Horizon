@@ -15,12 +15,12 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 @LoadFrom("config.yml")
 public class Config {
@@ -83,6 +83,7 @@ public class Config {
             if (annotation == null || !Modifier.isStatic(field.getModifiers())) {
                 continue;
             }
+            boolean accessible = field.isAccessible();
             field.setAccessible(true);
 
             String path = annotation.value();
@@ -100,22 +101,18 @@ public class Config {
                 }
             }
 
-            field.setAccessible(false);
+            field.setAccessible(accessible);
         }
     }
 
     public static void watcher() throws IOException {
         // Use Set to deduplication so every directory will have only 1 listener
-        Set<Path> parents = new HashSet<>();
-        for (Map.Entry<File, Class<?>> entry : listener.entrySet()) {
-            Path parent = entry.getKey().toPath().getParent();
-            parents.add(parent);
-        }
-        ExecutorService threadPool = Executors.newFixedThreadPool(parents.size(),
-                new ThreadFactoryBuilder()
-                        .setDaemon(true)
-                        .setNameFormat("Horizon Auto-Reloading Thread")
-                        .build());
+        Set<Path> parents = listener.keySet().stream().map(file -> file.toPath().getParent()).collect(Collectors.toSet());
+
+        ExecutorService threadPool = Executors.newFixedThreadPool(parents.size(), new ThreadFactoryBuilder()
+                .setDaemon(true)
+                .setNameFormat("Horizon Auto-Reloading Thread")
+                .build());
         for (Path parent : parents) {
             WatchService service = FileSystems.getDefault().newWatchService();
             // Register the service for the path
@@ -131,16 +128,12 @@ public class Config {
                         break;
                     }
 
-                    // Use Set to deduplication
-                    Set<String> names = new HashSet<>();
-                    for (WatchEvent<?> event : key.pollEvents()) {
-                        names.add(event.context().toString());
-                    }
-                    for (String name : names) {
+                    key.pollEvents().stream().map(e -> e.context().toString()).distinct().forEach(name -> {
                         File changed = new File(dir, name);
                         Class<?> clazz = listener.get(changed);
                         if (clazz == null || changed.length() == 0) {
-                            continue;
+                            // In Stream#forEach, return = continue
+                            return;
                         }
                         try {
                             // Test the file first, if an error occurred, skip
@@ -150,7 +143,7 @@ public class Config {
                             load(clazz);
                         } catch (Exception ignore) {
                         }
-                    }
+                    });
                     key.reset();
                 }
             });

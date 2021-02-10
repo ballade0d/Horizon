@@ -11,9 +11,7 @@ import xyz.hstudio.horizon.module.CheckBase;
 import xyz.hstudio.horizon.util.*;
 import xyz.hstudio.horizon.wrapper.EntityWrapper;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.OptionalDouble;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @LoadFrom("checks/hit_box.yml")
@@ -36,9 +34,7 @@ public class HitBox extends CheckBase {
     @LoadInfo("step")
     private static int STEP;
 
-    private static final int N = 5;
-
-    private final float[] yaws = new float[N], pitches = new float[N];
+    private final Deque<Vector2D> moves = new LinkedList<>();
     private double buffer;
 
     public HitBox(HPlayer p) {
@@ -56,11 +52,12 @@ public class HitBox extends CheckBase {
             float yaw = e.to.yaw;
             float pitch = e.to.pitch;
 
-            // Remove the last value and add the new value to the head
-            System.arraycopy(yaws, 0, yaws, 1, yaws.length - 1);
-            yaws[0] = yaw;
-            System.arraycopy(pitches, 0, pitches, 1, pitches.length - 1);
-            pitches[0] = pitch;
+            // Add the new value to the head
+            moves.addFirst(new Vector2D(yaw, pitch));
+
+            if (moves.size() > 5) {
+                moves.removeLast();
+            }
         } else if (event instanceof EntityInteractEvent) {
             EntityInteractEvent e = (EntityInteractEvent) event;
             if (e.type != EntityInteractEvent.InteractType.ATTACK) {
@@ -106,45 +103,40 @@ public class HitBox extends CheckBase {
                 if ((buffer += BUFFER_ADDER) > MAX_BUFFER) {
                     punish(e, "HitBox (COY9Y)", 2, Detection.HIT_BOX, null);
                 }
-            } else {
-                buffer = Math.max(buffer - BUFFER_REDUCER, 0);
-            }
+            } else buffer = Math.max(buffer - BUFFER_REDUCER, 0);
         }
     }
 
     private boolean direction(AABB cube) {
+        if (moves.isEmpty()) {
+            return true;
+        }
+
         Vector3D headPos = p.physics.headPos();
 
-        Vector2D point = new Vector2D(yaws[0], pitches[0]);
-        for (int i = 0; i < N - 1; i++) {
-            if (point.x == 0 && point.y == 0) {
-                return true;
-            }
+        Iterator<Vector2D> iterator = moves.iterator();
+        Vector2D previous = iterator.next();
+        while (iterator.hasNext()) {
+            Vector2D point = iterator.next();
 
-            Vector2D next = new Vector2D(yaws[i + 1], pitches[i + 1]);
+            Ray2D currToPrev = new Ray2D(previous, point.minus(point));
+            Ray2D.Tracer ctpTracer = currToPrev.new Tracer();
 
-            Ray2D ray2D = new Ray2D(point, next.minus(point));
-            Ray2D.Tracer tracer2D = ray2D.new Tracer();
-
-            double distance = point.distance(next);
+            double distance = previous.distance(point);
             double rate = distance / STEP;
 
-            // Check for the origin point
-            Vector3D dir = MathUtils.getDirection(tracer2D.x, tracer2D.y);
-            Ray3D ray3D = new Ray3D(headPos, dir);
-            if (cube.intersectsRay(ray3D, 0, Float.MAX_VALUE) != null) {
-                return true;
-            }
+            for (double traced = 0; traced < distance; traced += rate) {
+                ctpTracer.trace(traced);
 
-            while (tracer2D.trace(rate) < distance) {
-                dir = MathUtils.getDirection(tracer2D.x, tracer2D.y);
-                ray3D = new Ray3D(headPos, dir);
+                Vector3D dir = MathUtils.getDirection(ctpTracer.x, ctpTracer.y);
+                Ray3D ray3D = new Ray3D(headPos, dir);
 
                 if (cube.intersectsRay(ray3D, 0, Float.MAX_VALUE) != null) {
                     return true;
                 }
             }
-            point = next;
+
+            previous = point;
         }
         return false;
     }

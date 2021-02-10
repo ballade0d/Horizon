@@ -1,4 +1,4 @@
-package xyz.hstudio.horizon.kirin.clientctrl;
+package xyz.hstudio.horizon.kirin.module.clientctrl;
 
 import com.google.gson.JsonObject;
 import io.netty.buffer.Unpooled;
@@ -7,7 +7,7 @@ import net.minecraft.server.v1_8_R3.PacketPlayOutCustomPayload;
 import xyz.hstudio.horizon.HPlayer;
 import xyz.hstudio.horizon.configuration.LoadFrom;
 import xyz.hstudio.horizon.configuration.LoadInfo;
-import xyz.hstudio.horizon.kirin.ClientCtrl;
+import xyz.hstudio.horizon.kirin.module.ClientCtrl;
 
 import java.util.List;
 
@@ -68,8 +68,8 @@ public class LabyMod extends ClientCtrl {
         object.addProperty("ANIMATIONS", ANIMATIONS);
         object.addProperty("SATURATION_BAR", SATURATION_BAR);
 
-        this.dataToSend.a("PERMISSIONS");
-        this.dataToSend.a(object.toString());
+        dataToSend.a("PERMISSIONS");
+        dataToSend.a(object.toString());
     }
 
     @Override

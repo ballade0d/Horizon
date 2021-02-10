@@ -1,1 +1,5 @@
 enable: true
+
+xz_epsilon: 0.003
+
+y_epsilon: 0.01

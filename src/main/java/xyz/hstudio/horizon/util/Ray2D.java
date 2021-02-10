@@ -16,8 +16,12 @@ public class Ray2D {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (!(obj instanceof Ray2D)) return false;
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof Ray2D)) {
+            return false;
+        }
         Ray2D other = (Ray2D) obj;
         return Objects.equals(origin, other.origin) && Objects.equals(direction, other.direction);
     }
@@ -30,17 +34,16 @@ public class Ray2D {
     }
 
     public class Tracer {
-        public double x, y, total;
+        public double x, y;
 
         public Tracer() {
             x = origin.x;
             y = origin.y;
         }
 
-        public double trace(double distance) {
+        public void trace(double distance) {
             x += direction.x * distance;
             y += direction.y * distance;
-            return total += distance;
         }
     }
 }

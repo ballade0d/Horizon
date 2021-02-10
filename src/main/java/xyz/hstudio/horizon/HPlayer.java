@@ -204,6 +204,7 @@ public class HPlayer {
         public boolean isSneaking;
         public boolean isSprinting;
         public boolean hitSlowdown;
+        public boolean teleport;
 
         public boolean isEating, isPullingBow, isBlocking;
 

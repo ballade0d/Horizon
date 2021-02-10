@@ -31,18 +31,18 @@ public class BadPackets extends CheckBase {
 
     private void held(HeldItemEvent e) {
         if (p.inventory.heldSlot == e.heldItemSlot) {
-            punish(e, "BadPackets (Y2xI0)", 10, Detection.BAD_PACKETS, null);
+            punish(e, "BadPackets (Y2xI0)", 1, Detection.BAD_PACKETS, null);
         }
     }
 
     private void sneak(EntityActionEvent e) {
         if (e.type == EntityActionEvent.ActionType.START_SNEAKING) {
             if (p.status.isSneaking && p.nms.isSneaking()) {
-                punish(e, "BadPackets (YwjXR)", 10, Detection.BAD_PACKETS, null);
+                punish(e, "BadPackets (YwjXR)", 1, Detection.BAD_PACKETS, null);
             }
         } else if (e.type == EntityActionEvent.ActionType.STOP_SNEAKING) {
             if (!p.status.isSneaking && !p.nms.isSneaking()) {
-                punish(e, "BadPackets (YzQap)", 10, Detection.BAD_PACKETS, null);
+                punish(e, "BadPackets (YwjXR)", 1, Detection.BAD_PACKETS, null);
             }
         }
     }

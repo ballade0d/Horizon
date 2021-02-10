@@ -5,6 +5,7 @@ import net.minecraft.server.v1_8_R3.PacketPlayInFlying;
 import org.bukkit.Material;
 import xyz.hstudio.horizon.HPlayer;
 import xyz.hstudio.horizon.event.Event;
+import xyz.hstudio.horizon.module.checks.AntiVelocity;
 import xyz.hstudio.horizon.util.AABB;
 import xyz.hstudio.horizon.util.Location;
 import xyz.hstudio.horizon.util.Vector3D;
@@ -237,22 +238,22 @@ public class MoveEvent extends Event<PacketPlayInFlying> {
             failedVelocity = true;
             return null;
         }
-        double speedPotMultiplier = 1 + p.getEffectAmplifier(MobEffectList.FASTER_MOVEMENT) * 0.2;
-        double sprintMultiplier = p.status.isSprinting ? 1.3 : 1;
-        double weirdConstant = jump && p.status.isSprinting ? 0.2518462 : 0.098;
-        double baseMultiplier = 5 * p.walkSpeed() * speedPotMultiplier;
-        double maxDiscrepancy = weirdConstant * baseMultiplier * sprintMultiplier + 0.003;
 
         double x = p.status.hitSlowdown ? 0.6 * p.velocity.x : p.velocity.x;
         double y = p.velocity.y;
         double z = p.status.hitSlowdown ? 0.6 * p.velocity.z : p.velocity.z;
 
         if (!((touchedFaces.contains(Direction.UP) && y > 0) || (touchedFaces.contains(Direction.DOWN) && y < 0)) &&
-                Math.abs(y - velocity.y) > 0.01 &&
+                Math.abs(y - velocity.y) > AntiVelocity.Y_EPSILON &&
                 !jump && !step) {
-            p.sendMessage("A");
             return null;
         }
+
+        double speedPotMultiplier = 1 + p.getEffectAmplifier(MobEffectList.FASTER_MOVEMENT) * 0.2;
+        double sprintMultiplier = p.status.isSprinting ? 1.3 : 1;
+        double weirdConstant = jump && p.status.isSprinting ? 0.2518462 : 0.098;
+        double baseMultiplier = 5 * p.walkSpeed() * speedPotMultiplier;
+        double maxDiscrepancy = weirdConstant * baseMultiplier * sprintMultiplier + AntiVelocity.XZ_EPSILON;
 
         double minX = x - maxDiscrepancy;
         double maxX = x + maxDiscrepancy;
@@ -260,12 +261,10 @@ public class MoveEvent extends Event<PacketPlayInFlying> {
         double maxZ = z + maxDiscrepancy;
         if (!((touchedFaces.contains(Direction.EAST) && x > 0) || (touchedFaces.contains(Direction.WEST) && x < 0)) &&
                 !(velocity.x <= maxX && velocity.x >= minX)) {
-            p.sendMessage("B");
             return null;
         }
         if (!((touchedFaces.contains(Direction.SOUTH) && z > 0) || (touchedFaces.contains(Direction.NORTH) && z < 0)) &&
                 !(velocity.z <= maxZ && velocity.z >= minZ)) {
-            p.sendMessage("C");
             return null;
         }
 
@@ -288,5 +287,6 @@ public class MoveEvent extends Event<PacketPlayInFlying> {
         physics.touchedFaces = touchedFaces;
 
         p.status.hitSlowdown = false;
+        p.status.teleport = teleport;
     }
 }

@@ -87,7 +87,7 @@ public class Phase extends CheckBase {
                         boolean yCollide = collides2d(test.min.x, test.max.x, test.min.z, test.max.z, playerFrom.min.x, playerFrom.max.x, playerFrom.min.z, playerFrom.max.z, e.velocity.x, e.velocity.z);
                         boolean zCollide = collides2d(test.min.x, test.max.x, test.min.y, test.max.y, playerFrom.min.x, playerFrom.max.x, playerFrom.min.y, playerFrom.max.y, e.velocity.x, e.velocity.y);
                         if (xCollide && yCollide && zCollide) {
-                            punish(e, "Phase ()", 1, Detection.PHASE, null);
+                            punish(e, "Phase (VNjUd)", 1, Detection.PHASE, null);
                             return;
                         }
                     }

@@ -36,10 +36,12 @@ public class FastBreak extends CheckBase {
                 totalDamage = 0;
                 tickDig();
             } else if (e.type == BlockDigEvent.DigType.STOP_DESTROY_BLOCK) {
-                if (totalDamage < 1) {
+                if (totalDamage == 0) {
+                    punish(e, "NoSwing (tAxYy)", 1, Detection.NO_SWING, null);
+                } else if (totalDamage < 1) {
                     double speedFactor = 1 / totalDamage;
                     double adder = Math.min((speedFactor - 1) * 10, 10);
-                    punish(e, "FastBreak ()", adder, Detection.FAST_BREAK, speedFactor + "x");
+                    punish(e, "FastBreak (7dvs8)", adder, Detection.FAST_BREAK, speedFactor + "x");
                 }
                 target = null;
                 totalDamage = 0;
@@ -57,7 +59,8 @@ public class FastBreak extends CheckBase {
     private float getDamage(BlockWrapper block, ItemWrapper hand) {
         float hardness = block.hardness();
         float digSpeed = getDigSpeed(block, hand);
-        return Math.max(!hand.canBreak(block) && !block.isAlwaysDestroyable() ? digSpeed / hardness / 100 : digSpeed / hardness / 30, 0);
+        return Math.max(!hand.canBreak(block) && !block.isAlwaysDestroyable() ?
+                digSpeed / hardness / 100 : digSpeed / hardness / 30, 0);
     }
 
     private float getDigSpeed(BlockWrapper block, ItemWrapper hand) {
@@ -79,17 +82,17 @@ public class FastBreak extends CheckBase {
                 float f1;
                 switch (effect.getAmplifier()) {
                     case 0:
-                        f1 = 0.3F;
+                        f1 = 0.3f;
                         break;
                     case 1:
-                        f1 = 0.09F;
+                        f1 = 0.09f;
                         break;
                     case 2:
-                        f1 = 0.0027F;
+                        f1 = 0.0027f;
                         break;
                     case 3:
                     default:
-                        f1 = 8.1E-4F;
+                        f1 = 8.1E-4f;
                 }
                 speed *= f1;
             }
@@ -97,12 +100,12 @@ public class FastBreak extends CheckBase {
 
         /*
         if (this.isInsideOfMaterial(Material.WATER) && !EnchantmentHelper.getAquaAffinityModifier(this)) {
-            f /= 5.0F;
+            f /= 5f;
         }
         */
 
         if (!p.physics.onGround) {
-            speed /= 5.0F;
+            speed /= 5f;
         }
 
         return speed;

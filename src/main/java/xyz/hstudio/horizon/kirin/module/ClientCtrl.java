@@ -1,4 +1,4 @@
-package xyz.hstudio.horizon.kirin;
+package xyz.hstudio.horizon.kirin.module;
 
 import lombok.RequiredArgsConstructor;
 import org.bukkit.plugin.java.JavaPlugin;

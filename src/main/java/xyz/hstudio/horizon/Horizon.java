@@ -7,6 +7,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import xyz.hstudio.horizon.configuration.Config;
@@ -94,6 +95,11 @@ public final class Horizon extends JavaPlugin {
             @EventHandler(priority = EventPriority.MONITOR)
             public void onJoin(PlayerJoinEvent e) {
                 new HPlayer(e.getPlayer());
+            }
+
+            @EventHandler(priority = EventPriority.MONITOR)
+            public void onQuit(PlayerQuitEvent e) {
+                players.remove(e.getPlayer().getUniqueId());
             }
 
             @EventHandler(priority = EventPriority.MONITOR)
