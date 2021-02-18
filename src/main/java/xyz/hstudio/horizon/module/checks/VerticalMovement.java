@@ -41,7 +41,7 @@ public class VerticalMovement extends CheckBase {
     public void run(Event<?> event) {
         if (!ENABLE) return;
         if (event instanceof MoveEvent) {
-            if (p.nms.vehicle != null) {
+            if (p.nms.vehicle != null || p.status.isFlying) {
                 return;
             }
             move((MoveEvent) event);

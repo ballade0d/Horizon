@@ -28,6 +28,9 @@ public class Config {
     @LoadInfo("prefix")
     public static String PREFIX;
 
+    @LoadInfo("log")
+    public static boolean LOG;
+
     @LoadInfo("mysql.enabled")
     public static boolean MYSQL_ENABLED;
     @LoadInfo("mysql.host")

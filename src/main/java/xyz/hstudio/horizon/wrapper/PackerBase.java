@@ -63,12 +63,12 @@ public class PackerBase {
 
         boolean invulnerable = (status & 1) > 0;
         boolean flying = (status & 2) > 0;
-        boolean flyable = (status & 4) > 0;
+        boolean canFly = (status & 4) > 0;
         boolean inCreative = (status & 8) > 0;
         float flyingSpeed = serializer.readFloat();
         float walkingSpeed = serializer.readFloat();
 
-        return new AbilitiesEvent(p, invulnerable, flying, flyable, inCreative, flyingSpeed, walkingSpeed);
+        return new CAbilitiesEvent(p, invulnerable, flying, canFly, inCreative, flyingSpeed, walkingSpeed);
     }
 
     private static Event<?> toEvent(HPlayer p, PacketPlayInArmAnimation packet) {
@@ -361,6 +361,8 @@ public class PackerBase {
             return toEvent(p, (PacketPlayOutEntityVelocity) packet);
         } else if (packet instanceof PacketPlayOutEntityMetadata) {
             return toEvent(p, (PacketPlayOutEntityMetadata) packet);
+        } else if (packet instanceof PacketPlayOutAbilities) {
+            return toEvent(p, (PacketPlayOutAbilities) packet);
         }
         return null;
     }
@@ -431,5 +433,20 @@ public class PackerBase {
             return null;
         }
         return new MetaEvent(p, id, metadata);
+    }
+
+    private static Event<?> toEvent(HPlayer p, PacketPlayOutAbilities packet) throws IOException {
+        PacketDataSerializer serializer = new PacketDataSerializer(Unpooled.buffer());
+        packet.b(serializer);
+        byte b = serializer.readByte();
+        boolean invulnerable = (b & 1) > 0;
+        boolean flying = (b & 2) > 0;
+        boolean canFly = (b & 4) > 0;
+        boolean inCreative = (b & 8) > 0;
+
+        float flyingSpeed = serializer.readFloat();
+        float walkingSpeed = serializer.readFloat();
+
+        return new SAbilitiesEvent(p, invulnerable, flying, canFly, inCreative, flyingSpeed, walkingSpeed);
     }
 }

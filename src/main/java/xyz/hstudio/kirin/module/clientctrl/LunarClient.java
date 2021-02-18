@@ -1,9 +1,9 @@
-package xyz.hstudio.horizon.kirin.module.clientctrl;
+package xyz.hstudio.kirin.module.clientctrl;
 
 import xyz.hstudio.horizon.HPlayer;
 import xyz.hstudio.horizon.configuration.LoadFrom;
 import xyz.hstudio.horizon.configuration.LoadInfo;
-import xyz.hstudio.horizon.kirin.module.ClientCtrl;
+import xyz.hstudio.kirin.module.ClientCtrl;
 
 import java.util.List;
 

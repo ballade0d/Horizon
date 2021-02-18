@@ -5,6 +5,7 @@ import org.apache.commons.io.IOUtils;
 import org.bukkit.util.NumberConversions;
 import xyz.hstudio.horizon.HPlayer;
 import xyz.hstudio.horizon.Horizon;
+import xyz.hstudio.horizon.configuration.Config;
 import xyz.hstudio.horizon.module.CheckBase;
 import xyz.hstudio.horizon.util.Location;
 import xyz.hstudio.horizon.util.Pair;
@@ -33,6 +34,11 @@ public class Async implements Runnable {
                 .setDaemon(true)
                 .setNameFormat("Horizon Processing Thread")
                 .build());
+
+        if (!Config.LOG) {
+            logOutput = null;
+            return;
+        }
 
         try {
             File logs = new File(inst.getDataFolder(), "logs");
@@ -182,6 +188,9 @@ public class Async implements Runnable {
     private final FileOutputStream logOutput;
 
     private void writeLogs() {
+        if (!Config.LOG) {
+            return;
+        }
         String time = "[" + FORMATTER.format(LocalDateTime.now()) + "] ";
         try {
             for (String message : logs) {
@@ -196,6 +205,9 @@ public class Async implements Runnable {
     }
 
     public void log(String message) {
+        if (!Config.LOG) {
+            return;
+        }
         logs.addLast(message);
     }
 }

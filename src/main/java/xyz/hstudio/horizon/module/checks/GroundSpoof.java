@@ -70,6 +70,7 @@ public class GroundSpoof extends CheckBase {
                     } else if (packet instanceof PacketPlayInFlying.PacketPlayInPositionLook) {
                         serializer.setByte(32, 0);
                     }
+                    packet.a(serializer);
                 } catch (Exception ignore) {
                 }
             });

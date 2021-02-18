@@ -1,9 +1,9 @@
-package xyz.hstudio.horizon.kirin.module.clientctrl;
+package xyz.hstudio.kirin.module.clientctrl;
 
 import xyz.hstudio.horizon.configuration.LoadFrom;
 
 @LoadFrom("kirin/clientctrl/badlionclient.yml")
-public class BadLionClient {
+public class Badlion {
 
 
 }

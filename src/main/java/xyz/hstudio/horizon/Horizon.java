@@ -1,6 +1,7 @@
 package xyz.hstudio.horizon;
 
 import lombok.Getter;
+import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
@@ -20,6 +21,7 @@ import xyz.hstudio.horizon.util.AABB;
 import xyz.hstudio.horizon.util.BlockUtils;
 import xyz.hstudio.horizon.util.Location;
 import xyz.hstudio.horizon.util.Yaml;
+import xyz.hstudio.kirin.Kirin;
 
 import java.io.File;
 import java.io.IOException;
@@ -126,6 +128,9 @@ public final class Horizon extends JavaPlugin {
             Logger.msg("WARN", "Failed to register WatchService! Stacktrace:");
             e.printStackTrace();
         }
+
+        Metrics metrics = new Metrics(this, 4236);
+        metrics.addCustomChart(new Metrics.SimplePie("kirin", () -> String.valueOf(Kirin.verified)));
     }
 
     public void onDisable() {

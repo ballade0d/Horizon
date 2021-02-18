@@ -1,4 +1,4 @@
-package xyz.hstudio.horizon.kirin;
+package xyz.hstudio.kirin;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
@@ -18,6 +18,8 @@ import java.security.PublicKey;
 import java.security.spec.X509EncodedKeySpec;
 
 public class Kirin extends ChannelInboundHandlerAdapter {
+
+    public static boolean verified;
 
     private PublicKey key;
     private boolean infoSent;
@@ -65,6 +67,7 @@ public class Kirin extends ChannelInboundHandlerAdapter {
             }
 
             if (available) {
+                verified = true;
                 // Startup here
             }
 

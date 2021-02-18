@@ -1,7 +1,7 @@
-package xyz.hstudio.horizon.kirin.module.clientctrl;
+package xyz.hstudio.kirin.module.clientctrl;
 
 import xyz.hstudio.horizon.configuration.LoadFrom;
 
 @LoadFrom("kirin/clientctrl/bettersprintmod.yml")
-public class BetterSprintMod {
+public class BetterSprinting {
 }

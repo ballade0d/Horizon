@@ -82,8 +82,8 @@ public class HPlayer {
         inst.getPlayers().put(nms.getUniqueID(), this);
     }
 
-    public void sendMessage(String message) {
-        nms.sendMessage(CraftChatMessage.fromString(message));
+    public void sendMessage(Object message) {
+        nms.sendMessage(CraftChatMessage.fromString(message.toString()));
     }
 
     public WorldWrapper world() {
@@ -203,6 +203,7 @@ public class HPlayer {
         public int ping;
         public boolean isSneaking;
         public boolean isSprinting;
+        public boolean isFlying;
         public boolean hitSlowdown;
         public boolean teleport;
 

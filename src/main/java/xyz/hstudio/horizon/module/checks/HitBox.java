@@ -12,7 +12,6 @@ import xyz.hstudio.horizon.util.*;
 import xyz.hstudio.horizon.wrapper.EntityWrapper;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @LoadFrom("checks/hit_box.yml")
 public class HitBox extends CheckBase {
@@ -74,13 +73,11 @@ public class HitBox extends CheckBase {
 
             double epsilon = entity.borderSize() + BOX_EPSILON;
 
-            List<AABB> cubes = inst
-                    .getAsync()
-                    .getHistory(entity, p.status.ping, HISTORY_RANGE)
-                    .stream().map(loc -> loc
-                            .toAABB(entity.length(), entity.width())
-                            .expand(epsilon, epsilon, epsilon))
-                    .collect(Collectors.toList());
+            List<AABB> cubes = new ArrayList<>(HISTORY_RANGE);
+
+            for (Location history : inst.getAsync().getHistory(entity, p.status.ping, HISTORY_RANGE)) {
+                cubes.add(history.toAABB(entity.length(), entity.width()).expand(epsilon, epsilon, epsilon));
+            }
 
             if (cubes.isEmpty()) {
                 return;
@@ -94,16 +91,14 @@ public class HitBox extends CheckBase {
                     .min();
 
             double dist = distance.orElse(0);
-            if (dist > LIMIT) {
-                if ((buffer += BUFFER_ADDER) > MAX_BUFFER) {
-                    punish(e, "HitBox (TYCqq)", (dist - LIMIT) * 10, Detection.HIT_BOX,
-                            "d:" + dist);
-                }
-            } else if (cubes.stream().noneMatch(this::direction)) {
-                if ((buffer += BUFFER_ADDER) > MAX_BUFFER) {
-                    punish(e, "HitBox (COY9Y)", 2, Detection.HIT_BOX, null);
-                }
-            } else buffer = Math.max(buffer - BUFFER_REDUCER, 0);
+            if (dist > LIMIT && (buffer += BUFFER_ADDER) > MAX_BUFFER) {
+                punish(e, "HitBox (TYCqq)", (dist - LIMIT) * 10, Detection.HIT_BOX,
+                        "d:" + dist);
+            } else if (cubes.stream().noneMatch(this::direction) && (buffer += BUFFER_ADDER) > MAX_BUFFER) {
+                punish(e, "HitBox (COY9Y)", 2, Detection.HIT_BOX, null);
+            } else {
+                buffer = Math.max(buffer - BUFFER_REDUCER, 0);
+            }
         }
     }
 

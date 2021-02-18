@@ -1,5 +1,6 @@
 package xyz.hstudio.horizon.module.checks;
 
+import net.minecraft.server.v1_8_R3.WorldSettings;
 import org.bukkit.Material;
 import org.bukkit.material.Openable;
 import xyz.hstudio.horizon.HPlayer;
@@ -33,7 +34,7 @@ public class Phase extends CheckBase {
             return;
         }
         MoveEvent e = (MoveEvent) event;
-        if (e.teleport) {
+        if (e.teleport || p.getMode() == WorldSettings.EnumGamemode.SPECTATOR) {
             return;
         }
         Location to = e.to;
@@ -69,7 +70,7 @@ public class Phase extends CheckBase {
                     }
 
                     BlockWrapper block = world.getBlock(x, y, z);
-                    if (block == null || !block.isSolid()) {
+                    if (block == null || !BlockUtils.isSolid(block)) {
                         continue;
                     }
                     if (block.type() == Material.PISTON_MOVING_PIECE) {
@@ -99,7 +100,7 @@ public class Phase extends CheckBase {
     // 2d collision test. check if hexagon collides with rectangle
     private boolean collides2d(double testMinX, double testMaxX, double testMinY, double testMaxY, double otherMinX, double otherMaxX, double otherMinY, double otherMaxY, double otherExtrudeX, double otherExtrudeY) {
         if (otherExtrudeX == 0) {
-            return true; //prevent division by 0
+            return true; // prevent division by 0
         }
         double slope = otherExtrudeY / otherExtrudeX;
         double height;

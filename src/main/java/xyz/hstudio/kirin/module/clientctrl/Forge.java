@@ -1,4 +1,4 @@
-package xyz.hstudio.horizon.kirin.module.clientctrl;
+package xyz.hstudio.kirin.module.clientctrl;
 
 import xyz.hstudio.horizon.configuration.LoadFrom;
 

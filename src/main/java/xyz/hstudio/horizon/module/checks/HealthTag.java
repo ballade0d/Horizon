@@ -56,16 +56,16 @@ public class HealthTag extends CheckBase {
                 return;
             }
 
-            e.modify(packet -> {
-                try {
-                    PacketDataSerializer serializer = new PacketDataSerializer(Unpooled.buffer());
-                    serializer.clear();
-                    serializer.b(e.id);
-                    DataWatcher.a(e.metadata, serializer);
-                    packet.a(serializer);
-                } catch (IOException ignore) {
-                }
-            });
+            e.setCancelled(true);
+            try {
+                PacketDataSerializer serializer = new PacketDataSerializer(Unpooled.buffer());
+                serializer.b(e.id);
+                DataWatcher.a(e.metadata, serializer);
+                Packet<?> packet = new PacketPlayOutEntityMetadata();
+                packet.a(serializer);
+                p.pipeline.writeAndFlush(packet);
+            } catch (IOException ignore) {
+            }
         }
     }
 }

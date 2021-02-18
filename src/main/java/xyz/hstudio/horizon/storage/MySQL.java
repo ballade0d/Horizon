@@ -19,16 +19,17 @@ public class MySQL {
     private Connection connection;
 
     public void setup() {
+        if (!Config.MYSQL_ENABLED) {
+            Logger.msg("INFO", "MySQL was chosen to not be enabled!");
+            return;
+        }
+
         String host = Config.MYSQL_HOST;
         String database = Config.MYSQL_DATABASE;
         String user = Config.MYSQL_USER;
         String pass = Config.MYSQL_PASSWORD;
         int port = Config.MYSQL_PORT;
 
-        if (!Config.MYSQL_ENABLED) {
-            Logger.msg("INFO", "MySQL was chosen to not be enabled!");
-            return;
-        }
         try {
             if (connection != null && !connection.isClosed()) {
                 return;
@@ -52,7 +53,7 @@ public class MySQL {
 
     private void createTables() throws SQLException {
         Statement statement = connection.createStatement();
-        statement.execute("CREATE TABLE IF NOT EXISTS HORIZON(" +
+        statement.execute("CREATE TABLE IF NOT EXISTS playerdata(" +
                 "uuid char(36) NOT NULL, " +
                 "AIM_ASSIST int, " +
                 "ANTI_VELOCITY int, " +
@@ -76,9 +77,9 @@ public class MySQL {
 
         Statement statement = connection.createStatement();
 
-        ResultSet result = statement.executeQuery("SELECT * FROM HORIZON WHERE uuid='" + uuid + "'");
+        ResultSet result = statement.executeQuery("SELECT * FROM playerdata WHERE uuid='" + uuid + "'");
         if (!result.next()) {
-            statement.execute("INSERT INTO HORIZON VALUES (" +
+            statement.execute("INSERT INTO playerdata VALUES (" +
                     "'" + uuid + "', " +
                     info.get(Detection.AIM_ASSIST) + ", " +
                     info.get(Detection.ANTI_VELOCITY) + ", " +
@@ -96,7 +97,7 @@ public class MySQL {
             return;
         }
 
-        statement.execute("UPDATE HORIZON SET " +
+        statement.execute("UPDATE playerdata SET " +
                 "AIM_ASSIST=" + info.get(Detection.AIM_ASSIST) + ", " +
                 "ANTI_VELOCITY=" + info.get(Detection.ANTI_VELOCITY) + ", " +
                 "BAD_PACKETS=" + info.get(Detection.BAD_PACKETS) + ", " +
@@ -117,7 +118,7 @@ public class MySQL {
         String uuid = p.nms.getUniqueID().toString();
 
         Statement statement = connection.createStatement();
-        ResultSet result = statement.executeQuery("SELECT * FROM HORIZON WHERE uuid='" + uuid + "'");
+        ResultSet result = statement.executeQuery("SELECT * FROM playerdata WHERE uuid='" + uuid + "'");
 
         if (!result.next()) {
             return;

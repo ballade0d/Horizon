@@ -1,4 +1,4 @@
-package xyz.hstudio.horizon.kirin.module.clientctrl;
+package xyz.hstudio.kirin.module.clientctrl;
 
 import com.google.gson.JsonObject;
 import io.netty.buffer.Unpooled;
@@ -7,7 +7,7 @@ import net.minecraft.server.v1_8_R3.PacketPlayOutCustomPayload;
 import xyz.hstudio.horizon.HPlayer;
 import xyz.hstudio.horizon.configuration.LoadFrom;
 import xyz.hstudio.horizon.configuration.LoadInfo;
-import xyz.hstudio.horizon.kirin.module.ClientCtrl;
+import xyz.hstudio.kirin.module.ClientCtrl;
 
 import java.util.List;
 

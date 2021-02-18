@@ -42,7 +42,7 @@ public class AimAssist extends CheckBase {
             }
             float deltaYaw = Math.abs(e.to.yaw - e.from.yaw);
             float deltaPitch = Math.abs(e.to.pitch - e.from.pitch);
-            common(e, deltaYaw);
+            // common(e, deltaYaw);
             gcd(e, deltaPitch);
 
             lastDeltaPitch = deltaPitch;
@@ -82,11 +82,11 @@ public class AimAssist extends CheckBase {
             double[] data = samples.toArray();
             double avg = MathUtils.average(data);
             double deviation = MathUtils.stdev(data);
-            if (avg < 7 && deviation < 12) {
+            if (avg < 8 && deviation < 12) {
                 if (++buffer > 15) {
                     buffer = 10;
                     samples.remove(0, 4);
-                    punish(e, "AimAssist ()", 2, Detection.AIM_ASSIST, null);
+                    punish(e, "AimAssist (rTBhy)", 2, Detection.AIM_ASSIST, null);
                 }
             } else buffer = Math.max(buffer - 1, 0);
 

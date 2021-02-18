@@ -51,4 +51,27 @@ public class BlockUtils {
         blocks.remove(null);
         return blocks;
     }
+
+    public static boolean blockNearbyIsSolid(Location loc, boolean definition) {
+        Set<BlockWrapper> sample = new HashSet<>();
+        sample.add(loc.plus(0, 0, 1).getBlock());
+        sample.add(loc.plus(1, 0, 1).getBlock());
+        sample.add(loc.plus(1, 0, 0).getBlock());
+        sample.add(loc.plus(1, 0, -1).getBlock());
+        sample.add(loc.plus(0, 0, -1).getBlock());
+        sample.add(loc.plus(-1, 0, -1).getBlock());
+        sample.add(loc.plus(-1, 0, 0).getBlock());
+        sample.add(loc.plus(-1, 0, 1).getBlock());
+        for (BlockWrapper b : sample) {
+            if (b == null) {
+                continue;
+            }
+            if (definition && b.isSolid()) {
+                return true;
+            } else if (b.isSolid()) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

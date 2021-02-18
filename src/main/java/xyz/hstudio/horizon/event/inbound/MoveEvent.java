@@ -49,9 +49,9 @@ public class MoveEvent extends Event<PacketPlayInFlying> {
      * Values
      */
     //This is the friction that is used to compute this move's initial force.
-    private float newFriction;
+    public float newFriction;
     //This is the friction that affects this move's velocity.
-    private float oldFriction;
+    public float oldFriction;
 
     public MoveEvent(HPlayer p, Location to, boolean onGround, boolean hasLook, boolean hasPos) {
         super(p);
@@ -110,7 +110,7 @@ public class MoveEvent extends Event<PacketPlayInFlying> {
 
     private float computeFriction() {
         float friction = 0.91F;
-        if (onGround) {
+        if (p.physics.onGround) {
             BlockWrapper b = new Location(to.world, from.x, from.y - 1, from.z).getBlock();
             if (b != null) {
                 friction *= b.friction();
@@ -271,6 +271,10 @@ public class MoveEvent extends Event<PacketPlayInFlying> {
         p.velocity.x = p.velocity.y = p.velocity.z = 0;
 
         return new Vector3D(x, y, z);
+    }
+
+    public boolean isTouchingBlocks() {
+        return touchedFaces.size() > 0;
     }
 
     @Override
