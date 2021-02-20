@@ -2,8 +2,8 @@ package xyz.hstudio.horizon.storage;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import me.cgoo.api.logger.Logger;
 import xyz.hstudio.horizon.HPlayer;
-import xyz.hstudio.horizon.Logger;
 import xyz.hstudio.horizon.api.enums.Detection;
 import xyz.hstudio.horizon.configuration.Config;
 import xyz.hstudio.horizon.module.CheckBase;
@@ -20,7 +20,7 @@ public class MySQL {
 
     public void setup() {
         if (!Config.MYSQL_ENABLED) {
-            Logger.msg("INFO", "MySQL was chosen to not be enabled!");
+            Logger.info("MySQL was chosen to not be enabled!");
             return;
         }
 
@@ -44,9 +44,9 @@ public class MySQL {
             connection = source.getConnection();
 
             createTables();
-            Logger.msg("INFO", "Connected to MySQL!");
+            Logger.info("Connected to MySQL!");
         } catch (SQLException e) {
-            Logger.msg("WARN", "Failed to connect to MySQL! Stacktrace:");
+            Logger.warn("Failed to connect to MySQL! Stacktrace:");
             e.printStackTrace();
         }
     }

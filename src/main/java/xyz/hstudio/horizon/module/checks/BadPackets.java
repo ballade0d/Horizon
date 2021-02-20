@@ -1,9 +1,9 @@
 package xyz.hstudio.horizon.module.checks;
 
+import me.cgoo.api.cfg.LoadFrom;
+import me.cgoo.api.cfg.LoadPath;
 import xyz.hstudio.horizon.HPlayer;
 import xyz.hstudio.horizon.api.enums.Detection;
-import xyz.hstudio.horizon.configuration.LoadFrom;
-import xyz.hstudio.horizon.configuration.LoadInfo;
 import xyz.hstudio.horizon.event.Event;
 import xyz.hstudio.horizon.event.inbound.EntityActionEvent;
 import xyz.hstudio.horizon.event.inbound.HeldItemEvent;
@@ -12,7 +12,7 @@ import xyz.hstudio.horizon.module.CheckBase;
 @LoadFrom("checks/bad_packets.yml")
 public class BadPackets extends CheckBase {
 
-    @LoadInfo("enable")
+    @LoadPath("enable")
     private static boolean ENABLE;
 
     public BadPackets(HPlayer p) {

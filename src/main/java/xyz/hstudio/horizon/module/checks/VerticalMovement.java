@@ -1,9 +1,9 @@
 package xyz.hstudio.horizon.module.checks;
 
+import me.cgoo.api.cfg.LoadFrom;
+import me.cgoo.api.cfg.LoadPath;
 import xyz.hstudio.horizon.HPlayer;
 import xyz.hstudio.horizon.api.enums.Detection;
-import xyz.hstudio.horizon.configuration.LoadFrom;
-import xyz.hstudio.horizon.configuration.LoadInfo;
 import xyz.hstudio.horizon.event.Event;
 import xyz.hstudio.horizon.event.inbound.MoveEvent;
 import xyz.hstudio.horizon.module.CheckBase;
@@ -26,9 +26,9 @@ import xyz.hstudio.horizon.util.enums.Direction;
 @LoadFrom("checks/vertical_movement.yml")
 public class VerticalMovement extends CheckBase {
 
-    @LoadInfo("enable")
+    @LoadPath("enable")
     private static boolean ENABLE;
-    @LoadInfo("precision")
+    @LoadPath("precision")
     private static double PRECISION;
 
     private float estimatedYVelocity;

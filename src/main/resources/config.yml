@@ -1,8 +1,30 @@
+#####################################################################################
+#                             _    _             ______                             #
+#                            | |  | |           |___  /                             #
+#                            | |__| |              / /                              #
+#                            |  __  |             / /                               #
+#                            | |  | |            / /__                              #
+#                            |_|  |_|           /_____|                             #
+#                                                                                   #
+#####################################################################################
+#                                    AUTHORS                                        #
+#                                Founder: MrCraftGoo                                #
+#          Managers: Anthony M., Cipher, ExclusiveFurryYT, Juli_0 | Julian          #
+#                         Developers: FrozenAnarchy, xAbode_                        #
+#####################################################################################
+#                         Thank You For Downloading Horizon                         #
+#####################################################################################
+
 # Horizon Prefix ( [Prefix] [Message] )
 prefix: '§9Horizon §1» §r§3'
 
+# Would you like Horizon to log the notification of suspicious players cheating?
+# Would help out when reporting false positives and will create a folder ( Horizon/logs )
+# However, if you have limited storage we would recommend to disable it.
+log: true
+
 # Would you like to enable discord integration?
-# Sends notification when a player is detected for cheating according to YOUR check.yml setup
+# It sends notification when a player is detected for cheating according to your configuration.
 discord_integration:
   enabled: false
   token: ''
@@ -17,8 +39,7 @@ mysql:
   port: 3306
 
 # Would you like to enable Kirin?
-# Kirin is the paid version of Horizon,
-# you will be able to purchase a license in our website.
+# Kirin is the paid version of Horizon, you can purchase a license in our website.
 kirin:
   enabled: false
   email: ''

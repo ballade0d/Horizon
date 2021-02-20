@@ -1,12 +1,12 @@
 package xyz.hstudio.horizon.module.checks;
 
+import me.cgoo.api.cfg.LoadFrom;
+import me.cgoo.api.cfg.LoadPath;
 import net.minecraft.server.v1_8_R3.WorldSettings;
 import org.bukkit.Material;
 import org.bukkit.material.Openable;
 import xyz.hstudio.horizon.HPlayer;
 import xyz.hstudio.horizon.api.enums.Detection;
-import xyz.hstudio.horizon.configuration.LoadFrom;
-import xyz.hstudio.horizon.configuration.LoadInfo;
 import xyz.hstudio.horizon.event.Event;
 import xyz.hstudio.horizon.event.inbound.MoveEvent;
 import xyz.hstudio.horizon.module.CheckBase;
@@ -17,7 +17,7 @@ import xyz.hstudio.horizon.wrapper.WorldWrapper;
 @LoadFrom("checks/phase.yml")
 public class Phase extends CheckBase {
 
-    @LoadInfo("enable")
+    @LoadPath("enable")
     private static boolean ENABLE;
 
     private static final double HORIZONTAL_DISTANCE_THRESHOLD = Math.pow(0.4, 2);

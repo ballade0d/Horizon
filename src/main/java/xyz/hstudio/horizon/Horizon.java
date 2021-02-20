@@ -1,6 +1,9 @@
 package xyz.hstudio.horizon;
 
 import lombok.Getter;
+import me.cgoo.api.cfg.Cfg;
+import me.cgoo.api.logger.Logger;
+import me.cgoo.api.util.YamlUtil;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -20,7 +23,6 @@ import xyz.hstudio.horizon.task.Sync;
 import xyz.hstudio.horizon.util.AABB;
 import xyz.hstudio.horizon.util.BlockUtils;
 import xyz.hstudio.horizon.util.Location;
-import xyz.hstudio.horizon.util.Yaml;
 import xyz.hstudio.kirin.Kirin;
 
 import java.io.File;
@@ -65,29 +67,34 @@ public final class Horizon extends JavaPlugin {
         if (!folder.isDirectory() || !configFile.isFile()) {
             saveResource("config.yml", true);
         }
-        Config.load(Config.class);
+        Cfg.load(this, Config.class);
+        try {
+            Logger.init(this, "Horizon", Config.LOG);
+        } catch (IOException e) {
+            throw new IllegalStateException("Failed to initial the logging system. Reason: " + e.getMessage());
+        }
 
         File executionFile = new File(folder, "execution.yml");
         if (!folder.isDirectory() || !executionFile.isFile()) {
             saveResource("execution.yml", true);
         }
-        Execution.load(Yaml.loadConfiguration(executionFile));
+        Execution.load(YamlUtil.load(executionFile));
 
         // Setup for SQL
         sql.setup();
 
         // Load the config of checks
-        Config.load(AimAssist.class);
-        Config.load(AntiVelocity.class);
-        Config.load(BadPackets.class);
-        Config.load(GroundSpoof.class);
-        Config.load(HealthTag.class);
-        Config.load(HitBox.class);
-        Config.load(KillAura.class);
-        Config.load(KillAuraBot.class);
-        Config.load(NoSwing.class);
-        Config.load(Phase.class);
-        Config.load(VerticalMovement.class);
+        Cfg.load(this, AimAssist.class);
+        Cfg.load(this, AntiVelocity.class);
+        Cfg.load(this, BadPackets.class);
+        Cfg.load(this, GroundSpoof.class);
+        Cfg.load(this, HealthTag.class);
+        Cfg.load(this, HitBox.class);
+        Cfg.load(this, KillAura.class);
+        Cfg.load(this, KillAuraBot.class);
+        Cfg.load(this, NoSwing.class);
+        Cfg.load(this, Phase.class);
+        Cfg.load(this, VerticalMovement.class);
 
         // Register for joined players
         Bukkit.getOnlinePlayers().forEach(HPlayer::new);
@@ -123,9 +130,9 @@ public final class Horizon extends JavaPlugin {
         }, this);
 
         try {
-            Config.watcher();
+            Cfg.watcher(this);
         } catch (IOException e) {
-            Logger.msg("WARN", "Failed to register WatchService! Stacktrace:");
+            Logger.warn("Failed to register WatchService! Stacktrace:");
             e.printStackTrace();
         }
 

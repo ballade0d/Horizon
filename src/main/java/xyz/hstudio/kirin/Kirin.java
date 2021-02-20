@@ -8,7 +8,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.base64.Base64;
-import xyz.hstudio.horizon.Logger;
+import me.cgoo.api.logger.Logger;
 import xyz.hstudio.horizon.configuration.Config;
 
 import javax.crypto.Cipher;
@@ -63,7 +63,7 @@ public class Kirin extends ChannelInboundHandlerAdapter {
                 byte[] strBytes = new byte[length];
                 decrypted.readBytes(strBytes);
                 String content = new String(strBytes);
-                Logger.msg("KIRIN", content);
+                Logger.log("KIRIN", content);
             }
 
             if (available) {

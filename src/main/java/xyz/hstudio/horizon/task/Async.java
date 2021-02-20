@@ -1,26 +1,20 @@
 package xyz.hstudio.horizon.task;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import org.apache.commons.io.IOUtils;
 import org.bukkit.util.NumberConversions;
 import xyz.hstudio.horizon.HPlayer;
 import xyz.hstudio.horizon.Horizon;
-import xyz.hstudio.horizon.configuration.Config;
 import xyz.hstudio.horizon.module.CheckBase;
 import xyz.hstudio.horizon.util.Location;
 import xyz.hstudio.horizon.util.Pair;
 import xyz.hstudio.horizon.wrapper.EntityWrapper;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.zip.GZIPOutputStream;
 
 public class Async implements Runnable {
 
@@ -34,53 +28,6 @@ public class Async implements Runnable {
                 .setDaemon(true)
                 .setNameFormat("Horizon Processing Thread")
                 .build());
-
-        if (!Config.LOG) {
-            logOutput = null;
-            return;
-        }
-
-        try {
-            File logs = new File(inst.getDataFolder(), "logs");
-            if (!logs.exists() && !logs.mkdirs()) {
-                throw new IllegalStateException("Failed to enable log system.");
-            }
-            File[] files = logs.listFiles();
-            if (files == null) {
-                throw new IllegalStateException("Failed to enable log system.");
-            }
-
-            String date = DateTimeFormatter.ofPattern("yyyy-MM-dd").format(LocalDateTime.now());
-
-            int count = 0;
-            for (File file : files) {
-                if (!file.getName().startsWith(date)) {
-                    continue;
-                }
-                count++;
-            }
-
-            File oldLog = new File(logs, date + "-" + count + ".log");
-            if (oldLog.exists()) {
-                FileInputStream input = new FileInputStream(oldLog);
-                GZIPOutputStream output = new GZIPOutputStream(new FileOutputStream(new File(logs, date + "-" + count + ".log.gz")));
-                IOUtils.copy(input, output);
-                output.close();
-                input.close();
-                if (!oldLog.delete()) {
-                    throw new IllegalStateException("Failed to enable log system.");
-                }
-            }
-
-            File log = new File(logs, date + "-" + (count + 1) + ".log");
-            if (!log.createNewFile()) {
-                throw new IllegalStateException("Failed to enable log system.");
-            }
-
-            this.logOutput = new FileOutputStream(log, true);
-        } catch (IOException e) {
-            throw new IllegalStateException(e);
-        }
     }
 
     public void start() {
@@ -99,7 +46,6 @@ public class Async implements Runnable {
     public void run() {
         executeChecks();
         trackEntities();
-        writeLogs();
 
         tick.incrementAndGet();
     }
@@ -178,36 +124,5 @@ public class Async implements Runnable {
 
     public void clearHistory(EntityWrapper entity) {
         trackedEntities.remove(entity);
-    }
-
-    /**
-     * Log system
-     */
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-    private final Deque<String> logs = new ConcurrentLinkedDeque<>();
-    private final FileOutputStream logOutput;
-
-    private void writeLogs() {
-        if (!Config.LOG) {
-            return;
-        }
-        String time = "[" + FORMATTER.format(LocalDateTime.now()) + "] ";
-        try {
-            for (String message : logs) {
-                logOutput.write((time + message).getBytes());
-                logOutput.write(System.lineSeparator().getBytes());
-            }
-            logs.clear();
-            logOutput.flush();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void log(String message) {
-        if (!Config.LOG) {
-            return;
-        }
-        logs.addLast(message);
     }
 }

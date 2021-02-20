@@ -1,13 +1,13 @@
 package xyz.hstudio.horizon.module.checks;
 
 import io.netty.buffer.Unpooled;
+import me.cgoo.api.cfg.LoadFrom;
+import me.cgoo.api.cfg.LoadPath;
 import net.minecraft.server.v1_8_R3.PacketDataSerializer;
 import net.minecraft.server.v1_8_R3.PacketPlayInFlying;
 import org.bukkit.Material;
 import xyz.hstudio.horizon.HPlayer;
 import xyz.hstudio.horizon.api.enums.Detection;
-import xyz.hstudio.horizon.configuration.LoadFrom;
-import xyz.hstudio.horizon.configuration.LoadInfo;
 import xyz.hstudio.horizon.event.Event;
 import xyz.hstudio.horizon.event.inbound.MoveEvent;
 import xyz.hstudio.horizon.module.CheckBase;
@@ -17,7 +17,7 @@ import xyz.hstudio.horizon.util.Location;
 @LoadFrom("checks/ground_spoof.yml")
 public class GroundSpoof extends CheckBase {
 
-    @LoadInfo("enable")
+    @LoadPath("enable")
     private static boolean ENABLE;
 
     public GroundSpoof(HPlayer p) {

@@ -1,9 +1,9 @@
 package xyz.hstudio.horizon.module.checks;
 
+import me.cgoo.api.cfg.LoadFrom;
+import me.cgoo.api.cfg.LoadPath;
 import xyz.hstudio.horizon.HPlayer;
 import xyz.hstudio.horizon.api.enums.Detection;
-import xyz.hstudio.horizon.configuration.LoadFrom;
-import xyz.hstudio.horizon.configuration.LoadInfo;
 import xyz.hstudio.horizon.event.Event;
 import xyz.hstudio.horizon.event.inbound.EntityInteractEvent;
 import xyz.hstudio.horizon.event.inbound.MoveEvent;
@@ -16,21 +16,21 @@ import java.util.*;
 @LoadFrom("checks/hit_box.yml")
 public class HitBox extends CheckBase {
 
-    @LoadInfo("enable")
+    @LoadPath("enable")
     private static boolean ENABLE;
-    @LoadInfo("max_buffer")
+    @LoadPath("max_buffer")
     private static int MAX_BUFFER;
-    @LoadInfo("buffer_adder")
+    @LoadPath("buffer_adder")
     private static double BUFFER_ADDER;
-    @LoadInfo("buffer_reducer")
+    @LoadPath("buffer_reducer")
     private static double BUFFER_REDUCER;
-    @LoadInfo("box_epsilon")
+    @LoadPath("box_epsilon")
     private static double BOX_EPSILON;
-    @LoadInfo("history_range")
+    @LoadPath("history_range")
     private static int HISTORY_RANGE;
-    @LoadInfo("limit")
+    @LoadPath("limit")
     private static double LIMIT;
-    @LoadInfo("step")
+    @LoadPath("step")
     private static int STEP;
 
     private final Deque<Vector2D> moves = new LinkedList<>();

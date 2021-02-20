@@ -2,11 +2,11 @@ package xyz.hstudio.kirin.module.clientctrl;
 
 import com.google.gson.JsonObject;
 import io.netty.buffer.Unpooled;
+import me.cgoo.api.cfg.LoadFrom;
+import me.cgoo.api.cfg.LoadPath;
 import net.minecraft.server.v1_8_R3.PacketDataSerializer;
 import net.minecraft.server.v1_8_R3.PacketPlayOutCustomPayload;
 import xyz.hstudio.horizon.HPlayer;
-import xyz.hstudio.horizon.configuration.LoadFrom;
-import xyz.hstudio.horizon.configuration.LoadInfo;
 import xyz.hstudio.kirin.module.ClientCtrl;
 
 import java.util.List;
@@ -14,34 +14,34 @@ import java.util.List;
 @LoadFrom("kirin/clientctrl/labymod.yml")
 public class LabyMod extends ClientCtrl {
 
-    @LoadInfo("improved_lava")
+    @LoadPath("improved_lava")
     private static boolean IMPROVED_LAVA;
-    @LoadInfo("crosshair_sync")
+    @LoadPath("crosshair_sync")
     private static boolean CROSSHAIR_SYNC;
-    @LoadInfo("refill_fix")
+    @LoadPath("refill_fix")
     private static boolean REFILL_FIX;
 
-    @LoadInfo("gui_all")
+    @LoadPath("gui_all")
     private static boolean GUI_ALL;
-    @LoadInfo("gui_potion_effects")
+    @LoadPath("gui_potion_effects")
     private static boolean GUI_POTION_EFFECTS;
-    @LoadInfo("gui_armor_hud")
+    @LoadPath("gui_armor_hud")
     private static boolean GUI_ARMOR_HUD;
-    @LoadInfo("gui_item_hud")
+    @LoadPath("gui_item_hud")
     private static boolean GUI_ITEM_HUD;
 
-    @LoadInfo("blockbuild")
+    @LoadPath("blockbuild")
     private static boolean BLOCKBUILD;
-    @LoadInfo("tags")
+    @LoadPath("tags")
     private static boolean TAGS;
-    @LoadInfo("chat")
+    @LoadPath("chat")
     private static boolean CHAT;
-    @LoadInfo("animations")
+    @LoadPath("animations")
     private static boolean ANIMATIONS;
-    @LoadInfo("saturation_bar")
+    @LoadPath("saturation_bar")
     private static boolean SATURATION_BAR;
 
-    @LoadInfo("execution")
+    @LoadPath("execution")
     private static List<String> EXECUTION;
 
     private final PacketDataSerializer dataToSend = new PacketDataSerializer(Unpooled.buffer());

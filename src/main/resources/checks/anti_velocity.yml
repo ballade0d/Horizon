@@ -1,5 +1,7 @@
 enable: true
 
 xz_epsilon: 0.003
-
 y_epsilon: 0.01
+
+restrict_midair_direction_changes: true
+min_speed_to_check: 0.02

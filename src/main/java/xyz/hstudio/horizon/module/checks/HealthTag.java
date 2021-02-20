@@ -1,10 +1,10 @@
 package xyz.hstudio.horizon.module.checks;
 
 import io.netty.buffer.Unpooled;
+import me.cgoo.api.cfg.LoadFrom;
+import me.cgoo.api.cfg.LoadPath;
 import net.minecraft.server.v1_8_R3.*;
 import xyz.hstudio.horizon.HPlayer;
-import xyz.hstudio.horizon.configuration.LoadFrom;
-import xyz.hstudio.horizon.configuration.LoadInfo;
 import xyz.hstudio.horizon.event.Event;
 import xyz.hstudio.horizon.event.outbound.MetaEvent;
 import xyz.hstudio.horizon.module.CheckBase;
@@ -14,7 +14,7 @@ import java.io.IOException;
 @LoadFrom("checks/health_tag.yml")
 public class HealthTag extends CheckBase {
 
-    @LoadInfo("enable")
+    @LoadPath("enable")
     private static boolean ENABLE;
 
     public HealthTag(HPlayer p) {

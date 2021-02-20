@@ -1,10 +1,10 @@
 package xyz.hstudio.horizon.module.checks;
 
+import me.cgoo.api.cfg.LoadFrom;
+import me.cgoo.api.cfg.LoadPath;
 import org.bukkit.Material;
 import xyz.hstudio.horizon.HPlayer;
 import xyz.hstudio.horizon.api.enums.Detection;
-import xyz.hstudio.horizon.configuration.LoadFrom;
-import xyz.hstudio.horizon.configuration.LoadInfo;
 import xyz.hstudio.horizon.event.Event;
 import xyz.hstudio.horizon.event.inbound.MoveEvent;
 import xyz.hstudio.horizon.module.CheckBase;
@@ -14,15 +14,15 @@ import xyz.hstudio.horizon.util.Vector3D;
 @LoadFrom("checks/anti_velocity.yml")
 public class AntiVelocity extends CheckBase {
 
-    @LoadInfo("enable")
+    @LoadPath("enable")
     private static boolean ENABLE;
-    @LoadInfo("xz_epsilon")
+    @LoadPath("xz_epsilon")
     public static double XZ_EPSILON;
-    @LoadInfo("y_epsilon")
+    @LoadPath("y_epsilon")
     public static double Y_EPSILON;
-    @LoadInfo("restrict_midair_direction_changes")
+    @LoadPath("restrict_midair_direction_changes")
     public static boolean RESTRICT_MIDAIR_DIRECTION_CHANGES;
-    @LoadInfo("min_speed_to_check")
+    @LoadPath("min_speed_to_check")
     public static double MIN_SPEED_TO_CHECK;
 
     public AntiVelocity(HPlayer p) {

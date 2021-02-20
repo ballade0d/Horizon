@@ -2,10 +2,10 @@ package xyz.hstudio.horizon.module.checks;
 
 import gnu.trove.list.TDoubleList;
 import gnu.trove.list.linked.TDoubleLinkedList;
+import me.cgoo.api.cfg.LoadFrom;
+import me.cgoo.api.cfg.LoadPath;
 import xyz.hstudio.horizon.HPlayer;
 import xyz.hstudio.horizon.api.enums.Detection;
-import xyz.hstudio.horizon.configuration.LoadFrom;
-import xyz.hstudio.horizon.configuration.LoadInfo;
 import xyz.hstudio.horizon.event.Event;
 import xyz.hstudio.horizon.event.inbound.EntityInteractEvent;
 import xyz.hstudio.horizon.event.inbound.MoveEvent;
@@ -18,7 +18,7 @@ import xyz.hstudio.horizon.wrapper.EntityWrapper;
 @LoadFrom("checks/aim_assist.yml")
 public class AimAssist extends CheckBase {
 
-    @LoadInfo("enable")
+    @LoadPath("enable")
     private static boolean ENABLE;
 
     private float lastDeltaPitch;

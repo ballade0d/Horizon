@@ -1,9 +1,9 @@
 package xyz.hstudio.kirin;
 
+import me.cgoo.api.logger.Logger;
 import org.apache.commons.io.FileUtils;
 import org.bukkit.plugin.java.JavaPlugin;
 import xyz.hstudio.horizon.Horizon;
-import xyz.hstudio.horizon.Logger;
 
 import javax.script.Invocable;
 import javax.script.ScriptEngine;
@@ -29,7 +29,7 @@ public class CustomCheck {
         name = invocable.invokeFunction("getName").toString();
         author = invocable.invokeFunction("getAuthor").toString();
         version = invocable.invokeFunction("getVersion").toString();
-        Logger.msg("Kirin", "Check " + name + " " + version + " by " + author + " is successfully loaded.");
+        Logger.log("Kirin", "Check " + name + " " + version + " by " + author + " is successfully loaded.");
     }
 
     public static void init() {

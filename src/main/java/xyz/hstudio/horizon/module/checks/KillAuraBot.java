@@ -1,6 +1,8 @@
 package xyz.hstudio.horizon.module.checks;
 
 import com.mojang.authlib.GameProfile;
+import me.cgoo.api.cfg.LoadFrom;
+import me.cgoo.api.cfg.LoadPath;
 import net.minecraft.server.v1_8_R3.*;
 import org.apache.commons.lang.RandomStringUtils;
 import org.bukkit.Bukkit;
@@ -11,8 +13,6 @@ import org.bukkit.craftbukkit.v1_8_R3.util.CraftChatMessage;
 import org.bukkit.craftbukkit.v1_8_R3.util.CraftMagicNumbers;
 import xyz.hstudio.horizon.HPlayer;
 import xyz.hstudio.horizon.api.enums.Detection;
-import xyz.hstudio.horizon.configuration.LoadFrom;
-import xyz.hstudio.horizon.configuration.LoadInfo;
 import xyz.hstudio.horizon.event.Event;
 import xyz.hstudio.horizon.event.inbound.EntityInteractEvent;
 import xyz.hstudio.horizon.event.inbound.MoveEvent;
@@ -28,33 +28,33 @@ import java.util.concurrent.ThreadLocalRandom;
 @LoadFrom("checks/kill_aura_bot.yml")
 public class KillAuraBot extends CheckBase {
 
-    @LoadInfo("enable")
+    @LoadPath("enable")
     private static boolean ENABLE;
-    @LoadInfo("command_only")
+    @LoadPath("command_only")
     private static boolean COMMAND_ONLY;
-    @LoadInfo("update_interval")
+    @LoadPath("update_interval")
     private static int UPDATE_INTERVAL;
-    @LoadInfo("xz_distance")
+    @LoadPath("xz_distance")
     private static double XZ_DISTANCE;
-    @LoadInfo("y_distance")
+    @LoadPath("y_distance")
     private static double Y_DISTANCE;
-    @LoadInfo("offset.x")
+    @LoadPath("offset.x")
     private static double OFFSET_X;
-    @LoadInfo("offset.y")
+    @LoadPath("offset.y")
     private static double OFFSET_Y;
-    @LoadInfo("offset.z")
+    @LoadPath("offset.z")
     private static double OFFSET_Z;
-    @LoadInfo("show_arrow")
+    @LoadPath("show_arrow")
     private static boolean SHOW_ARROW;
-    @LoadInfo("show_damage")
+    @LoadPath("show_damage")
     private static boolean SHOW_DAMAGE;
-    @LoadInfo("show_swing")
+    @LoadPath("show_swing")
     private static boolean SHOW_SWING;
-    @LoadInfo("show_armor")
+    @LoadPath("show_armor")
     private static boolean SHOW_ARMOR;
-    @LoadInfo("realistic_ping")
+    @LoadPath("realistic_ping")
     private static boolean REALISTIC_PING;
-    @LoadInfo("async_packet")
+    @LoadPath("async_packet")
     private static boolean ASYNC_PACKET;
 
     private static final ItemStack[] HELMET = {
