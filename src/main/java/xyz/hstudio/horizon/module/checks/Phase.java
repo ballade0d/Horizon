@@ -44,11 +44,10 @@ public class Phase extends CheckBase {
             return;
         }
 
-        double horizDistanceSquared = Math.pow(to.x - from.x, 2) + Math.pow(to.z - from.z, 2);
+        double horizDistanceSquared = to.distance2dSquared(from);
         double vertDistance = Math.abs(to.y - from.y);
 
-        AABB playerFrom = from.toAABB();
-        playerFrom.shrink(0.1, 0, 0.1);
+        AABB playerFrom = from.toAABB().shrink(0.1, 0, 0.1);
         playerFrom.min.y += 0.4;
         playerFrom.max.y -= 0.1;
         AABB playerTo = playerFrom.plus(e.velocity);

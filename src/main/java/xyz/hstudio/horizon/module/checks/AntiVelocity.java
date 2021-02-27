@@ -25,6 +25,8 @@ public class AntiVelocity extends CheckBase {
     @LoadPath("min_speed_to_check")
     public static double MIN_SPEED_TO_CHECK;
 
+    private double failIfNextYEquals;
+
     public AntiVelocity(HPlayer p) {
         super(p);
     }
@@ -47,6 +49,7 @@ public class AntiVelocity extends CheckBase {
             if (RESTRICT_MIDAIR_DIRECTION_CHANGES) {
                 midair(e);
             }
+            genius(e);
         }
     }
 
@@ -65,7 +68,7 @@ public class AntiVelocity extends CheckBase {
             Vector3D prevVector = p.physics.velocity.newY(0);
 
             double angle = moveVector.angle(prevVector);
-            double horizSpeedSquared = Math.pow(e.to.x - e.from.x, 2) + Math.pow(e.to.z - e.from.z, 2);
+            double horizSpeedSquared = e.to.distance2dSquared(e.from);
             double prevSpeed = p.status.hitSlowdown ? prevVector.length() * 0.6 : prevVector.length();
 
             double magnitudeThreshold = e.oldFriction * prevSpeed - 0.026001;
@@ -79,5 +82,19 @@ public class AntiVelocity extends CheckBase {
                 punish(e, "AntiVelocity (ej52K)", 1, Detection.ANTI_VELOCITY, null);
             }
         }
+    }
+
+    private void genius(MoveEvent e) {
+        if (e.knockBack) {
+            failIfNextYEquals = -e.velocity.y;
+            return;
+        }
+        if (failIfNextYEquals == 0) {
+            return;
+        }
+        if (e.velocity.y == failIfNextYEquals && e.onGround && !p.physics.onGround) {
+            punish(e, "AntiVelocity (KYkoC)", 1, Detection.ANTI_VELOCITY, null);
+        }
+        failIfNextYEquals = 0;
     }
 }

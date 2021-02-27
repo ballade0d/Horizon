@@ -162,10 +162,6 @@ public class HPlayer {
 
         public int heldSlot;
 
-        public Inventory() {
-            this.heldSlot = nms.inventory.itemInHandIndex;
-        }
-
         public ItemWrapper hand() {
             return new ItemWrapper(nms.inventory.items[heldSlot]);
         }

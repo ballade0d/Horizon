@@ -111,6 +111,7 @@ public final class Horizon extends JavaPlugin {
                 players.remove(e.getPlayer().getUniqueId());
             }
 
+            // The ghost-block remover
             @EventHandler(priority = EventPriority.MONITOR)
             public void onTeleport(PlayerTeleportEvent e) {
                 if (e.getCause() != PlayerTeleportEvent.TeleportCause.UNKNOWN || !Config.GHOST_BLOCK_FIX) {
@@ -140,6 +141,7 @@ public final class Horizon extends JavaPlugin {
         metrics.addCustomChart(new Metrics.SimplePie("kirin", () -> String.valueOf(Kirin.verified)));
     }
 
+    @Override
     public void onDisable() {
         // Unregister packet handlers
         players.values().forEach(p -> p.packetHandler.unregister());
