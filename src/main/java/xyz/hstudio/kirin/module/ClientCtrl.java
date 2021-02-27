@@ -13,7 +13,7 @@ public abstract class ClientCtrl {
     protected static final Horizon inst = JavaPlugin.getPlugin(Horizon.class);
 
     protected final HPlayer p;
-    public final String channel;
+    protected final String channel;
     private final List<String> execution;
 
     public void send() {

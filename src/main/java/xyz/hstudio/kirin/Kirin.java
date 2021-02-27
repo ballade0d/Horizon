@@ -10,6 +10,7 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.base64.Base64;
 import me.cgoo.api.logger.Logger;
 import xyz.hstudio.horizon.configuration.Config;
+import xyz.hstudio.kirin.module.Script;
 
 import javax.crypto.Cipher;
 import java.nio.charset.StandardCharsets;
@@ -63,12 +64,13 @@ public class Kirin extends ChannelInboundHandlerAdapter {
                 byte[] strBytes = new byte[length];
                 decrypted.readBytes(strBytes);
                 String content = new String(strBytes);
-                Logger.log("KIRIN", content);
+                Logger.log("Kirin", content);
             }
 
             if (available) {
                 verified = true;
                 // Startup here
+                Script.init();
             }
 
             synchronized (this) {

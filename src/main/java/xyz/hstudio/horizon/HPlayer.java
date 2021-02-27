@@ -71,7 +71,7 @@ public class HPlayer {
         });
 
         this.pipeline = nms.playerConnection.networkManager.channel.pipeline();
-        this.packetHandler = new PacketHandler(this);
+        this.packetHandler = new PacketHandler(this, inst);
 
         this.inventory = new Inventory();
         this.physics = new Physics();
