@@ -6,13 +6,8 @@ import me.cgoo.api.logger.Logger;
 import xyz.hstudio.horizon.HPlayer;
 import xyz.hstudio.horizon.api.enums.Detection;
 import xyz.hstudio.horizon.configuration.Config;
-import xyz.hstudio.horizon.module.CheckBase;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.Map;
+import java.sql.*;
 
 public class MySQL {
 
@@ -43,7 +38,8 @@ public class MySQL {
 
             connection = source.getConnection();
 
-            createTables();
+            createTable();
+            updateTable();
             Logger.info("Connected to MySQL!");
         } catch (SQLException e) {
             Logger.warn("Failed to connect to MySQL! Stacktrace:");
@@ -51,77 +47,59 @@ public class MySQL {
         }
     }
 
-    private void createTables() throws SQLException {
+    private void createTable() throws SQLException {
+        DatabaseMetaData metaData = connection.getMetaData();
+        ResultSet result = metaData.getTables(null, null, "playerdata", null);
+        if (result.next()) {
+            return;
+        }
         Statement statement = connection.createStatement();
-        statement.execute("CREATE TABLE IF NOT EXISTS playerdata(" +
-                "uuid char(36) NOT NULL, " +
-                "AIM_ASSIST int, " +
-                "ANTI_VELOCITY int, " +
-                "BAD_PACKETS int, " +
-                "FAST_BREAK int, " +
-                "GROUND_SPOOF int, " +
-                "HEALTH_TAG int, " +
-                "HIT_BOX int, " +
-                "KILL_AURA int, " +
-                "KILL_AURA_BOT int, " +
-                "NO_sWING int, " +
-                "PHASE int, " +
-                "VERTICAL_MOVEMENT int, " +
-                "primary key(uuid))"
-        );
+        statement.execute("CREATE TABLE playerdata(uuid CHAR(36) NOT NULL, PRIMARY KEY(uuid))");
     }
 
-    private void save(HPlayer p) throws SQLException {
-        Map<Detection, CheckBase> info = p.checks;
+    private void updateTable() throws SQLException {
+        DatabaseMetaData metaData = connection.getMetaData();
+        for (Detection detection : Detection.values()) {
+            ResultSet result = metaData.getColumns(null, null, "playerdata", detection.name());
+            if (result.next()) {
+                continue;
+            }
+            Statement statement = connection.createStatement();
+            statement.execute("ALTER TABLE playerdata ADD " + detection + " INT DEFAULT 0");
+        }
+    }
+
+    public void initData(HPlayer p) throws SQLException {
+        if (!Config.MYSQL_ENABLED) {
+            return;
+        }
         String uuid = p.nms.getUniqueID().toString();
-
-        Statement statement = connection.createStatement();
-
-        ResultSet result = statement.executeQuery("SELECT * FROM playerdata WHERE uuid='" + uuid + "'");
-        if (!result.next()) {
-            statement.execute("INSERT INTO playerdata VALUES (" +
-                    "'" + uuid + "', " +
-                    info.get(Detection.AIM_ASSIST) + ", " +
-                    info.get(Detection.ANTI_VELOCITY) + ", " +
-                    info.get(Detection.BAD_PACKETS) + ", " +
-                    info.get(Detection.FAST_BREAK) + ", " +
-                    info.get(Detection.GROUND_SPOOF) + ", " +
-                    info.get(Detection.HEALTH_TAG) + ", " +
-                    info.get(Detection.HIT_BOX) + ", " +
-                    info.get(Detection.KILL_AURA) + ", " +
-                    info.get(Detection.KILL_AURA_BOT) + ", " +
-                    info.get(Detection.NO_SWING) + ", " +
-                    info.get(Detection.PHASE) + ", " +
-                    info.get(Detection.VERTICAL_MOVEMENT) + ")"
-            );
+        PreparedStatement statement = connection.prepareStatement("SELECT * from playerdata WHERE uuid=?");
+        ResultSet result = statement.executeQuery();
+        if (result.next()) {
             return;
         }
 
-        statement.execute("UPDATE playerdata SET " +
-                "AIM_ASSIST=" + info.get(Detection.AIM_ASSIST) + ", " +
-                "ANTI_VELOCITY=" + info.get(Detection.ANTI_VELOCITY) + ", " +
-                "BAD_PACKETS=" + info.get(Detection.BAD_PACKETS) + ", " +
-                "FAST_BREAK=" + info.get(Detection.FAST_BREAK) + ", " +
-                "GROUND_SPOOF=" + info.get(Detection.GROUND_SPOOF) + ", " +
-                "HEALTH_TAG=" + info.get(Detection.HEALTH_TAG) + ", " +
-                "HIT_BOX=" + info.get(Detection.HIT_BOX) + ", " +
-                "KILL_AURA=" + info.get(Detection.KILL_AURA) + ", " +
-                "KILL_AURA_BOT=" + info.get(Detection.KILL_AURA_BOT) + ", " +
-                "NO_SWING=" + info.get(Detection.NO_SWING) + ", " +
-                "PHASE=" + info.get(Detection.PHASE) + ", " +
-                "VERTICAL_MOVEMENT=" + info.get(Detection.VERTICAL_MOVEMENT) + " " +
-                "WHERE uuid='" + uuid + "'"
-        );
+        statement = connection.prepareStatement("INSERT IGNORE INTO playerdata(uuid) VALUES(?)");
+        statement.setString(1, uuid);
+        statement.execute();
     }
 
-    private void testLoad(HPlayer p) throws SQLException {
+    public void syncData(HPlayer p, Detection detection, int vl) throws SQLException {
         String uuid = p.nms.getUniqueID().toString();
 
-        Statement statement = connection.createStatement();
-        ResultSet result = statement.executeQuery("SELECT * FROM playerdata WHERE uuid='" + uuid + "'");
+        PreparedStatement statement = connection.prepareStatement("SELECT * from playerdata WHERE uuid=?");
+        statement.setString(1, uuid);
+        ResultSet result = statement.executeQuery();
+        result.updateInt(detection.name(), vl);
+        result.updateRow();
+    }
 
-        if (!result.next()) {
-            return;
-        }
+    public int loadData(HPlayer p, Detection detection) throws SQLException {
+        String uuid = p.nms.getUniqueID().toString();
+        PreparedStatement statement = connection.prepareStatement("SELECT * from playerdata WHERE uuid=?");
+        statement.setString(1, uuid);
+        ResultSet result = statement.executeQuery();
+        return result.getInt(detection.name());
     }
 }

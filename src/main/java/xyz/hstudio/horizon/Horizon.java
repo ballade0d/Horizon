@@ -28,6 +28,7 @@ import xyz.hstudio.kirin.Kirin;
 import java.io.File;
 import java.io.IOException;
 import java.net.URLClassLoader;
+import java.sql.SQLException;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -103,7 +104,13 @@ public final class Horizon extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new Listener() {
             @EventHandler(priority = EventPriority.MONITOR)
             public void onJoin(PlayerJoinEvent e) {
-                new HPlayer(e.getPlayer());
+                HPlayer p = new HPlayer(e.getPlayer());
+                try {
+                    sql.initData(p);
+                } catch (SQLException exception) {
+                    Logger.warn("Failed to init sql for player " + e.getPlayer().getName());
+                    exception.printStackTrace();
+                }
             }
 
             @EventHandler(priority = EventPriority.MONITOR)

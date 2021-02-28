@@ -1,4 +1,4 @@
-package xyz.hstudio.kirin.module.clientctrl;
+package xyz.hstudio.kirin.module.client;
 
 import me.cgoo.api.cfg.LoadFrom;
 

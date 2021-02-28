@@ -8,7 +8,7 @@ import xyz.hstudio.horizon.Horizon;
 import java.util.List;
 
 @RequiredArgsConstructor
-public abstract class ClientCtrl {
+public abstract class Client {
 
     protected static final Horizon inst = JavaPlugin.getPlugin(Horizon.class);
 

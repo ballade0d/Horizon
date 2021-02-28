@@ -1,4 +1,4 @@
-package xyz.hstudio.kirin.module.clientctrl;
+package xyz.hstudio.kirin.module.client;
 
 import com.google.gson.JsonObject;
 import io.netty.buffer.Unpooled;
@@ -7,12 +7,12 @@ import me.cgoo.api.cfg.LoadPath;
 import net.minecraft.server.v1_8_R3.PacketDataSerializer;
 import net.minecraft.server.v1_8_R3.PacketPlayOutCustomPayload;
 import xyz.hstudio.horizon.HPlayer;
-import xyz.hstudio.kirin.module.ClientCtrl;
+import xyz.hstudio.kirin.module.Client;
 
 import java.util.List;
 
 @LoadFrom("kirin/clientctrl/labymod.yml")
-public class LabyMod extends ClientCtrl {
+public class LabyMod extends Client {
 
     @LoadPath("improved_lava")
     private static boolean IMPROVED_LAVA;
