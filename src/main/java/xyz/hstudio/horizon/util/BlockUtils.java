@@ -39,29 +39,31 @@ public class BlockUtils {
     }
 
     public static Set<BlockWrapper> getBlocksInLocation(Location loc) {
+        Location check = loc.clone();
         Set<BlockWrapper> blocks = new HashSet<>();
-        blocks.add(loc.plus(0.3, 0, 0).getBlock());
-        blocks.add(loc.plus(0, 0, 0.3).getBlock());
-        blocks.add(loc.plus(-0.3, 0, 0).getBlock());
-        blocks.add(loc.plus(0, 0, -0.3).getBlock());
-        blocks.add(loc.plus(0.3, 0, 0.3).getBlock());
-        blocks.add(loc.plus(-0.3, 0, -0.3).getBlock());
-        blocks.add(loc.plus(0.3, 0, -0.3).getBlock());
-        blocks.add(loc.plus(-0.3, 0, 0.3).getBlock());
+        blocks.add(check.add(0, 0, 0.3).getBlock());
+        blocks.add(check.add(0.3, 0, 0).getBlock());
+        blocks.add(check.add(0, 0, -0.3).getBlock());
+        blocks.add(check.add(0, 0, -0.3).getBlock());
+        blocks.add(check.add(-0.3, 0, 0).getBlock());
+        blocks.add(check.add(-0.3, 0, 0).getBlock());
+        blocks.add(check.add(0, 0, 0.3).getBlock());
+        blocks.add(check.add(0, 0, 0.3).getBlock());
         blocks.remove(null);
         return blocks;
     }
 
     public static boolean blockNearbyIsSolid(Location loc, boolean definition) {
+        Location check = loc.clone();
         Set<BlockWrapper> sample = new HashSet<>();
-        sample.add(loc.plus(0, 0, 1).getBlock());
-        sample.add(loc.plus(1, 0, 1).getBlock());
-        sample.add(loc.plus(1, 0, 0).getBlock());
-        sample.add(loc.plus(1, 0, -1).getBlock());
-        sample.add(loc.plus(0, 0, -1).getBlock());
-        sample.add(loc.plus(-1, 0, -1).getBlock());
-        sample.add(loc.plus(-1, 0, 0).getBlock());
-        sample.add(loc.plus(-1, 0, 1).getBlock());
+        sample.add(check.add(0, 0, 1).getBlock());
+        sample.add(check.add(1, 0, 0).getBlock());
+        sample.add(check.add(0, 0, -1).getBlock());
+        sample.add(check.add(0, 0, -1).getBlock());
+        sample.add(check.add(-1, 0, 0).getBlock());
+        sample.add(check.add(-1, 0, 0).getBlock());
+        sample.add(check.add(0, 0, 1).getBlock());
+        sample.add(check.add(0, 0, 1).getBlock());
         for (BlockWrapper b : sample) {
             if (b == null) {
                 continue;

@@ -66,7 +66,7 @@ public class MoveEvent extends Event<PacketPlayInFlying> {
     public boolean pre() {
         p.currTick++;
 
-        this.velocity = to.minus(from);
+        this.velocity = to.clone().subtract(from);
 
         this.teleport = testTeleport();
 

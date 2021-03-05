@@ -12,6 +12,7 @@ import java.sql.*;
 public class MySQL {
 
     private Connection connection;
+    private boolean connected;
 
     public void setup() {
         if (!Config.MYSQL_ENABLED) {
@@ -40,6 +41,7 @@ public class MySQL {
 
             createTable();
             updateTable();
+            connected = true;
             Logger.info("Connected to MySQL!");
         } catch (SQLException e) {
             Logger.warn("Failed to connect to MySQL! Stacktrace:");
@@ -74,18 +76,15 @@ public class MySQL {
             return;
         }
         String uuid = p.nms.getUniqueID().toString();
-        PreparedStatement statement = connection.prepareStatement("SELECT * from playerdata WHERE uuid=?");
-        ResultSet result = statement.executeQuery();
-        if (result.next()) {
-            return;
-        }
-
-        statement = connection.prepareStatement("INSERT IGNORE INTO playerdata(uuid) VALUES(?)");
+        PreparedStatement statement = connection.prepareStatement("INSERT IGNORE INTO playerdata(uuid) VALUES(?)");
         statement.setString(1, uuid);
         statement.execute();
     }
 
     public void syncData(HPlayer p, Detection detection, int vl) throws SQLException {
+        if (!Config.MYSQL_ENABLED || !connected) {
+            return;
+        }
         String uuid = p.nms.getUniqueID().toString();
 
         PreparedStatement statement = connection.prepareStatement("SELECT * from playerdata WHERE uuid=?");
@@ -96,6 +95,9 @@ public class MySQL {
     }
 
     public int loadData(HPlayer p, Detection detection) throws SQLException {
+        if (!Config.MYSQL_ENABLED || !connected) {
+            return 0;
+        }
         String uuid = p.nms.getUniqueID().toString();
         PreparedStatement statement = connection.prepareStatement("SELECT * from playerdata WHERE uuid=?");
         statement.setString(1, uuid);

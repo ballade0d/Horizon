@@ -3,6 +3,7 @@ package xyz.hstudio.horizon.module;
 import gnu.trove.map.TIntObjectMap;
 import lombok.Getter;
 import lombok.Setter;
+import me.cgoo.api.logger.Logger;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -14,6 +15,7 @@ import xyz.hstudio.horizon.api.event.PlayerViolationEvent;
 import xyz.hstudio.horizon.configuration.Execution;
 import xyz.hstudio.horizon.event.Event;
 
+import java.sql.SQLException;
 import java.util.List;
 
 public abstract class CheckBase {
@@ -83,6 +85,12 @@ public abstract class CheckBase {
         }
 
         p.sendMessage(type + " " + info);
+        try {
+            inst.getSql().syncData(p, detection, vl);
+        } catch (SQLException exception) {
+            Logger.warn("Failed to sync the data of player " + p.nms.getName());
+            exception.printStackTrace();
+        }
 
         this.violation = vl;
         this.failedTick = inst.getAsync().getTick();

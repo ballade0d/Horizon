@@ -10,7 +10,7 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-public class Location extends Vector3D {
+public class Location extends Vector3D implements Cloneable {
 
     public final WorldWrapper world;
     public float yaw, pitch;
@@ -50,16 +50,6 @@ public class Location extends Vector3D {
 
     public Location add(Location vec) {
         return add(vec.x, vec.y, vec.z);
-    }
-
-    // Minus
-
-    public Location minus(double x, double y, double z) {
-        return new Location(world, this.x - x, this.y - y, this.z - z, yaw, pitch);
-    }
-
-    public Location minus(Location vec) {
-        return minus(vec.x, vec.y, vec.z);
     }
 
     // Subtract
@@ -205,5 +195,10 @@ public class Location extends Vector3D {
     @Override
     public String toString() {
         return "x: " + x + ", y: " + y + ", z: " + z + ", yaw: " + yaw + ", pitch: " + pitch;
+    }
+
+    @Override
+    public Location clone() {
+        return (Location) super.clone();
     }
 }

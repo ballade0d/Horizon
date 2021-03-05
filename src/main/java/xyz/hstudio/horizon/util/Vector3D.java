@@ -2,7 +2,7 @@ package xyz.hstudio.horizon.util;
 
 import org.bukkit.util.NumberConversions;
 
-public class Vector3D {
+public class Vector3D implements Cloneable {
 
     public double x, y, z;
 
@@ -33,16 +33,6 @@ public class Vector3D {
 
     public Vector3D add(Vector3D vec) {
         return add(vec.x, vec.y, vec.z);
-    }
-
-    // Minus
-
-    public Vector3D minus(double x, double y, double z) {
-        return new Vector3D(this.x - x, this.y - y, this.z - z);
-    }
-
-    public Vector3D minus(Vector3D vec) {
-        return minus(vec.x, vec.y, vec.z);
     }
 
     // Subtract
@@ -115,6 +105,16 @@ public class Vector3D {
         return Math.acos(dot);
     }
 
+    public Vector3D crossProduct(Vector3D o) {
+        double newX = this.y * o.z - o.y * this.z;
+        double newY = this.z * o.x - o.z * this.x;
+        double newZ = this.x * o.y - o.x * this.y;
+        this.x = newX;
+        this.y = newY;
+        this.z = newZ;
+        return this;
+    }
+
     public Vector3D normalize() {
         double length = this.length();
         this.x /= length;
@@ -183,5 +183,14 @@ public class Vector3D {
     @Override
     public String toString() {
         return "x:" + x + ", y:" + y + ", z:" + z;
+    }
+
+    @Override
+    public Vector3D clone() {
+        try {
+            return (Vector3D) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new Error(e);
+        }
     }
 }

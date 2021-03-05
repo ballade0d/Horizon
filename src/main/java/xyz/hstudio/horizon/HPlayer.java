@@ -1,6 +1,7 @@
 package xyz.hstudio.horizon;
 
 import io.netty.channel.ChannelPipeline;
+import me.cgoo.api.logger.Logger;
 import net.minecraft.server.v1_8_R3.*;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_8_R3.util.CraftChatMessage;
@@ -19,6 +20,7 @@ import xyz.hstudio.horizon.wrapper.EntityWrapper;
 import xyz.hstudio.horizon.wrapper.ItemWrapper;
 import xyz.hstudio.horizon.wrapper.WorldWrapper;
 
+import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -69,6 +71,17 @@ public class HPlayer {
                 put(VERTICAL_MOVEMENT, new VerticalMovement(HPlayer.this));
             }
         });
+
+        // Load data from sql
+        try {
+            for (Map.Entry<Detection, CheckBase> entry : checks.entrySet()) {
+                CheckBase check = entry.getValue();
+                check.setViolation(inst.getSql().loadData(this, entry.getKey()));
+            }
+        } catch (SQLException e) {
+            Logger.warn("Failed to load the data of player " + nms.getName());
+            e.printStackTrace();
+        }
 
         this.pipeline = nms.playerConnection.networkManager.channel.pipeline();
         this.packetHandler = new PacketHandler(this, inst);
