@@ -40,4 +40,20 @@ public class Ray3D {
         result = 31 * result + direction.hashCode();
         return result;
     }
+
+    public class Tracer {
+        public double x, y, z;
+
+        public Tracer() {
+            x = origin.x;
+            y = origin.y;
+            z = origin.z;
+        }
+
+        public void trace(double distance) {
+            x += direction.x * distance;
+            y += direction.y * distance;
+            z += direction.z * distance;
+        }
+    }
 }

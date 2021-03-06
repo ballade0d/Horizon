@@ -2,6 +2,7 @@ package xyz.hstudio.horizon.module.checks;
 
 import me.cgoo.api.cfg.LoadFrom;
 import me.cgoo.api.cfg.LoadPath;
+import org.bukkit.util.NumberConversions;
 import xyz.hstudio.horizon.HPlayer;
 import xyz.hstudio.horizon.api.enums.Detection;
 import xyz.hstudio.horizon.event.Event;
@@ -9,6 +10,7 @@ import xyz.hstudio.horizon.event.inbound.EntityInteractEvent;
 import xyz.hstudio.horizon.event.inbound.MoveEvent;
 import xyz.hstudio.horizon.module.CheckBase;
 import xyz.hstudio.horizon.util.*;
+import xyz.hstudio.horizon.wrapper.BlockWrapper;
 import xyz.hstudio.horizon.wrapper.EntityWrapper;
 
 import java.util.*;
@@ -45,7 +47,7 @@ public class HitBox extends CheckBase {
         if (!ENABLE) return;
         if (event instanceof MoveEvent) {
             MoveEvent e = (MoveEvent) event;
-            if (!e.hasLook) {
+            if (!e.hasLook && !moves.isEmpty()) {
                 return;
             }
             float yaw = e.to.yaw;
@@ -67,10 +69,6 @@ public class HitBox extends CheckBase {
                 return;
             }
 
-            Vector3D headPos = p.physics.headPos();
-            Vector3D direction = p.physics.position.getDirection();
-            Ray3D ray = new Ray3D(headPos, direction);
-
             double epsilon = entity.borderSize() + BOX_EPSILON;
 
             List<AABB> cubes = new ArrayList<>(HISTORY_RANGE);
@@ -78,61 +76,83 @@ public class HitBox extends CheckBase {
             for (Location history : inst.getAsync().getHistory(entity, p.status.ping, HISTORY_RANGE)) {
                 cubes.add(history.toAABB(entity.length(), entity.width()).expand(epsilon, epsilon, epsilon));
             }
-
-            if (cubes.isEmpty()) {
+            if (cubes.isEmpty() || moves.isEmpty()) {
                 return;
             }
 
-            OptionalDouble distance = cubes
-                    .stream()
-                    .map(cube -> cube.intersectsRay(ray, 0, Float.MAX_VALUE))
-                    .filter(Objects::nonNull)
-                    .mapToDouble(vec -> vec.distance(headPos))
-                    .min();
+            Vector3D headPos = p.physics.headPos();
+            Vector3D dir = p.physics.position.getDirection();
 
-            double dist = distance.orElse(0);
-            if (dist > LIMIT && (buffer += BUFFER_ADDER) > MAX_BUFFER) {
-                punish(e, "HitBox (TYCqq)", (dist - LIMIT) * 10, Detection.HIT_BOX,
-                        "d:" + dist);
-            } else if (cubes.stream().noneMatch(this::direction) && (buffer += BUFFER_ADDER) > MAX_BUFFER) {
-                punish(e, "HitBox (COY9Y)", 2, Detection.HIT_BOX, null);
-            } else {
-                buffer = Math.max(buffer - BUFFER_REDUCER, 0);
+            List<Pair<Vector3D, Double>> solutions = findSolutions(cubes, headPos);
+
+            if (solutions.isEmpty()) {
+                if ((buffer += BUFFER_ADDER) > MAX_BUFFER) {
+                    punish(e, "HitBox (COY9Y)", 1, Detection.HIT_BOX, null);
+                }
+                return;
             }
+
+            solutions.sort(Comparator.comparingDouble(o -> o.getKey().angle(dir)));
+
+            Vector3D bestDir = solutions.get(0).getKey();
+            double distance = solutions.get(0).getValue();
+
+            Ray3D ray3D = new Ray3D(headPos, bestDir);
+            Ray3D.Tracer tracer = ray3D.new Tracer();
+
+            for (double traced = 0; traced < distance; traced += 0.1) {
+                Vector3D point = new Vector3D(NumberConversions.floor(tracer.x),
+                        NumberConversions.floor(tracer.y), NumberConversions.floor(tracer.z));
+                BlockWrapper block = entity.world.getBlock(point);
+                if (block != null && BlockUtils.isSolid(block) &&
+                        Arrays.stream(block.boxes(p)).anyMatch(box -> box.collides(point))) {
+                    punish(e, "HitBox (11mr0)", 1, Detection.HIT_BOX, "t:" + block.type());
+                    return;
+                }
+
+                tracer.trace(0.1);
+            }
+
+            buffer = Math.max(buffer - BUFFER_REDUCER, 0);
         }
     }
 
-    private boolean direction(AABB cube) {
-        if (moves.isEmpty()) {
-            return true;
-        }
+    private List<Pair<Vector3D, Double>> findSolutions(List<AABB> cubes, Vector3D headPos) {
+        List<Pair<Vector3D, Double>> solutions = new ArrayList<>(HISTORY_RANGE);
 
-        Vector3D headPos = p.physics.headPos();
+        for (AABB cube : cubes) {
+            Iterator<Vector2D> iterator = moves.iterator();
+            Vector2D previous = iterator.next();
 
-        Iterator<Vector2D> iterator = moves.iterator();
-        Vector2D previous = iterator.next();
-        while (iterator.hasNext()) {
-            Vector2D point = iterator.next();
+            while (iterator.hasNext()) {
+                Vector2D next = iterator.next();
 
-            Ray2D currToPrev = new Ray2D(previous, point.minus(point));
-            Ray2D.Tracer ctpTracer = currToPrev.new Tracer();
+                Ray2D currToPrev = new Ray2D(previous, next.clone().subtract(next));
+                Ray2D.Tracer currToPrevTracer = currToPrev.new Tracer();
 
-            double distance = previous.distance(point);
-            double rate = distance / STEP;
+                double distToTrace = previous.distance(next);
+                double rate = distToTrace / STEP;
 
-            for (double traced = 0; traced < distance; traced += rate) {
-                ctpTracer.trace(traced);
+                for (double traced = 0; traced < distToTrace; traced += rate) {
+                    currToPrevTracer.trace(rate);
 
-                Vector3D dir = MathUtils.getDirection(ctpTracer.x, ctpTracer.y);
-                Ray3D ray3D = new Ray3D(headPos, dir);
+                    Vector3D currToPrevDir = MathUtils.getDirection(currToPrevTracer.x, currToPrevTracer.y);
+                    Ray3D ray3D = new Ray3D(headPos, currToPrevDir);
 
-                if (cube.intersectsRay(ray3D, 0, Float.MAX_VALUE) != null) {
-                    return true;
+                    Vector3D result = cube.intersectsRay(ray3D, 0, Float.MAX_VALUE);
+                    double distance;
+
+                    if (result == null || (distance = headPos.distance(result)) > LIMIT) {
+                        continue;
+                    }
+
+                    solutions.add(new Pair<>(currToPrevDir, distance));
                 }
-            }
 
-            previous = point;
+                previous = next;
+            }
         }
-        return false;
+
+        return solutions;
     }
 }

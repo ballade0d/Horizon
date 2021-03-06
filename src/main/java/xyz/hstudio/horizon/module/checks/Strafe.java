@@ -3,6 +3,7 @@ package xyz.hstudio.horizon.module.checks;
 import org.bukkit.Material;
 import xyz.hstudio.horizon.HPlayer;
 import xyz.hstudio.horizon.api.enums.Detection;
+import xyz.hstudio.horizon.event.Event;
 import xyz.hstudio.horizon.event.inbound.MoveEvent;
 import xyz.hstudio.horizon.module.CheckBase;
 import xyz.hstudio.horizon.util.BlockUtils;
@@ -20,8 +21,15 @@ public class Strafe extends CheckBase {
     private boolean bounced;
     private boolean wasSneakingOnEdge;
 
-    protected Strafe(HPlayer p) {
+    public Strafe(HPlayer p) {
         super(p, 1, 20, 20);
+    }
+
+    @Override
+    public void run(Event<?> event) {
+        if (event instanceof MoveEvent) {
+            angle((MoveEvent) event);
+        }
     }
 
     private void angle(MoveEvent e) {
@@ -41,7 +49,7 @@ public class Strafe extends CheckBase {
         if (e.teleport || e.knockBack || bounced || collidingHorizontally || !e.hasPos ||
                 sneakEdge || e.jump || nearLiquid || activeBlocks.contains(Material.LADDER) ||
                 activeBlocks.contains(Material.VINE) || wasSneakingOnEdge || onSlimeBlock ||
-                (e.step && p.status.isSprinting)) {
+                (e.step && p.status.isSprinting) || (!e.onGround && e.onGroundReally)) {
             this.wasSneakingOnEdge = sneakEdge;
             return;
         }

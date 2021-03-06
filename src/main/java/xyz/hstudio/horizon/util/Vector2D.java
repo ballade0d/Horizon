@@ -2,7 +2,7 @@ package xyz.hstudio.horizon.util;
 
 import org.bukkit.util.NumberConversions;
 
-public class Vector2D {
+public class Vector2D implements Cloneable {
 
     public double x, y;
 
@@ -31,16 +31,6 @@ public class Vector2D {
 
     public Vector2D add(Vector2D vec) {
         return add(vec.x, vec.y);
-    }
-
-    // Minus
-
-    public Vector2D minus(double x, double y) {
-        return new Vector2D(this.x - x, this.y - y);
-    }
-
-    public Vector2D minus(Vector2D vec) {
-        return minus(vec.x, vec.y);
     }
 
     // Subtract
@@ -82,5 +72,14 @@ public class Vector2D {
         int result = Double.hashCode(x);
         result = 31 * result + Double.hashCode(y);
         return result;
+    }
+
+    @Override
+    public Vector2D clone() {
+        try {
+            return (Vector2D) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new Error(e);
+        }
     }
 }

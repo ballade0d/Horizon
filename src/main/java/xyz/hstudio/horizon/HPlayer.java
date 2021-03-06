@@ -68,6 +68,7 @@ public class HPlayer {
                 put(KILL_AURA_BOT, new KillAuraBot(HPlayer.this));
                 put(NO_SWING, new NoSwing(HPlayer.this));
                 put(PHASE, new Phase(HPlayer.this));
+                put(STRAFE, new Strafe(HPlayer.this));
                 put(VERTICAL_MOVEMENT, new VerticalMovement(HPlayer.this));
             }
         });

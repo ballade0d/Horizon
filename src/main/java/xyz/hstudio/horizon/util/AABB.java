@@ -68,6 +68,12 @@ public class AABB {
         return !(max.z < other.min.z) && !(min.z > other.max.z);
     }
 
+    public boolean collides(Vector3D point) {
+        return point.x >= min.x && point.x <= max.x &&
+                point.y >= min.y && point.y <= max.y &&
+                point.z >= min.z && point.z <= max.z;
+    }
+
     public List<BlockWrapper> blocks(WorldWrapper world) {
         List<BlockWrapper> blocks = new ArrayList<>();
         for (int x = NumberConversions.floor(min.x); x < NumberConversions.ceil(max.x); x++) {

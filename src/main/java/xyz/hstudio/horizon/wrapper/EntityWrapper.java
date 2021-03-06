@@ -7,7 +7,7 @@ import xyz.hstudio.horizon.util.Vector3D;
 
 public class EntityWrapper {
 
-    protected final WorldWrapper world;
+    public final WorldWrapper world;
     protected final net.minecraft.server.v1_8_R3.Entity entity;
 
     public EntityWrapper(org.bukkit.entity.Entity entity) {
