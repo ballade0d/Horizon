@@ -6,13 +6,13 @@ import org.bukkit.Material;
 import xyz.hstudio.horizon.HPlayer;
 import xyz.hstudio.horizon.event.Event;
 import xyz.hstudio.horizon.module.checks.AntiVelocity;
-import xyz.hstudio.horizon.util.AABB;
-import xyz.hstudio.horizon.util.Location;
-import xyz.hstudio.horizon.util.Vector3D;
+import xyz.hstudio.horizon.util.*;
 import xyz.hstudio.horizon.util.enums.Direction;
 import xyz.hstudio.horizon.wrapper.BlockWrapper;
 
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class MoveEvent extends Event<PacketPlayInFlying> {
@@ -24,6 +24,8 @@ public class MoveEvent extends Event<PacketPlayInFlying> {
     public final boolean hasPos;
 
     public Vector3D velocity;
+
+    public boolean clientBlock;
 
     /*
      *  Teleport
@@ -66,6 +68,8 @@ public class MoveEvent extends Event<PacketPlayInFlying> {
     public boolean pre() {
         p.currTick++;
 
+        this.clientBlock = testClientBlock();
+
         this.velocity = to.clone().subtract(from);
 
         this.teleport = testTeleport();
@@ -91,6 +95,31 @@ public class MoveEvent extends Event<PacketPlayInFlying> {
             return false;
         }
         return true;
+    }
+
+    public boolean testClientBlock() {
+        AABB feet = new AABB(to.plus(-0.3, -0.02, -0.3), to.plus(0.3, 0, 0.3));
+        AABB aboveFeet = feet.plus(new Vector3D(0, 0.020001, 0));
+        AABB cube = new AABB(0, 0, 0, 1, 1, 1);
+
+        Iterator<Map.Entry<Vector3D, Pair<Integer, Material>>> iterator = p.clientBlocks.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<Vector3D, Pair<Integer, Material>> entry = iterator.next();
+
+            Vector3D pos = entry.getKey();
+            Pair<Integer, Material> info = entry.getValue();
+
+            if (p.currTick - info.getKey() > 5) {
+                iterator.remove();
+                continue;
+            }
+
+            cube.translateTo(pos);
+            if (BlockUtils.isSolid(info.getValue()) && feet.collides(cube) && !aboveFeet.collides(cube)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private boolean testTeleport() {

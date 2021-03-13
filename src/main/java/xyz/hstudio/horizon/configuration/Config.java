@@ -3,6 +3,8 @@ package xyz.hstudio.horizon.configuration;
 import me.cgoo.api.cfg.LoadFrom;
 import me.cgoo.api.cfg.LoadPath;
 
+import java.util.List;
+
 @LoadFrom("config.yml")
 public class Config {
 
@@ -11,6 +13,9 @@ public class Config {
 
     @LoadPath("log")
     public static boolean LOG;
+
+    @LoadPath("command_alias")
+    public static List<String> COMMAND_ALIAS;
 
     @LoadPath("mysql.enabled")
     public static boolean MYSQL_ENABLED;

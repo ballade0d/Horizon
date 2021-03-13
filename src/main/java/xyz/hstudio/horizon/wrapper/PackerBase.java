@@ -203,7 +203,7 @@ public class PackerBase {
                 placeType = BlockInteractEvent.InteractType.INTERACT_BLOCK;
             }
 
-            return new BlockInteractEvent(p, targetPos, cursorPos, placePos, dir, placeType);
+            return new BlockInteractEvent(p, mat, targetPos, cursorPos, placePos, dir, placeType);
         } else {
             if (itemStack == null) {
                 // Interact with nothing in hand.

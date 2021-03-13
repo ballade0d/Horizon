@@ -33,7 +33,7 @@ public class GroundSpoof extends CheckBase {
     }
 
     private void check(MoveEvent e) {
-        if (e.onGroundReally || e.step || e.teleport) {
+        if (e.onGroundReally || e.step || e.teleport || e.clientBlock) {
             return;
         }
         /*
@@ -56,8 +56,6 @@ public class GroundSpoof extends CheckBase {
             if (notPhasing && pass) {
                 return;
             }
-
-            // TODO: Check for client blocks
 
             e.modify(packet -> {
                 try {

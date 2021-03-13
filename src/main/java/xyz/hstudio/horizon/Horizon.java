@@ -1,9 +1,15 @@
 package xyz.hstudio.horizon;
 
+import com.google.common.io.ByteArrayDataOutput;
+import com.google.common.io.ByteStreams;
+import io.netty.buffer.Unpooled;
 import lombok.Getter;
 import me.cgoo.api.cfg.Cfg;
 import me.cgoo.api.logger.Logger;
 import me.cgoo.api.util.YamlUtil;
+import net.minecraft.server.v1_8_R3.Packet;
+import net.minecraft.server.v1_8_R3.PacketDataSerializer;
+import net.minecraft.server.v1_8_R3.PacketPlayOutCustomPayload;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -25,6 +31,8 @@ import xyz.hstudio.horizon.util.BlockUtils;
 import xyz.hstudio.horizon.util.Location;
 import xyz.hstudio.kirin.Kirin;
 
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.net.URLClassLoader;
@@ -144,6 +152,8 @@ public final class Horizon extends JavaPlugin {
             e.printStackTrace();
         }
 
+        Bukkit.getMessenger().registerOutgoingPluginChannel(this, "horizon:data_transporter");
+
         Metrics metrics = new Metrics(this, 4236);
         metrics.addCustomChart(new Metrics.SimplePie("kirin", () -> String.valueOf(Kirin.verified)));
     }
@@ -164,5 +174,24 @@ public final class Horizon extends JavaPlugin {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void executeBungeeCommand(HPlayer p, String command) {
+        ByteArrayDataOutput out = ByteStreams.newDataOutput();
+
+        ByteArrayOutputStream msgBytes = new ByteArrayOutputStream();
+        DataOutputStream msgOut = new DataOutputStream(msgBytes);
+        try {
+            msgOut.writeUTF(command);
+        } catch (IOException exception) {
+            exception.printStackTrace();
+        }
+
+        out.writeShort(msgBytes.toByteArray().length);
+        out.write(msgBytes.toByteArray());
+
+        Packet<?> packet = new PacketPlayOutCustomPayload("horizon:data_transporter",
+                new PacketDataSerializer(Unpooled.wrappedBuffer(out.toByteArray())));
+        p.pipeline.writeAndFlush(packet);
     }
 }

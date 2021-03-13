@@ -3,6 +3,7 @@ package xyz.hstudio.horizon;
 import io.netty.channel.ChannelPipeline;
 import me.cgoo.api.logger.Logger;
 import net.minecraft.server.v1_8_R3.*;
+import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_8_R3.util.CraftChatMessage;
 import org.bukkit.entity.Player;
@@ -36,6 +37,7 @@ public class HPlayer {
     public final List<AttributeEvent.AttributeModifier> moveFactors = new CopyOnWriteArrayList<>();
     public final Queue<Pair<Integer, Long>> pings = new ConcurrentLinkedQueue<>();
     public final Map<Integer, Runnable> simulatedCmds = new ConcurrentHashMap<>();
+    public final Map<Vector3D, Pair<Integer, Material>> clientBlocks = new ConcurrentHashMap<>();
 
     public final EntityPlayer nms;
     public final EntityWrapper base;

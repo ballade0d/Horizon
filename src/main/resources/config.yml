@@ -23,6 +23,10 @@ prefix: '§9Horizon §1» §r§3'
 # However, if you have limited storage we would recommend to disable it.
 log: true
 
+command_alias: |-
+  /hori
+  /hz
+
 # Would you like to enable discord integration?
 # It sends notification when a player is detected for cheating according to your configuration.
 discord_integration:

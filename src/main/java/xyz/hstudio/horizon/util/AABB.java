@@ -38,6 +38,16 @@ public class AABB {
         return this;
     }
 
+    //translate AABB so that the min point is located at the given vector (AABB origin is min)
+    public void translateTo(Vector3D vector) {
+        max.x = vector.x + (max.x - min.x);
+        max.y = vector.y + (max.y - min.y);
+        max.z = vector.z + (max.z - min.z);
+        min.x = vector.x;
+        min.y = vector.y;
+        min.z = vector.z;
+    }
+
     public AABB plus(double minX, double minY, double minZ, double maxX, double maxY, double maxZ) {
         return new AABB(min.x + minX, min.y + minY, min.z + minZ, max.x + maxX, max.y + maxY, max.z + maxZ);
     }

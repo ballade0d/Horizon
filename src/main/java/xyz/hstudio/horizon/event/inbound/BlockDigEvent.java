@@ -1,8 +1,10 @@
 package xyz.hstudio.horizon.event.inbound;
 
 import net.minecraft.server.v1_8_R3.PacketPlayInBlockDig;
+import org.bukkit.Material;
 import xyz.hstudio.horizon.HPlayer;
 import xyz.hstudio.horizon.event.Event;
+import xyz.hstudio.horizon.util.Pair;
 import xyz.hstudio.horizon.util.Vector3D;
 import xyz.hstudio.horizon.util.enums.Direction;
 import xyz.hstudio.horizon.wrapper.BlockWrapper;
@@ -20,6 +22,13 @@ public class BlockDigEvent extends Event<PacketPlayInBlockDig> {
         this.dir = dir;
         this.type = type;
         this.block = block;
+    }
+
+    @Override
+    public void post() {
+        if (type == DigType.STOP_DESTROY_BLOCK) {
+            p.clientBlocks.put(pos, new Pair<>(p.currTick, Material.AIR));
+        }
     }
 
     public enum DigType {
