@@ -23,17 +23,21 @@ prefix: '§9Horizon §1» §r§3'
 # However, if you have limited storage we would recommend to disable it.
 log: true
 
-command_alias: |-
-  /hori
-  /hz
+console_language: 'en_US'
+
+command_alias:
+  - '/hori'
+  - '/hz'
 
 # Would you like to enable discord integration?
 # It sends notification when a player is detected for cheating according to your configuration.
+# To apply your changes of this settings, you need to restart your server.
 discord_integration:
   enabled: false
   token: ''
   channel_name: ''
 
+# To apply your changes of this settings, you need to restart your server.
 mysql:
   enabled: false
   host: '127.0.0.1'
@@ -44,6 +48,7 @@ mysql:
 
 # Would you like to enable Kirin?
 # Kirin is the paid version of Horizon, you can purchase a license in our website.
+# To apply your changes of this settings, you need to restart your server.
 kirin:
   enabled: false
   email: ''

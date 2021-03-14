@@ -1,10 +1,10 @@
 package xyz.hstudio.horizon.event.inbound;
 
+import me.cgoo.api.util.Pair;
 import net.minecraft.server.v1_8_R3.PacketPlayInBlockPlace;
 import org.bukkit.Material;
 import xyz.hstudio.horizon.HPlayer;
 import xyz.hstudio.horizon.event.Event;
-import xyz.hstudio.horizon.util.Pair;
 import xyz.hstudio.horizon.util.Vector3D;
 import xyz.hstudio.horizon.util.enums.Direction;
 

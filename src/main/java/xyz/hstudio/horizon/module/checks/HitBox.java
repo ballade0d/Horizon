@@ -2,6 +2,7 @@ package xyz.hstudio.horizon.module.checks;
 
 import me.cgoo.api.cfg.LoadFrom;
 import me.cgoo.api.cfg.LoadPath;
+import me.cgoo.api.util.Pair;
 import org.bukkit.util.NumberConversions;
 import xyz.hstudio.horizon.HPlayer;
 import xyz.hstudio.horizon.api.enums.Detection;

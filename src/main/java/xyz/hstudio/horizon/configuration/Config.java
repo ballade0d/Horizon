@@ -14,6 +14,9 @@ public class Config {
     @LoadPath("log")
     public static boolean LOG;
 
+    @LoadPath("console_language")
+    public static String CONSOLE_LANGUAGE;
+
     @LoadPath("command_alias")
     public static List<String> COMMAND_ALIAS;
 

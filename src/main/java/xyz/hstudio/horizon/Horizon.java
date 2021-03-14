@@ -20,8 +20,11 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.plugin.java.JavaPlugin;
+import xyz.hstudio.horizon.command.ConsoleCmd;
+import xyz.hstudio.horizon.command.InGameCmd;
 import xyz.hstudio.horizon.configuration.Config;
 import xyz.hstudio.horizon.configuration.Execution;
+import xyz.hstudio.horizon.language.Language;
 import xyz.hstudio.horizon.module.checks.*;
 import xyz.hstudio.horizon.storage.MySQL;
 import xyz.hstudio.horizon.task.Async;
@@ -51,6 +54,10 @@ public final class Horizon extends JavaPlugin {
     private final Sync sync = new Sync(this);
     @Getter
     private final MySQL sql = new MySQL();
+    @Getter
+    private final InGameCmd inGameCmd = new InGameCmd(this);
+    @Getter
+    private final ConsoleCmd consoleCmd = new ConsoleCmd(this);
 
     public Horizon() {
         try {
@@ -76,7 +83,13 @@ public final class Horizon extends JavaPlugin {
         if (!folder.isDirectory() || !configFile.isFile()) {
             saveResource("config.yml", true);
         }
-        Cfg.load(this, Config.class);
+        try {
+            Cfg.watchClz(this, Cfg.load(this, Config.class));
+        } catch (IOException e) {
+            Logger.warn("Failed to register WatchService for Horizon folder! Stacktrace:");
+            e.printStackTrace();
+        }
+
         try {
             Logger.init(this, "Horizon", Config.LOG);
         } catch (IOException e) {
@@ -93,17 +106,31 @@ public final class Horizon extends JavaPlugin {
         sql.setup();
 
         // Load the config of checks
-        Cfg.load(this, AimAssist.class);
-        Cfg.load(this, AntiVelocity.class);
-        Cfg.load(this, BadPackets.class);
-        Cfg.load(this, GroundSpoof.class);
-        Cfg.load(this, HealthTag.class);
-        Cfg.load(this, HitBox.class);
-        Cfg.load(this, KillAura.class);
-        Cfg.load(this, KillAuraBot.class);
-        Cfg.load(this, NoSwing.class);
-        Cfg.load(this, Phase.class);
-        Cfg.load(this, VerticalMovement.class);
+        try {
+            Cfg.watchClz(this,
+                    Cfg.load(this, AimAssist.class),
+                    Cfg.load(this, AntiVelocity.class),
+                    Cfg.load(this, BadPackets.class),
+                    Cfg.load(this, GroundSpoof.class),
+                    Cfg.load(this, HealthTag.class),
+                    Cfg.load(this, HitBox.class),
+                    Cfg.load(this, KillAura.class),
+                    Cfg.load(this, KillAuraBot.class),
+                    Cfg.load(this, NoSwing.class),
+                    Cfg.load(this, Phase.class),
+                    Cfg.load(this, VerticalMovement.class));
+        } catch (IOException e) {
+            Logger.warn("Failed to register WatchService for checks folder! Stacktrace:");
+            e.printStackTrace();
+        }
+
+        try {
+            Cfg.watchObj(this,
+                    Cfg.load(this, new Language("en_US"), "language/en_US.yml"));
+        } catch (IOException e) {
+            Logger.warn("Failed to register WatchService for languages folder! Stacktrace:");
+            e.printStackTrace();
+        }
 
         // Register for joined players
         Bukkit.getOnlinePlayers().forEach(HPlayer::new);
@@ -144,15 +171,6 @@ public final class Horizon extends JavaPlugin {
                 aabb.blocks(p.world()).forEach(b -> p.pipeline.writeAndFlush(p.world().updateBlock(b)));
             }
         }, this);
-
-        try {
-            Cfg.watcher(this);
-        } catch (IOException e) {
-            Logger.warn("Failed to register WatchService! Stacktrace:");
-            e.printStackTrace();
-        }
-
-        Bukkit.getMessenger().registerOutgoingPluginChannel(this, "horizon:data_transporter");
 
         Metrics metrics = new Metrics(this, 4236);
         metrics.addCustomChart(new Metrics.SimplePie("kirin", () -> String.valueOf(Kirin.verified)));

@@ -2,6 +2,7 @@ package xyz.hstudio.horizon;
 
 import io.netty.channel.ChannelPipeline;
 import me.cgoo.api.logger.Logger;
+import me.cgoo.api.util.Pair;
 import net.minecraft.server.v1_8_R3.*;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
@@ -14,7 +15,6 @@ import xyz.hstudio.horizon.module.CheckBase;
 import xyz.hstudio.horizon.module.checks.*;
 import xyz.hstudio.horizon.network.PacketHandler;
 import xyz.hstudio.horizon.util.Location;
-import xyz.hstudio.horizon.util.Pair;
 import xyz.hstudio.horizon.util.Vector3D;
 import xyz.hstudio.horizon.util.enums.Direction;
 import xyz.hstudio.horizon.wrapper.EntityWrapper;
@@ -52,6 +52,7 @@ public class HPlayer {
     public final Map<Detection, CheckBase> checks;
 
     public int currTick;
+    public String locale = "en_US";
 
     public HPlayer(Player shit) {
         this.nms = ((CraftPlayer) shit).getHandle();

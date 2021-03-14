@@ -47,6 +47,8 @@ public class PackerBase {
             return toEvent(p, (PacketPlayInUseEntity) packet);
         } else if (packet instanceof PacketPlayInKeepAlive) {
             return toEvent(p, (PacketPlayInKeepAlive) packet);
+        } else if (packet instanceof PacketPlayInChat) {
+            return toEvent(p, (PacketPlayInChat) packet);
         }
         return null;
     }
@@ -348,6 +350,10 @@ public class PackerBase {
 
     private static Event<?> toEvent(HPlayer p, PacketPlayInKeepAlive packet) {
         return new KeepaliveRespondEvent(p, packet.a());
+    }
+
+    private static Event<?> toEvent(HPlayer p, PacketPlayInChat packet) {
+        return new ChatEvent(p, packet.a());
     }
 
     public static Event<?> sent(HPlayer p, Object packet) throws IOException {

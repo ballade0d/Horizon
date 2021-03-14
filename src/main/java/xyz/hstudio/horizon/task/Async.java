@@ -1,12 +1,12 @@
 package xyz.hstudio.horizon.task;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import me.cgoo.api.util.Pair;
 import org.bukkit.util.NumberConversions;
 import xyz.hstudio.horizon.HPlayer;
 import xyz.hstudio.horizon.Horizon;
 import xyz.hstudio.horizon.module.CheckBase;
 import xyz.hstudio.horizon.util.Location;
-import xyz.hstudio.horizon.util.Pair;
 import xyz.hstudio.horizon.wrapper.EntityWrapper;
 
 import java.util.*;

@@ -1,9 +1,9 @@
 package xyz.hstudio.horizon.event.inbound;
 
+import me.cgoo.api.util.Pair;
 import net.minecraft.server.v1_8_R3.PacketPlayInKeepAlive;
 import xyz.hstudio.horizon.HPlayer;
 import xyz.hstudio.horizon.event.Event;
-import xyz.hstudio.horizon.util.Pair;
 
 public class KeepaliveRespondEvent extends Event<PacketPlayInKeepAlive> {
 

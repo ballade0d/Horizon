@@ -1,0 +1,4 @@
+no_permission: 'You don''t have the permission to do this!'
+
+cmd_bungee_executed: 'The command is sent to bungee cord successfully!'
+cmd_bungee_no_online: 'There''re no online players. At least one online player is needed to execute this command.'
