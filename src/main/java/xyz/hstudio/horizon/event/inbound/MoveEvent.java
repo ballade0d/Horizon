@@ -1,6 +1,6 @@
 package xyz.hstudio.horizon.event.inbound;
 
-import me.cgoo.api.util.Pair;
+import me.cgoo.api.util.IntObjPair;
 import net.minecraft.server.v1_8_R3.MobEffectList;
 import net.minecraft.server.v1_8_R3.PacketPlayInFlying;
 import org.bukkit.Material;
@@ -106,12 +106,12 @@ public class MoveEvent extends Event<PacketPlayInFlying> {
         AABB aboveFeet = feet.plus(new Vector3D(0, 0.020001, 0));
         AABB cube = new AABB(0, 0, 0, 1, 1, 1);
 
-        Iterator<Map.Entry<Vector3D, Pair<Integer, Material>>> iterator = p.clientBlocks.entrySet().iterator();
+        Iterator<Map.Entry<Vector3D, IntObjPair<Material>>> iterator = p.clientBlocks.entrySet().iterator();
         while (iterator.hasNext()) {
-            Map.Entry<Vector3D, Pair<Integer, Material>> entry = iterator.next();
+            Map.Entry<Vector3D, IntObjPair<Material>> entry = iterator.next();
 
             Vector3D pos = entry.getKey();
-            Pair<Integer, Material> info = entry.getValue();
+            IntObjPair<Material> info = entry.getValue();
 
             if (p.currTick - info.getKey() > 5) {
                 iterator.remove();

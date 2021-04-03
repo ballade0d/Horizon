@@ -1,6 +1,6 @@
 package xyz.hstudio.horizon.event.inbound;
 
-import me.cgoo.api.util.Pair;
+import me.cgoo.api.util.IntObjPair;
 import net.minecraft.server.v1_8_R3.PacketPlayInKeepAlive;
 import xyz.hstudio.horizon.HPlayer;
 import xyz.hstudio.horizon.event.Event;
@@ -22,7 +22,7 @@ public class KeepaliveRespondEvent extends Event<PacketPlayInKeepAlive> {
             return false;
         }
 
-        Pair<Integer, Long> first = p.pings.poll();
+        IntObjPair<Long> first = p.pings.poll();
         if (first == null) {
             // Kick
             return false;

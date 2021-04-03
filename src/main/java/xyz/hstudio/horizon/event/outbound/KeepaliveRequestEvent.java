@@ -1,6 +1,6 @@
 package xyz.hstudio.horizon.event.outbound;
 
-import me.cgoo.api.util.Pair;
+import me.cgoo.api.util.IntObjPair;
 import net.minecraft.server.v1_8_R3.PacketPlayOutKeepAlive;
 import xyz.hstudio.horizon.HPlayer;
 import xyz.hstudio.horizon.event.Event;
@@ -20,6 +20,6 @@ public class KeepaliveRequestEvent extends Event<PacketPlayOutKeepAlive> {
             // Don't count this
             return;
         }
-        p.pings.offer(new Pair<>(id, System.currentTimeMillis()));
+        p.pings.offer(new IntObjPair<>(id, System.currentTimeMillis()));
     }
 }

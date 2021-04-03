@@ -1,6 +1,6 @@
 package xyz.hstudio.horizon.event.inbound;
 
-import me.cgoo.api.util.Pair;
+import me.cgoo.api.util.IntObjPair;
 import net.minecraft.server.v1_8_R3.PacketPlayInBlockDig;
 import org.bukkit.Material;
 import xyz.hstudio.horizon.HPlayer;
@@ -27,7 +27,7 @@ public class BlockDigEvent extends Event<PacketPlayInBlockDig> {
     @Override
     public void post() {
         if (type == DigType.STOP_DESTROY_BLOCK) {
-            p.clientBlocks.put(pos, new Pair<>(p.currTick, Material.AIR));
+            p.clientBlocks.put(pos, new IntObjPair<>(p.currTick, Material.AIR));
         }
     }
 

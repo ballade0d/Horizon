@@ -1,6 +1,6 @@
 package xyz.hstudio.horizon.event.inbound;
 
-import me.cgoo.api.util.Pair;
+import me.cgoo.api.util.IntObjPair;
 import net.minecraft.server.v1_8_R3.PacketPlayInBlockPlace;
 import org.bukkit.Material;
 import xyz.hstudio.horizon.HPlayer;
@@ -30,7 +30,7 @@ public class BlockInteractEvent extends Event<PacketPlayInBlockPlace> {
     @Override
     public void post() {
         if (type == InteractType.PLACE_BLOCK) {
-            p.clientBlocks.put(placePos, new Pair<>(p.currTick, material));
+            p.clientBlocks.put(placePos, new IntObjPair<>(p.currTick, material));
         }
     }
 

@@ -150,7 +150,13 @@ public final class Horizon extends JavaPlugin {
 
             @EventHandler(priority = EventPriority.MONITOR)
             public void onQuit(PlayerQuitEvent e) {
-                players.remove(e.getPlayer().getUniqueId());
+                UUID uuid = e.getPlayer().getUniqueId();
+                HPlayer p = players.get(uuid);
+                if (p == null) {
+                    return;
+                }
+                async.clearHistory(p.base);
+                players.remove(uuid);
             }
 
             // The ghost-block remover

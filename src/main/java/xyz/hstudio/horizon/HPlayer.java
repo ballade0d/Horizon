@@ -2,7 +2,7 @@ package xyz.hstudio.horizon;
 
 import io.netty.channel.ChannelPipeline;
 import me.cgoo.api.logger.Logger;
-import me.cgoo.api.util.Pair;
+import me.cgoo.api.util.IntObjPair;
 import net.minecraft.server.v1_8_R3.*;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
@@ -35,9 +35,9 @@ public class HPlayer {
     private static final Horizon inst = JavaPlugin.getPlugin(Horizon.class);
 
     public final List<AttributeEvent.AttributeModifier> moveFactors = new CopyOnWriteArrayList<>();
-    public final Queue<Pair<Integer, Long>> pings = new ConcurrentLinkedQueue<>();
+    public final Queue<IntObjPair<Long>> pings = new ConcurrentLinkedQueue<>();
     public final Map<Integer, Runnable> simulatedCmds = new ConcurrentHashMap<>();
-    public final Map<Vector3D, Pair<Integer, Material>> clientBlocks = new ConcurrentHashMap<>();
+    public final Map<Vector3D, IntObjPair<Material>> clientBlocks = new ConcurrentHashMap<>();
 
     public final EntityPlayer nms;
     public final EntityWrapper base;

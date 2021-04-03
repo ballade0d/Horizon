@@ -17,6 +17,7 @@ import xyz.hstudio.horizon.language.Language;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class ConsoleCmd extends Command {
 
@@ -35,7 +36,10 @@ public class ConsoleCmd extends Command {
             COMMAND_MAP.put(annotation, ACCESS.getIndex(method.getName()));
         }
 
-        this.setAliases(Config.COMMAND_ALIAS);
+        this.setAliases(Config.COMMAND_ALIAS.stream()
+                .map(s -> s.substring(1))
+                .collect(Collectors.toList())
+        );
 
         CommandMap commandMap = ((CraftServer) Bukkit.getServer()).getCommandMap();
         commandMap.register("horizon", this);

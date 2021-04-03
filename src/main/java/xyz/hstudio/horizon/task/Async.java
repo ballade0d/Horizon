@@ -1,7 +1,7 @@
 package xyz.hstudio.horizon.task;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import me.cgoo.api.util.Pair;
+import me.cgoo.api.util.ObjIntPair;
 import org.bukkit.util.NumberConversions;
 import xyz.hstudio.horizon.HPlayer;
 import xyz.hstudio.horizon.Horizon;
@@ -66,7 +66,7 @@ public class Async implements Runnable {
     /**
      * Entity tracker
      */
-    private final Map<EntityWrapper, List<Pair<Location, Integer>>> trackedEntities = new ConcurrentHashMap<>();
+    private final Map<EntityWrapper, List<ObjIntPair<Location>>> trackedEntities = new ConcurrentHashMap<>();
 
     private void trackEntities() {
         if (tick.get() % 20 == 0) {
@@ -93,11 +93,10 @@ public class Async implements Runnable {
             }
         }
 
-
         for (EntityWrapper entity : trackedEntities.keySet()) {
-            List<Pair<Location, Integer>> times = trackedEntities.getOrDefault(entity, new ArrayList<>());
-            times.add(new Pair<>(entity.position(), tick.get()));
-            if (times.size() > 30) {
+            List<ObjIntPair<Location>> times = trackedEntities.getOrDefault(entity, new ArrayList<>());
+            times.add(new ObjIntPair<>(entity.position(), tick.get()));
+            if (times.size() > 25) {
                 times.remove(0);
             }
             trackedEntities.put(entity, times);
@@ -105,7 +104,7 @@ public class Async implements Runnable {
     }
 
     public List<Location> getHistory(EntityWrapper entity, int ping, int range) {
-        List<Pair<Location, Integer>> times = trackedEntities.get(entity);
+        List<ObjIntPair<Location>> times = trackedEntities.get(entity);
         if (times == null || times.isEmpty()) {
             return Collections.emptyList();
         }
